@@ -93,12 +93,13 @@ public class ServerBackup implements Runnable {
 			f.createNewFile();
 		FileOutputStream dest = new FileOutputStream(f);
 		ZipOutputStream out = new ZipOutputStream(new BufferedOutputStream(dest));
-		zipDir(directory.getPath(),out);
+		zipDir(directory.getPath(),out,directory.getPath().length()+1);
 		out.close();
 		dest.close();
 		System.out.println("[SimpleServer] Backup saved: " + f.getPath());		
 	}
-	public void zipDir(String dir2zip, ZipOutputStream zos) 
+	
+	public void zipDir(String dir2zip, ZipOutputStream zos,int prefixLength) 
 	{ 
 	    try 
 	   { 
@@ -117,7 +118,7 @@ public class ServerBackup implements Runnable {
 		                //if the File object is a directory, call this 
 		                //function again to add its content recursively 
 		            String filePath = f.getPath(); 
-		            zipDir(filePath, zos); 
+		            zipDir(filePath, zos, prefixLength); 
 		                //loop again 
 		            continue; 
 		        } 
@@ -125,7 +126,7 @@ public class ServerBackup implements Runnable {
 	            //create a FileInputStream on top of f 
 	            FileInputStream fis = new FileInputStream(f); 
 	            //create a new zip entry 
-	            ZipEntry anEntry = new ZipEntry(f.getPath()); 
+	            ZipEntry anEntry = new ZipEntry(f.getPath().substring(prefixLength)); 
 	            //place the zip entry in the ZipOutputStream object 
 	            zos.putNextEntry(anEntry); 
 	            //now write the content of the file to the ZipOutputStream 
