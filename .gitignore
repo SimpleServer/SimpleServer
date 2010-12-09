@@ -1,0 +1,16 @@
+*.jar
+*.zip
+world*/
+simpleserver/
+*.properties
+addons/
+launch.bat
+launch.sh
+dumps/
+backups/
+tmp/
+logs/
+*.log
+*.log.1
+*.log.lck
+*.txt
