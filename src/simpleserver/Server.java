@@ -139,6 +139,7 @@ public class Server {
     {        
 		System.out.println(license);
 		System.out.println(warranty);
+		System.out.println(">> Starting SimpleServer " + version);
         server = new Server();
     }
 	/*
@@ -341,9 +342,7 @@ public class Server {
 		System.out.println("Server stopped successfully!");
 		System.exit(0);
 	}
-	public void openSocket() {
-		System.out.println(">> Starting SimpleServer " + version);
-        
+	public void openSocket() {        
         if (socketThread!=null)
         	socketThread.interrupt();
         open=true;
