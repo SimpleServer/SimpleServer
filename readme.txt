@@ -5,6 +5,7 @@ See LICENSE for details.
 
 http://www.devfluid.com/simpleserver
 http://www.minecraftforum.net/viewtopic.php?f=1012&t=27756
+https://github.com/spiegalpwns/SimpleServer
 
 Installation:
 1) Download minecraft_server.jar from minecraft.net
