@@ -107,6 +107,9 @@ public class InputStreamRouter implements Runnable {
 				return line;
 			}
 		}
+		if (line.startsWith("show")) {
+			System.out.println("SimpleServer is licensed under GPL v3.\nSee the file LICENSE for more details.");
+		}
 		return line;
 	}
 	public void run() {
