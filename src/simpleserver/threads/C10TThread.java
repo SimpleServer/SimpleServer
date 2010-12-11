@@ -34,6 +34,7 @@ public class C10TThread implements Runnable {
   InputStream stderr;
 
   class ErrGobblerThread extends Thread {
+    @Override
     public void run() {
       byte[] buf = new byte[256];
       try {
@@ -47,6 +48,7 @@ public class C10TThread implements Runnable {
   }
 
   class OutGobblerThread extends Thread {
+    @Override
     public void run() {
       byte[] buf = new byte[256];
       try {

@@ -105,7 +105,7 @@ public class StreamDumper implements Runnable {
 
   int bytesToShort(byte[] data) {
     // int value = data[1];
-    int value = (((short) data[0]) << 8) | (((short) data[1]) & 0xff);
+    int value = ((data[0]) << 8) | ((data[1]) & 0xff);
     // value = (value << 8) | data[0];
     // System.out.println("DATA:" + value);
     return value;
@@ -124,6 +124,7 @@ public class StreamDumper implements Runnable {
   byte[] buf = new byte[1024];
   int timer = 0;
 
+  @Override
   public void finalize() {
     try {
       in.close();

@@ -50,7 +50,7 @@ public class RobotLoader extends FileLoader {
       // TODO Auto-generated catch block
       e.printStackTrace();
     }
-    activeRobots.add((Integer) port);
+    activeRobots.add(port);
     robotLock.release();
   }
 

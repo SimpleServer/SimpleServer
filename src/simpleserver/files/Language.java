@@ -24,9 +24,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.util.Properties;
-import java.util.Scanner;
-
-import simpleserver.files.CommandList;
 
 public class Language {
 

@@ -20,18 +20,12 @@
  ******************************************************************************/
 package simpleserver;
 
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
-import java.net.Socket;
-import java.net.SocketException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.LinkedList;
-
-import simpleserver.files.Group;
 
 public class RconUDP implements Rcon {
   protected final int BUF_SIZE = 8192;

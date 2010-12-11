@@ -34,6 +34,7 @@ public class ShutdownHook implements Runnable {
     stream = mc.getOutputStream();
   }
 
+  @Override
   public void finalize() {
     mc = null;
     try {

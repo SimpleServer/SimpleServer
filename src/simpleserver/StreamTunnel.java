@@ -330,7 +330,7 @@ public class StreamTunnel implements Runnable {
       case 0x3b:
         oldCursor = r - 1;
         int xC3b = readInt();
-        int yC3b = (int) readShort();
+        int yC3b = readShort();
         int zC3b = readInt();
         int arraySize = readShort();
         skipBytes(arraySize);
@@ -393,7 +393,7 @@ public class StreamTunnel implements Runnable {
           @SuppressWarnings("unused")
           int status = readByte();
           int xC0e = readInt();
-          int yC0e = (int) readByte();
+          int yC0e = readByte();
           int zC0e = readInt();
           readByte();
           if (server.chests.hasLock(xC0e, yC0e, zC0e) && !parent.isAdmin()) {
@@ -453,7 +453,7 @@ public class StreamTunnel implements Runnable {
             if (parent.attemptLock) {
               // calculate coordinates
               int xC0f = readInt();
-              int yC0f = (int) readByte();
+              int yC0f = readByte();
               int zC0f = readInt();
               int dir = readByte();
               switch (dir) {

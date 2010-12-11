@@ -29,6 +29,7 @@ public class MinecraftMonitor extends Thread {
     server = p;
   }
 
+  @Override
   public void run() {
     try {
       server.p.waitFor();
