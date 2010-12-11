@@ -3,8 +3,14 @@ backups/
 bin/
 dumps/
 logs/
+simpleserver/
 tmp/
 world*/
 *.log*
 *.properties
+API.jar
+banned-ips.txt
+banned-players.txt
+minecraft_server.jar
+ops.txt
 SimpleServer.jar

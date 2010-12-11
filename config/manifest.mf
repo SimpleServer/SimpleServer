@@ -1,0 +1,4 @@
+Manifest-Version: 1.0
+Main-Class: simpleserver.Server
+Class-Path: lib/guava-r07.jar
+
