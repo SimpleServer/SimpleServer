@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<jardesc>
+    <jar path="SimpleServer/SimpleServer.zip"/>
+    <options buildIfNeeded="true" compress="true" descriptionLocation="/SimpleServer/config/SimpleServer-Release.jardesc" exportErrors="true" exportWarnings="true" includeDirectoryEntries="true" overwrite="false" saveDescription="true" storeRefactorings="false" useSourceFolders="false"/>
+    <storedRefactorings deprecationInfo="true" structuralOnly="false"/>
+    <selectedProjects/>
+    <manifest generateManifest="true" manifestLocation="" manifestVersion="1.0" reuseManifest="false" saveManifest="false" usesManifest="false">
+        <sealing sealJar="false">
+            <packagesToSeal/>
+            <packagesToUnSeal/>
+        </sealing>
+    </manifest>
+    <selectedElements exportClassFiles="true" exportJavaFiles="false" exportOutputFolder="false">
+        <file path="/SimpleServer/CHANGES"/>
+        <file path="/SimpleServer/LICENSE"/>
+        <file path="/SimpleServer/simpleserver.properties"/>
+        <file path="/SimpleServer/launch.sh"/>
+        <file path="/SimpleServer/README"/>
+        <file path="/SimpleServer/SimpleServer.jar"/>
+        <file path="/SimpleServer/launch.bat"/>
+        <folder path="/SimpleServer/simpleserver"/>
+    </selectedElements>
+</jardesc>
