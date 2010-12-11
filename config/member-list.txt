@@ -1,3 +1,0 @@
-#List of players and their group id
-#
-spiegalpwns=0

@@ -1,9 +1,0 @@
-#List of Block IDs and the groups that can place them.
-#Format:
-#BlockID:GroupNotation
-#Group Notation:
-#0 means any group can use the command, except guests.
-#X,Y,Z means group IDs X, Y, and Z are allowed.
-#X-Y Where X<Y. Groups X, Y, and all group ID's inbetween. Ex: 1-3 means 1,2, and 3.
-#Ex: 1-3,5 means 1,2,3, and 5.
-328:2-4

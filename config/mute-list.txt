@@ -1,2 +1,0 @@
-#list of muted players
-#case insensitive
