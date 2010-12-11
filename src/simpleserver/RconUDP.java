@@ -92,9 +92,9 @@ public class RconUDP implements Rcon {
 
   /*
   public boolean parseCommand(String msg) throws InterruptedException, IOException {
-  	if (!closed)
-  		return parser.parse(msg);
-  	return true;
+    if (!closed)
+      return parser.parse(msg);
+    return true;
   }
   */
   public void kick(String msg) {
@@ -137,27 +137,27 @@ public class RconUDP implements Rcon {
     handle(p);
     /*
     try {
-    	
-    	t1=new Thread(rconHandler=new RconHandler(current,this));
-    	//t2=new Thread(clientToServer=new StreamTunnel(extsocket.getInputStream(),intsocket.getOutputStream(),false,this));
-    	t1.start();
-    	//t2.start();
+
+      t1=new Thread(rconHandler=new RconHandler(current,this));
+      //t2=new Thread(clientToServer=new StreamTunnel(extsocket.getInputStream(),intsocket.getOutputStream(),false,this));
+      t1.start();
+      //t2.start();
     } catch (Exception e) {
-    	e.printStackTrace();
-    	try {
-    		close();
-    	} catch (InterruptedException e1) {
-    		e1.printStackTrace();
-    	}
+      e.printStackTrace();
+      try {
+        close();
+      } catch (InterruptedException e1) {
+        e1.printStackTrace();
+      }
     }
     try {
-    	socket.setTcpNoDelay(true);
-    	socket.setTrafficClass(0x10);
-    	
-    	socket.setPerformancePreferences(1, 2, 0);
+      socket.setTcpNoDelay(true);
+      socket.setTrafficClass(0x10);
+
+      socket.setPerformancePreferences(1, 2, 0);
     } catch (SocketException e) {
-    	// TODO Auto-generated catch block
-    	e.printStackTrace();
+      // TODO Auto-generated catch block
+      e.printStackTrace();
     }
     */
 
@@ -169,11 +169,11 @@ public class RconUDP implements Rcon {
       if (System.currentTimeMillis() - lastRead > StreamTunnel.IDLE_TIME) {
         /*
         if (!isRobot)
-        	System.out.println("[SimpleServer] Disconnecting " + getIPAddress() + " due to inactivity.");
+          System.out.println("[SimpleServer] Disconnecting " + getIPAddress() + " due to inactivity.");
         try {
-        	close();
+          close();
         } catch (InterruptedException e) {
-        	e.printStackTrace();
+          e.printStackTrace();
         }
         */
         return true;
@@ -251,11 +251,11 @@ public class RconUDP implements Rcon {
       if (tokens[0].equalsIgnoreCase("help")) {
         if (tokens.length > 1) {
           if (tokens[1].equalsIgnoreCase("get")) {
-            return "Resources:\r\n" + "console		Shows console output\r\n";
+            return "Resources:\r\n" + "console    Shows console output\r\n";
           }
         }
-        return "Commands:\r\n" + "help		Shows this message\r\n"
-            + "rcon		Execute Command\r\n" + "get		Get a resource";
+        return "Commands:\r\n" + "help    Shows this message\r\n"
+            + "rcon    Execute Command\r\n" + "get    Get a resource";
       }
       if (tokens[0].equalsIgnoreCase("get")) {
         if (tokens.length > 1) {

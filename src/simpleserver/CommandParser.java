@@ -27,13 +27,13 @@ public class CommandParser {
   Player parent;
   Server server;
 
-  /*public static final String[] commands = { 
-  	"ban","banip","unban","unbanip","kick",
-  	"lock","unlock","tp","warpmeto","warptome",
-  	"iddqd","listips","kit","kits","mute","unmute",
-  	"give","giveplayer","setgroup","whitelist",
-  	"unwhitelist","restart","save","reload","backup"
-  	};
+  /*public static final String[] commands = {
+    "ban","banip","unban","unbanip","kick",
+    "lock","unlock","tp","warpmeto","warptome",
+    "iddqd","listips","kit","kits","mute","unmute",
+    "give","giveplayer","setgroup","whitelist",
+    "unwhitelist","restart","save","reload","backup"
+    };
   */
   public CommandParser(Player parent) {
     this.parent = parent;
@@ -90,7 +90,7 @@ public class CommandParser {
     if (tokens.length >= 1) {
       /*
       if (tokens[0].compareTo("!kill")==0) {
-      	parent.kill();
+        parent.kill();
       }
       */
       if (tokens[0].compareTo("!list") == 0 || tokens[0].compareTo("!who") == 0) {
@@ -286,36 +286,36 @@ public class CommandParser {
       }
       /*
       if (tokens[0].compareTo("!warp")==0) {
-      	if (parent.getRank()>=server.options.useWarpRank) {
-      		if (tokens.length==2) {
-      			double[] coords = server.warps.getWarp(tokens[1]);
-      			if (coords!=null) {
-      				parent.warp(coords);
-      			}
-      			else {
-      				parent.addMessage("Warp was unsuccessful!");
-      			}
-      			//server.runCommand("tp " + tokens[1] + " " + parent.getName());
-      		}
-      	}
+        if (parent.getRank()>=server.options.useWarpRank) {
+          if (tokens.length==2) {
+            double[] coords = server.warps.getWarp(tokens[1]);
+            if (coords!=null) {
+              parent.warp(coords);
+            }
+            else {
+              parent.addMessage("Warp was unsuccessful!");
+            }
+            //server.runCommand("tp " + tokens[1] + " " + parent.getName());
+          }
+        }
       }
       if (tokens[0].compareTo("!listwarps")==0) {
-      	if (parent.getRank()>=server.options.useWarpRank) {
-      		server.warps.listWarps(parent);
-      	}
+        if (parent.getRank()>=server.options.useWarpRank) {
+          server.warps.listWarps(parent);
+        }
       }
       if (tokens[0].compareTo("!createwarp")==0) {
-      	if (parent.getRank()>=server.options.createWarpRank) {
-      		if (tokens.length==2) {
-      			if (server.warps.makeWarp(tokens[1], parent.x, parent.y, parent.z, parent.stance)) {
-      				parent.addMessage("Warp creation successful!");
-      			}
-      			else {
-      				parent.addMessage("Warp creation failed!");
-      			}
-      			//server.runCommand("tp " + tokens[1] + " " + parent.getName());
-      		}
-      	}
+        if (parent.getRank()>=server.options.createWarpRank) {
+          if (tokens.length==2) {
+            if (server.warps.makeWarp(tokens[1], parent.x, parent.y, parent.z, parent.stance)) {
+              parent.addMessage("Warp creation successful!");
+            }
+            else {
+              parent.addMessage("Warp creation failed!");
+            }
+            //server.runCommand("tp " + tokens[1] + " " + parent.getName());
+          }
+        }
       }
       */
       if (tokens[0].equals("!local") || tokens[0].equals("!l")) {

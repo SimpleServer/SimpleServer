@@ -123,7 +123,7 @@ public class Options {
       optionsLoader.setProperty("muteRank", Integer.toString(muteRank));
       optionsLoader.setProperty("givePlayerRank", Integer.toString(givePlayerRank));
       optionsLoader.setProperty("setRankRank", Integer.toString(setRankRank));
-      
+
       optionsLoader.setProperty("teleportRank", Integer.toString(teleportRank));
       optionsLoader.setProperty("warpPlayerRank", Integer.toString(warpPlayerRank));
       optionsLoader.setProperty("homeCommandRank", Integer.toString(homeCommandRank));
@@ -319,9 +319,9 @@ public class Options {
         javaArguments = optionsLoader.getProperty("javaArguments");
       /*
       if (optionsLoader.getProperty("useWarpRank")!=null)
-      	useWarpRank = Integer.valueOf(optionsLoader.getProperty("useWarpRank"));
+        useWarpRank = Integer.valueOf(optionsLoader.getProperty("useWarpRank"));
       if (optionsLoader.getProperty("createWarpRank")!=null)
-      	createWarpRank = Integer.valueOf(optionsLoader.getProperty("createWarpRank"));
+        createWarpRank = Integer.valueOf(optionsLoader.getProperty("createWarpRank"));
       */
 
       if (optionsLoader.getProperty("muteRank") != null

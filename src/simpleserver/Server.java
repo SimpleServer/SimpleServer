@@ -463,14 +463,14 @@ public class Server {
     }
     /*
     synchronized(players) {
-    	for (Iterator<Player> itr = players.iterator(); itr.hasNext(); ) {
-    		Player p = itr.next();
-    		if (p.extsocket.getInetAddress().getHostAddress().equals(ipAddress)) {
-    			p.kick(reason);
-    			adminLog.addMessage("Player " + p.getName() + " was ip-banned:\t " + reason);
-    			itr.remove();
-    		}
-    	}
+      for (Iterator<Player> itr = players.iterator(); itr.hasNext(); ) {
+        Player p = itr.next();
+        if (p.extsocket.getInetAddress().getHostAddress().equals(ipAddress)) {
+          p.kick(reason);
+          adminLog.addMessage("Player " + p.getName() + " was ip-banned:\t " + reason);
+          itr.remove();
+        }
+      }
     }
     */
   }
@@ -489,14 +489,14 @@ public class Server {
       }
       /*
       synchronized(players) {
-      	for (Iterator<Player> itr = players.iterator(); itr.hasNext(); ) {
-      		Player p = itr.next();
-      		if (p.getName().toLowerCase().equals(name.toLowerCase())) {
-      			adminLog.addMessage("Player " + p.getName() + " was banned:\t " + msg);
-      			p.kick(msg);
-      			itr.remove();
-      		}
-      	}
+        for (Iterator<Player> itr = players.iterator(); itr.hasNext(); ) {
+          Player p = itr.next();
+          if (p.getName().toLowerCase().equals(name.toLowerCase())) {
+            adminLog.addMessage("Player " + p.getName() + " was banned:\t " + msg);
+            p.kick(msg);
+            itr.remove();
+          }
+        }
       }
       */
     }
@@ -525,16 +525,16 @@ public class Server {
 
   /*
   public int getRank(String name) throws InterruptedException {
-  	playerLock.acquire();
-  	for(Player i: players) {
-  		if (i.getName()!=null) {
-  			if (i.getName().toLowerCase().compareTo(name.toLowerCase())==0){
-  				return i.getRank();
-  			}
-  		}
-  	}
-  	playerLock.release();
-  	return options.defaultRank;
+    playerLock.acquire();
+    for(Player i: players) {
+      if (i.getName()!=null) {
+        if (i.getName().toLowerCase().compareTo(name.toLowerCase())==0){
+          return i.getRank();
+        }
+      }
+    }
+    playerLock.release();
+    return options.defaultRank;
   }
   */
   public void loadAll() {
@@ -560,13 +560,13 @@ public class Server {
   public String findName(String prefix) throws InterruptedException {
     // synchronized(players) {
     /*
-    	for(Player i: players) {
-    		if (i.getName()!=null) {
-    			if (i.getName().toLowerCase().startsWith(prefix.toLowerCase().trim())) {
-    				return i.getName();
-    			}
-    		}
-    	}
+      for(Player i: players) {
+        if (i.getName()!=null) {
+          if (i.getName().toLowerCase().startsWith(prefix.toLowerCase().trim())) {
+            return i.getName();
+          }
+        }
+      }
     */
     // }
     Player i = PlayerFactory.findPlayer(prefix);
@@ -579,13 +579,13 @@ public class Server {
   public Player findPlayer(String prefix) throws InterruptedException {
     // synchronized(players) {
     /*
-    	for(Player i: players) {
-    		if (i.getName()!=null) {
-    			if (i.getName().toLowerCase().startsWith(prefix.toLowerCase().trim())) {
-    				return i;
-    			}
-    		}
-    	}
+      for(Player i: players) {
+        if (i.getName()!=null) {
+          if (i.getName().toLowerCase().startsWith(prefix.toLowerCase().trim())) {
+            return i;
+          }
+        }
+      }
     */
     // }
     return PlayerFactory.findPlayer(prefix);
@@ -594,13 +594,13 @@ public class Server {
   public Player findPlayerExact(String exact) throws InterruptedException {
     // synchronized(players) {
     /*
-    	for(Player i: players) {
-    		if (i.getName()!=null) {
-    			if (i.getName().equals(exact)) {
-    				return i;
-    			}
-    		}
-    	}
+      for(Player i: players) {
+        if (i.getName()!=null) {
+          if (i.getName().equals(exact)) {
+            return i;
+          }
+        }
+      }
     */
     // }
     return PlayerFactory.findPlayerExact(exact);
@@ -628,14 +628,14 @@ public class Server {
       p.updateGroup();
     }
     /*
-    	for(Player i: players) {
-    		if (i.getName()!=null) {
-    			if (i.getName().toLowerCase().compareTo(name.toLowerCase())==0){
-    				i.updateGroup();
-    			}
-    		}
-    	}
-    	*/
+      for(Player i: players) {
+        if (i.getName()!=null) {
+          if (i.getName().toLowerCase().compareTo(name.toLowerCase())==0){
+            i.updateGroup();
+          }
+        }
+      }
+      */
     // }
   }
 

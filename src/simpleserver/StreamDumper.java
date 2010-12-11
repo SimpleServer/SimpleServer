@@ -245,95 +245,95 @@ public class StreamDumper implements Runnable {
   }
   /*
   private void print(byte[] buf, int amt) {
-  	byte[] conv;
-  	for(int i=0;i<amt;i++) {
-  		if (reading) {
-  			if (waitingfor>0) {
-  				if (i+waitingfor<=amt) {
-  					System.arraycopy(buf, i, current, 0, waitingfor);
-  					waitingfor=0;
-  					state++;
-  					continue;
-  				}
-  				else {
-  					System.arraycopy(buf, i, current, cursor, (amt-i));
-  					cursor=amt-i;
-  					continue;
-  				}
-  			}
-  			switch(packetid) {
-  				case 0:
-  					reading=false;
-  					state=0;
-  					current=data;
-  					i--;
-  					break;
-  				case 1: 
-  					
-  					switch(state) {
-  						case 0:
-  							current=data;
-  							waitingfor=4;
-  							i--;
-  							break;
-  						case 1:
-  							current=data2;
-  							conv = new byte[2];
-  							System.arraycopy(buf, i, conv, 0, 2);
-  							waitingfor=bytesToShort(conv);
-  							i++;
-  							break;
-  						case 2:
-  							current=data3;
-  							conv = new byte[2];
-  							System.arraycopy(buf, i, conv, 0, 2);
-  							waitingfor=bytesToShort(conv);
-  							i++;
-  							break;
-  						case 3:
-  							current=data;
-  							state=0;
-  							reading=false;
-  							System.out.println(new String(data) + " " + new String(data2) + " " + new String(data3));
-  							i--;
-  							break;
-  					}
-  					break;
-  				case 2: 
-  					
-  					switch(state) {
-  						case 0:
-  							current=data;
-  							conv = new byte[2];
-  							System.arraycopy(buf, i, conv, 0, 2);
-  							waitingfor=bytesToShort(conv);
-  							i++;
-  							break;
-  						case 1:
-  							current=data;
-  							state=0;
-  							reading=false;
-  							System.out.println(new String(data));
-  							i--;
-  							break;
-  					}
-  					break;
-  				default: 
-  					reading=false;
-  					state=0;
-  					current=data;
-  					i--;
-  					break;
+    byte[] conv;
+    for(int i=0;i<amt;i++) {
+      if (reading) {
+        if (waitingfor>0) {
+          if (i+waitingfor<=amt) {
+            System.arraycopy(buf, i, current, 0, waitingfor);
+            waitingfor=0;
+            state++;
+            continue;
+          }
+          else {
+            System.arraycopy(buf, i, current, cursor, (amt-i));
+            cursor=amt-i;
+            continue;
+          }
+        }
+        switch(packetid) {
+          case 0:
+            reading=false;
+            state=0;
+            current=data;
+            i--;
+            break;
+          case 1:
 
-  			}
-  		}
-  		else {
-  			
-  			packetid=buf[i];
-  			System.out.println(packetid);
-  			reading=true;
-  		}
-  	}
+            switch(state) {
+              case 0:
+                current=data;
+                waitingfor=4;
+                i--;
+                break;
+              case 1:
+                current=data2;
+                conv = new byte[2];
+                System.arraycopy(buf, i, conv, 0, 2);
+                waitingfor=bytesToShort(conv);
+                i++;
+                break;
+              case 2:
+                current=data3;
+                conv = new byte[2];
+                System.arraycopy(buf, i, conv, 0, 2);
+                waitingfor=bytesToShort(conv);
+                i++;
+                break;
+              case 3:
+                current=data;
+                state=0;
+                reading=false;
+                System.out.println(new String(data) + " " + new String(data2) + " " + new String(data3));
+                i--;
+                break;
+            }
+            break;
+          case 2:
+
+            switch(state) {
+              case 0:
+                current=data;
+                conv = new byte[2];
+                System.arraycopy(buf, i, conv, 0, 2);
+                waitingfor=bytesToShort(conv);
+                i++;
+                break;
+              case 1:
+                current=data;
+                state=0;
+                reading=false;
+                System.out.println(new String(data));
+                i--;
+                break;
+            }
+            break;
+          default:
+            reading=false;
+            state=0;
+            current=data;
+            i--;
+            break;
+
+        }
+      }
+      else {
+
+        packetid=buf[i];
+        System.out.println(packetid);
+        reading=true;
+      }
+    }
   }
   */
 }

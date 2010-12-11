@@ -271,11 +271,11 @@ public class Player {
           || System.currentTimeMillis() - clientToServer.lastRead > StreamTunnel.IDLE_TIME) {
         /*
         if (!isRobot)
-        	System.out.println("[SimpleServer] Disconnecting " + getIPAddress() + " due to inactivity.");
+          System.out.println("[SimpleServer] Disconnecting " + getIPAddress() + " due to inactivity.");
         try {
-        	close();
+          close();
         } catch (InterruptedException e) {
-        	e.printStackTrace();
+          e.printStackTrace();
         }
         */
         return true;

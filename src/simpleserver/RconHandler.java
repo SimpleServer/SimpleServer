@@ -93,11 +93,11 @@ public class RconHandler implements Runnable {
 
         /*
         if (System.currentTimeMillis()-lastRead>IDLE_TIME) {
-        	if (!parent.isRobot)
-        		System.out.println("[SimpleServer] Disconnecting " + parent.getIPAddress() + " due to inactivity.");
-        	try {in.close();} catch (IOException e1) {}
+          if (!parent.isRobot)
+            System.out.println("[SimpleServer] Disconnecting " + parent.getIPAddress() + " due to inactivity.");
+          try {in.close();} catch (IOException e1) {}
         try {out.close();} catch (IOException e1) {}
-        	parent.close();
+          parent.close();
         }
         */
         int requestID = readInt();
@@ -267,11 +267,11 @@ public class RconHandler implements Runnable {
       if (tokens[0].equalsIgnoreCase("help")) {
         if (tokens.length > 1) {
           if (tokens[1].equalsIgnoreCase("get")) {
-            return "Resources:\r\n" + "console		Shows console output\r\n";
+            return "Resources:\r\n" + "console    Shows console output\r\n";
           }
         }
-        return "Commands:\r\n" + "help		Shows this message\r\n"
-            + "rcon		Execute Command\r\n" + "get		Get a resource";
+        return "Commands:\r\n" + "help    Shows this message\r\n"
+            + "rcon    Execute Command\r\n" + "get    Get a resource";
       }
       if (tokens[0].equalsIgnoreCase("get")) {
         if (tokens.length > 1) {
