@@ -68,7 +68,6 @@ public class RconServer implements Runnable {
   }
 
   public void run() {
-    // TODO Auto-generated method stub
     if (!udp)
       try {
         parent.rconSocket = new ServerSocket(parent.options.rconPort);
@@ -123,7 +122,6 @@ public class RconServer implements Runnable {
         parent.rconSocket.close();
       }
       catch (IOException e) {
-        // TODO Auto-generated catch block
         if (!parent.isRestarting)
           e.printStackTrace();
       }

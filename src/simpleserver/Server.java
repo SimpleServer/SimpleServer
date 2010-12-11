@@ -227,7 +227,6 @@ public class Server {
       p = Runtime.getRuntime().exec(cmd);
     }
     catch (IOException e) {
-      // TODO Auto-generated catch block
       e.printStackTrace();
       System.out.println("[SimpleServer] FATAL ERROR: Could not start minecraft_server.jar!");
       System.exit(-1);

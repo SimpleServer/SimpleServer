@@ -74,13 +74,11 @@ public class IPMemberList extends FileLoader {
 
   @Override
   protected void beforeLoad() {
-    // TODO Auto-generated method stub
     members.clear();
   }
 
   @Override
   protected void loadLine(String line) {
-    // TODO Auto-generated method stub
     String[] tokens = line.split("=");
     if (tokens.length >= 2)
       members.add(new Member(tokens[0], Integer.valueOf(tokens[1])));
@@ -88,7 +86,6 @@ public class IPMemberList extends FileLoader {
 
   @Override
   protected String saveString() {
-    // TODO Auto-generated method stub
     String line = "";
     for (Member i : members) {
       line += i.ip + "=" + i.group + "\r\n";

@@ -35,8 +35,6 @@ public class ErrorStreamRouter implements Runnable {
   }
 
   public void run() {
-
-    // TODO Auto-generated method stub
     try {
       InputStream in1 = stream;
       byte[] buf = new byte[1024];

@@ -58,19 +58,16 @@ public class MuteLoader extends FileLoader {
 
   @Override
   protected void beforeLoad() {
-    // TODO Auto-generated method stub
     users.clear();
   }
 
   @Override
   protected void loadLine(String line) {
-    // TODO Auto-generated method stub
     users.add(line);
   }
 
   @Override
   protected String saveString() {
-    // TODO Auto-generated method stub
     String line = "";
     for (String i : users) {
       line += i + "\r\n";

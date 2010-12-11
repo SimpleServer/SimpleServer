@@ -67,7 +67,6 @@ public class C10TThread implements Runnable {
   }
 
   public void run() {
-    // TODO Auto-generated method stub
     try {
       while (true) {
         Thread.sleep(parent.options.c10tMins * 1000 * 60);
@@ -79,7 +78,6 @@ public class C10TThread implements Runnable {
             c10t = Runtime.getRuntime().exec(command);
           }
           catch (IOException e) {
-            // TODO Auto-generated catch block
             parent.runCommand("say Mapping Complete!");
             parent.runCommand("save-on");
             e.printStackTrace();
@@ -103,7 +101,6 @@ public class C10TThread implements Runnable {
       }
     }
     catch (InterruptedException e) {
-      // TODO Auto-generated catch block
       if (!parent.isRestarting()) {
         e.printStackTrace();
         System.out.println("[WARNING] Automated Server Save Failure! Please run save-all and restart server!");

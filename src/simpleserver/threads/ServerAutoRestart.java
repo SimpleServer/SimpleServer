@@ -30,7 +30,6 @@ public class ServerAutoRestart implements Runnable {
   }
 
   public void run() {
-    // TODO Auto-generated method stub
     try {
       while (true) {
         while (parent.options.autoRestart) {
@@ -56,7 +55,6 @@ public class ServerAutoRestart implements Runnable {
     }
     catch (InterruptedException e) {
       parent.saveLock.release();
-      // TODO Auto-generated catch block
       if (!parent.isRestarting()) {
         e.printStackTrace();
         System.out.println("[WARNING] Automated Server Restart Failure! Server will no longer automatically restart until SimpleServer is manually restarted!");

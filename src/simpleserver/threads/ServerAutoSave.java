@@ -30,7 +30,6 @@ public class ServerAutoSave implements Runnable {
   }
 
   public void run() {
-    // TODO Auto-generated method stub
     try {
       while (true) {
         while (parent.options.autoSave) {
@@ -57,7 +56,6 @@ public class ServerAutoSave implements Runnable {
       }
     }
     catch (InterruptedException e) {
-      // TODO Auto-generated catch block
       if (!parent.isRestarting()) {
         e.printStackTrace();
         System.out.println("[WARNING] Automated Server Save Failure! Please run save-all and restart server!");

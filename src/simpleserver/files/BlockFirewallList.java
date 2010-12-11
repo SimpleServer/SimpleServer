@@ -69,13 +69,11 @@ public class BlockFirewallList extends FileLoader {
 
   @Override
   protected void beforeLoad() {
-    // TODO Auto-generated method stub
     blocks.clear();
   }
 
   @Override
   protected void loadLine(String line) {
-    // TODO Auto-generated method stub
     String[] tokens = line.split(":");
     if (tokens.length >= 2)
       blocks.add(new BlockEntry(Integer.valueOf(tokens[0]),
@@ -84,7 +82,6 @@ public class BlockFirewallList extends FileLoader {
 
   @Override
   protected String saveString() {
-    // TODO Auto-generated method stub
     String line = "";
     for (BlockEntry i : blocks) {
       line += i.id + ":";

@@ -42,7 +42,6 @@ public class EOFWriter implements Runnable {
   }
 
   public void run() {
-    // TODO Auto-generated method stub
     Calendar date = Calendar.getInstance();
     File dump = new File("dump_" + date.get(Calendar.YEAR) + "-"
         + (date.get(Calendar.MONTH) + 1) + "-" + date.get(Calendar.DATE) + "-"

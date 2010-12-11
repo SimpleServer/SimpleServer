@@ -72,13 +72,11 @@ public class ItemWatchList extends FileLoader {
 
   @Override
   protected void beforeLoad() {
-    // TODO Auto-generated method stub
     items.clear();
   }
 
   @Override
   protected void loadLine(String line) {
-    // TODO Auto-generated method stub
     String[] tokens = line.split(":");
     if (tokens.length >= 3)
       items.add(new ItemEntry(Integer.valueOf(tokens[0]),
@@ -88,7 +86,6 @@ public class ItemWatchList extends FileLoader {
 
   @Override
   protected String saveString() {
-    // TODO Auto-generated method stub
     String line = "";
     for (ItemEntry i : items) {
       line += i.id + ":" + i.threshold + ":";

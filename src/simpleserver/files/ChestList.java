@@ -302,13 +302,11 @@ public class ChestList extends FileLoader {
 
   @Override
   protected void beforeLoad() {
-    // TODO Auto-generated method stub
     chests.clear();
   }
 
   @Override
   protected void loadLine(String line) {
-    // TODO Auto-generated method stub
     String[] tokens = line.split(",");
     if (tokens.length > 0) {
       try {
@@ -325,7 +323,6 @@ public class ChestList extends FileLoader {
 
   @Override
   protected String saveString() {
-    // TODO Auto-generated method stub
     String line = "";
     for (Chest i : chests.flatArray2()) {
       line += i.name + "," + i.isGroup + "," + i.x + "," + i.y + "," + i.z;

@@ -56,7 +56,6 @@ public class InputStreamRouter implements Runnable {
 
     }
     catch (Exception e) {
-      // TODO Auto-generated catch block
       if (!parent.isRestarting()) {
         e.printStackTrace();
         if (parent.options.exitOnFailure)

@@ -120,13 +120,11 @@ public class RobotLoader extends FileLoader {
 
   @Override
   protected void beforeLoad() {
-    // TODO Auto-generated method stub
     robots.clear();
   }
 
   @Override
   protected void loadLine(String line) {
-    // TODO Auto-generated method stub
     if (line != null)
       if (line.length() > 0)
         robots.add(line);
@@ -134,7 +132,6 @@ public class RobotLoader extends FileLoader {
 
   @Override
   protected String saveString() {
-    // TODO Auto-generated method stub
     String line = "";
     for (String i : robots) {
       line += i + "\r\n";

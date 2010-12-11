@@ -225,7 +225,6 @@ public class Player {
       intsocket = new Socket("localhost", parent.options.internalPort);
     }
     catch (Exception e2) {
-      // TODO Auto-generated catch block
       e2.printStackTrace();
       if (parent.options.exitOnFailure)
         System.exit(-1);
@@ -388,7 +387,6 @@ public class Player {
       intsocket = new Socket("localhost", parent.options.internalPort);
     }
     catch (Exception e2) {
-      // TODO Auto-generated catch block
       e2.printStackTrace();
       if (parent.options.exitOnFailure)
         System.exit(-1);

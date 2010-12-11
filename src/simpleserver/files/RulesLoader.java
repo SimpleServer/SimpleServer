@@ -37,19 +37,16 @@ public class RulesLoader extends FileLoader {
 
   @Override
   protected void beforeLoad() {
-    // TODO Auto-generated method stub
     rules = "";
   }
 
   @Override
   protected void loadLine(String line) {
-    // TODO Auto-generated method stub
     rules += line + "\r\n";
   }
 
   @Override
   protected String saveString() {
-    // TODO Auto-generated method stub
     return rules;
   }
 }

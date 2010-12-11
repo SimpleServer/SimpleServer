@@ -56,20 +56,17 @@ public class IPBanLoader extends FileLoader {
 
   @Override
   protected void beforeLoad() {
-    // TODO Auto-generated method stub
     bans.clear();
   }
 
   @Override
   protected void loadLine(String line) {
-    // TODO Auto-generated method stub
     if (line != null && line != "")
       bans.add(line);
   }
 
   @Override
   protected String saveString() {
-    // TODO Auto-generated method stub
     String line = "";
     for (String i : bans) {
       line += i + "\r\n";

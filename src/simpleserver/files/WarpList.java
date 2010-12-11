@@ -96,13 +96,11 @@ public class WarpList extends FileLoader {
 
   @Override
   protected void beforeLoad() {
-    // TODO Auto-generated method stub
     warps.clear();
   }
 
   @Override
   protected void loadLine(String line) {
-    // TODO Auto-generated method stub
     String[] tokens = line.split(",");
     try {
       warps.add(new Warp(tokens[0], Double.valueOf(tokens[1]),
@@ -115,7 +113,6 @@ public class WarpList extends FileLoader {
 
   @Override
   protected String saveString() {
-    // TODO Auto-generated method stub
     String line = "";
     for (Warp i : warps) {
       line += i.name + "," + i.x + "," + i.y + "," + i.z + "," + i.stance + ",";

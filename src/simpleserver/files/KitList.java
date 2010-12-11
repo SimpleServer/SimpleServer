@@ -106,13 +106,11 @@ public class KitList extends FileLoader {
 
   @Override
   protected void beforeLoad() {
-    // TODO Auto-generated method stub
     kits.clear();
   }
 
   @Override
   protected void loadLine(String line) {
-    // TODO Auto-generated method stub
     Kit current = null;
     String[] tokens = line.split(",");
     for (int i = 0; i < tokens.length; i++) {
@@ -131,7 +129,6 @@ public class KitList extends FileLoader {
 
   @Override
   protected String saveString() {
-    // TODO Auto-generated method stub
     String line = "";
     for (Kit i : kits) {
       line += i.name + ":";

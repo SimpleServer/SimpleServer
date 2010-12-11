@@ -52,7 +52,6 @@ public class AdminLog implements Runnable {
   }
 
   public void run() {
-    // TODO Auto-generated method stub
     boolean write = false;
     while (!Thread.interrupted()) {
       synchronized (lines) {

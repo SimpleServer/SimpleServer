@@ -51,7 +51,6 @@ public class ServerBackup implements Runnable {
   }
 
   public void run() {
-    // TODO Auto-generated method stub
     while (!Thread.interrupted()) {
       while (parent.options.autoBackup) {
         try {

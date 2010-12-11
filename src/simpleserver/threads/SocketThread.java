@@ -35,7 +35,6 @@ public class SocketThread implements Runnable {
   }
 
   public void run() {
-    // TODO Auto-generated method stub
     try {
       if (parent.options.ipAddress.equals("0.0.0.0"))
         parent.socket = new ServerSocket(parent.options.port);
@@ -74,7 +73,6 @@ public class SocketThread implements Runnable {
       parent.socket.close();
     }
     catch (IOException e) {
-      // TODO Auto-generated catch block
       if (!parent.isRestarting())
         e.printStackTrace();
     }

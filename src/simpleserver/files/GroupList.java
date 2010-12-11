@@ -65,13 +65,11 @@ public class GroupList extends FileLoader {
 
   @Override
   protected void beforeLoad() {
-    // TODO Auto-generated method stub
     groups.clear();
   }
 
   @Override
   protected void loadLine(String line) {
-    // TODO Auto-generated method stub
     String[] tokens = line.split("=");
     if (tokens.length >= 2) {
       String[] tokens2 = tokens[1].split(",");
@@ -85,7 +83,6 @@ public class GroupList extends FileLoader {
 
   @Override
   protected String saveString() {
-    // TODO Auto-generated method stub
     String line = "";
     for (Group i : groups) {
       line += i.getID() + "=" + i.getName() + "," + i.showTitle() + ","
