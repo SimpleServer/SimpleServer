@@ -1,0 +1,2 @@
+#List of Whitelisted Players
+#Case insensitive

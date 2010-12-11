@@ -1,0 +1,2 @@
+#A Multi-line compatible file
+#accessible by !rules
