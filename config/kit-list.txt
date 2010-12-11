@@ -1,0 +1,3 @@
+# Kit format:
+# NAME:Group1;Group2;Group3, ItemId1:Amount1, ItemId2:Amount2, ... ... , ItemIdN:AmountN
+toolkit:0;,269:1,270:1,268:1,290:1,

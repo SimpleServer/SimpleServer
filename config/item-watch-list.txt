@@ -1,0 +1,4 @@
+#Item Watch List will watch player's inventories and automatically ban players who reach the threshold
+#unless they belong to the exception groups
+#Format:
+#ItemId:Threshold(1-64):ExceptionGroups
