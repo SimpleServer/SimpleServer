@@ -284,40 +284,7 @@ public class CommandParser {
         }
         return true;
       }
-      /*
-      if (tokens[0].compareTo("!warp")==0) {
-        if (parent.getRank()>=server.options.useWarpRank) {
-          if (tokens.length==2) {
-            double[] coords = server.warps.getWarp(tokens[1]);
-            if (coords!=null) {
-              parent.warp(coords);
-            }
-            else {
-              parent.addMessage("Warp was unsuccessful!");
-            }
-            //server.runCommand("tp " + tokens[1] + " " + parent.getName());
-          }
-        }
-      }
-      if (tokens[0].compareTo("!listwarps")==0) {
-        if (parent.getRank()>=server.options.useWarpRank) {
-          server.warps.listWarps(parent);
-        }
-      }
-      if (tokens[0].compareTo("!createwarp")==0) {
-        if (parent.getRank()>=server.options.createWarpRank) {
-          if (tokens.length==2) {
-            if (server.warps.makeWarp(tokens[1], parent.x, parent.y, parent.z, parent.stance)) {
-              parent.addMessage("Warp creation successful!");
-            }
-            else {
-              parent.addMessage("Warp creation failed!");
-            }
-            //server.runCommand("tp " + tokens[1] + " " + parent.getName());
-          }
-        }
-      }
-      */
+
       if (tokens[0].equals("!local") || tokens[0].equals("!l")) {
         if (server.cmdAllowed(cmd, parent)) {
           String chat = msg.substring(tokens[0].length());

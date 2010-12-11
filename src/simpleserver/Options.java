@@ -115,17 +115,12 @@ public class Options {
       optionsLoader.setProperty("maxPlayers", Integer.toString(maxPlayers));
 
       /*
-      optionsLoader.setProperty("createWarpRank", Integer.toString(createWarpRank));
-      optionsLoader.setProperty("useWarpRank", Integer.toString(useWarpRank));
-      */
-      /*
       optionsLoader.setProperty("giveRank", Integer.toString(giveRank));
       optionsLoader.setProperty("muteRank", Integer.toString(muteRank));
       optionsLoader.setProperty("givePlayerRank", Integer.toString(givePlayerRank));
       optionsLoader.setProperty("setRankRank", Integer.toString(setRankRank));
 
       optionsLoader.setProperty("teleportRank", Integer.toString(teleportRank));
-      optionsLoader.setProperty("warpPlayerRank", Integer.toString(warpPlayerRank));
       optionsLoader.setProperty("homeCommandRank", Integer.toString(homeCommandRank));
       */
       optionsLoader.setProperty("defaultGroup", Integer.toString(defaultGroup));
@@ -317,12 +312,6 @@ public class Options {
         msgTitleFormat = optionsLoader.getProperty("msgTitleFormat");
       if (optionsLoader.getProperty("javaArguments") != null)
         javaArguments = optionsLoader.getProperty("javaArguments");
-      /*
-      if (optionsLoader.getProperty("useWarpRank")!=null)
-        useWarpRank = Integer.valueOf(optionsLoader.getProperty("useWarpRank"));
-      if (optionsLoader.getProperty("createWarpRank")!=null)
-        createWarpRank = Integer.valueOf(optionsLoader.getProperty("createWarpRank"));
-      */
 
       if (optionsLoader.getProperty("muteRank") != null
           || optionsLoader.getProperty("warpPlayerRank") != null
