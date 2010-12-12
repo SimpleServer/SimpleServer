@@ -20,78 +20,50 @@
  ******************************************************************************/
 package simpleserver.config;
 
-import java.util.LinkedList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 
-import simpleserver.Config;
 import simpleserver.Group;
 import simpleserver.Player;
-import simpleserver.Server;
 
-public class BlockList extends Config {
-  Server parent;
+public class BlockList extends PropertiesConfig {
+  private Map<Integer, int[]> blocks;
 
-  static class BlockEntry {
-    int id;
-    int[] groups;
+  public BlockList() {
+    super("block-list.txt");
 
-    public BlockEntry(int id, int[] groups) {
-      this.id = id;
-      this.groups = groups;
-    }
+    this.blocks = new HashMap<Integer, int[]>();
   }
 
-  LinkedList<BlockEntry> blocks = new LinkedList<BlockEntry>();
-
-  @SuppressWarnings("unused")
-  private BlockList() {
+  public boolean contains(int blockID) {
+    return blocks.containsKey(blockID);
   }
 
-  public BlockList(Server parent) {
-    this.parent = parent;
-    this.filename = "block-list.txt";
-  }
-
-  public boolean checkCheck(int blockID) {
-    for (BlockEntry i : blocks) {
-      if (i.id == blockID) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  public boolean checkAllowed(Player p, int blockID) {
-    for (BlockEntry i : blocks) {
-      if (i.id == blockID) {
-        return Group.contains(i.groups, p);
-      }
+  public boolean playerAllowed(Player player, int blockID) {
+    int[] groups = blocks.get(blockID);
+    if (groups != null) {
+      return Group.contains(groups, player);
     }
     return true;
   }
 
   @Override
-  protected void beforeLoad() {
+  public void load() {
+    super.load();
+
     blocks.clear();
-  }
-
-  @Override
-  protected void loadLine(String line) {
-    String[] tokens = line.split(":");
-    if (tokens.length >= 2)
-      blocks.add(new BlockEntry(Integer.valueOf(tokens[0]),
-                                Group.parseGroups(tokens[1])));
-  }
-
-  @Override
-  protected String saveString() {
-    String line = "";
-    for (BlockEntry i : blocks) {
-      line += i.id + ":";
-      for (int group : i.groups) {
-        line += group + ",";
+    for (Entry<Object, Object> entry : entrySet()) {
+      Integer block;
+      try {
+        block = Integer.parseInt(entry.getKey().toString());
       }
-      line += "\r\n";
+      catch (NumberFormatException e) {
+        System.out.println("Skipping bad block list entry " + entry.getKey());
+        continue;
+      }
+
+      blocks.put(block, Group.parseGroups(entry.getValue().toString()));
     }
-    return line;
   }
 }

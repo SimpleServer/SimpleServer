@@ -25,10 +25,9 @@ import java.util.LinkedList;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Semaphore;
 
-import simpleserver.Config;
 import simpleserver.Server;
 
-public class ChestList extends Config {
+public class ChestList extends AsciiConfig {
   Server parent;
 
   static class CoordinateMap {
@@ -257,13 +256,10 @@ public class ChestList extends Config {
 
   private CoordinateMap chests = new CoordinateMap();
 
-  @SuppressWarnings("unused")
-  private ChestList() {
-  }
-
   public ChestList(Server parent) {
+    super("chest-list.txt");
+
     this.parent = parent;
-    this.filename = "chest-list.txt";
   }
 
   public synchronized boolean giveLock(String name, int x, int y, int z,

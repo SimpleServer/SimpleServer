@@ -181,7 +181,7 @@ public class CommandParser {
       if (tokens[0].compareTo("!kit") == 0) {
         if (server.cmdAllowed(cmd, player)) {
           if (tokens.length >= 2)
-            server.kits.giveKit(player.getName(), tokens[1]);
+            server.kits.giveKit(player, tokens[1]);
         }
         return true;
       }

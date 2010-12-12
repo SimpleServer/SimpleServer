@@ -20,82 +20,78 @@
  ******************************************************************************/
 package simpleserver.config;
 
-import java.util.LinkedList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 
-import simpleserver.Config;
 import simpleserver.Group;
 import simpleserver.Player;
-import simpleserver.Server;
 
-public class ItemWatchList extends Config {
-  Server parent;
+public class ItemWatchList extends PropertiesConfig {
+  private static final class Options {
+    public int threshold;
+    public int[] groups;
 
-  static class ItemEntry {
-    int id;
-    int threshold;
-    int[] groups;
-
-    public ItemEntry(int id, int threshold, int[] groups) {
-      this.id = id;
+    public Options(int threshold, int[] groups) {
       this.threshold = threshold;
       this.groups = groups;
     }
   }
 
-  LinkedList<ItemEntry> items = new LinkedList<ItemEntry>();
+  private Map<Integer, Options> items;
 
-  @SuppressWarnings("unused")
-  private ItemWatchList() {
+  public ItemWatchList() {
+    super("item-watch-list.txt");
+
+    this.items = new HashMap<Integer, Options>();
   }
 
-  public ItemWatchList(Server parent) {
-    this.parent = parent;
-    this.filename = "item-watch-list.txt";
+  public boolean contains(int blockID) {
+    return items.containsKey(blockID);
   }
 
-  public boolean checkCheck(int blockID) {
-    for (ItemEntry i : items) {
-      if (i.id == blockID) {
-        return true;
-      }
+  public boolean playerAllowed(Player player, int blockID, int amount) {
+    Options options = items.get(blockID);
+    if (options != null) {
+      return amount >= options.threshold
+          && Group.contains(options.groups, player);
     }
-    return false;
-  }
 
-  public boolean checkAllowed(Player p, int blockID, int amt) {
-    for (ItemEntry i : items) {
-      if (i.id == blockID) {
-        if (amt >= i.threshold)
-          return Group.contains(i.groups, p);
-      }
-    }
     return true;
   }
 
-  @Override
-  protected void beforeLoad() {
+  public void load() {
+    super.load();
+
     items.clear();
-  }
-
-  @Override
-  protected void loadLine(String line) {
-    String[] tokens = line.split(":");
-    if (tokens.length >= 3)
-      items.add(new ItemEntry(Integer.valueOf(tokens[0]),
-                              Integer.valueOf(tokens[1]),
-                              Group.parseGroups(tokens[2])));
-  }
-
-  @Override
-  protected String saveString() {
-    String line = "";
-    for (ItemEntry i : items) {
-      line += i.id + ":" + i.threshold + ":";
-      for (int group : i.groups) {
-        line += group + ",";
+    for (Entry<Object, Object> entry : entrySet()) {
+      Integer block;
+      try {
+        block = Integer.parseInt(entry.getKey().toString());
       }
-      line += "\r\n";
+      catch (NumberFormatException e) {
+        System.out.println("Skipping bad item watch list entry "
+            + entry.getKey());
+        continue;
+      }
+
+      String[] options = entry.getValue().toString().split(":");
+      if (options.length != 2) {
+        System.out.println("Skipping bad item watch list entry "
+            + entry.getValue());
+        continue;
+      }
+
+      Integer threshold;
+      try {
+        threshold = Integer.parseInt(options[0].trim());
+      }
+      catch (NumberFormatException e) {
+        System.out.println("Skipping bad item watch list entry " + options[0]);
+        continue;
+      }
+
+      items.put(block, new Options(threshold, Group.parseGroups(options[1])));
     }
-    return line;
   }
 }

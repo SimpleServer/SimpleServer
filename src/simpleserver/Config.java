@@ -20,131 +20,71 @@
  ******************************************************************************/
 package simpleserver;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
+import java.io.DataInputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 
 public abstract class Config {
-  protected String filename = "file.txt";
-  protected String folder = "simpleserver";
-  protected String header = "";
+  private static final String resourceLocation = "defaults";
+  private static final String folder = "simpleserver";
 
-  protected File obtainFile() {
-    File check;
-    File dir = new File(folder);
-    check = new File(filename);
-    File f = new File(folder + File.separator + filename);
-    if (!dir.exists()) {
-      dir.mkdir();
-    }
-    if (check.exists() && !f.exists()) {
-      try {
-        f.createNewFile();
-        copyFile(check, f);
-      }
-      catch (Exception e) {
-        e.printStackTrace();
-        System.out.println("[SimpleServer] Could not load configuration for "
-            + filename);
-        System.exit(-1);
-      }
-      check.delete();
-    }
+  private String filename;
 
-    if (f.exists()) {
-      return f;
-    }
-    else {
-      try {
-        f.createNewFile();
-        return f;
-      }
-      catch (IOException e) {
-        e.printStackTrace();
-        return null;
-      }
-    }
+  public Config(String filename) {
+    this.filename = filename;
   }
 
-  private static void copyFile(File in, File out) throws Exception {
-    FileInputStream fis = new FileInputStream(in);
-    FileOutputStream fos = new FileOutputStream(out);
+  public abstract void save();
+
+  public abstract void load();
+  
+  protected String getFilename() {
+    return filename;
+  }
+
+  protected File getFile() {
+    File file = new File(folder + File.separator + filename);
+    if (file.exists()) {
+      return file;
+    }
+
+    new File(folder).mkdir();
+
+    File check = new File(filename);
+    if (check.exists()) {
+      check.renameTo(file);
+    }
+
+    return file;
+  }
+
+  protected String readFully(InputStream input) {
+    byte[] buffer;
     try {
-      byte[] buf = new byte[1024];
-      int i = 0;
-      while ((i = fis.read(buf)) != -1) {
-        fos.write(buf, 0, i);
+      DataInputStream dataInput = new DataInputStream(input);
+      try {
+        buffer = new byte[dataInput.available()];
+        dataInput.readFully(buffer);
+        return new String(buffer, 0, buffer.length, "UTF-8");
+      }
+      finally {
+        dataInput.close();
       }
     }
-    catch (Exception e) {
-      throw e;
+    catch (IOException e) {
+      e.printStackTrace();
     }
-    finally {
-      if (fis != null)
-        fis.close();
-      if (fos != null)
-        fos.close();
-    }
+
+    return null;
   }
 
-  protected abstract String saveString();
-
-  public void save() {
-    File outFile = obtainFile();
-    outFile.delete();
-    outFile = obtainFile();
-    if (outFile != null) {
-      try {
-        BufferedWriter writer = new BufferedWriter(new FileWriter(outFile));
-        writer.write(header);
-        writer.write(saveString());
-        writer.flush();
-        writer.close();
-      }
-      catch (Exception e) {
-        e.printStackTrace();
-      }
-    }
-    else {
-      System.out.println("Unable to save " + filename + "!");
-    }
+  protected InputStream getResourceStream() {
+    return getClass().getResourceAsStream(resourceLocation + "/" + filename);
   }
 
-  protected abstract void beforeLoad();
-
-  protected abstract void loadLine(String line);
-
-  public void load() {
-    beforeLoad();
-    header = "";
-    File inFile = obtainFile();
-    boolean readingHeader = true;
-    if (inFile != null) {
-      try {
-        BufferedReader reader = new BufferedReader(new FileReader(inFile));
-        String line = null;
-        while ((line = reader.readLine()) != null) {
-          if (readingHeader && line.startsWith("#")) {
-            header += line + "\r\n";
-          }
-          else {
-            readingHeader = false;
-            loadLine(line);
-          }
-        }
-        reader.close();
-      }
-      catch (Exception e) {
-        e.printStackTrace();
-      }
-    }
-    else {
-      System.out.println("Unable to load " + filename + "!");
-    }
+  protected InputStream getHeaderResourceStream() {
+    return getClass().getResourceAsStream(resourceLocation + "/" + filename
+                                              + "-header");
   }
 }

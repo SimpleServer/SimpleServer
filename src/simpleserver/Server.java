@@ -187,14 +187,12 @@ public class Server {
 
   private void initResources() {
     resources.add(robots = new RobotList());
-    resources.add(ipMembers = new IPMemberList(this));
+    resources.add(ipMembers = new IPMemberList(options.defaultGroup));
     resources.add(chests = new ChestList(this));
-    resources.add(commands = new CommandList(this));
-    // resources.add(warps = new WarpList(this));
-    resources.add(blockFirewall = new BlockList(this));
-    resources.add(itemWatch = new ItemWatchList(this));
-    // resources.add(ranks = new RankList(this));
-    resources.add(groups = new GroupList(this));
+    resources.add(commands = new CommandList(options.useSlashes));
+    resources.add(blockFirewall = new BlockList());
+    resources.add(itemWatch = new ItemWatchList());
+    resources.add(groups = new GroupList());
     resources.add(members = new MemberList(this));
     resources.add(motd = new MOTD());
     resources.add(rules = new Rules());
@@ -413,11 +411,11 @@ public class Server {
   }
 
   public boolean cmdAllowed(String cmd, Player p) {
-    return commands.checkPlayer(cmd, p);
+    return commands.playerAllowed(cmd, p);
   }
 
   public String getCommands(Player p) {
-    return commands.getCommands(p);
+    return commands.getCommandList(p);
   }
 
   public int numPlayers() {

@@ -20,135 +20,89 @@
  ******************************************************************************/
 package simpleserver.config;
 
-import java.util.LinkedList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 
-import simpleserver.Config;
 import simpleserver.Group;
 import simpleserver.Player;
-import simpleserver.Server;
 
-public class CommandList extends Config {
-  public static final String[] commandList = { "ban=3,4", "banip=3,4",
-      "unban=3,4", "unbanip=3,4", "kick=2-4", "lock=0", "unlock=0", "tp=3,4",
-      "warpmeto=2-4", "warptome=2-4", "iddqd=3,4", "listips=2-4", "kit=0",
-      "kits=0", "mute=2-4", "unmute=2-4", "give=2-4", "giveplayer=3,4",
-      "setgroup=3,4", "whitelist=2-4", "home=-1", "unwhitelist=2-4",
-      "restart=3,4", "save=3,4", "reload=3,4", "backup=3,4", "rcon=4",
-      "local=-1" };
-  public static final String[] synonyms = { "releaselock=unlock", "l=local" };
-
-  static class Command {
-    String name;
-    int[] groups;
-
-    public Command(String name, int[] groups) {
-      this.name = name;
-      this.groups = groups;
-    }
+public class CommandList extends PropertiesConfig {
+  public static final Map<String, String> synonyms = new HashMap<String, String>();
+  static {
+    synonyms.put("releaselock", "unlock");
+    synonyms.put("l", "local");
   }
 
-  LinkedList<Command> commands = new LinkedList<Command>();
-  Server parent;
+  private boolean useSlashes;
+  private Map<String, int[]> commands;
 
-  public CommandList(Server parent) {
-    this.filename = "command-list.txt";
-    this.parent = parent;
+  public CommandList(boolean useSlashes) {
+    super("command-list.txt");
+
+    this.useSlashes = useSlashes;
+    this.commands = new HashMap<String, int[]>();
   }
 
-  private void setDefaults() {
-    commands.clear();
-    for (int i = 0; i < commandList.length; i++) {
-      String[] cmd = commandList[i].split("=");
-      commands.add(new Command(cmd[0], Group.parseGroups(cmd[1])));
+  public boolean playerAllowed(String command, Player player) {
+    int[] groups = commands.get(command);
+    if (groups != null) {
+      return Group.contains(groups, player);
     }
-  }
 
-  public boolean checkPlayer(String command, Player p) {
-    if (command != null) {
-      for (Command i : commands) {
-        if (command.equals(i.name)) {
-          return Group.contains(i.groups, p);
-        }
-      }
+    String synonym = synonyms.get(command);
+    if (synonym != null) {
+      return playerAllowed(synonym, player);
     }
-    for (String j : synonyms) {
-      if (j.startsWith(command)) {
-        String newCommand = j.split("=")[1];
-        return checkPlayer(newCommand, p);
-      }
-    }
+
     return false;
   }
 
-  public int[] checkGroups(String command) {
-    if (command != null) {
-      for (Command i : commands) {
-        if (command.equals(i.name)) {
-          return i.groups;
-        }
-      }
+  public int[] getGroups(String command) {
+    int[] groups = commands.get(command);
+    if (groups != null) {
+      return groups;
     }
-    for (String j : synonyms) {
-      if (j.startsWith(command)) {
-        String newCommand = command.split("=")[1];
-        return checkGroups(newCommand);
-      }
+
+    String synonym = synonyms.get(command);
+    if (synonym != null) {
+      return getGroups(synonym);
     }
+
     return null;
   }
 
-  public void setRank(String command, int rank) {
-    if (command != null) {
-      for (Command i : commands) {
-        if (command.equals(i.name)) {
-          i.groups = new int[] { rank };
-        }
-      }
-    }
+  public void setGroup(String command, int group) {
+    commands.put(command, new int[] { group });
+    setProperty(command, Integer.toString(group));
   }
 
-  public String getCommands(Player p) {
-    String cmds = "";
+  public String getCommandList(Player player) {
+    StringBuilder commandList = new StringBuilder();
     String prefix = "!";
-    if (parent.options.useSlashes)
+    if (useSlashes) {
       prefix = "/";
-    if (p != null) {
-      for (Command i : commands) {
-        if (Group.contains(i.groups, p)) {
-          cmds = cmds + prefix + i.name + " ";
-        }
+    }
+
+    for (Entry<String, int[]> entry : commands.entrySet()) {
+      if (Group.contains(entry.getValue(), player)) {
+        commandList.append(prefix);
+        commandList.append(entry.getKey());
+        commandList.append(", ");
       }
     }
-    return cmds;
+
+    return commandList.substring(0, commandList.length() - 2);
   }
 
   @Override
-  protected void beforeLoad() {
-    setDefaults();
-  }
+  public void load() {
+    super.load();
 
-  @Override
-  protected void loadLine(String line) {
-    String[] tokens = line.split("=");
-    if (tokens.length >= 2) {
-      for (Command i : commands) {
-        if (tokens[0].equals(i.name)) {
-          i.groups = Group.parseGroups(tokens[1]);
-        }
-      }
+    commands.clear();
+    for (Entry<Object, Object> entry : entrySet()) {
+      commands.put(entry.getKey().toString(),
+                   Group.parseGroups(entry.getValue().toString()));
     }
-  }
-
-  @Override
-  protected String saveString() {
-    String line = "";
-    for (Command i : commands) {
-      line += i.name + "=";
-      for (int group : i.groups) {
-        line += group + ",";
-      }
-      line += "\r\n";
-    }
-    return line;
   }
 }

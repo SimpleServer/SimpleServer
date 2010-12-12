@@ -23,12 +23,8 @@ package simpleserver.config;
 import java.util.LinkedList;
 import java.util.concurrent.Semaphore;
 
-import simpleserver.Config;
-
-
-public class RobotList extends Config {
+public class RobotList extends PropertiesConfig {
   Semaphore robotLock = new Semaphore(1);
-  LinkedList<String> robots = new LinkedList<String>();
   LinkedList<UnconfirmedRobot> potentialRobots = new LinkedList<UnconfirmedRobot>();
   LinkedList<Integer> activeRobots = new LinkedList<Integer>();
 
@@ -42,7 +38,7 @@ public class RobotList extends Config {
   }
 
   public RobotList() {
-    this.filename = "robot-list.txt";
+    super("robot-list.txt");
   }
 
   public void addRobotPort(int port) {
@@ -84,12 +80,7 @@ public class RobotList extends Config {
   }
 
   public boolean isRobot(String ip) {
-    for (String i : robots) {
-      if (ip.equals(i)) {
-        return true;
-      }
-    }
-    return false;
+    return getProperty(ip) != null;
   }
 
   public boolean isPotentialRobot(String ip) {
@@ -111,7 +102,7 @@ public class RobotList extends Config {
           if (ip.equals(i.ipAddress)) {
             i.tries++;
             if (i.tries > 30) {
-              robots.add(ip);
+              setProperty(ip, "");
               potentialRobots.remove(i);
               save();
             }
@@ -119,26 +110,5 @@ public class RobotList extends Config {
         }
       }
     }
-  }
-
-  @Override
-  protected void beforeLoad() {
-    robots.clear();
-  }
-
-  @Override
-  protected void loadLine(String line) {
-    if (line != null)
-      if (line.length() > 0)
-        robots.add(line);
-  }
-
-  @Override
-  protected String saveString() {
-    String line = "";
-    for (String i : robots) {
-      line += i + "\r\n";
-    }
-    return line;
   }
 }

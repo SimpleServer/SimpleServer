@@ -20,129 +20,114 @@
  ******************************************************************************/
 package simpleserver.config;
 
+import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Map;
+import java.util.Map.Entry;
 
-import simpleserver.Config;
 import simpleserver.Group;
 import simpleserver.Player;
 import simpleserver.Server;
 
-public class KitList extends Config {
-  Server parent;
+public class KitList extends PropertiesConfig {
+  private Server server;
 
-  static class Kit {
-    String name;
-    int[] groups;
-    LinkedList<Entry> items = new LinkedList<Entry>();
+  private static final class Kit {
+    public int[] groups;
+    public LinkedList<Entry> items = new LinkedList<Entry>();
 
-    class Entry {
-      int id;
-      int amt;
+    private static final class Entry {
+      int item;
+      int amount;
 
-      public Entry(int id, int amt) {
-        this.id = id;
-        this.amt = amt;
+      public Entry(int item, int amount) {
+        this.item = item;
+        this.amount = amount;
       }
     }
 
-    public Kit(String name, int[] groups) {
-      this.name = name;
+    public Kit(int[] groups) {
       this.groups = groups;
     }
 
-    public void addItem(int id, int amt) {
-      items.add(new Entry(id, amt));
+    public void addItem(int item, int amount) {
+      items.add(new Entry(item, amount));
     }
   }
 
-  LinkedList<Kit> kits = new LinkedList<Kit>();
-
-  @SuppressWarnings("unused")
-  private KitList() {
-  }
+  private Map<String, Kit> kits;
 
   public KitList(Server parent) {
-    this.parent = parent;
-    this.filename = "kit-list.txt";
+    super("kit-list.txt");
+
+    this.server = parent;
+    this.kits = new HashMap<String, Kit>();
   }
 
-  public void giveKit(String name, String kitName) throws InterruptedException {
-    Kit kit = null;
-    for (Kit i : kits) {
-      if (kitName.toLowerCase().compareTo(i.name.toLowerCase()) == 0) {
-        if (Group.contains(i.groups, parent.findPlayer(name)))
-          kit = i;
-      }
-    }
-    if (kit != null) {
-      for (KitList.Kit.Entry i : kit.items) {
-        // parent.runCommand("give " + name + " " + i.id + " " + i.amt);
-        giveItems(name, i.id, i.amt);
-      }
-    }
-  }
-
-  public void giveItems(String name, int id, int amt)
+  public void giveKit(Player player, String kitName)
       throws InterruptedException {
-    while (amt > 0) {
-      if (amt > 64) {
-        parent.runCommand("give " + name + " " + id + " " + 64);
-        amt -= 64;
-      }
-      else {
-        parent.runCommand("give " + name + " " + id + " " + amt);
-        amt = 0;
+    Kit kit = kits.get(kitName);
+    if ((kit != null) && (Group.contains(kit.groups, player))) {
+      for (Kit.Entry entry : kit.items) {
+        String baseCommand = "give " + player.getName() + " " + entry.item;
+        for (int c = 0; c < entry.amount / 64; ++c) {
+          server.runCommand(baseCommand + " " + 64);
+        }
+        server.runCommand(baseCommand + " " + entry.amount % 64);
       }
     }
   }
 
-  public void listKits(Player p) {
-    String line = "Allowed kits: ";
-    for (Kit i : kits) {
-      if (Group.contains(i.groups, p)) {
-        line += i.name + ",";
+  public void listKits(Player player) {
+    StringBuilder kitList = new StringBuilder();
+    kitList.append("Allowed kits: ");
+    for (String name : kits.keySet()) {
+      Kit kit = kits.get(name);
+      if (Group.contains(kit.groups, player)) {
+        kitList.append(name);
+        kitList.append(", ");
       }
     }
-    p.addMessage(line);
+
+    player.addMessage(kitList.substring(0, kitList.length() - 2));
   }
 
-  @Override
-  protected void beforeLoad() {
+  public void load() {
+    super.load();
+
     kits.clear();
-  }
+    for (Entry<Object, Object> entry : entrySet()) {
+      String[] options = entry.getValue().toString().split(",");
+      if (options.length < 2) {
+        System.out.println("Skipping bad kit list entry " + entry.getValue());
+        continue;
+      }
 
-  @Override
-  protected void loadLine(String line) {
-    Kit current = null;
-    String[] tokens = line.split(",");
-    for (int i = 0; i < tokens.length; i++) {
-      if (i == 0) {
-        String[] tokens2 = tokens[i].split(":");
-        current = new Kit(tokens2[0], Group.parseGroups(tokens2[1], ";"));
-        kits.add(current);
-      }
-      else {
-        String[] tokens2 = tokens[i].split(":");
-        current.addItem(Integer.valueOf(tokens2[0]),
-                        Integer.valueOf(tokens2[1]));
-      }
-    }
-  }
+      int[] groups = Group.parseGroups(options[0], ";");
+      Kit kit = new Kit(groups);
 
-  @Override
-  protected String saveString() {
-    String line = "";
-    for (Kit i : kits) {
-      line += i.name + ":";
-      for (int k : i.groups) {
-        line += k + ";";
+      for (int c = 1; c < options.length; ++c) {
+        String[] item = options[c].split(":");
+        if (item.length != 2) {
+          System.out.println("Skipping bad kit item " + options[c]);
+          continue;
+        }
+
+        Integer block;
+        Integer amount;
+        try {
+          block = Integer.parseInt(item[0]);
+          amount = Integer.parseInt(item[1]);
+        }
+        catch (NumberFormatException e) {
+          System.out.println("Skipping bad kit item " + options[c]);
+          continue;
+        }
+
+        kit.addItem(block, amount);
       }
-      line += ",";
-      for (KitList.Kit.Entry j : i.items) {
-        line += j.id + ":" + j.amt + ",";
-      }
-      line += "\r\n";
+
+      kits.put(entry.getKey().toString(), kit);
     }
-    return line;
   }
 }

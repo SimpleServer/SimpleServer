@@ -20,76 +20,57 @@
  ******************************************************************************/
 package simpleserver.config;
 
-import java.util.LinkedList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 
-import simpleserver.Config;
 import simpleserver.Server;
 
-public class MemberList extends Config {
-  static class Member {
-    String name;
-    int group;
+public class MemberList extends PropertiesConfig {
+  private Server server;
+  private Map<String, Integer> members;
 
-    public Member(String name, int group) {
-      this.name = name;
-      this.group = group;
-    }
-  }
+  public MemberList(Server server) {
+    super("member-list.txt");
 
-  LinkedList<Member> members = new LinkedList<Member>();
-  Server parent;
-
-  public MemberList(Server parent) {
-    this.filename = "member-list.txt";
-    this.parent = parent;
+    this.server = server;
+    this.members = new HashMap<String, Integer>();
   }
 
   public int checkName(String name) {
-    if (name != null) {
-      for (Member i : members) {
-        if (name.toLowerCase().trim().compareTo(i.name.toLowerCase().trim()) == 0) {
-          return i.group;
-        }
-      }
+    Integer group = members.get(name.toLowerCase());
+    if (group != null) {
+      return group;
     }
-    return parent.options.defaultGroup;
+    return server.options.defaultGroup;
   }
 
   public void setGroup(String name, int group) throws InterruptedException {
-    if (group > 0 && !parent.groups.groupExists(group))
+    if (!server.groups.groupExists(group)) {
       return;
-    for (Member i : members) {
-      if (name.toLowerCase().trim().compareTo(i.name.toLowerCase().trim()) == 0) {
-
-        i.group = group;
-        parent.updateGroup(name);
-        save();
-        return;
-      }
     }
-    members.add(new Member(name, group));
-    parent.updateGroup(name);
+    members.put(name.toLowerCase(), group);
+    setProperty(name.toLowerCase(), Integer.toString(group));
+
+    server.updateGroup(name);
     save();
   }
 
-  @Override
-  protected void beforeLoad() {
+  public void load() {
+    super.load();
+
     members.clear();
-  }
+    for (Entry<Object, Object> entry : entrySet()) {
+      Integer group;
+      try {
+        group = Integer.parseInt(entry.getValue().toString());
+      }
+      catch (NumberFormatException e) {
+        System.out.println("Skipping bad member list entry " + entry.getValue());
+        continue;
+      }
 
-  @Override
-  protected void loadLine(String line) {
-    String[] tokens = line.split("=");
-    if (tokens.length >= 2)
-      members.add(new Member(tokens[0], Integer.valueOf(tokens[1])));
-  }
-
-  @Override
-  protected String saveString() {
-    String line = "";
-    for (Member i : members) {
-      line += i.name + "=" + i.group + "\r\n";
+      members.put(entry.getKey().toString().toLowerCase(), group);
     }
-    return line;
   }
 }

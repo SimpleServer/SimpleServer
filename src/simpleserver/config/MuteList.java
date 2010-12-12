@@ -20,61 +20,34 @@
  ******************************************************************************/
 package simpleserver.config;
 
-import java.util.LinkedList;
+import java.util.Map.Entry;
 
-import simpleserver.Config;
-
-
-public class MuteList extends Config {
-  LinkedList<String> users = new LinkedList<String>();
-
+public class MuteList extends PropertiesConfig {
   public MuteList() {
-    this.filename = "mute-list.txt";
+    super("mute-list.txt");
   }
 
   public boolean isMuted(String name) {
-    for (String i : users) {
-      if (name.toLowerCase().trim().compareTo(i.toLowerCase().trim()) == 0) {
-        return true;
-      }
-    }
-    return false;
+    return getProperty(name.toLowerCase()) != null;
   }
 
   public void addName(String name) {
-    if (!isMuted(name)) {
-      users.add(name);
+    if (setProperty(name.toLowerCase(), "") == null) {
       save();
     }
   }
 
   public boolean removeName(String name) {
-    for (String i : users) {
-      if (i.equalsIgnoreCase(name)) {
-        users.remove(i);
-        save();
-        return true;
-      }
+    return setProperty(name.toLowerCase(), null) != null;
+  }
+
+  public void load() {
+    super.load();
+
+    for (Entry<Object, Object> entry : entrySet()) {
+      String name = entry.getKey().toString();
+      setProperty(name, null);
+      setProperty(name.toLowerCase(), "");
     }
-    return false;
-  }
-
-  @Override
-  protected void beforeLoad() {
-    users.clear();
-  }
-
-  @Override
-  protected void loadLine(String line) {
-    users.add(line);
-  }
-
-  @Override
-  protected String saveString() {
-    String line = "";
-    for (String i : users) {
-      line += i + "\r\n";
-    }
-    return line;
   }
 }

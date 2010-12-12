@@ -20,60 +20,58 @@
  ******************************************************************************/
 package simpleserver.config;
 
-import java.util.LinkedList;
+import java.util.Map.Entry;
+import java.util.regex.Pattern;
 
-import simpleserver.Config;
-
-
-public class IPBanList extends Config {
-  LinkedList<String> bans = new LinkedList<String>();
-
+public class IPBanList extends PropertiesConfig {
   public IPBanList() {
-    this.filename = "ip-ban-list.txt";
+    super("ip-ban-list.txt");
   }
 
   public void addBan(String ipAddress) {
-    bans.add(ipAddress);
+    setProperty(ipAddress, "");
+
     save();
   }
 
   public boolean removeBan(String ipAddress) {
-    for (String i : bans) {
-      if (i.compareTo(ipAddress) == 0) {
-        bans.remove(i);
-        save();
-        return true;
-      }
+    if (setProperty(ipAddress, null) != null) {
+      save();
+
+      return true;
     }
+
     return false;
   }
 
   public boolean isBanned(String ipAddress) {
-    for (String i : bans) {
-      if (ipAddress.startsWith(i) && i.length() != 0) {
+    String network = "";
+    String[] octets = ipAddress.split(".");
+
+    for (String octet : octets) {
+      network += octet;
+
+      if (getProperty(network) != null) {
         return true;
       }
+
+      network += ".";
     }
+
     return false;
   }
 
   @Override
-  protected void beforeLoad() {
-    bans.clear();
-  }
+  public void load() {
+    super.load();
 
-  @Override
-  protected void loadLine(String line) {
-    if (line != null && line != "")
-      bans.add(line);
-  }
+    Pattern trailingDot = Pattern.compile("\\.$");
+    for (Entry<Object, Object> entry : entrySet()) {
+      String ipAddress = entry.getKey().toString();
+      setProperty(ipAddress, null);
 
-  @Override
-  protected String saveString() {
-    String line = "";
-    for (String i : bans) {
-      line += i + "\r\n";
+      String network = trailingDot.matcher(ipAddress).replaceFirst("");
+      setProperty(network, "");
     }
-    return line;
   }
 }

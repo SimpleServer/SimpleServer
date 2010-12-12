@@ -20,14 +20,11 @@
  ******************************************************************************/
 package simpleserver.config;
 
-import simpleserver.Config;
-
-
-public class MOTD extends Config {
+public class MOTD extends AsciiConfig {
   String motd;
 
   public MOTD() {
-    this.filename = "motd.txt";
+    super("motd.txt");
   }
 
   public String getMOTD() {

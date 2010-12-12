@@ -307,9 +307,9 @@ public class StreamTunnel implements Runnable {
         for (int pst = 0; pst < sizeOfArray; pst++) {
           short s = readShort();
           if (s != -1) {
-            if (server.itemWatch.checkCheck(s) && parent.getName() != null) {
+            if (server.itemWatch.contains(s) && parent.getName() != null) {
               byte amtOfItem = readByte();
-              if (!server.itemWatch.checkAllowed(parent, s, amtOfItem)
+              if (!server.itemWatch.playerAllowed(parent, s, amtOfItem)
                   && parent.getName() != null) {
                 server.adminLog.addMessage("ItemWatchList banned player:\t"
                     + parent.getName());
@@ -430,8 +430,8 @@ public class StreamTunnel implements Runnable {
       case 0x0f:
         short block = readShort();
         if (!isServerTunnel) {
-          if (server.blockFirewall.checkCheck(block) || parent.getGroup() < 0) {
-            boolean allowed = server.blockFirewall.checkAllowed(parent, block);
+          if (server.blockFirewall.contains(block) || parent.getGroup() < 0) {
+            boolean allowed = server.blockFirewall.playerAllowed(parent, block);
             if (!allowed || parent.getGroup() < 0) {
               // Remove the packet! : )
               int coord_x = readInt();

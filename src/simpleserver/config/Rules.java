@@ -20,14 +20,11 @@
  ******************************************************************************/
 package simpleserver.config;
 
-import simpleserver.Config;
-
-
-public class Rules extends Config {
+public class Rules extends AsciiConfig {
   String rules;
 
   public Rules() {
-    this.filename = "rules.txt";
+    super("rules.txt");
   }
 
   public String getRules() {

@@ -20,77 +20,67 @@
  ******************************************************************************/
 package simpleserver.config;
 
-import java.util.LinkedList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 
-import simpleserver.Config;
 import simpleserver.Player;
-import simpleserver.Server;
 
-public class IPMemberList extends Config {
-  static class Member {
-    String ip;
-    int group;
+public class IPMemberList extends PropertiesConfig {
+  private int defaultGroup;
+  private Map<String, Integer> members;
 
-    public Member(String ip, int group) {
-      this.ip = ip;
-      this.group = group;
-    }
+  public IPMemberList(int defaultGroup) {
+    super("ip-member-list.txt");
+
+    this.defaultGroup = defaultGroup;
+    this.members = new HashMap<String, Integer>();
   }
 
-  LinkedList<Member> members = new LinkedList<Member>();
-  Server parent;
+  public int getGroup(Player player) {
+    String network = "";
+    String ip = player.extsocket.getInetAddress().getHostAddress();
+    String[] octets = ip.split(".");
 
-  public IPMemberList(Server parent) {
-    this.filename = "ip-member-list.txt";
-    this.parent = parent;
-  }
+    for (String octet : octets) {
+      network += octet;
 
-  public int checkPlayer(Player p) {
-    if (p != null) {
-      String ip = p.extsocket.getInetAddress().getHostAddress();
-      for (Member i : members) {
-        if (ip.startsWith(i.ip)) {
-          return i.group;
-        }
+      Integer group = members.get(network);
+      if (group != null) {
+        return group;
       }
+
+      network += ".";
     }
-    return parent.options.defaultGroup;
+
+    return defaultGroup;
   }
 
-  public void setRank(Player p, int group) {
-    if (p != null) {
-      String ip = p.extsocket.getInetAddress().getHostAddress();
-      for (Member i : members) {
-        if (i.ip.compareTo(ip.trim()) == 0) {
-          i.group = group;
-          save();
-          return;
-        }
-      }
-      members.add(new Member(ip.trim(), group));
+  public void setGroup(Player player, int group) {
+    String ip = player.extsocket.getInetAddress().getHostAddress();
+    members.put(ip, group);
+    setProperty(ip, Integer.toString(group));
 
-      save();
-    }
+    save();
   }
 
   @Override
-  protected void beforeLoad() {
+  public void load() {
+    super.load();
+
     members.clear();
-  }
+    for (Entry<Object, Object> entry : entrySet()) {
+      Integer group;
+      try {
+        group = Integer.parseInt(entry.getValue().toString());
+      }
+      catch (NumberFormatException e) {
+        System.out.println("Skipping bad ip member list entry "
+            + entry.getValue());
+        continue;
+      }
 
-  @Override
-  protected void loadLine(String line) {
-    String[] tokens = line.split("=");
-    if (tokens.length >= 2)
-      members.add(new Member(tokens[0], Integer.valueOf(tokens[1])));
-  }
-
-  @Override
-  protected String saveString() {
-    String line = "";
-    for (Member i : members) {
-      line += i.ip + "=" + i.group + "\r\n";
+      members.put(entry.getKey().toString(), group);
     }
-    return line;
   }
 }

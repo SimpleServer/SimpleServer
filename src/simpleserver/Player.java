@@ -155,7 +155,7 @@ public class Player {
 
   private void updateGroup(String name) {
     int nameGroup = parent.members.checkName(name);
-    int ipGroup = parent.ipMembers.checkPlayer(this);
+    int ipGroup = parent.ipMembers.getGroup(this);
     if ((nameGroup == -1 || ipGroup == -1 && parent.options.defaultGroup != -1)
         || (nameGroup == -1 && ipGroup == -1 && parent.options.defaultGroup == -1)) {
       group = -1;

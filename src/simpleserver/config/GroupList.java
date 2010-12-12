@@ -20,76 +20,55 @@
  ******************************************************************************/
 package simpleserver.config;
 
-import java.util.LinkedList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 
-import simpleserver.Config;
 import simpleserver.Group;
-import simpleserver.Server;
 
-public class GroupList extends Config {
+public class GroupList extends PropertiesConfig {
+  private Map<Integer, Group> groups;
 
-  LinkedList<Group> groups = new LinkedList<Group>();
-  Server parent;
+  public GroupList() {
+    super("group-list.txt");
 
-  public GroupList(Server parent) {
-    this.filename = "group-list.txt";
-    this.parent = parent;
-  }
-
-  public int checkGroupName(String name) {
-    if (name != null) {
-      for (Group i : groups) {
-        if (name.toLowerCase().trim()
-                .compareTo(i.getName().toLowerCase().trim()) == 0) {
-          return i.getID();
-        }
-      }
-    }
-    return parent.options.defaultGroup;
+    this.groups = new HashMap<Integer, Group>();
   }
 
   public boolean groupExists(int group) {
-    for (Group i : groups) {
-      if (i.getID() == group)
-        return true;
-    }
-    return false;
+    return groups.containsKey(group);
   }
 
   public Group getGroup(int id) {
-    for (Group i : groups) {
-      if (i.getID() == id) {
-        return i;
-      }
-    }
-    return null;
+    return groups.get(id);
   }
 
   @Override
-  protected void beforeLoad() {
+  public void load() {
+    super.load();
+
     groups.clear();
-  }
-
-  @Override
-  protected void loadLine(String line) {
-    String[] tokens = line.split("=");
-    if (tokens.length >= 2) {
-      String[] tokens2 = tokens[1].split(",");
-      if (tokens2.length >= 3) {
-        groups.add(new Group(Integer.valueOf(tokens[0]), tokens2[0],
-                             Boolean.valueOf(tokens2[1]),
-                             Boolean.valueOf(tokens2[2]), tokens2[3]));
+    for (Entry<Object, Object> entry : entrySet()) {
+      Integer group;
+      try {
+        group = Integer.parseInt(entry.getKey().toString());
       }
-    }
-  }
+      catch (NumberFormatException e) {
+        System.out.println("Skipping bad group list entry " + entry.getKey());
+        continue;
+      }
 
-  @Override
-  protected String saveString() {
-    String line = "";
-    for (Group i : groups) {
-      line += i.getID() + "=" + i.getName() + "," + i.showTitle() + ","
-          + i.isAdmin() + "," + i.getColor() + "\r\n";
+      String[] attributes = entry.getValue().toString().split(",");
+      if (attributes.length != 4) {
+        System.out.println("Skipping bad group list entry " + entry.getValue());
+        continue;
+      }
+      String name = attributes[0].trim();
+      boolean showTitle = Boolean.parseBoolean(attributes[1].trim());
+      boolean isAdmin = Boolean.parseBoolean(attributes[2].trim());
+      String color = attributes[3].trim();
+
+      groups.put(group, new Group(group, name, showTitle, isAdmin, color));
     }
-    return line;
   }
 }
