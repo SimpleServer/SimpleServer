@@ -18,58 +18,41 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-package simpleserver.files;
+package simpleserver.log;
 
-import java.util.LinkedList;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.PrintStream;
+import java.util.Calendar;
 
-public class WhitelistLoader extends FileLoader {
-  LinkedList<String> users = new LinkedList<String>();
+public class ErrorLog implements Runnable {
+  Exception e;
+  String comments;
 
-  public WhitelistLoader() {
-    this.filename = "white-list.txt";
+  public ErrorLog(Exception e, String comments) {
+    this.e = e;
+    this.comments = comments;
   }
 
-  public boolean isWhitelisted(String name) {
-    for (String i : users) {
-      if (name.toLowerCase().trim().equals(i.toLowerCase().trim())) {
-        return true;
-      }
+  public void run() {
+    Calendar date = Calendar.getInstance();
+    File dump = new File("error_" + date.get(Calendar.YEAR) + "-"
+        + (date.get(Calendar.MONTH) + 1) + "-" + date.get(Calendar.DATE) + "-"
+        + date.get(Calendar.HOUR_OF_DAY) + "_" + date.get(Calendar.MINUTE)
+        + ".txt");
+    try {
+      if (!dump.exists())
+        dump.createNewFile();
+      FileOutputStream f = new FileOutputStream(dump);
+      PrintStream p = new PrintStream(f);
+      p.println(comments);
+      if (e != null)
+        e.printStackTrace(p);
+      p.close();
+      f.close();
     }
-    return false;
-  }
-
-  public void addName(String name) {
-    users.add(name);
-    save();
-  }
-
-  public boolean removeName(String name) {
-    for (String i : users) {
-      if (name.toLowerCase().trim().compareTo(i.toLowerCase().trim()) == 0) {
-        users.remove(i);
-        save();
-        return true;
-      }
+    catch (Exception e) {
+      e.printStackTrace();
     }
-    return false;
-  }
-
-  @Override
-  protected void beforeLoad() {
-    users.clear();
-  }
-
-  @Override
-  protected void loadLine(String line) {
-    users.add(line);
-  }
-
-  @Override
-  protected String saveString() {
-    String line = "";
-    for (String i : users) {
-      line += i + "\r\n";
-    }
-    return line;
   }
 }

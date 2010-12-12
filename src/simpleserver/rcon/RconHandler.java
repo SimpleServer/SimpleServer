@@ -18,7 +18,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-package simpleserver;
+package simpleserver.rcon;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -28,6 +28,8 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.LinkedList;
 import java.util.concurrent.Semaphore;
+
+import simpleserver.Server;
 
 public class RconHandler implements Runnable {
   protected final int BUF_SIZE = 8192;

@@ -18,12 +18,15 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-package simpleserver.files;
+package simpleserver.config;
 
 import java.util.LinkedList;
 import java.util.concurrent.Semaphore;
 
-public class RobotLoader extends FileLoader {
+import simpleserver.Config;
+
+
+public class RobotList extends Config {
   Semaphore robotLock = new Semaphore(1);
   LinkedList<String> robots = new LinkedList<String>();
   LinkedList<UnconfirmedRobot> potentialRobots = new LinkedList<UnconfirmedRobot>();
@@ -38,7 +41,7 @@ public class RobotLoader extends FileLoader {
     }
   }
 
-  public RobotLoader() {
+  public RobotList() {
     this.filename = "robot-list.txt";
   }
 

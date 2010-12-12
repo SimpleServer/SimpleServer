@@ -18,36 +18,41 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-package simpleserver.files;
+package simpleserver.config;
 
 import java.util.LinkedList;
 
-public class IPBanLoader extends FileLoader {
-  LinkedList<String> bans = new LinkedList<String>();
+import simpleserver.Config;
 
-  public IPBanLoader() {
-    this.filename = "ip-ban-list.txt";
+
+public class MuteList extends Config {
+  LinkedList<String> users = new LinkedList<String>();
+
+  public MuteList() {
+    this.filename = "mute-list.txt";
   }
 
-  public void addBan(String ipAddress) {
-    bans.add(ipAddress);
-    save();
-  }
-
-  public boolean removeBan(String ipAddress) {
-    for (String i : bans) {
-      if (i.compareTo(ipAddress) == 0) {
-        bans.remove(i);
-        save();
+  public boolean isMuted(String name) {
+    for (String i : users) {
+      if (name.toLowerCase().trim().compareTo(i.toLowerCase().trim()) == 0) {
         return true;
       }
     }
     return false;
   }
 
-  public boolean isBanned(String ipAddress) {
-    for (String i : bans) {
-      if (ipAddress.startsWith(i) && i.length() != 0) {
+  public void addName(String name) {
+    if (!isMuted(name)) {
+      users.add(name);
+      save();
+    }
+  }
+
+  public boolean removeName(String name) {
+    for (String i : users) {
+      if (i.equalsIgnoreCase(name)) {
+        users.remove(i);
+        save();
         return true;
       }
     }
@@ -56,19 +61,18 @@ public class IPBanLoader extends FileLoader {
 
   @Override
   protected void beforeLoad() {
-    bans.clear();
+    users.clear();
   }
 
   @Override
   protected void loadLine(String line) {
-    if (line != null && line != "")
-      bans.add(line);
+    users.add(line);
   }
 
   @Override
   protected String saveString() {
     String line = "";
-    for (String i : bans) {
+    for (String i : users) {
       line += i + "\r\n";
     }
     return line;

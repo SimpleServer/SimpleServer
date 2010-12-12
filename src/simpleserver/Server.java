@@ -26,23 +26,22 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.concurrent.Semaphore;
 
-import simpleserver.files.AdminLog;
-import simpleserver.files.BlockFirewallList;
-import simpleserver.files.ChestList;
-import simpleserver.files.CommandList;
-import simpleserver.files.FileLoader;
-import simpleserver.files.GroupList;
-import simpleserver.files.IPBanLoader;
-import simpleserver.files.IPMemberList;
-import simpleserver.files.ItemWatchList;
-import simpleserver.files.KitList;
-import simpleserver.files.Language;
-import simpleserver.files.MOTDLoader;
-import simpleserver.files.MemberList;
-import simpleserver.files.MuteLoader;
-import simpleserver.files.RobotLoader;
-import simpleserver.files.RulesLoader;
-import simpleserver.files.WhitelistLoader;
+import simpleserver.config.BlockList;
+import simpleserver.config.ChestList;
+import simpleserver.config.CommandList;
+import simpleserver.config.GroupList;
+import simpleserver.config.IPBanList;
+import simpleserver.config.IPMemberList;
+import simpleserver.config.ItemWatchList;
+import simpleserver.config.KitList;
+import simpleserver.config.MOTD;
+import simpleserver.config.MemberList;
+import simpleserver.config.MuteList;
+import simpleserver.config.RobotList;
+import simpleserver.config.Rules;
+import simpleserver.config.WhiteList;
+import simpleserver.log.AdminLog;
+import simpleserver.rcon.RconServer;
 import simpleserver.threads.C10TThread;
 import simpleserver.threads.ErrorStreamRouter;
 import simpleserver.threads.InputStreamRouter;
@@ -63,26 +62,26 @@ public class Server {
   boolean open = true;
   boolean debug = false;
   public ServerSocket socket;
-  ServerSocket rconSocket;
+  public ServerSocket rconSocket;
 
   LinkedList<String> outputLog = new LinkedList<String>();
 
   public Semaphore saveLock = new Semaphore(1);
-  public BlockFirewallList blockFirewall;
+  public BlockList blockFirewall;
   // public RankList ranks;
   public GroupList groups;
   public MemberList members;
-  public RobotLoader robots;
-  public MOTDLoader motd;
+  public RobotList robots;
+  public MOTD motd;
   public KitList kits;
   // public WarpList warps;
   public ChestList chests;
-  public RulesLoader rules;
+  public Rules rules;
   public IPMemberList ipMembers;
-  public IPBanLoader ipBans;
+  public IPBanList ipBans;
   public ItemWatchList itemWatch;
-  public WhitelistLoader whitelist;
-  public MuteLoader mutelist;
+  public WhiteList whitelist;
+  public MuteList mutelist;
   public Options options;
   public CommandList commands;
 
@@ -108,20 +107,20 @@ public class Server {
   ServerAutoRestart autoRestart;
   PlayerScanner playerScanner;
   MinecraftMonitor minecraftMonitor;
-  RequestTracker requestTracker;
+  public RequestTracker requestTracker;
 
   ForceShutdown forceShutdown;
   ForceRestart forceRestart;
 
   boolean requireBackup = false;
   boolean isSaving = false;
-  boolean isRestarting = false;
+  public boolean isRestarting = false;
   boolean waitingForStart = false;
   boolean useDev = false;
 
-  LinkedList<FileLoader> resources = new LinkedList<FileLoader>();
+  LinkedList<Config> resources = new LinkedList<Config>();
   // LinkedList<Player> players = new LinkedList<Player>();
-  LinkedList<Rcon> rcons = new LinkedList<Rcon>();
+  public LinkedList<Rcon> rcons = new LinkedList<Rcon>();
 
   // Minecraft Process
   public Process p;
@@ -187,22 +186,22 @@ public class Server {
   }
 
   private void initResources() {
-    resources.add(robots = new RobotLoader());
+    resources.add(robots = new RobotList());
     resources.add(ipMembers = new IPMemberList(this));
     resources.add(chests = new ChestList(this));
     resources.add(commands = new CommandList(this));
     // resources.add(warps = new WarpList(this));
-    resources.add(blockFirewall = new BlockFirewallList(this));
+    resources.add(blockFirewall = new BlockList(this));
     resources.add(itemWatch = new ItemWatchList(this));
     // resources.add(ranks = new RankList(this));
     resources.add(groups = new GroupList(this));
     resources.add(members = new MemberList(this));
-    resources.add(motd = new MOTDLoader());
-    resources.add(rules = new RulesLoader());
+    resources.add(motd = new MOTD());
+    resources.add(rules = new Rules());
     resources.add(kits = new KitList(this));
-    resources.add(ipBans = new IPBanLoader());
-    resources.add(whitelist = new WhitelistLoader());
-    resources.add(mutelist = new MuteLoader());
+    resources.add(ipBans = new IPBanList());
+    resources.add(whitelist = new WhiteList());
+    resources.add(mutelist = new MuteList());
 
   }
 
@@ -537,7 +536,7 @@ public class Server {
   }
   */
   public void loadAll() {
-    for (FileLoader i : resources) {
+    for (Config i : resources) {
       i.load();
     }
     l.load();
@@ -545,7 +544,7 @@ public class Server {
   }
 
   public void saveAll() {
-    for (FileLoader i : resources) {
+    for (Config i : resources) {
       i.save();
     }
     options.save();

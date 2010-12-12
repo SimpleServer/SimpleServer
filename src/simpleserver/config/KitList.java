@@ -18,14 +18,16 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-package simpleserver.files;
+package simpleserver.config;
 
 import java.util.LinkedList;
 
+import simpleserver.Config;
+import simpleserver.Group;
 import simpleserver.Player;
 import simpleserver.Server;
 
-public class KitList extends FileLoader {
+public class KitList extends Config {
   Server parent;
 
   static class Kit {

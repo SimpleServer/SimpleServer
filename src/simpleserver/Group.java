@@ -18,11 +18,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-package simpleserver.files;
+package simpleserver;
 
 import java.util.Vector;
 
-import simpleserver.Player;
 
 public class Group {
   private int id;

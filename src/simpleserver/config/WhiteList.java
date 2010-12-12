@@ -18,77 +18,60 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-package simpleserver.files;
+package simpleserver.config;
 
 import java.util.LinkedList;
 
-import simpleserver.Player;
-import simpleserver.Server;
+import simpleserver.Config;
 
-public class BlockFirewallList extends FileLoader {
-  Server parent;
 
-  static class BlockEntry {
-    int id;
-    int[] groups;
+public class WhiteList extends Config {
+  LinkedList<String> users = new LinkedList<String>();
 
-    public BlockEntry(int id, int[] groups) {
-      this.id = id;
-      this.groups = groups;
-    }
+  public WhiteList() {
+    this.filename = "white-list.txt";
   }
 
-  LinkedList<BlockEntry> blocks = new LinkedList<BlockEntry>();
-
-  @SuppressWarnings("unused")
-  private BlockFirewallList() {
-  }
-
-  public BlockFirewallList(Server parent) {
-    this.parent = parent;
-    this.filename = "block-list.txt";
-  }
-
-  public boolean checkCheck(int blockID) {
-    for (BlockEntry i : blocks) {
-      if (i.id == blockID) {
+  public boolean isWhitelisted(String name) {
+    for (String i : users) {
+      if (name.toLowerCase().trim().equals(i.toLowerCase().trim())) {
         return true;
       }
     }
     return false;
   }
 
-  public boolean checkAllowed(Player p, int blockID) {
-    for (BlockEntry i : blocks) {
-      if (i.id == blockID) {
-        return Group.contains(i.groups, p);
+  public void addName(String name) {
+    users.add(name);
+    save();
+  }
+
+  public boolean removeName(String name) {
+    for (String i : users) {
+      if (name.toLowerCase().trim().compareTo(i.toLowerCase().trim()) == 0) {
+        users.remove(i);
+        save();
+        return true;
       }
     }
-    return true;
+    return false;
   }
 
   @Override
   protected void beforeLoad() {
-    blocks.clear();
+    users.clear();
   }
 
   @Override
   protected void loadLine(String line) {
-    String[] tokens = line.split(":");
-    if (tokens.length >= 2)
-      blocks.add(new BlockEntry(Integer.valueOf(tokens[0]),
-                                Group.parseGroups(tokens[1])));
+    users.add(line);
   }
 
   @Override
   protected String saveString() {
     String line = "";
-    for (BlockEntry i : blocks) {
-      line += i.id + ":";
-      for (int group : i.groups) {
-        line += group + ",";
-      }
-      line += "\r\n";
+    for (String i : users) {
+      line += i + "\r\n";
     }
     return line;
   }

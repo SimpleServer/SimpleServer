@@ -18,7 +18,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-package simpleserver;
+package simpleserver.rcon;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -27,6 +27,9 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
 import java.util.Iterator;
+
+import simpleserver.Rcon;
+import simpleserver.Server;
 
 public class RconServer implements Runnable {
   private Server parent;

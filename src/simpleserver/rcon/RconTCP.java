@@ -18,18 +18,16 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-package simpleserver;
+package simpleserver.rcon;
 
 import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
+import java.net.Socket;
 import java.util.LinkedList;
 
-public class RconUDP implements Rcon {
-  protected final int BUF_SIZE = 8192;
-  protected int BYTE_THRESHOLD = 32;
+import simpleserver.Rcon;
+import simpleserver.Server;
+
+public class RconTCP implements Rcon {
   protected final int SERVERDATA_AUTH = 3;
   protected final int SERVERDATA_EXECCOMMAND = 2;
   protected final int SERVERDATA_AUTH_RESPONSE = 2;
@@ -39,7 +37,7 @@ public class RconUDP implements Rcon {
   // public SocketThread internal;
   // public SocketThread external;
   // public RconParser parser;
-  public DatagramPacket current;
+  public Socket current;
   protected long lastRead;
   Thread t1;
   String name = null;
@@ -106,10 +104,11 @@ public class RconUDP implements Rcon {
   }
 
   public String getIPAddress() {
-    return current.getAddress().getHostAddress();
+    return current.getInetAddress().getHostAddress();
   }
 
-  public RconUDP(DatagramPacket p, Server parent) throws IOException {
+  public RconTCP(Socket p, Server parent) throws IOException {
+
     this.parent = parent;
     // parser = new RconParser(this);
     current = p;
@@ -123,11 +122,30 @@ public class RconUDP implements Rcon {
       // TODO Auto-generated catch block
       e2.printStackTrace();
     }
-    if (parent.isIPBanned(current.getAddress().getHostAddress())) {
+    if (parent.isIPBanned(getIPAddress())) {
       System.out.println("[SimpleServer] IP " + getIPAddress() + " is banned!");
       kick("Banned IP!");
     }
     this.name = getIPAddress();
+
+    lastRead = System.currentTimeMillis();
+    t1 = new Thread() {
+      @Override
+      public void run() {
+        if (testTimeout()) {
+          close();
+          return;
+        }
+        try {
+          Thread.sleep(1000);
+        }
+        catch (InterruptedException e) {
+          return;
+        }
+      }
+    };
+    t1.start();
+
     handle(p);
     /*
     try {
@@ -160,7 +178,7 @@ public class RconUDP implements Rcon {
   // Public Methods:
   public boolean testTimeout() {
     if (!closed) {
-      if (System.currentTimeMillis() - lastRead > StreamTunnel.IDLE_TIME) {
+      if (System.currentTimeMillis() - lastRead > RconHandler.IDLE_TIME) {
         /*
         if (!isRobot)
           System.out.println("[SimpleServer] Disconnecting " + getIPAddress() + " due to inactivity.");
@@ -187,7 +205,9 @@ public class RconUDP implements Rcon {
     // parent.notifyClosedRcon(this);
     if (!closed) {
       closed = true;
-      cleanup();
+      auth = false;
+      if (!isKicked)
+        parent.notifyClosedRcon(this);
     }
   }
 
@@ -195,45 +215,44 @@ public class RconUDP implements Rcon {
 
   }
 
+  /*
+
   protected String readString2(ByteBuffer bb) {
     byte b;
     int offset = bb.position();
-    int i = 0;
-    while (true) {
+    int i=0;
+    while(true) {
       b = bb.get();
       System.out.print(b + " ");
-      if (b == 0)
+      if (b==0)
         break;
       i++;
     }
-    if (i == 0)
+    if (i==0)
       return "";
     byte[] string = new byte[i];
-    // bb.position(0);
+    //bb.position(0);
     System.out.println("");
     bb.get(string, offset, i);
     return new String(string);
   }
-
   private String getConsole() {
     String console = "";
     String[] consolearray = parent.getOutputLog();
-    for (String i : consolearray) {
+    for (String i: consolearray) {
       console += i;
     }
     return console;
   }
-
   protected String parsePacket(String command) {
     String[] tokens = command.split(" ");
-    if (tokens.length > 0) {
+    if (tokens.length>0) {
       if (tokens[0].equalsIgnoreCase("rcon")) {
-        if (tokens.length > 1) {
+        if (tokens.length>1) {
           int idx = command.indexOf(tokens[1]);
           try {
             parent.runCommand(command.substring(idx));
-          }
-          catch (InterruptedException e) {
+          } catch (InterruptedException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
           }
@@ -243,16 +262,19 @@ public class RconUDP implements Rcon {
           return "Error: No Command";
       }
       if (tokens[0].equalsIgnoreCase("help")) {
-        if (tokens.length > 1) {
+        if (tokens.length>1) {
           if (tokens[1].equalsIgnoreCase("get")) {
-            return "Resources:\r\n" + "console    Shows console output\r\n";
+            return "Resources:\r\n" +
+            "console    Shows console output\r\n";
           }
         }
-        return "Commands:\r\n" + "help    Shows this message\r\n"
-            + "rcon    Execute Command\r\n" + "get    Get a resource";
+        return "Commands:\r\n" +
+          "help    Shows this message\r\n" +
+          "rcon    Execute Command\r\n" +
+          "get    Get a resource";
       }
       if (tokens[0].equalsIgnoreCase("get")) {
-        if (tokens.length > 1) {
+        if (tokens.length>1) {
           if (tokens[1].equalsIgnoreCase("console")) {
             return getConsole();
           }
@@ -262,34 +284,30 @@ public class RconUDP implements Rcon {
     }
     return "Error: Unrecognized Command";
   }
-
   protected String auth(String passwd) {
     if (parent.options.rconPassword.equals("")) {
-      System.out.println("[SimpleServer] RCON Auth Attempt from "
-          + parent.socket.getInetAddress().getHostAddress()
-          + "! (rconPassword is blank)");
+      System.out.println("[SimpleServer] RCON Auth Attempt from " + parent.socket.getInetAddress().getHostAddress() + "! (rconPassword is blank)");
       return null;
     }
     if (passwd.equals(parent.options.rconPassword)) {
-      auth = true;
+      auth=true;
       return "";
     }
     else {
-      System.out.println("[SimpleServer] RCON Authentication Failed from "
-          + parent.socket.getInetAddress().getHostAddress() + "!");
+      System.out.println("[SimpleServer] RCON Authentication Failed from " + parent.socket.getInetAddress().getHostAddress() + "!");
       return null;
     }
   }
 
   private void sendPacket(byte[] bb) throws IOException {
     DatagramSocket s = new DatagramSocket();
-    s.connect(current.getAddress(), current.getPort());
-    DatagramPacket send = new DatagramPacket(bb, bb.length);
+    s.connect(current.getAddress(),current.getPort());
+    DatagramPacket send = new DatagramPacket(bb,bb.length);
     s.send(send);
   }
 
   private void junkResponse() throws IOException {
-    int packetSize = INT * 2 + 1 + 1;
+    int packetSize= INT * 2 + 1 + 1;
     ByteBuffer bb;
     bb = ByteBuffer.allocate(INT + packetSize);
     bb.order(ByteOrder.LITTLE_ENDIAN);
@@ -300,104 +318,18 @@ public class RconUDP implements Rcon {
     bb.put((byte) 0);
     sendPacket(bb.array());
 
-    // out.write(bb.array());
+    //out.write(bb.array());
   }
-
-  public void handle(DatagramPacket p) throws IOException {
-    lastRead = System.currentTimeMillis();
-    ByteBuffer buf = ByteBuffer.wrap(p.getData());
-
-    int packetSize = buf.getInt();
-    int requestID = buf.getInt();
-    int requestType = buf.getInt();
-    String s1 = readString2(buf);
-    String s2 = readString2(buf);
-
-    int responseType = 0;
-    String response;
-    if (requestType == SERVERDATA_EXECCOMMAND && auth) {
-      response = parsePacket(s1);
-    }
-    else if (requestType == SERVERDATA_AUTH) {
-      response = auth(s1);
-      responseType = SERVERDATA_AUTH_RESPONSE;
-      if (response == null) {
-        requestID = -1;
-        response = "";
-      }
-      junkResponse();
-    }
-    else if (!auth) {
-      responseType = SERVERDATA_AUTH_RESPONSE;
-      requestID = -1;
-      response = "";
-    }
-    else {
-      responseType = SERVERDATA_RESPONSE_VALUE;
-      requestID = -1;
-      response = "Error";
-    }
-    ByteBuffer bb;
-    ByteBuffer bbSend;
-
-    if (!response.equals("")) {
-      bbSend = ByteBuffer.wrap(response.getBytes());
-      int i = 0;
-
-      byte[] send = null;
-      for (i = 0; i + 4096 < bbSend.capacity(); i += 4096) {
-        if (send == null)
-          send = new byte[4098];
-        packetSize = INT * 2 + 4096 + 1 + 1;
-
-        bb = ByteBuffer.allocate(4 + packetSize);
-        bb.order(ByteOrder.LITTLE_ENDIAN);
-        bb.putInt(packetSize);
-        bb.putInt(requestID);
-        bb.putInt(responseType);
-
-        // sendPacket(bb.array());
-        bbSend.get(send, i, 4096);
-        send[4096] = 0;
-        send[4097] = 0;
-        bb.put(send);
-        sendPacket(bb.array());
-
-      }
-      send = new byte[bbSend.capacity() - i + 2];
-      packetSize = INT * 2 + (bbSend.capacity() - i) + 1 + 1;
-      bb = ByteBuffer.allocate(4 + packetSize);
-      bb.order(ByteOrder.LITTLE_ENDIAN);
-      bb.putInt(packetSize);
-      bb.putInt(requestID);
-      bb.putInt(responseType);
-
-      // out.write(bb.array());
-      bbSend.get(send, i, bbSend.capacity() - i);
-      send[bbSend.capacity() - i] = 0;
-      send[bbSend.capacity() - i + 1] = 0;
-      bb.put(send);
-      sendPacket(bb.array());
-
-    }
-    else {
-      packetSize = INT * 2 + 1 + 1;
-      bb = ByteBuffer.allocate(4 + packetSize);
-      bb.order(ByteOrder.LITTLE_ENDIAN);
-      bb.putInt(packetSize);
-      bb.putInt(requestID);
-      bb.putInt(responseType);
-      bb.put((byte) 0);
-      bb.put((byte) 0);
-      sendPacket(bb.array());
-    }
+  */
+  public void handle(Socket p) throws IOException {
+    new Thread(new RconHandler(p, this)).start();
 
   }
 
   public void handle(Object o) {
-    if (o instanceof DatagramPacket)
+    if (o instanceof Socket)
       try {
-        handle((DatagramPacket) o);
+        handle((Socket) o);
       }
       catch (IOException e) {
         // TODO Auto-generated catch block

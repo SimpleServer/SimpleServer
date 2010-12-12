@@ -18,12 +18,15 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-package simpleserver.files;
+package simpleserver.config;
 
-public class MOTDLoader extends FileLoader {
+import simpleserver.Config;
+
+
+public class MOTD extends Config {
   String motd;
 
-  public MOTDLoader() {
+  public MOTD() {
     this.filename = "motd.txt";
   }
 

@@ -18,104 +18,82 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-package simpleserver.files;
+package simpleserver.config;
 
 import java.util.LinkedList;
 
+import simpleserver.Config;
+import simpleserver.Group;
 import simpleserver.Player;
 import simpleserver.Server;
 
-public class WarpList extends FileLoader {
+public class ItemWatchList extends Config {
   Server parent;
 
-  static class Warp {
-    String name;
-    double x, y, z, stance;
+  static class ItemEntry {
+    int id;
+    int threshold;
+    int[] groups;
 
-    public Warp(String name, double x, double y, double z, double stance) {
-      this.name = name.toLowerCase().trim();
-      this.x = x;
-      this.y = y;
-      this.z = z;
-      this.stance = stance;
+    public ItemEntry(int id, int threshold, int[] groups) {
+      this.id = id;
+      this.threshold = threshold;
+      this.groups = groups;
     }
   }
 
-  LinkedList<Warp> warps = new LinkedList<Warp>();
+  LinkedList<ItemEntry> items = new LinkedList<ItemEntry>();
 
   @SuppressWarnings("unused")
-  private WarpList() {
+  private ItemWatchList() {
   }
 
-  public WarpList(Server parent) {
+  public ItemWatchList(Server parent) {
     this.parent = parent;
-    this.filename = "warp-list.txt";
+    this.filename = "item-watch-list.txt";
   }
 
-  public boolean warpExists(String name) {
-    for (Warp i : warps) {
-      if (i.name.compareTo(name.toLowerCase().trim()) == 0)
+  public boolean checkCheck(int blockID) {
+    for (ItemEntry i : items) {
+      if (i.id == blockID) {
         return true;
+      }
     }
     return false;
   }
 
-  public double[] getWarp(String name) {
-    for (Warp i : warps) {
-      if (i.name.compareTo(name.toLowerCase().trim()) == 0)
-        return new double[] { i.x, i.y, i.z, i.stance };
+  public boolean checkAllowed(Player p, int blockID, int amt) {
+    for (ItemEntry i : items) {
+      if (i.id == blockID) {
+        if (amt >= i.threshold)
+          return Group.contains(i.groups, p);
+      }
     }
-    return null;
-  }
-
-  public boolean makeWarp(String name, double x, double y, double z,
-                          double stance) {
-    if (warpExists(name))
-      return false;
-    warps.add(new Warp(name, x, y, z, stance));
     return true;
-  }
-
-  public boolean removeWarp(String name) {
-    for (Warp i : warps) {
-      if (i.name.compareTo(name.toLowerCase().trim()) == 0)
-        warps.remove(i);
-      return true;
-    }
-    return false;
-  }
-
-  public void listWarps(Player p) {
-    // int rank=parent.ranks.checkName(p.getName());
-    String line = "Warps: ";
-    for (Warp i : warps) {
-      line += i.name + ", ";
-    }
-    p.addMessage(line);
   }
 
   @Override
   protected void beforeLoad() {
-    warps.clear();
+    items.clear();
   }
 
   @Override
   protected void loadLine(String line) {
-    String[] tokens = line.split(",");
-    try {
-      warps.add(new Warp(tokens[0], Double.valueOf(tokens[1]),
-                         Double.valueOf(tokens[2]), Double.valueOf(tokens[3]),
-                         Double.valueOf(tokens[4])));
-    }
-    catch (Exception e) {
-    }
+    String[] tokens = line.split(":");
+    if (tokens.length >= 3)
+      items.add(new ItemEntry(Integer.valueOf(tokens[0]),
+                              Integer.valueOf(tokens[1]),
+                              Group.parseGroups(tokens[2])));
   }
 
   @Override
   protected String saveString() {
     String line = "";
-    for (Warp i : warps) {
-      line += i.name + "," + i.x + "," + i.y + "," + i.z + "," + i.stance + ",";
+    for (ItemEntry i : items) {
+      line += i.id + ":" + i.threshold + ":";
+      for (int group : i.groups) {
+        line += group + ",";
+      }
       line += "\r\n";
     }
     return line;

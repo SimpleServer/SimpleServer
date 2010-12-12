@@ -18,75 +18,77 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-package simpleserver.files;
+package simpleserver.config;
 
 import java.util.LinkedList;
 
+import simpleserver.Config;
 import simpleserver.Server;
 
-public class GroupList extends FileLoader {
+public class MemberList extends Config {
+  static class Member {
+    String name;
+    int group;
 
-  LinkedList<Group> groups = new LinkedList<Group>();
+    public Member(String name, int group) {
+      this.name = name;
+      this.group = group;
+    }
+  }
+
+  LinkedList<Member> members = new LinkedList<Member>();
   Server parent;
 
-  public GroupList(Server parent) {
-    this.filename = "group-list.txt";
+  public MemberList(Server parent) {
+    this.filename = "member-list.txt";
     this.parent = parent;
   }
 
-  public int checkGroupName(String name) {
+  public int checkName(String name) {
     if (name != null) {
-      for (Group i : groups) {
-        if (name.toLowerCase().trim()
-                .compareTo(i.getName().toLowerCase().trim()) == 0) {
-          return i.getID();
+      for (Member i : members) {
+        if (name.toLowerCase().trim().compareTo(i.name.toLowerCase().trim()) == 0) {
+          return i.group;
         }
       }
     }
     return parent.options.defaultGroup;
   }
 
-  public boolean groupExists(int group) {
-    for (Group i : groups) {
-      if (i.getID() == group)
-        return true;
-    }
-    return false;
-  }
+  public void setGroup(String name, int group) throws InterruptedException {
+    if (group > 0 && !parent.groups.groupExists(group))
+      return;
+    for (Member i : members) {
+      if (name.toLowerCase().trim().compareTo(i.name.toLowerCase().trim()) == 0) {
 
-  public Group getGroup(int id) {
-    for (Group i : groups) {
-      if (i.getID() == id) {
-        return i;
+        i.group = group;
+        parent.updateGroup(name);
+        save();
+        return;
       }
     }
-    return null;
+    members.add(new Member(name, group));
+    parent.updateGroup(name);
+    save();
   }
 
   @Override
   protected void beforeLoad() {
-    groups.clear();
+    members.clear();
   }
 
   @Override
   protected void loadLine(String line) {
     String[] tokens = line.split("=");
-    if (tokens.length >= 2) {
-      String[] tokens2 = tokens[1].split(",");
-      if (tokens2.length >= 3) {
-        groups.add(new Group(Integer.valueOf(tokens[0]), tokens2[0],
-                             Boolean.valueOf(tokens2[1]),
-                             Boolean.valueOf(tokens2[2]), tokens2[3]));
-      }
-    }
+    if (tokens.length >= 2)
+      members.add(new Member(tokens[0], Integer.valueOf(tokens[1])));
   }
 
   @Override
   protected String saveString() {
     String line = "";
-    for (Group i : groups) {
-      line += i.getID() + "=" + i.getName() + "," + i.showTitle() + ","
-          + i.isAdmin() + "," + i.getColor() + "\r\n";
+    for (Member i : members) {
+      line += i.name + "=" + i.group + "\r\n";
     }
     return line;
   }

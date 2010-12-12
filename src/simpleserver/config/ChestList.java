@@ -18,16 +18,17 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-package simpleserver.files;
+package simpleserver.config;
 
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Semaphore;
 
+import simpleserver.Config;
 import simpleserver.Server;
 
-public class ChestList extends FileLoader {
+public class ChestList extends Config {
   Server parent;
 
   static class CoordinateMap {

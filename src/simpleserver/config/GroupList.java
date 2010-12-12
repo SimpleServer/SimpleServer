@@ -18,77 +18,77 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-package simpleserver.files;
+package simpleserver.config;
 
 import java.util.LinkedList;
 
-import simpleserver.Player;
+import simpleserver.Config;
+import simpleserver.Group;
 import simpleserver.Server;
 
-public class IPMemberList extends FileLoader {
-  static class Member {
-    String ip;
-    int group;
+public class GroupList extends Config {
 
-    public Member(String ip, int group) {
-      this.ip = ip;
-      this.group = group;
-    }
-  }
-
-  LinkedList<Member> members = new LinkedList<Member>();
+  LinkedList<Group> groups = new LinkedList<Group>();
   Server parent;
 
-  public IPMemberList(Server parent) {
-    this.filename = "ip-member-list.txt";
+  public GroupList(Server parent) {
+    this.filename = "group-list.txt";
     this.parent = parent;
   }
 
-  public int checkPlayer(Player p) {
-    if (p != null) {
-      String ip = p.extsocket.getInetAddress().getHostAddress();
-      for (Member i : members) {
-        if (ip.startsWith(i.ip)) {
-          return i.group;
+  public int checkGroupName(String name) {
+    if (name != null) {
+      for (Group i : groups) {
+        if (name.toLowerCase().trim()
+                .compareTo(i.getName().toLowerCase().trim()) == 0) {
+          return i.getID();
         }
       }
     }
     return parent.options.defaultGroup;
   }
 
-  public void setRank(Player p, int group) {
-    if (p != null) {
-      String ip = p.extsocket.getInetAddress().getHostAddress();
-      for (Member i : members) {
-        if (i.ip.compareTo(ip.trim()) == 0) {
-          i.group = group;
-          save();
-          return;
-        }
-      }
-      members.add(new Member(ip.trim(), group));
-
-      save();
+  public boolean groupExists(int group) {
+    for (Group i : groups) {
+      if (i.getID() == group)
+        return true;
     }
+    return false;
+  }
+
+  public Group getGroup(int id) {
+    for (Group i : groups) {
+      if (i.getID() == id) {
+        return i;
+      }
+    }
+    return null;
   }
 
   @Override
   protected void beforeLoad() {
-    members.clear();
+    groups.clear();
   }
 
   @Override
   protected void loadLine(String line) {
     String[] tokens = line.split("=");
-    if (tokens.length >= 2)
-      members.add(new Member(tokens[0], Integer.valueOf(tokens[1])));
+    if (tokens.length >= 2) {
+      String[] tokens2 = tokens[1].split(",");
+      if (tokens2.length >= 3) {
+        groups.add(new Group(Integer.valueOf(tokens[0]), tokens2[0],
+                             Boolean.valueOf(tokens2[1]),
+                             Boolean.valueOf(tokens2[2]), tokens2[3]));
+      }
+    }
   }
 
   @Override
   protected String saveString() {
     String line = "";
-    for (Member i : members) {
-      line += i.ip + "=" + i.group + "\r\n";
+    for (Group i : groups) {
+      line += i.getID() + "=" + i.getName() + "," + i.showTitle() + ","
+          + i.isAdmin() + "," + i.getColor() + "\r\n";
     }
     return line;
   }

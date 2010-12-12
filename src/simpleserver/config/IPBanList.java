@@ -18,76 +18,61 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-package simpleserver.files;
+package simpleserver.config;
 
 import java.util.LinkedList;
 
-import simpleserver.Server;
+import simpleserver.Config;
 
-public class MemberList extends FileLoader {
-  static class Member {
-    String name;
-    int group;
 
-    public Member(String name, int group) {
-      this.name = name;
-      this.group = group;
-    }
+public class IPBanList extends Config {
+  LinkedList<String> bans = new LinkedList<String>();
+
+  public IPBanList() {
+    this.filename = "ip-ban-list.txt";
   }
 
-  LinkedList<Member> members = new LinkedList<Member>();
-  Server parent;
-
-  public MemberList(Server parent) {
-    this.filename = "member-list.txt";
-    this.parent = parent;
-  }
-
-  public int checkName(String name) {
-    if (name != null) {
-      for (Member i : members) {
-        if (name.toLowerCase().trim().compareTo(i.name.toLowerCase().trim()) == 0) {
-          return i.group;
-        }
-      }
-    }
-    return parent.options.defaultGroup;
-  }
-
-  public void setGroup(String name, int group) throws InterruptedException {
-    if (group > 0 && !parent.groups.groupExists(group))
-      return;
-    for (Member i : members) {
-      if (name.toLowerCase().trim().compareTo(i.name.toLowerCase().trim()) == 0) {
-
-        i.group = group;
-        parent.updateGroup(name);
-        save();
-        return;
-      }
-    }
-    members.add(new Member(name, group));
-    parent.updateGroup(name);
+  public void addBan(String ipAddress) {
+    bans.add(ipAddress);
     save();
+  }
+
+  public boolean removeBan(String ipAddress) {
+    for (String i : bans) {
+      if (i.compareTo(ipAddress) == 0) {
+        bans.remove(i);
+        save();
+        return true;
+      }
+    }
+    return false;
+  }
+
+  public boolean isBanned(String ipAddress) {
+    for (String i : bans) {
+      if (ipAddress.startsWith(i) && i.length() != 0) {
+        return true;
+      }
+    }
+    return false;
   }
 
   @Override
   protected void beforeLoad() {
-    members.clear();
+    bans.clear();
   }
 
   @Override
   protected void loadLine(String line) {
-    String[] tokens = line.split("=");
-    if (tokens.length >= 2)
-      members.add(new Member(tokens[0], Integer.valueOf(tokens[1])));
+    if (line != null && line != "")
+      bans.add(line);
   }
 
   @Override
   protected String saveString() {
     String line = "";
-    for (Member i : members) {
-      line += i.name + "=" + i.group + "\r\n";
+    for (String i : bans) {
+      line += i + "\r\n";
     }
     return line;
   }

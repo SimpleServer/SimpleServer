@@ -32,7 +32,7 @@ import java.nio.ByteOrder;
 import java.util.LinkedList;
 import java.util.concurrent.Semaphore;
 
-import simpleserver.files.EOFWriter;
+import simpleserver.log.EOFWriter;
 
 public class StreamTunnel implements Runnable {
   protected final int BUF_SIZE = 8192;

@@ -26,7 +26,7 @@ import java.io.FileOutputStream;
 import java.util.Properties;
 import java.util.Scanner;
 
-import simpleserver.files.CommandList;
+import simpleserver.config.CommandList;
 
 public class Options {
 

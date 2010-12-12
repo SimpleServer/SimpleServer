@@ -18,35 +18,80 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-package simpleserver.files;
+package simpleserver.config;
 
-public class RulesLoader extends FileLoader {
-  String rules;
+import java.util.LinkedList;
 
-  public RulesLoader() {
-    this.filename = "rules.txt";
+import simpleserver.Config;
+import simpleserver.Group;
+import simpleserver.Player;
+import simpleserver.Server;
+
+public class BlockList extends Config {
+  Server parent;
+
+  static class BlockEntry {
+    int id;
+    int[] groups;
+
+    public BlockEntry(int id, int[] groups) {
+      this.id = id;
+      this.groups = groups;
+    }
   }
 
-  public String getRules() {
-    return rules;
+  LinkedList<BlockEntry> blocks = new LinkedList<BlockEntry>();
+
+  @SuppressWarnings("unused")
+  private BlockList() {
   }
 
-  public void setRules(String msg) {
-    rules = msg;
+  public BlockList(Server parent) {
+    this.parent = parent;
+    this.filename = "block-list.txt";
+  }
+
+  public boolean checkCheck(int blockID) {
+    for (BlockEntry i : blocks) {
+      if (i.id == blockID) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  public boolean checkAllowed(Player p, int blockID) {
+    for (BlockEntry i : blocks) {
+      if (i.id == blockID) {
+        return Group.contains(i.groups, p);
+      }
+    }
+    return true;
   }
 
   @Override
   protected void beforeLoad() {
-    rules = "";
+    blocks.clear();
   }
 
   @Override
   protected void loadLine(String line) {
-    rules += line + "\r\n";
+    String[] tokens = line.split(":");
+    if (tokens.length >= 2)
+      blocks.add(new BlockEntry(Integer.valueOf(tokens[0]),
+                                Group.parseGroups(tokens[1])));
   }
 
   @Override
   protected String saveString() {
-    return rules;
+    String line = "";
+    for (BlockEntry i : blocks) {
+      line += i.id + ":";
+      for (int group : i.groups) {
+        line += group + ",";
+      }
+      line += "\r\n";
+    }
+    return line;
   }
 }

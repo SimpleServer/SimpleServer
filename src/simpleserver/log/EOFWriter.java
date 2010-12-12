@@ -18,25 +18,32 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-package simpleserver.files;
+package simpleserver.log;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.util.Calendar;
+import java.util.Iterator;
+import java.util.LinkedList;
 
-public class ErrorLog implements Runnable {
-  Exception e;
+public class EOFWriter implements Runnable {
+  byte[] buffer;
+  LinkedList<byte[]> buffer2;
+  Exception exception;
   String comments;
 
-  public ErrorLog(Exception e, String comments) {
-    this.e = e;
-    this.comments = comments;
+  public EOFWriter(byte[] buf, LinkedList<byte[]> lastSent, Exception e,
+                   String msg) {
+    buffer = buf;
+    buffer2 = lastSent;
+    exception = e;
+    comments = msg;
   }
 
   public void run() {
     Calendar date = Calendar.getInstance();
-    File dump = new File("error_" + date.get(Calendar.YEAR) + "-"
+    File dump = new File("dump_" + date.get(Calendar.YEAR) + "-"
         + (date.get(Calendar.MONTH) + 1) + "-" + date.get(Calendar.DATE) + "-"
         + date.get(Calendar.HOUR_OF_DAY) + "_" + date.get(Calendar.MINUTE)
         + ".txt");
@@ -45,14 +52,31 @@ public class ErrorLog implements Runnable {
         dump.createNewFile();
       FileOutputStream f = new FileOutputStream(dump);
       PrintStream p = new PrintStream(f);
+      if (exception != null)
+        exception.printStackTrace(p);
+
       p.println(comments);
-      if (e != null)
-        e.printStackTrace(p);
+      printStream(buffer, p);
+      synchronized (buffer2) {
+        for (Iterator<byte[]> itr = buffer2.iterator(); itr.hasNext();) {
+          byte[] i = itr.next();
+          printStream(i, p);
+        }
+      }
       p.close();
       f.close();
     }
     catch (Exception e) {
       e.printStackTrace();
     }
+
   }
+
+  private void printStream(byte[] stream, PrintStream p) {
+    for (int i = 0; i < stream.length; i++) {
+      p.print(Byte.toString(stream[i]) + " ");
+    }
+    p.println();
+  }
+
 }

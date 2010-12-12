@@ -32,7 +32,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import simpleserver.Server;
-import simpleserver.files.ErrorLog;
+import simpleserver.log.ErrorLog;
 
 /*
  * I forgot where I got some of this code from.

@@ -18,59 +18,78 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-package simpleserver.files;
+package simpleserver.config;
 
 import java.util.LinkedList;
 
-public class MuteLoader extends FileLoader {
-  LinkedList<String> users = new LinkedList<String>();
+import simpleserver.Config;
+import simpleserver.Player;
+import simpleserver.Server;
 
-  public MuteLoader() {
-    this.filename = "mute-list.txt";
+public class IPMemberList extends Config {
+  static class Member {
+    String ip;
+    int group;
+
+    public Member(String ip, int group) {
+      this.ip = ip;
+      this.group = group;
+    }
   }
 
-  public boolean isMuted(String name) {
-    for (String i : users) {
-      if (name.toLowerCase().trim().compareTo(i.toLowerCase().trim()) == 0) {
-        return true;
+  LinkedList<Member> members = new LinkedList<Member>();
+  Server parent;
+
+  public IPMemberList(Server parent) {
+    this.filename = "ip-member-list.txt";
+    this.parent = parent;
+  }
+
+  public int checkPlayer(Player p) {
+    if (p != null) {
+      String ip = p.extsocket.getInetAddress().getHostAddress();
+      for (Member i : members) {
+        if (ip.startsWith(i.ip)) {
+          return i.group;
+        }
       }
     }
-    return false;
+    return parent.options.defaultGroup;
   }
 
-  public void addName(String name) {
-    if (!isMuted(name)) {
-      users.add(name);
+  public void setRank(Player p, int group) {
+    if (p != null) {
+      String ip = p.extsocket.getInetAddress().getHostAddress();
+      for (Member i : members) {
+        if (i.ip.compareTo(ip.trim()) == 0) {
+          i.group = group;
+          save();
+          return;
+        }
+      }
+      members.add(new Member(ip.trim(), group));
+
       save();
     }
   }
 
-  public boolean removeName(String name) {
-    for (String i : users) {
-      if (i.equalsIgnoreCase(name)) {
-        users.remove(i);
-        save();
-        return true;
-      }
-    }
-    return false;
-  }
-
   @Override
   protected void beforeLoad() {
-    users.clear();
+    members.clear();
   }
 
   @Override
   protected void loadLine(String line) {
-    users.add(line);
+    String[] tokens = line.split("=");
+    if (tokens.length >= 2)
+      members.add(new Member(tokens[0], Integer.valueOf(tokens[1])));
   }
 
   @Override
   protected String saveString() {
     String line = "";
-    for (String i : users) {
-      line += i + "\r\n";
+    for (Member i : members) {
+      line += i.ip + "=" + i.group + "\r\n";
     }
     return line;
   }

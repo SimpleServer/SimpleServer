@@ -18,14 +18,16 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-package simpleserver.files;
+package simpleserver.config;
 
 import java.util.LinkedList;
 
+import simpleserver.Config;
+import simpleserver.Group;
 import simpleserver.Player;
 import simpleserver.Server;
 
-public class CommandList extends FileLoader {
+public class CommandList extends Config {
   public static final String[] commandList = { "ban=3,4", "banip=3,4",
       "unban=3,4", "unbanip=3,4", "kick=2-4", "lock=0", "unlock=0", "tp=3,4",
       "warpmeto=2-4", "warptome=2-4", "iddqd=3,4", "listips=2-4", "kit=0",

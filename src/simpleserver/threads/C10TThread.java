@@ -24,7 +24,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import simpleserver.Server;
-import simpleserver.files.ErrorLog;
+import simpleserver.log.ErrorLog;
 
 public class C10TThread implements Runnable {
   Server parent;
