@@ -47,7 +47,7 @@ public class AdminLog implements Runnable {
   public void addMessage(String msg) {
     synchronized (lines) {
       lines.add("[SimpleServer]\t" + date.get(Calendar.HOUR_OF_DAY) + ":"
-          + date.get(Calendar.MINUTE) + "\t" + msg + "\r\n");
+          + date.get(Calendar.MINUTE) + "\t" + msg + "\n");
     }
   }
 

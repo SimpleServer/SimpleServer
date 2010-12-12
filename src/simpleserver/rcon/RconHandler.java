@@ -263,11 +263,11 @@ public class RconHandler implements Runnable {
       if (tokens[0].equalsIgnoreCase("help")) {
         if (tokens.length > 1) {
           if (tokens[1].equalsIgnoreCase("get")) {
-            return "Resources:\r\n" + "console    Shows console output\r\n";
+            return "Resources:\n" + "console    Shows console output\n";
           }
         }
-        return "Commands:\r\n" + "help    Shows this message\r\n"
-            + "rcon    Execute Command\r\n" + "get    Get a resource";
+        return "Commands:\n" + "help    Shows this message\n"
+            + "rcon    Execute Command\n" + "get    Get a resource";
       }
       if (tokens[0].equalsIgnoreCase("get")) {
         if (tokens.length > 1) {

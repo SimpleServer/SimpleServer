@@ -80,7 +80,7 @@ public class RconServer implements Runnable {
       catch (IOException e) {
         System.out.println("Could not listen on port "
             + parent.options.rconPort
-            + "!\r\nIs it already in use? RCON is not available!");
+            + "!\nIs it already in use? RCON is not available!");
         return;
       }
     else

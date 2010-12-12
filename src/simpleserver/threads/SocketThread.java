@@ -47,7 +47,7 @@ public class SocketThread implements Runnable {
     }
     catch (IOException e) {
       System.out.println("Could not listen on port " + parent.options.port
-          + "!\r\nIs it already in use? Exiting application...");
+          + "!\nIs it already in use? Exiting application...");
       System.exit(-1);
     }
 

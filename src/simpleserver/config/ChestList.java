@@ -353,7 +353,7 @@ public class ChestList extends AsciiConfig {
     String line = "";
     for (Chest i : chests.flatArray2()) {
       line += i.name + "," + i.isGroup + "," + i.x + "," + i.y + "," + i.z;
-      line += "\r\n";
+      line += "\n";
     }
     return line;
   }

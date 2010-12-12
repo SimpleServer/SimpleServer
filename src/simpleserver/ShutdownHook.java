@@ -53,7 +53,7 @@ public class ShutdownHook implements Runnable {
     // parent.options.save();
     // parent.saveAll();
     stream = parent.p.getOutputStream();
-    String cmd = "stop" + "\r\n";
+    String cmd = "stop" + "\n";
     try {
       stream.write(cmd.getBytes());
       stream.flush();

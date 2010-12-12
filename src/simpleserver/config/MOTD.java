@@ -44,7 +44,7 @@ public class MOTD extends AsciiConfig {
 
   @Override
   protected void loadLine(String line) {
-    motd += line + "\r\n";
+    motd += line + "\n";
   }
 
   @Override

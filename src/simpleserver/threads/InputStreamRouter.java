@@ -45,7 +45,7 @@ public class InputStreamRouter implements Runnable {
 
   public boolean runCommand(String msg) throws InterruptedException {
 
-    msg += "\r\n";
+    msg += "\n";
     msg = parse(msg);
     if (msg == null)
       return true;
@@ -122,7 +122,7 @@ public class InputStreamRouter implements Runnable {
     while (!Thread.interrupted()) {
       String line = scan.nextLine();
 
-      line += "\r\n";
+      line += "\n";
       line = parse(line);
       if (line == null)
         continue;

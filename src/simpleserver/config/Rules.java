@@ -44,7 +44,7 @@ public class Rules extends AsciiConfig {
 
   @Override
   protected void loadLine(String line) {
-    rules += line + "\r\n";
+    rules += line + "\n";
   }
 
   @Override
