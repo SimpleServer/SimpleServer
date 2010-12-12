@@ -46,6 +46,7 @@ public class WhiteList extends PropertiesConfig {
     return false;
   }
 
+  @Override
   public void load() {
     super.load();
 

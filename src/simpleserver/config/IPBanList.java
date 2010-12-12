@@ -46,7 +46,7 @@ public class IPBanList extends PropertiesConfig {
 
   public boolean isBanned(String ipAddress) {
     String network = "";
-    String[] octets = ipAddress.split(".");
+    String[] octets = ipAddress.split("\\.");
 
     for (String octet : octets) {
       network += octet;

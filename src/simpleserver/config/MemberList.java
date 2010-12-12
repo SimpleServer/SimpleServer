@@ -34,7 +34,7 @@ public class MemberList extends PropertiesConfig {
     super("member-list.txt");
 
     this.server = server;
-    this.members = new HashMap<String, Integer>();
+    members = new HashMap<String, Integer>();
   }
 
   public int checkName(String name) {
@@ -56,6 +56,7 @@ public class MemberList extends PropertiesConfig {
     save();
   }
 
+  @Override
   public void load() {
     super.load();
 

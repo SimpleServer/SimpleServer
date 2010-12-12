@@ -39,8 +39,9 @@ public class ChestList extends AsciiConfig {
       }
 
       public boolean put(Chest c) {
-        if (x.containsKey(c.x))
+        if (x.containsKey(c.x)) {
           return x.get(c.x).put(c);
+        }
         else {
           Y newY = new Y();
           x.put(c.x, newY);
@@ -49,22 +50,27 @@ public class ChestList extends AsciiConfig {
       }
 
       public Chest remove(int xC, int yC, int zC) {
-        if (!x.containsKey(xC))
+        if (!x.containsKey(xC)) {
           return null;
+        }
         Chest c = x.get(xC).remove(yC, zC);
         Y yObj = x.get(xC);
-        if (yObj.y.keySet().size() == 0)
+        if (yObj.y.keySet().size() == 0) {
           x.remove(xC);
+        }
         return c;
       }
 
       public boolean remove(Chest c) {
-        if (!x.containsKey(c.x))
+        if (!x.containsKey(c.x)) {
           return false;
-        if (x.get(c.x).remove(c))
+        }
+        if (x.get(c.x).remove(c)) {
           x.remove(c.x);
-        if (x.keySet().size() == 0)
+        }
+        if (x.keySet().size() == 0) {
           return true;
+        }
         return false;
       }
     }
@@ -77,8 +83,9 @@ public class ChestList extends AsciiConfig {
       }
 
       public boolean put(Chest c) {
-        if (y.containsKey(c.y))
+        if (y.containsKey(c.y)) {
           return y.get(c.y).put(c);
+        }
         else {
           Z newZ = new Z();
           y.put(c.y, newZ);
@@ -87,22 +94,27 @@ public class ChestList extends AsciiConfig {
       }
 
       public Chest remove(int yC, int zC) {
-        if (!y.containsKey(yC))
+        if (!y.containsKey(yC)) {
           return null;
+        }
         Chest c = y.get(yC).remove(zC);
         Z zObj = y.get(yC);
-        if (zObj.z.keySet().size() == 0)
+        if (zObj.z.keySet().size() == 0) {
           y.remove(yC);
+        }
         return c;
       }
 
       public boolean remove(Chest c) {
-        if (!y.containsKey(c.y))
+        if (!y.containsKey(c.y)) {
           return false;
-        if (y.get(c.y).remove(c))
+        }
+        if (y.get(c.y).remove(c)) {
           y.remove(c.y);
-        if (y.keySet().size() == 0)
+        }
+        if (y.keySet().size() == 0) {
           return true;
+        }
         return false;
       }
     }
@@ -115,8 +127,9 @@ public class ChestList extends AsciiConfig {
       }
 
       public boolean put(Chest c) {
-        if (z.containsKey(c.z))
+        if (z.containsKey(c.z)) {
           return false;
+        }
         else {
           z.put(c.z, c);
           return true;
@@ -124,19 +137,22 @@ public class ChestList extends AsciiConfig {
       }
 
       public Chest remove(int zC) {
-        if (!z.containsKey(zC))
+        if (!z.containsKey(zC)) {
           return null;
+        }
         Chest c = z.get(zC);
         z.remove(zC);
         return c;
       }
 
       public boolean remove(Chest c) {
-        if (!z.containsKey(c.z))
+        if (!z.containsKey(c.z)) {
           return false;
+        }
         z.remove(c.z);
-        if (z.keySet().size() == 0)
+        if (z.keySet().size() == 0) {
           return true;
+        }
         return false;
       }
     }
@@ -148,8 +164,9 @@ public class ChestList extends AsciiConfig {
     public boolean findLock(int x, int y, int z) {
       try {
         Chest c = map.get(x).get(y).get(z);
-        if (c == null)
+        if (c == null) {
           return false;
+        }
         return true;
       }
       catch (Exception e) {
@@ -159,8 +176,9 @@ public class ChestList extends AsciiConfig {
     }
 
     public boolean findLock(String name) {
-      if (names.containsKey(name.toLowerCase()))
+      if (names.containsKey(name.toLowerCase())) {
         return true;
+      }
       return false;
     }
 
@@ -185,8 +203,9 @@ public class ChestList extends AsciiConfig {
 
     public void removeLock(String name) {
       Chest c;
-      if (!names.containsKey(name))
+      if (!names.containsKey(name)) {
         return;
+      }
       c = names.get(name);
       names.remove(name);
       map.remove(c);
@@ -242,7 +261,7 @@ public class ChestList extends AsciiConfig {
       this.x = x;
       this.y = y;
       this.z = z;
-      this.isGroup = false;
+      isGroup = false;
     }
 
     public Chest(String name, int x, int y, int z, boolean isGroup) {
@@ -264,10 +283,12 @@ public class ChestList extends AsciiConfig {
 
   public synchronized boolean giveLock(String name, int x, int y, int z,
                                        boolean isGroupLock) {
-    if (hasLock(name))
+    if (hasLock(name)) {
       return false;
-    if (hasLock(x, y, z))
+    }
+    if (hasLock(x, y, z)) {
       return false;
+    }
     name = name.toLowerCase().trim();
     chests.addLock(new Chest(name, x, y, z, isGroupLock));
     save();
@@ -279,13 +300,16 @@ public class ChestList extends AsciiConfig {
   }
 
   public boolean ownsLock(int x, int y, int z, String name) {
-    if (!hasLock(name))
+    if (!hasLock(name)) {
       return false;
+    }
     Chest c = chests.getLock(name);
-    if (c == null)
+    if (c == null) {
       return false;
-    if (c.x == x && c.y == y && c.z == z)
+    }
+    if (c.x == x && c.y == y && c.z == z) {
       return true;
+    }
     return false;
   }
 
@@ -298,12 +322,18 @@ public class ChestList extends AsciiConfig {
   }
 
   @Override
-  protected void beforeLoad() {
+  public void load() {
     chests.clear();
+
+    super.load();
   }
 
   @Override
   protected void loadLine(String line) {
+    if (line.length() == 0) {
+      return;
+    }
+
     String[] tokens = line.split(",");
     if (tokens.length > 0) {
       try {

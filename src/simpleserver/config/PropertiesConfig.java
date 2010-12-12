@@ -21,6 +21,7 @@
 package simpleserver.config;
 
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -32,14 +33,12 @@ import java.util.Set;
 import simpleserver.Config;
 
 public abstract class PropertiesConfig extends Config {
-  private String header;
   private Properties properties;
 
   public PropertiesConfig(String filename) {
     super(filename);
 
-    loadDefaultHeader();
-    loadDefault();
+    properties = new Properties();
   }
 
   @Override
@@ -53,6 +52,11 @@ public abstract class PropertiesConfig extends Config {
         stream.close();
       }
     }
+    catch (FileNotFoundException e) {
+      System.out.println(getFilename() + " is missing.  Loading defaults.");
+      loadDefaults();
+      save();
+    }
     catch (IOException e) {
       e.printStackTrace();
       System.out.println("Failed to load " + getFilename());
@@ -64,7 +68,7 @@ public abstract class PropertiesConfig extends Config {
     try {
       OutputStream stream = new FileOutputStream(getFile());
       try {
-        properties.store(stream, header);
+        properties.store(stream, getHeader());
       }
       finally {
         stream.close();
@@ -87,31 +91,12 @@ public abstract class PropertiesConfig extends Config {
   protected Set<Entry<Object, Object>> entrySet() {
     return properties.entrySet();
   }
-  
+
   protected Set<Object> keySet() {
     return properties.keySet();
   }
 
-  private void loadDefaultHeader() {
-    InputStream headerStream = getHeaderResourceStream();
-    try {
-      header = readFully(headerStream);
-    }
-    finally {
-      try {
-        headerStream.close();
-      }
-      catch (IOException e) {
-        e.printStackTrace();
-      }
-    }
-
-    if (header == null) {
-      System.out.println("Failed to load default header for " + getFilename());
-    }
-  }
-
-  private void loadDefault() {
+  protected void loadDefaults() {
     InputStream stream = getResourceStream();
     properties = new Properties();
     try {

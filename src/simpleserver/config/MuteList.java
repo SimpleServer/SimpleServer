@@ -41,6 +41,7 @@ public class MuteList extends PropertiesConfig {
     return setProperty(name.toLowerCase(), null) != null;
   }
 
+  @Override
   public void load() {
     super.load();
 

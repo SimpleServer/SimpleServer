@@ -11,13 +11,11 @@
         </sealing>
     </manifest>
     <selectedElements exportClassFiles="true" exportJavaFiles="false" exportOutputFolder="false">
-        <file path="/SimpleServer/CHANGES"/>
-        <file path="/SimpleServer/LICENSE"/>
-        <file path="/SimpleServer/simpleserver.properties"/>
         <file path="/SimpleServer/launch.sh"/>
         <file path="/SimpleServer/README"/>
         <file path="/SimpleServer/SimpleServer.jar"/>
         <file path="/SimpleServer/launch.bat"/>
-        <folder path="/SimpleServer/simpleserver"/>
+        <file path="/SimpleServer/CHANGES"/>
+        <file path="/SimpleServer/LICENSE"/>
     </selectedElements>
 </jardesc>

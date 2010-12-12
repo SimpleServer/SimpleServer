@@ -36,8 +36,10 @@ public class Rules extends AsciiConfig {
   }
 
   @Override
-  protected void beforeLoad() {
+  public void load() {
     rules = "";
+
+    super.load();
   }
 
   @Override

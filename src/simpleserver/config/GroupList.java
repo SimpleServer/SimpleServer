@@ -32,7 +32,7 @@ public class GroupList extends PropertiesConfig {
   public GroupList() {
     super("group-list.txt");
 
-    this.groups = new HashMap<Integer, Group>();
+    groups = new HashMap<Integer, Group>();
   }
 
   public boolean groupExists(int group) {

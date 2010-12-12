@@ -43,7 +43,7 @@ public class ItemWatchList extends PropertiesConfig {
   public ItemWatchList() {
     super("item-watch-list.txt");
 
-    this.items = new HashMap<Integer, Options>();
+    items = new HashMap<Integer, Options>();
   }
 
   public boolean contains(int blockID) {
@@ -60,6 +60,7 @@ public class ItemWatchList extends PropertiesConfig {
     return true;
   }
 
+  @Override
   public void load() {
     super.load();
 

@@ -14,7 +14,7 @@
         <file path="/SimpleServer/README"/>
         <javaElement handleIdentifier="=SimpleServer/src"/>
         <file path="/SimpleServer/lib/guava-r07.jar"/>
-        <file path="/SimpleServer/LICENSE"/>
         <file path="/SimpleServer/CHANGES"/>
+        <file path="/SimpleServer/LICENSE"/>
     </selectedElements>
 </jardesc>

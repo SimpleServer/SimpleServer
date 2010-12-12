@@ -34,13 +34,13 @@ public class IPMemberList extends PropertiesConfig {
     super("ip-member-list.txt");
 
     this.defaultGroup = defaultGroup;
-    this.members = new HashMap<String, Integer>();
+    members = new HashMap<String, Integer>();
   }
 
   public int getGroup(Player player) {
     String network = "";
     String ip = player.extsocket.getInetAddress().getHostAddress();
-    String[] octets = ip.split(".");
+    String[] octets = ip.split("\\.");
 
     for (String octet : octets) {
       network += octet;

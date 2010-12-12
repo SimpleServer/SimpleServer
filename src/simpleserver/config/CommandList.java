@@ -41,7 +41,9 @@ public class CommandList extends PropertiesConfig {
     super("command-list.txt");
 
     this.useSlashes = useSlashes;
-    this.commands = new HashMap<String, int[]>();
+    commands = new HashMap<String, int[]>();
+
+    loadDefaults();
   }
 
   public boolean playerAllowed(String command, Player player) {

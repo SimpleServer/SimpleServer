@@ -60,8 +60,8 @@ public class KitList extends PropertiesConfig {
   public KitList(Server parent) {
     super("kit-list.txt");
 
-    this.server = parent;
-    this.kits = new HashMap<String, Kit>();
+    server = parent;
+    kits = new HashMap<String, Kit>();
   }
 
   public void giveKit(Player player, String kitName)
@@ -92,6 +92,7 @@ public class KitList extends PropertiesConfig {
     player.addMessage(kitList.substring(0, kitList.length() - 2));
   }
 
+  @Override
   public void load() {
     super.load();
 

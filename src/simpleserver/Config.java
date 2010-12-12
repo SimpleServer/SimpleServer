@@ -30,17 +30,24 @@ public abstract class Config {
   private static final String folder = "simpleserver";
 
   private String filename;
+  private String header;
 
   public Config(String filename) {
     this.filename = filename;
+
+    loadHeader();
   }
 
   public abstract void save();
 
   public abstract void load();
-  
+
   protected String getFilename() {
     return filename;
+  }
+
+  protected String getHeader() {
+    return header;
   }
 
   protected File getFile() {
@@ -83,8 +90,27 @@ public abstract class Config {
     return getClass().getResourceAsStream(resourceLocation + "/" + filename);
   }
 
-  protected InputStream getHeaderResourceStream() {
+  private InputStream getHeaderResourceStream() {
     return getClass().getResourceAsStream(resourceLocation + "/" + filename
                                               + "-header");
+  }
+
+  private void loadHeader() {
+    InputStream headerStream = getHeaderResourceStream();
+    try {
+      header = readFully(headerStream);
+    }
+    finally {
+      try {
+        headerStream.close();
+      }
+      catch (IOException e) {
+        e.printStackTrace();
+      }
+    }
+
+    if (header == null) {
+      System.out.println("Failed to load default header for " + getFilename());
+    }
   }
 }

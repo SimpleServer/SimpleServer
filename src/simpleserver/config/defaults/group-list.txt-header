@@ -1,4 +1,4 @@
-#Group -1 is defined as guest
-#Group 0 is defined as normal player
-#Format: 
-# GID=Name,showTitle,isAdmin,colorCode
+ Group -1 is defined as guest
+ Group 0 is defined as normal player
+ Format:
+  GID=Name,showTitle,isAdmin,colorCode

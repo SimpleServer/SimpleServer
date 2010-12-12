@@ -33,7 +33,9 @@ public class BlockList extends PropertiesConfig {
   public BlockList() {
     super("block-list.txt");
 
-    this.blocks = new HashMap<Integer, int[]>();
+    blocks = new HashMap<Integer, int[]>();
+
+    loadDefaults();
   }
 
   public boolean contains(int blockID) {

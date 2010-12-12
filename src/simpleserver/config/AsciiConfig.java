@@ -23,20 +23,18 @@ package simpleserver.config;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 
 import simpleserver.Config;
 
 public abstract class AsciiConfig extends Config {
-  private String header = "";
-
   public AsciiConfig(String filename) {
     super(filename);
   }
-
-  protected abstract String saveString();
 
   @Override
   public void save() {
@@ -46,7 +44,7 @@ public abstract class AsciiConfig extends Config {
       BufferedWriter writer = new BufferedWriter(new FileWriter(outFile));
 
       try {
-        writer.write(header);
+        writer.write(getHeader());
         writer.write(saveString());
         writer.flush();
 
@@ -61,20 +59,12 @@ public abstract class AsciiConfig extends Config {
     }
 
     if (!success) {
-      System.out.println("Unable to save " + outFile.getName() + "!");
+      System.out.println("Failed to save " + getFilename() + "!");
     }
   }
 
-  protected abstract void beforeLoad();
-
-  protected abstract void loadLine(String line);
-
   @Override
   public void load() {
-    beforeLoad();
-
-    header = "";
-    boolean readingHeader = true;
     boolean success = false;
 
     File inFile = getFile();
@@ -83,11 +73,7 @@ public abstract class AsciiConfig extends Config {
       try {
         String line;
         while ((line = reader.readLine()) != null) {
-          if (readingHeader && line.startsWith("#")) {
-            header += line + "\n";
-          }
-          else {
-            readingHeader = false;
+          if (!line.startsWith("#")) {
             loadLine(line);
           }
         }
@@ -97,12 +83,52 @@ public abstract class AsciiConfig extends Config {
         reader.close();
       }
     }
-    catch (Exception e) {
+    catch (FileNotFoundException e) {
+      System.out.println(getFilename() + " is missing.  Loading defaults.");
+      loadDefaults();
+
+      save();
+      success = true;
+    }
+    catch (IOException e) {
       e.printStackTrace();
     }
 
     if (!success) {
-      System.out.println("Unable to load " + inFile.getName() + "!");
+      System.out.println("Failed to load " + getFilename() + "!");
+    }
+  }
+
+  protected abstract String saveString();
+
+  protected abstract void loadLine(String line);
+
+  private void loadDefaults() {
+    InputStream stream = getResourceStream();
+    String defaults;
+    try {
+      defaults = readFully(stream);
+    }
+    finally {
+      try {
+        stream.close();
+      }
+      catch (IOException e) {
+        e.printStackTrace();
+      }
+    }
+
+    if (defaults == null) {
+      System.out.println("Failed to load defaults for " + getFilename());
+      return;
+    }
+
+    defaults = defaults.replaceAll("\\s+$", "");
+    String[] lines = defaults.split("\n");
+    for (String line : lines) {
+      if (!line.startsWith("#")) {
+        loadLine(line);
+      }
     }
   }
 }

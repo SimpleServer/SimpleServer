@@ -36,8 +36,10 @@ public class MOTD extends AsciiConfig {
   }
 
   @Override
-  protected void beforeLoad() {
+  public void load() {
     motd = "";
+
+    super.load();
   }
 
   @Override
