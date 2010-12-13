@@ -48,12 +48,14 @@ public class EOFWriter implements Runnable {
         + date.get(Calendar.HOUR_OF_DAY) + "_" + date.get(Calendar.MINUTE)
         + ".txt");
     try {
-      if (!dump.exists())
+      if (!dump.exists()) {
         dump.createNewFile();
+      }
       FileOutputStream f = new FileOutputStream(dump);
       PrintStream p = new PrintStream(f);
-      if (exception != null)
+      if (exception != null) {
         exception.printStackTrace(p);
+      }
 
       p.println(comments);
       printStream(buffer, p);

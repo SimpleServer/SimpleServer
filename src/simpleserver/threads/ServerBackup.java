@@ -126,8 +126,9 @@ public class ServerBackup implements Runnable {
         + "-" + (date.get(Calendar.MONTH) + 1) + "-" + date.get(Calendar.DATE)
         + "-" + date.get(Calendar.HOUR_OF_DAY) + "_"
         + date.get(Calendar.MINUTE) + ".zip");
-    if (!f.exists())
+    if (!f.exists()) {
       f.createNewFile();
+    }
     FileOutputStream dest = new FileOutputStream(f);
     ZipOutputStream out = new ZipOutputStream(new BufferedOutputStream(dest));
     zipDir(directory.getPath(), out, directory.getPath().length() + 1);
@@ -207,9 +208,10 @@ public class ServerBackup implements Runnable {
 
       String[] children = sourceLocation.list();
       for (int i = 0; i < children.length; i++) {
-        if (!children[i].contains("tmp_chunk.dat"))
+        if (!children[i].contains("tmp_chunk.dat")) {
           copyDirectory(new File(sourceLocation, children[i]),
                         new File(targetLocation, children[i]));
+        }
       }
     }
     else {

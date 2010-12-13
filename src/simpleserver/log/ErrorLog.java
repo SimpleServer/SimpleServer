@@ -41,13 +41,15 @@ public class ErrorLog implements Runnable {
         + date.get(Calendar.HOUR_OF_DAY) + "_" + date.get(Calendar.MINUTE)
         + ".txt");
     try {
-      if (!dump.exists())
+      if (!dump.exists()) {
         dump.createNewFile();
+      }
       FileOutputStream f = new FileOutputStream(dump);
       PrintStream p = new PrintStream(f);
       p.println(comments);
-      if (e != null)
+      if (e != null) {
         e.printStackTrace(p);
+      }
       p.close();
       f.close();
     }

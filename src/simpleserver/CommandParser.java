@@ -29,7 +29,7 @@ public class CommandParser {
 
   public CommandParser(Player player) {
     this.player = player;
-    this.server = player.parent;
+    server = player.parent;
   }
 
   public void closing() {
@@ -69,8 +69,9 @@ public class CommandParser {
   public boolean parse(String msg) throws InterruptedException, IOException {
     String[] tokens = msg.split(" ");
     if (server.options.useSlashes) {
-      if (tokens[0].startsWith("/"))
+      if (tokens[0].startsWith("/")) {
         tokens[0] = "!" + tokens[0].substring(1);
+      }
     }
     String cmd = tokens[0].substring(1);
 
@@ -84,10 +85,12 @@ public class CommandParser {
         String list = "Connected Players (" + server.numPlayers() + "): ";
         for (Iterator<Player> itr = PlayerFactory.iterator(); itr.hasNext();) {
           Player i = itr.next();
-          if (i != null)
+          if (i != null) {
             if (i.getName() != null && i.getName() != "" && !i.closed
-                && i.kickMsg == null)
+                && i.kickMsg == null) {
               list += i.getName() + ", ";
+            }
+          }
         }
         player.addMessage(list);
         return true;
@@ -97,8 +100,9 @@ public class CommandParser {
           player.addMessage("IP Addresses:");
           for (Iterator<Player> itr = PlayerFactory.iterator(); itr.hasNext();) {
             Player i = itr.next();
-            if (i.getName() != null && i.getName() != "")
+            if (i.getName() != null && i.getName() != "") {
               player.addMessage(i.getName() + " " + i.getIPAddress());
+            }
           }
 
         }
@@ -136,10 +140,12 @@ public class CommandParser {
       if (tokens[0].compareTo("!iddqd") == 0) {
         if (server.cmdAllowed(cmd, player)) {
           player.destroy = !player.destroy;
-          if (player.destroy)
+          if (player.destroy) {
             player.addMessage("God-Mode Enabled!");
-          else
+          }
+          else {
             player.addMessage("God-Mode Disabled!");
+          }
         }
         return true;
       }
@@ -149,8 +155,9 @@ public class CommandParser {
             String rcon = "";
             try {
               rcon = rcon.substring(5 + 1);
-              if (rcon.length() == 0 || rcon == null)
+              if (rcon.length() == 0 || rcon == null) {
                 rcon = "";
+              }
             }
             catch (Exception e) {
               rcon = "";
@@ -163,15 +170,17 @@ public class CommandParser {
 
       if (tokens[0].compareTo("!kit") == 0) {
         if (server.cmdAllowed(cmd, player)) {
-          if (tokens.length >= 2)
+          if (tokens.length >= 2) {
             server.kits.giveKit(player, tokens[1]);
+          }
         }
         return true;
       }
 
       if (tokens[0].compareTo("!kits") == 0) {
-        if (server.cmdAllowed(cmd, player))
+        if (server.cmdAllowed(cmd, player)) {
           server.kits.listKits(player);
+        }
         return true;
       }
       if (tokens[0].compareTo("!kick") == 0) {
@@ -182,15 +191,17 @@ public class CommandParser {
             if (tokens.length > 2) {
               try {
                 reason = msg.substring(5 + 1 + tokens[1].length() + 1);
-                if (reason.length() == 0 || reason == null)
+                if (reason.length() == 0 || reason == null) {
                   reason = "";
+                }
               }
               catch (Exception e) {
                 reason = "";
               }
             }
-            if (tokens[1] == null)
+            if (tokens[1] == null) {
               return true;
+            }
             String name = server.kick(tokens[1], reason);
             if (name != null) {
               server.adminLog.addMessage("Admin " + player.getName()
@@ -198,8 +209,9 @@ public class CommandParser {
               server.runCommand("say Player " + name + " has been kicked! ("
                   + reason + ")");
             }
-            else
+            else {
               player.addMessage("No such player online! (" + tokens[1] + ")");
+            }
           }
         }
         return true;
@@ -208,8 +220,9 @@ public class CommandParser {
         if (server.cmdAllowed(cmd, player)) {
           if (tokens.length >= 2) {
             String name = server.findName(tokens[1]);
-            if (name == null)
+            if (name == null) {
               name = tokens[1];
+            }
             server.mutelist.addName(name);
             server.adminLog.addMessage("Admin " + player.getName()
                 + " muted player:\t " + name);
@@ -222,8 +235,9 @@ public class CommandParser {
         if (server.cmdAllowed(cmd, player)) {
           if (tokens.length >= 2) {
             String name = server.findName(tokens[1]);
-            if (name == null)
+            if (name == null) {
               name = tokens[1];
+            }
             server.mutelist.removeName(name);
             server.adminLog.addMessage("Admin " + player.getName()
                 + " unmuted player:\t " + name);
@@ -243,8 +257,9 @@ public class CommandParser {
                 server.adminLog.addMessage("Admin " + player.getName()
                     + " teleported:\t " + player.getName() + "\tto\t" + name);
               }
-              else
+              else {
                 player.addMessage("No such player online! (" + tokens[1] + ")");
+              }
             }
           }
         }
@@ -259,8 +274,9 @@ public class CommandParser {
               server.adminLog.addMessage("Admin " + player.getName()
                   + " teleported:\t " + name + "\tto\t" + player.getName());
             }
-            else
+            else {
               player.addMessage("No such player online! (" + tokens[1] + ")");
+            }
           }
         }
         return true;
@@ -270,8 +286,9 @@ public class CommandParser {
         if (server.cmdAllowed(cmd, player)) {
           String chat = msg.substring(tokens[0].length());
           int numPlayers = server.localChat(player, chat);
-          if (numPlayers <= 0)
+          if (numPlayers <= 0) {
             player.addMessage("\302\247cNobody is around to hear you.");
+          }
         }
         return true;
       }
@@ -286,10 +303,12 @@ public class CommandParser {
               server.adminLog.addMessage("User " + player.getName()
                   + " teleported:\t " + name1 + "\tto\t" + name2);
             }
-            else if (name1 == null)
+            else if (name1 == null) {
               player.addMessage("No such player online! (" + tokens[1] + ")");
-            else
+            }
+            else {
               player.addMessage("No such player online! (" + tokens[2] + ")");
+            }
           }
         }
         return true;
@@ -301,15 +320,17 @@ public class CommandParser {
             if (tokens.length > 2) {
               try {
                 reason = msg.substring(4 + 1 + tokens[1].length() + 1);
-                if (reason.length() == 0 || reason == null)
+                if (reason.length() == 0 || reason == null) {
                   reason = "";
+                }
               }
               catch (Exception e) {
                 reason = "";
               }
             }
-            if (tokens[1] == null)
+            if (tokens[1] == null) {
               return true;
+            }
             String name = server.findName(tokens[1]);
             if (name != null) {
               server.runCommand("ban " + name);
@@ -411,10 +432,12 @@ public class CommandParser {
         if (server.cmdAllowed(cmd, player)) {
           server.adminLog.addMessage("User " + player.getName()
               + " attempted a restart!");
-          if (server.saveLock.tryAcquire())
+          if (server.saveLock.tryAcquire()) {
             server.saveLock.release();
-          else
+          }
+          else {
             player.addMessage("Server is currently Backing Up/Saving/Restarting...");
+          }
           server.forceRestart();
         }
         return true;
@@ -529,8 +552,9 @@ public class CommandParser {
       if (tokens[0].compareTo("!commands") == 0
           || tokens[0].compareTo("!help") == 0) {
         String prefix = "!";
-        if (server.options.useSlashes)
+        if (server.options.useSlashes) {
           prefix = "/";
+        }
         String line = "Available Commands: " + prefix + "who " + prefix
             + "motd " + prefix + "rules ";
         line += server.getCommands(player);
@@ -569,8 +593,9 @@ public class CommandParser {
         return !(server.options.useSMPAPI);
       }
     }
-    if (msg.startsWith("/"))
+    if (msg.startsWith("/")) {
       return false;
+    }
     return !(server.options.useSMPAPI);
   }
 }

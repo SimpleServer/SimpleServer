@@ -211,8 +211,9 @@ public class Server {
         minMemory = options.memory;
       }
       String alternateJar = "minecraft_server.jar";
-      if (options.alternateJarFile.trim().length() != 0)
+      if (options.alternateJarFile.trim().length() != 0) {
         alternateJar = options.alternateJarFile.trim();
+      }
       // String[] cmd = {"java", "-Xmx" + options.memory + "M","-Xms" +
       // minMemory + "M", "-jar", alternateJar, "nogui"};
       String cmd = "java " + options.javaArguments + " -Xmx" + options.memory
@@ -275,8 +276,9 @@ public class Server {
       catch (Exception e) {
       }
     }
-    if (!stopped)
+    if (!stopped) {
       p.destroy();
+    }
     t.interrupt();
     t2.interrupt();
 
@@ -306,8 +308,9 @@ public class Server {
   }
 
   private void kickAllPlayers(String msg) {
-    if (msg == null)
+    if (msg == null) {
       msg = "";
+    }
     // synchronized(players) {
     for (Iterator<Player> itr = PlayerFactory.iterator(); itr.hasNext();) {
       Player p = itr.next();
@@ -318,8 +321,9 @@ public class Server {
   }
 
   private void kickAllRcons(String msg) {
-    if (msg == null)
+    if (msg == null) {
       msg = "";
+    }
     synchronized (rcons) {
       for (Iterator<Rcon> itr = rcons.iterator(); itr.hasNext();) {
         Rcon p = itr.next();
@@ -351,8 +355,9 @@ public class Server {
   }
 
   public void openSocket() {
-    if (socketThread != null)
+    if (socketThread != null) {
       socketThread.interrupt();
+    }
     open = true;
     socketThread = new Thread(new SocketThread(this));
     socketThread.start();
@@ -366,14 +371,17 @@ public class Server {
   public void restartServer() {
 
     if (!isRestarting) {
-      if (saveLock.tryAcquire())
+      if (saveLock.tryAcquire()) {
         saveLock.release();
-      else
+      }
+      else {
         System.out.println("[SimpleServer] Server is currently Backing Up/Saving...");
+      }
       new Thread(forceRestart).start();
     }
-    else
+    else {
       p.destroy();
+    }
   }
 
   public void forceRestart() {
@@ -381,8 +389,9 @@ public class Server {
   }
 
   private void setShutdownHook() {
-    if (shutDownHook != null)
+    if (shutDownHook != null) {
       Runtime.getRuntime().removeShutdownHook(shutDownHook);
+    }
     Runtime.getRuntime()
            .addShutdownHook(shutDownHook = new Thread(new ShutdownHook(p, this)));
 
@@ -405,8 +414,9 @@ public class Server {
   }
 
   public Integer[] getRobotPorts() {
-    if (robots != null)
+    if (robots != null) {
       return robots.getRobotPorts();
+    }
     return null;
   }
 
@@ -445,8 +455,9 @@ public class Server {
 
   public void banKickIP(String ipAddress, String reason)
       throws InterruptedException {
-    if (!isIPBanned(ipAddress))
+    if (!isIPBanned(ipAddress)) {
       ipBans.addBan(ipAddress);
+    }
     adminLog.addMessage("IP Address " + ipAddress + " was banned:\t " + reason);
     for (Iterator<Player> itr = PlayerFactory.iterator(); itr.hasNext();) {
       Player p = itr.next();
@@ -503,13 +514,15 @@ public class Server {
   }
 
   public void runCommand(String msg) throws InterruptedException {
-    if (input != null)
+    if (input != null) {
       input.runCommand(msg);
+    }
   }
 
   public void sendToAll(String msg) throws InterruptedException {
-    if (input != null && msg != null && !msg.equalsIgnoreCase(""))
+    if (input != null && msg != null && !msg.equalsIgnoreCase("")) {
       input.runCommand("say " + msg);
+    }
   }
 
   public void notifyClosed(Player player) throws InterruptedException {
@@ -566,10 +579,12 @@ public class Server {
     */
     // }
     Player i = PlayerFactory.findPlayer(prefix);
-    if (i != null)
+    if (i != null) {
       return i.getName();
-    else
+    }
+    else {
       return null;
+    }
   }
 
   public Player findPlayer(String prefix) throws InterruptedException {
@@ -638,8 +653,9 @@ public class Server {
   public int localChat(Player p, String msg) {
     String chat = "\302\2477" + p.getName() + " says: " + msg;
     int j = 0;
-    if (p.getName() == null)
+    if (p.getName() == null) {
       return 0;
+    }
     // synchronized(players) {
     for (Iterator<Player> itr = PlayerFactory.iterator(); itr.hasNext();) {
       Player i = itr.next();
@@ -648,8 +664,9 @@ public class Server {
             && Math.abs(i.y - p.y) < options.localChatRadius
             && Math.abs(i.z - p.z) < options.localChatRadius) {
           i.addMessage(chat);
-          if (p != i)
+          if (p != i) {
             j++;
+          }
         }
       }
     }
@@ -665,8 +682,9 @@ public class Server {
 
   public void addOutputLine(String s) {
     synchronized (outputLog) {
-      while (outputLog.size() > 30)
+      while (outputLog.size() > 30) {
         outputLog.remove();
+      }
       outputLog.add(s);
     }
   }

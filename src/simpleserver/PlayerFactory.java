@@ -105,9 +105,11 @@ public class PlayerFactory {
   }
 
   public static void removePlayer(Player p) {
-    if (p != null)
-      if (p.intsocket != null)
+    if (p != null) {
+      if (p.intsocket != null) {
         p.cleanup();
+      }
+    }
   }
 
   public static Player addPlayer(Socket sock) {

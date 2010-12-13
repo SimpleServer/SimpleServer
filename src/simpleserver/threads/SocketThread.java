@@ -36,13 +36,15 @@ public class SocketThread implements Runnable {
 
   public void run() {
     try {
-      if (parent.options.ipAddress.equals("0.0.0.0"))
+      if (parent.options.ipAddress.equals("0.0.0.0")) {
         parent.socket = new ServerSocket(parent.options.port);
-      else
+      }
+      else {
         parent.socket = new ServerSocket(
                                          parent.options.port,
                                          8,
                                          InetAddress.getByName(parent.options.ipAddress));
+      }
 
     }
     catch (IOException e) {
@@ -73,8 +75,9 @@ public class SocketThread implements Runnable {
       parent.socket.close();
     }
     catch (IOException e) {
-      if (!parent.isRestarting())
+      if (!parent.isRestarting()) {
         e.printStackTrace();
+      }
     }
   }
 

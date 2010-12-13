@@ -53,15 +53,17 @@ public class ErrorStreamRouter implements Runnable {
       }
     }
     catch (Exception e) {
-      if (!parent.isRestarting())
+      if (!parent.isRestarting()) {
         e.printStackTrace();
+      }
     }
     try {
       stream.close();
     }
     catch (IOException e) {
-      if (!parent.isRestarting())
+      if (!parent.isRestarting()) {
         e.printStackTrace();
+      }
     }
   }
 

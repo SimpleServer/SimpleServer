@@ -32,7 +32,7 @@ public class RequestTracker implements Runnable {
 
     Request(String ipAddress) {
       this.ipAddress = ipAddress;
-      this.requests = 1;
+      requests = 1;
     }
 
     public void addRequest() {

@@ -64,7 +64,7 @@ public class ShutdownHook implements Runnable {
       // e.printStackTrace();
     }
     try {
-      this.finalize();
+      finalize();
     }
     catch (Throwable e) {
       // TODO Auto-generated catch block

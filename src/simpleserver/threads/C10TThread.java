@@ -38,8 +38,9 @@ public class C10TThread implements Runnable {
     public void run() {
       byte[] buf = new byte[256];
       try {
-        while (stderr.read(buf) >= 0)
+        while (stderr.read(buf) >= 0) {
           ;
+        }
       }
       catch (IOException e) {
       }
@@ -52,8 +53,9 @@ public class C10TThread implements Runnable {
     public void run() {
       byte[] buf = new byte[256];
       try {
-        while (stdout.read(buf) >= 0)
+        while (stdout.read(buf) >= 0) {
           ;
+        }
       }
       catch (IOException e) {
       }

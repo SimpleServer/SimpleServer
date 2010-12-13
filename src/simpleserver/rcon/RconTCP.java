@@ -77,8 +77,9 @@ public class RconTCP implements Rcon {
   }
 
   public boolean hasMessages() {
-    if (messages.isEmpty())
+    if (messages.isEmpty()) {
       return false;
+    }
     return true;
   }
 
@@ -126,7 +127,7 @@ public class RconTCP implements Rcon {
       System.out.println("[SimpleServer] IP " + getIPAddress() + " is banned!");
       kick("Banned IP!");
     }
-    this.name = getIPAddress();
+    name = getIPAddress();
 
     lastRead = System.currentTimeMillis();
     t1 = new Thread() {
@@ -206,8 +207,9 @@ public class RconTCP implements Rcon {
     if (!closed) {
       closed = true;
       auth = false;
-      if (!isKicked)
+      if (!isKicked) {
         parent.notifyClosedRcon(this);
+      }
     }
   }
 
@@ -327,7 +329,7 @@ public class RconTCP implements Rcon {
   }
 
   public void handle(Object o) {
-    if (o instanceof Socket)
+    if (o instanceof Socket) {
       try {
         handle((Socket) o);
       }
@@ -335,6 +337,7 @@ public class RconTCP implements Rcon {
         // TODO Auto-generated catch block
         e.printStackTrace();
       }
+    }
   }
 
   public String getName() {

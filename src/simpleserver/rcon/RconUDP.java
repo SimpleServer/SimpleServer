@@ -83,8 +83,9 @@ public class RconUDP implements Rcon {
   }
 
   public boolean hasMessages() {
-    if (messages.isEmpty())
+    if (messages.isEmpty()) {
       return false;
+    }
     return true;
   }
 
@@ -131,7 +132,7 @@ public class RconUDP implements Rcon {
       System.out.println("[SimpleServer] IP " + getIPAddress() + " is banned!");
       kick("Banned IP!");
     }
-    this.name = getIPAddress();
+    name = getIPAddress();
     handle(p);
     /*
     try {
@@ -206,12 +207,14 @@ public class RconUDP implements Rcon {
     while (true) {
       b = bb.get();
       System.out.print(b + " ");
-      if (b == 0)
+      if (b == 0) {
         break;
+      }
       i++;
     }
-    if (i == 0)
+    if (i == 0) {
       return "";
+    }
     byte[] string = new byte[i];
     // bb.position(0);
     System.out.println("");
@@ -243,8 +246,9 @@ public class RconUDP implements Rcon {
           }
           return command;
         }
-        else
+        else {
           return "Error: No Command";
+        }
       }
       if (tokens[0].equalsIgnoreCase("help")) {
         if (tokens.length > 1) {
@@ -350,8 +354,9 @@ public class RconUDP implements Rcon {
 
       byte[] send = null;
       for (i = 0; i + 4096 < bbSend.capacity(); i += 4096) {
-        if (send == null)
+        if (send == null) {
           send = new byte[4098];
+        }
         packetSize = INT * 2 + 4096 + 1 + 1;
 
         bb = ByteBuffer.allocate(4 + packetSize);
@@ -399,7 +404,7 @@ public class RconUDP implements Rcon {
   }
 
   public void handle(Object o) {
-    if (o instanceof DatagramPacket)
+    if (o instanceof DatagramPacket) {
       try {
         handle((DatagramPacket) o);
       }
@@ -407,6 +412,7 @@ public class RconUDP implements Rcon {
         // TODO Auto-generated catch block
         e.printStackTrace();
       }
+    }
   }
 
   public String getName() {

@@ -47,9 +47,10 @@ public class PlayerScanner implements Runnable {
         timedOut = i.testTimeout();
         if (timedOut) {
           itr.remove();
-          if (!i.isRobot())
+          if (!i.isRobot()) {
             System.out.println("[SimpleServer] Disconnecting "
                 + i.getIPAddress() + " due to inactivity.");
+          }
           try {
             // This is required to make it not try to call notifyClosed()
             i.isKicked(true);

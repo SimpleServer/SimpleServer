@@ -71,7 +71,7 @@ public class RconServer implements Runnable {
   }
 
   public void run() {
-    if (!udp)
+    if (!udp) {
       try {
         parent.rconSocket = new ServerSocket(parent.options.rconPort);
         System.out.println("Opened RCON on port: " + parent.options.rconPort
@@ -83,7 +83,8 @@ public class RconServer implements Runnable {
             + "!\nIs it already in use? RCON is not available!");
         return;
       }
-    else
+    }
+    else {
       try {
         rconSocket = new DatagramSocket(parent.options.rconPort);
       }
@@ -91,10 +92,11 @@ public class RconServer implements Runnable {
         // TODO Auto-generated catch block
         e1.printStackTrace();
       }
+    }
 
     while (!Thread.interrupted()) {
 
-      if (!udp)
+      if (!udp) {
         try {
           Socket s = parent.rconSocket.accept();
           distribute(s);
@@ -103,6 +105,7 @@ public class RconServer implements Runnable {
           // TODO Auto-generated catch block
           e.printStackTrace();
         }
+      }
       else {
 
         DatagramPacket receivePacket = null;
@@ -113,23 +116,27 @@ public class RconServer implements Runnable {
         }
         catch (Exception e) {
           e.printStackTrace();
-          if (receivePacket != null)
+          if (receivePacket != null) {
             System.out.println("[SimpleServer] RCON failed for "
                 + receivePacket.getAddress().getHostAddress() + "! "
                 + e.getCause());
+          }
         }
       }
     }
-    if (!udp)
+    if (!udp) {
       try {
         parent.rconSocket.close();
       }
       catch (IOException e) {
-        if (!parent.isRestarting)
+        if (!parent.isRestarting) {
           e.printStackTrace();
+        }
       }
-    else
+    }
+    else {
       rconSocket.close();
+    }
   }
 
 }

@@ -40,8 +40,9 @@ public class AdminLog implements Runnable {
         + date.get(Calendar.DATE) + "-" + date.get(Calendar.HOUR_OF_DAY) + "_"
         + date.get(Calendar.MINUTE) + ".txt");
     File dir = new File("logs");
-    if (!dir.exists())
+    if (!dir.exists()) {
       dir.mkdir();
+    }
   }
 
   public void addMessage(String msg) {
@@ -58,8 +59,9 @@ public class AdminLog implements Runnable {
         while (lines.size() > 0) {
           if (!changed) {
             try {
-              if (!logFile.exists())
+              if (!logFile.exists()) {
                 logFile.createNewFile();
+              }
               writer = new FileWriter(logFile, true);
             }
             catch (IOException e) {

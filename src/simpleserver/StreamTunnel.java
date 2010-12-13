@@ -87,10 +87,12 @@ public class StreamTunnel implements Runnable {
   }
 
   public void setByteThreshold(int n) {
-    if (n > BUF_SIZE)
+    if (n > BUF_SIZE) {
       BYTE_THRESHOLD = BUF_SIZE;
-    if (n <= 0)
+    }
+    if (n <= 0) {
       BYTE_THRESHOLD = 32;
+    }
     BYTE_THRESHOLD = n;
   }
 
@@ -116,16 +118,18 @@ public class StreamTunnel implements Runnable {
           }
           if (a < buf.length) {
             int read = in.read(buf, a, avail);
-            if (read > 0)
+            if (read > 0) {
               a += read;
+            }
           }
         }
         lock.release();
 
         if (System.currentTimeMillis() - lastRead > IDLE_TIME) {
-          if (!parent.isRobot)
+          if (!parent.isRobot) {
             System.out.println("[SimpleServer] Disconnecting "
                 + parent.getIPAddress() + " due to inactivity.");
+          }
           try {
             in.close();
           }
@@ -214,8 +218,9 @@ public class StreamTunnel implements Runnable {
       e.printStackTrace();
     }
     try {
-      if (!parent.isClosed())
+      if (!parent.isClosed()) {
         parent.close();
+      }
     }
     catch (InterruptedException e) {
       // TODO Auto-generated catch block
@@ -317,8 +322,9 @@ public class StreamTunnel implements Runnable {
               }
               skipBytes(2);
             }
-            else
+            else {
               skipBytes(3);
+            }
           }
         }
         if (parent.getGroup() < 0) {
@@ -354,8 +360,9 @@ public class StreamTunnel implements Runnable {
         skipBytes(12);
         break;
       case 0x0b:
-        if (!isServerTunnel)
+        if (!isServerTunnel) {
           motionCounter++;
+        }
         if (!isServerTunnel && motionCounter % 8 == 0) {
           parent.x = readDouble();
           parent.y = readDouble();
@@ -363,15 +370,17 @@ public class StreamTunnel implements Runnable {
           parent.z = readDouble();
           skipBytes(1);
         }
-        else
+        else {
           skipBytes(33);
+        }
         break;
       case 0x0c:
         skipBytes(9);
         break;
       case 0x0d:
-        if (!isServerTunnel)
+        if (!isServerTunnel) {
           motionCounter++;
+        }
         if (!isServerTunnel && motionCounter % 8 == 0) {
           parent.x = readDouble();
           parent.y = readDouble();
@@ -379,8 +388,9 @@ public class StreamTunnel implements Runnable {
           parent.z = readDouble();
           skipBytes(9);
         }
-        else
+        else {
           skipBytes(41);
+        }
         break;
       case 0x0e:
 
@@ -423,8 +433,9 @@ public class StreamTunnel implements Runnable {
             addPacket(cpyPacket2);
           }
         }
-        else
+        else {
           skipBytes(11);
+        }
         break;
       // CHECK THIS
       case 0x0f:
@@ -483,20 +494,25 @@ public class StreamTunnel implements Runnable {
                 break;
               }
               if (!server.chests.giveLock(parent.getName().toLowerCase(), xC0f,
-                                          yC0f, zC0f, false))
+                                          yC0f, zC0f, false)) {
                 parent.addMessage("You already have a lock, or this block is locked already!");
-              else
+              }
+              else {
                 parent.addMessage("Your locked chest is created! Do not add another chest to it!");
+              }
               parent.attemptLock = false;
             }
-            else
+            else {
               skipBytes(10);
+            }
           }
-          else
+          else {
             skipBytes(10);
+          }
         }
-        else
+        else {
           skipBytes(10);
+        }
         break;
       case 0x10:
         skipBytes(6);
@@ -556,8 +572,9 @@ public class StreamTunnel implements Runnable {
       case 0x02:
         oldCursor = r - 1;
         if (!isServerTunnel) {
-          if (!parent.setName(readString()))
+          if (!parent.setName(readString())) {
             removeBytes(r - oldCursor);
+          }
         }
         else {
           readString();
@@ -570,11 +587,13 @@ public class StreamTunnel implements Runnable {
           if (msg.startsWith("<")) {
             try {
               String nameTok = msg.substring(1);
-              if (nameTok.startsWith("\302\247"))
+              if (nameTok.startsWith("\302\247")) {
                 nameTok = msg.substring(3);
+              }
               int sidx = nameTok.indexOf("\302\247");
-              if (sidx > 0)
+              if (sidx > 0) {
                 nameTok = nameTok.substring(0, sidx);
+              }
               else {
                 sidx = nameTok.indexOf(">");
                 nameTok = nameTok.substring(0, sidx);
@@ -621,18 +640,21 @@ public class StreamTunnel implements Runnable {
             break;
           }
           if (msg.equalsIgnoreCase("/home")) {
-            if (!server.cmdAllowed("home", parent))
+            if (!server.cmdAllowed("home", parent)) {
               removeBytes(msg.length() + 2 + 1);
-            else
+            }
+            else {
               break;
+            }
           }
 
           if (msg.startsWith("!")
               || (server.options.useSlashes && msg.startsWith("/"))) {
             boolean remove = parent.parseCommand(msg);
             // Remove the packet! : )
-            if (remove)
+            if (remove) {
               removeBytes(msg.length() + 2 + 1);
+            }
           }
         }
         break;
@@ -673,8 +695,9 @@ public class StreamTunnel implements Runnable {
         byte[] cpy = new byte[a];
         System.arraycopy(buf, 0, cpy, 0, a);
         String streamType = "PlayerStream";
-        if (isServerTunnel)
+        if (isServerTunnel) {
           streamType = "ServerStream";
+        }
         new Thread(new EOFWriter(cpy, history, null, streamType + " "
             + parent.getName() + " packetid: " + packetid + " totalsize: " + r
             + " amt: " + a)).start();
@@ -707,13 +730,16 @@ public class StreamTunnel implements Runnable {
 
   protected boolean ensureRead(int n) throws InterruptedException, IOException {
 
-    if (r + n > BUF_SIZE)
+    if (r + n > BUF_SIZE) {
       return false;
-    if (a >= r + n)
+    }
+    if (a >= r + n) {
       return true;
+    }
     while (a < r + n) {
-      if (parent.isClosed() || Thread.interrupted())
+      if (parent.isClosed() || Thread.interrupted()) {
         throw new InterruptedException();
+      }
       // readMore();
       // System.out.println((r+n) + " " + a);
       readMore((r + n) - a);

@@ -38,7 +38,7 @@ public class InputStreamRouter implements Runnable {
   Semaphore outLock = new Semaphore(1);
 
   public InputStreamRouter(InputStream in, OutputStream out, Server parent) {
-    this.stream = in;
+    stream = in;
     this.out = out;
     this.parent = parent;
   }
@@ -47,8 +47,9 @@ public class InputStreamRouter implements Runnable {
 
     msg += "\n";
     msg = parse(msg);
-    if (msg == null)
+    if (msg == null) {
       return true;
+    }
     outLock.acquire();
     try {
       out.write(msg.getBytes());
@@ -58,10 +59,12 @@ public class InputStreamRouter implements Runnable {
     catch (Exception e) {
       if (!parent.isRestarting()) {
         e.printStackTrace();
-        if (parent.options.exitOnFailure)
+        if (parent.options.exitOnFailure) {
           System.exit(-1);
-        else
+        }
+        else {
           parent.forceRestart();
+        }
       }
     }
     outLock.release();
@@ -83,18 +86,22 @@ public class InputStreamRouter implements Runnable {
     if (line.startsWith("!reload")) {
       System.out.println("Reloading Resources...");
       parent.loadAll();
-      if (parent.options.useSMPAPI)
+      if (parent.options.useSMPAPI) {
         return line;
-      else
+      }
+      else {
         return "";
+      }
     }
     if (line.startsWith("!save")) {
       System.out.println("Saving Resources...");
       parent.saveAll();
-      if (parent.options.useSMPAPI)
+      if (parent.options.useSMPAPI) {
         return line;
-      else
+      }
+      else {
         return "";
+      }
     }
     if (line.startsWith("!backup")) {
       parent.forceBackup();
@@ -124,8 +131,9 @@ public class InputStreamRouter implements Runnable {
 
       line += "\n";
       line = parse(line);
-      if (line == null)
+      if (line == null) {
         continue;
+      }
       try {
         outLock.acquire();
       }
@@ -139,10 +147,12 @@ public class InputStreamRouter implements Runnable {
       catch (Exception e) {
         if (!parent.isRestarting()) {
           e.printStackTrace();
-          if (parent.options.exitOnFailure)
+          if (parent.options.exitOnFailure) {
             System.exit(-1);
-          else
+          }
+          else {
             parent.forceRestart();
+          }
         }
       }
       outLock.release();
@@ -151,8 +161,9 @@ public class InputStreamRouter implements Runnable {
       out.close();
     }
     catch (IOException e) {
-      if (!parent.isRestarting())
+      if (!parent.isRestarting()) {
         e.printStackTrace();
+      }
     }
   }
 }

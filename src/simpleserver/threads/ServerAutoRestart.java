@@ -46,8 +46,9 @@ public class ServerAutoRestart implements Runnable {
           parent.sendToAll(parent.l.get("SERVER_RESTART_3"));
           Thread.sleep(3 * 1000);
 
-          if (!parent.isRestarting())
+          if (!parent.isRestarting()) {
             parent.restart();
+          }
           parent.saveLock.release();
         }
         Thread.sleep(1000);

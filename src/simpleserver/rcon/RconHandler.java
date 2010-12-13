@@ -59,8 +59,8 @@ public class RconHandler implements Runnable {
 
   public RconHandler(Socket s, RconTCP r) throws IOException {
     this.s = s;
-    this.in = s.getInputStream();
-    this.out = s.getOutputStream();
+    in = s.getInputStream();
+    out = s.getOutputStream();
     parent = r;
     server = r.parent;
     buf = new byte[BUF_SIZE];
@@ -69,10 +69,12 @@ public class RconHandler implements Runnable {
   }
 
   public void setByteThreshold(int n) {
-    if (n > BUF_SIZE)
+    if (n > BUF_SIZE) {
       BYTE_THRESHOLD = BUF_SIZE;
-    if (n <= 0)
+    }
+    if (n <= 0) {
       BYTE_THRESHOLD = 32;
+    }
     BYTE_THRESHOLD = n;
   }
 
@@ -250,8 +252,9 @@ public class RconHandler implements Runnable {
           server.runCommand(command.substring(idx));
           return command;
         }
-        else
+        else {
           return "Error: No Command";
+        }
       }
       if (tokens[0].equalsIgnoreCase("help")) {
         if (tokens.length > 1) {
@@ -302,10 +305,12 @@ public class RconHandler implements Runnable {
         Thread.sleep(20);
         return a;
       }
-      if (a + avail > buf.length)
+      if (a + avail > buf.length) {
         avail = buf.length - a;
-      if (avail > 0)
+      }
+      if (avail > 0) {
         tmp = in.read(buf, a, avail);
+      }
       if (tmp > 0) {
         a += tmp;
         parent.lastRead = System.currentTimeMillis();
@@ -326,13 +331,16 @@ public class RconHandler implements Runnable {
 
   protected boolean ensureRead(int n) throws InterruptedException, IOException {
 
-    if (r + n > BUF_SIZE)
+    if (r + n > BUF_SIZE) {
       return false;
-    if (a >= r + n)
+    }
+    if (a >= r + n) {
       return true;
+    }
     while (a < r + n) {
-      if (parent.isClosed() || Thread.interrupted())
+      if (parent.isClosed() || Thread.interrupted()) {
         throw new InterruptedException();
+      }
 
       readMore();
     }
@@ -346,14 +354,17 @@ public class RconHandler implements Runnable {
     while (true) {
       ensureRead(1);
       b = readByte();
-      if (b != 0)
+      if (b != 0) {
         bb.put(b);
-      else
+      }
+      else {
         break;
+      }
       i++;
     }
-    if (bb.get(0) == 0)
+    if (bb.get(0) == 0) {
       return "";
+    }
     byte[] string = new byte[i];
     bb.position(0);
     bb.get(string, 0, i);

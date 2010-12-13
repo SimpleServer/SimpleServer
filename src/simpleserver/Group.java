@@ -22,7 +22,6 @@ package simpleserver;
 
 import java.util.Vector;
 
-
 public class Group {
   private int id;
   private String groupName;
@@ -61,15 +60,19 @@ public class Group {
 
   public static boolean contains(int[] groups, Player p) {
     if (groups != null) {
-      if (groups[0] == -1)
+      if (groups[0] == -1) {
         return true;
-      if (p.getGroup() == -1)
+      }
+      if (p.getGroup() == -1) {
         return false;
-      if (groups[0] == 0)
+      }
+      if (groups[0] == 0) {
         return true;
+      }
       for (int i : groups) {
-        if (p.getGroup() == i)
+        if (p.getGroup() == i) {
           return true;
+        }
       }
     }
     return false;
@@ -119,8 +122,9 @@ public class Group {
     }
     int[] ret = new int[ranks.size()];
     int j = 0;
-    for (Integer num : ranks)
+    for (Integer num : ranks) {
       ret[j++] = num;
+    }
     return ret;
   }
 }

@@ -133,8 +133,9 @@ public class Player {
   }
 
   public boolean hasMessages() {
-    if (messages.isEmpty())
+    if (messages.isEmpty()) {
       return false;
+    }
     return true;
   }
 
@@ -144,8 +145,9 @@ public class Player {
 
   public boolean parseCommand(String msg) throws InterruptedException,
       IOException {
-    if (!closed)
+    if (!closed) {
       return parser.parse(msg);
+    }
     return true;
   }
 
@@ -159,31 +161,38 @@ public class Player {
     if ((nameGroup == -1 || ipGroup == -1 && parent.options.defaultGroup != -1)
         || (nameGroup == -1 && ipGroup == -1 && parent.options.defaultGroup == -1)) {
       group = -1;
-      if (parent.groups.groupExists(group))
+      if (parent.groups.groupExists(group)) {
         groupObject = parent.groups.getGroup(group);
-      else
+      }
+      else {
         groupObject = null;
+      }
       return;
     }
 
-    if (ipGroup >= nameGroup)
+    if (ipGroup >= nameGroup) {
       group = ipGroup;
-    else
+    }
+    else {
       group = nameGroup;
+    }
 
-    if (parent.groups.groupExists(group))
+    if (parent.groups.groupExists(group)) {
       groupObject = parent.groups.getGroup(group);
-    else
+    }
+    else {
       group = 0;
+    }
   }
 
   public void updateGroup() {
-    updateGroup(this.name);
+    updateGroup(name);
   }
 
   public boolean isAdmin() {
-    if (groupObject != null)
+    if (groupObject != null) {
       return groupObject.isAdmin();
+    }
     return false;
   }
 
@@ -204,9 +213,10 @@ public class Player {
           + extsocket.getInetAddress().getHostAddress() + ".");
       isRobot = true;
     }
-    if (!isRobot)
+    if (!isRobot) {
       System.out.println("[SimpleServer] IP Connection from "
           + extsocket.getInetAddress().getHostAddress() + "!");
+    }
     try {
       parent.requestTracker.addRequest(extsocket.getInetAddress()
                                                 .getHostAddress());
@@ -225,8 +235,9 @@ public class Player {
     }
     catch (Exception e2) {
       e2.printStackTrace();
-      if (parent.options.exitOnFailure)
+      if (parent.options.exitOnFailure) {
         System.exit(-1);
+      }
       else {
         parent.forceRestart();
       }
@@ -287,8 +298,9 @@ public class Player {
   }
 
   public boolean isConnected() throws InterruptedException {
-    if (closed)
+    if (closed) {
       return false;
+    }
     if (!extsocket.isConnected() || !intsocket.isConnected()) {
       parent.notifyClosed(this);
       close();
@@ -301,8 +313,9 @@ public class Player {
   public void close() throws InterruptedException {
     // Don't spam the console! : )
     // And don't close if we're already closing!
-    if (!isKicked && parent != null)
+    if (!isKicked && parent != null) {
       parent.notifyClosed(this);
+    }
     if (!closed) {
       closed = true;
       cleanup();
@@ -331,9 +344,10 @@ public class Player {
     catch (Exception e) {
     }
     intsocket = null;
-    if (!isRobot && extsocket != null)
+    if (!isRobot && extsocket != null) {
       System.out.println("[SimpleServer] Socket Closed: "
           + extsocket.getInetAddress().getHostAddress());
+    }
     extsocket = null;
     t1 = null;
     t2 = null;
@@ -366,9 +380,10 @@ public class Player {
           + extsocket.getInetAddress().getHostAddress() + ".");
       isRobot = true;
     }
-    if (!isRobot)
+    if (!isRobot) {
       System.out.println("[SimpleServer] IP Connection from "
           + extsocket.getInetAddress().getHostAddress() + "!");
+    }
     try {
       parent.requestTracker.addRequest(extsocket.getInetAddress()
                                                 .getHostAddress());
@@ -387,8 +402,9 @@ public class Player {
     }
     catch (Exception e2) {
       e2.printStackTrace();
-      if (parent.options.exitOnFailure)
+      if (parent.options.exitOnFailure) {
         System.exit(-1);
+      }
       else {
         parent.forceRestart();
       }

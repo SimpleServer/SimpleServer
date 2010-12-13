@@ -33,8 +33,9 @@ public class MinecraftMonitor extends Thread {
   public void run() {
     try {
       server.p.waitFor();
-      if (Thread.interrupted())
+      if (Thread.interrupted()) {
         return;
+      }
       System.out.println("[SimpleServer] Minecraft process stopped unexpectedly! Automatically restarting...");
       server.forceRestart();
     }

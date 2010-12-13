@@ -245,73 +245,105 @@ public class Options {
 
       optionsLoader.load(r);
 
-      if (optionsLoader.getProperty("rconPassword") != null)
+      if (optionsLoader.getProperty("rconPassword") != null) {
         rconPassword = optionsLoader.getProperty("rconPassword");
+      }
 
-      if (optionsLoader.getProperty("port") != null)
+      if (optionsLoader.getProperty("port") != null) {
         port = Integer.valueOf(optionsLoader.getProperty("port"));
-      if (optionsLoader.getProperty("rconPort") != null)
+      }
+      if (optionsLoader.getProperty("rconPort") != null) {
         rconPort = Integer.valueOf(optionsLoader.getProperty("rconPort"));
-      if (optionsLoader.getProperty("memory") != null)
+      }
+      if (optionsLoader.getProperty("memory") != null) {
         memory = Integer.valueOf(optionsLoader.getProperty("memory"));
-      if (optionsLoader.getProperty("internalPort") != null)
+      }
+      if (optionsLoader.getProperty("internalPort") != null) {
         internalPort = Integer.valueOf(optionsLoader.getProperty("internalPort"));
-      if (optionsLoader.getProperty("autoSaveMins") != null)
+      }
+      if (optionsLoader.getProperty("autoSaveMins") != null) {
         autoSaveMins = Integer.valueOf(optionsLoader.getProperty("autoSaveMins"));
-      if (optionsLoader.getProperty("autoBackupMins") != null)
+      }
+      if (optionsLoader.getProperty("autoBackupMins") != null) {
         autoBackupMins = Integer.valueOf(optionsLoader.getProperty("autoBackupMins"));
-      if (optionsLoader.getProperty("autoRestartMins") != null)
+      }
+      if (optionsLoader.getProperty("autoRestartMins") != null) {
         autoRestartMins = Integer.valueOf(optionsLoader.getProperty("autoRestartMins"));
-      if (optionsLoader.getProperty("keepBackupHours") != null)
+      }
+      if (optionsLoader.getProperty("keepBackupHours") != null) {
         keepBackupHours = Integer.valueOf(optionsLoader.getProperty("keepBackupHours"));
-      if (optionsLoader.getProperty("maxPlayers") != null)
+      }
+      if (optionsLoader.getProperty("maxPlayers") != null) {
         maxPlayers = Integer.valueOf(optionsLoader.getProperty("maxPlayers"));
+      }
 
-      if (optionsLoader.getProperty("guestsCanViewComplex") != null)
+      if (optionsLoader.getProperty("guestsCanViewComplex") != null) {
         guestsCanViewComplex = Boolean.valueOf(optionsLoader.getProperty("guestsCanViewComplex"));
+      }
 
-      if (optionsLoader.getProperty("defaultGroup") != null)
+      if (optionsLoader.getProperty("defaultGroup") != null) {
         defaultGroup = Integer.valueOf(optionsLoader.getProperty("defaultGroup"));
-      if (optionsLoader.getProperty("autoBackup") != null)
+      }
+      if (optionsLoader.getProperty("autoBackup") != null) {
         autoBackup = Boolean.valueOf(optionsLoader.getProperty("autoBackup"));
-      if (optionsLoader.getProperty("autoSave") != null)
+      }
+      if (optionsLoader.getProperty("autoSave") != null) {
         autoSave = Boolean.valueOf(optionsLoader.getProperty("autoSave"));
-      if (optionsLoader.getProperty("autoRestart") != null)
+      }
+      if (optionsLoader.getProperty("autoRestart") != null) {
         autoRestart = Boolean.valueOf(optionsLoader.getProperty("autoRestart"));
-      if (optionsLoader.getProperty("useWhitelist") != null)
+      }
+      if (optionsLoader.getProperty("useWhitelist") != null) {
         useWhitelist = Boolean.valueOf(optionsLoader.getProperty("useWhitelist"));
-      if (optionsLoader.getProperty("useSlashes") != null)
+      }
+      if (optionsLoader.getProperty("useSlashes") != null) {
         useSlashes = Boolean.valueOf(optionsLoader.getProperty("useSlashes"));
-      if (optionsLoader.getProperty("onlineMode") != null)
+      }
+      if (optionsLoader.getProperty("onlineMode") != null) {
         onlineMode = Boolean.valueOf(optionsLoader.getProperty("onlineMode"));
-      if (optionsLoader.getProperty("debug") != null)
+      }
+      if (optionsLoader.getProperty("debug") != null) {
         debug = Boolean.valueOf(optionsLoader.getProperty("debug"));
-      if (optionsLoader.getProperty("useSMPAPI") != null)
+      }
+      if (optionsLoader.getProperty("useSMPAPI") != null) {
         useSMPAPI = Boolean.valueOf(optionsLoader.getProperty("useSMPAPI"));
-      if (optionsLoader.getProperty("experimental") != null)
+      }
+      if (optionsLoader.getProperty("experimental") != null) {
         experimental = Boolean.valueOf(optionsLoader.getProperty("experimental"));
-      if (optionsLoader.getProperty("exitOnFailure") != null)
+      }
+      if (optionsLoader.getProperty("exitOnFailure") != null) {
         experimental = Boolean.valueOf(optionsLoader.getProperty("exitOnFailure"));
-      if (optionsLoader.getProperty("levelName") != null)
+      }
+      if (optionsLoader.getProperty("levelName") != null) {
         levelName = optionsLoader.getProperty("levelName");
-      if (optionsLoader.getProperty("ipAddress") != null)
+      }
+      if (optionsLoader.getProperty("ipAddress") != null) {
         ipAddress = optionsLoader.getProperty("ipAddress");
-      if (optionsLoader.getProperty("alternateJarFile") != null)
+      }
+      if (optionsLoader.getProperty("alternateJarFile") != null) {
         alternateJarFile = optionsLoader.getProperty("alternateJarFile");
-      if (optionsLoader.getProperty("c10tArgs") != null)
+      }
+      if (optionsLoader.getProperty("c10tArgs") != null) {
         c10tArgs = optionsLoader.getProperty("c10tArgs");
-      if (optionsLoader.getProperty("c10tMins") != null)
+      }
+      if (optionsLoader.getProperty("c10tMins") != null) {
         c10tMins = Integer.valueOf(optionsLoader.getProperty("c10tMins"));
-      if (optionsLoader.getProperty("localChatRadius") != null)
+      }
+      if (optionsLoader.getProperty("localChatRadius") != null) {
         localChatRadius = Integer.valueOf(optionsLoader.getProperty("localChatRadius"));
-      if (optionsLoader.getProperty("useMsgFormats") != null)
+      }
+      if (optionsLoader.getProperty("useMsgFormats") != null) {
         useMsgFormats = Boolean.valueOf(optionsLoader.getProperty("useMsgFormats"));
-      if (optionsLoader.getProperty("msgFormat") != null)
+      }
+      if (optionsLoader.getProperty("msgFormat") != null) {
         msgFormat = optionsLoader.getProperty("msgFormat");
-      if (optionsLoader.getProperty("msgTitleFormat") != null)
+      }
+      if (optionsLoader.getProperty("msgTitleFormat") != null) {
         msgTitleFormat = optionsLoader.getProperty("msgTitleFormat");
-      if (optionsLoader.getProperty("javaArguments") != null)
+      }
+      if (optionsLoader.getProperty("javaArguments") != null) {
         javaArguments = optionsLoader.getProperty("javaArguments");
+      }
 
       if (optionsLoader.getProperty("muteRank") != null
           || optionsLoader.getProperty("warpPlayerRank") != null
@@ -322,24 +354,33 @@ public class Options {
           || optionsLoader.getProperty("setRankRank") != null
           || optionsLoader.getProperty("useWarpRank") != null
           || optionsLoader.getProperty("createWarpRank") != null) {
-        if (optionsLoader.getProperty("muteRank") != null)
+        if (optionsLoader.getProperty("muteRank") != null) {
           muteRank = Integer.valueOf(optionsLoader.getProperty("muteRank"));
-        if (optionsLoader.getProperty("warpPlayerRank") != null)
+        }
+        if (optionsLoader.getProperty("warpPlayerRank") != null) {
           warpPlayerRank = Integer.valueOf(optionsLoader.getProperty("warpPlayerRank"));
-        if (optionsLoader.getProperty("teleportRank") != null)
+        }
+        if (optionsLoader.getProperty("teleportRank") != null) {
           teleportRank = Integer.valueOf(optionsLoader.getProperty("teleportRank"));
-        if (optionsLoader.getProperty("giveRank") != null)
+        }
+        if (optionsLoader.getProperty("giveRank") != null) {
           giveRank = Integer.valueOf(optionsLoader.getProperty("giveRank"));
-        if (optionsLoader.getProperty("homeCommandRank") != null)
+        }
+        if (optionsLoader.getProperty("homeCommandRank") != null) {
           homeCommandRank = Integer.valueOf(optionsLoader.getProperty("homeCommandRank"));
-        if (optionsLoader.getProperty("givePlayerRank") != null)
+        }
+        if (optionsLoader.getProperty("givePlayerRank") != null) {
           givePlayerRank = Integer.valueOf(optionsLoader.getProperty("givePlayerRank"));
-        if (optionsLoader.getProperty("setRankRank") != null)
+        }
+        if (optionsLoader.getProperty("setRankRank") != null) {
           setRankRank = Integer.valueOf(optionsLoader.getProperty("setRankRank"));
-        if (optionsLoader.getProperty("useWarpRank") != null)
+        }
+        if (optionsLoader.getProperty("useWarpRank") != null) {
           useWarpRank = Integer.valueOf(optionsLoader.getProperty("useWarpRank"));
-        if (optionsLoader.getProperty("createWarpRank") != null)
+        }
+        if (optionsLoader.getProperty("createWarpRank") != null) {
           createWarpRank = Integer.valueOf(optionsLoader.getProperty("createWarpRank"));
+        }
         r.close();
         conversion();
       }

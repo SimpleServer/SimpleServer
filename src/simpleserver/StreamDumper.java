@@ -41,10 +41,11 @@ public class StreamDumper implements Runnable {
     this.in = in;
     this.out = out;
     filename = "client.txt";
-    if (isServerTunnel)
+    if (isServerTunnel) {
       filename = "server.txt";
+    }
     File f = new File(filename);
-    if (!f.exists())
+    if (!f.exists()) {
       try {
         f.createNewFile();
       }
@@ -52,6 +53,7 @@ public class StreamDumper implements Runnable {
         // TODO Auto-generated catch block
         e1.printStackTrace();
       }
+    }
     try {
       file = new FileOutputStream(filename);
     }
@@ -59,7 +61,7 @@ public class StreamDumper implements Runnable {
       // TODO Auto-generated catch block
       e.printStackTrace();
     }
-    this.parent = p;
+    parent = p;
   }
 
   public void addPacket(byte[] b) {
@@ -70,10 +72,11 @@ public class StreamDumper implements Runnable {
     this.in = in;
     this.out = out;
     filename = "client.txt";
-    if (isServerTunnel)
+    if (isServerTunnel) {
       filename = "server.txt";
+    }
     File f = new File(filename);
-    if (!f.exists())
+    if (!f.exists()) {
       try {
         f.createNewFile();
       }
@@ -81,6 +84,7 @@ public class StreamDumper implements Runnable {
         // TODO Auto-generated catch block
         e1.printStackTrace();
       }
+    }
     try {
       file = new FileOutputStream(filename);
     }
@@ -88,7 +92,7 @@ public class StreamDumper implements Runnable {
       // TODO Auto-generated catch block
       e.printStackTrace();
     }
-    this.parent = p;
+    parent = p;
   }
 
   public static final int unsignedIntToLong(byte[] b) {
@@ -156,8 +160,9 @@ public class StreamDumper implements Runnable {
         if (amt > buf.length) {
           amt = buf.length;
         }
-        if (amt > 0)
+        if (amt > 0) {
           amt = in.read(buf, 0, amt);
+        }
 
         lastRead = System.currentTimeMillis();
 
@@ -167,10 +172,12 @@ public class StreamDumper implements Runnable {
           out.flush();
         }
 
-        if (!dontsleep)
+        if (!dontsleep) {
           Thread.sleep(20);
-        else
+        }
+        else {
           dontsleep = false;
+        }
       }
 
     }
