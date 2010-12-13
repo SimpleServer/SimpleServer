@@ -189,8 +189,6 @@ public class CommandParser {
                 reason = "";
               }
             }
-            if (reason == null)
-              reason = "";
             if (tokens[1] == null)
               return true;
             String name = server.kick(tokens[1], reason);
@@ -310,8 +308,6 @@ public class CommandParser {
                 reason = "";
               }
             }
-            if (reason == null)
-              reason = "";
             if (tokens[1] == null)
               return true;
             String name = server.findName(tokens[1]);

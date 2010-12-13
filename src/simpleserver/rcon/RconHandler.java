@@ -99,7 +99,7 @@ public class RconHandler implements Runnable {
         int requestID = readInt();
         int requestType = readInt();
         String s1 = readString2();
-        String s2 = readString2();
+        readString2();
         if (a - r > 0) {
           System.out.println(a - r);
           byte[] cpy = new byte[BUF_SIZE];
@@ -229,13 +229,6 @@ public class RconHandler implements Runnable {
     bb.put((byte) 0);
     bb.put((byte) 0);
     out.write(bb.array());
-  }
-
-  private void printStream(byte[] stream) {
-    for (int i = 0; i < 64; i++) {
-      System.out.print(Byte.toString(stream[i]) + " ");
-    }
-    System.out.println();
   }
 
   private String getConsole() {

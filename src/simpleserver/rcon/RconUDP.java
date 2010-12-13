@@ -315,7 +315,7 @@ public class RconUDP implements Rcon {
     int requestID = buf.getInt();
     int requestType = buf.getInt();
     String s1 = readString2(buf);
-    String s2 = readString2(buf);
+    readString2(buf);
 
     int responseType = 0;
     String response;

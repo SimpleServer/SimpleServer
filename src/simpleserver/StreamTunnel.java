@@ -682,43 +682,6 @@ public class StreamTunnel implements Runnable {
     }
   }
 
-  private void printStream(byte[] stream) {
-    for (int i = 0; i < stream.length; i++) {
-      System.out.print(Byte.toString(stream[i]) + " ");
-    }
-    System.out.println();
-  }
-
-  private int readMore() throws InterruptedException, IOException {
-    int tmp = 0;
-    int avail;
-    try {
-      lock.acquire();
-      avail = in.available();
-      if (avail == 0)
-        Thread.sleep(20);
-      if (a + avail > buf.length)
-        avail = buf.length - a;
-      if (avail > 0)
-        tmp = in.read(buf, a, avail);
-      if (tmp > 0) {
-        a += tmp;
-        lastRead = System.currentTimeMillis();
-      }
-      lock.release();
-      return a;
-    }
-    catch (IOException e) {
-      lock.release();
-      throw e;
-    }
-    catch (InterruptedException e) {
-      lock.release();
-      throw e;
-    }
-
-  }
-
   private int readMore(int num) throws InterruptedException, IOException {
     int tmp = 0;
     try {
