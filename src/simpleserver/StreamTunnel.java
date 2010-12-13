@@ -570,9 +570,9 @@ public class StreamTunnel implements Runnable {
           if (msg.startsWith("<")) {
             try {
               String nameTok = msg.substring(1);
-              if (nameTok.startsWith("�"))
+              if (nameTok.startsWith("\302\247"))
                 nameTok = msg.substring(3);
-              int sidx = nameTok.indexOf("�");
+              int sidx = nameTok.indexOf("\302\247");
               if (sidx > 0)
                 nameTok = nameTok.substring(0, sidx);
               else {
@@ -586,11 +586,11 @@ public class StreamTunnel implements Runnable {
                 msg = msg.substring(idx + 1);
                 if (server.options.msgFormat.equals("")
                     || server.options.msgFormat == null) {
-                  server.options.msgFormat = "<�%3$s%1$s>�f";
+                  server.options.msgFormat = "<\302\247%3$s%1$s>\302\247f";
                 }
                 if (server.options.msgTitleFormat.equals("")
                     || server.options.msgTitleFormat == null) {
-                  server.options.msgTitleFormat = "<�%3$s[%2$s]%1$s>�f";
+                  server.options.msgTitleFormat = "<\302\247%3$s[%2$s]%1$s>\302\247f";
                 }
 
                 String color = "f";

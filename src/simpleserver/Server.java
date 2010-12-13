@@ -636,7 +636,7 @@ public class Server {
   }
 
   public int localChat(Player p, String msg) {
-    String chat = "�7" + p.getName() + " says: " + msg;
+    String chat = "\302\2477" + p.getName() + " says: " + msg;
     int j = 0;
     if (p.getName() == null)
       return 0;

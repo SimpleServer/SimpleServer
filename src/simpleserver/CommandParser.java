@@ -27,14 +27,6 @@ public class CommandParser {
   private Player player;
   private Server server;
 
-  /*public static final String[] commands = {
-    "ban","banip","unban","unbanip","kick",
-    "lock","unlock","tp","warpmeto","warptome",
-    "iddqd","listips","kit","kits","mute","unmute",
-    "give","giveplayer","setgroup","whitelist",
-    "unwhitelist","restart","save","reload","backup"
-    };
-  */
   public CommandParser(Player player) {
     this.player = player;
     this.server = player.parent;
@@ -45,14 +37,10 @@ public class CommandParser {
   }
 
   public void sendMOTD() {
-    // System.out.println(server.getMOTD());
-    // parent.addMessage(server.getMOTD());
-    // server.runCommand("tell " + parent.getName() + " " + server.getMOTD());
     String rules = server.getMOTD();
     String[] lines = rules.split("\\r?\\n");
     for (int i = 0; i < lines.length; i++) {
       player.addMessage(lines[i]);
-      // server.runCommand("tell " + parent.getName() + " " + lines[i]);
     }
   }
 
@@ -61,7 +49,6 @@ public class CommandParser {
     String[] lines = rules.split("\\r?\\n");
     for (int i = 0; i < lines.length; i++) {
       player.addMessage(lines[i]);
-      // server.runCommand("tell " + parent.getName() + " " + lines[i]);
     }
   }
 
@@ -102,18 +89,14 @@ public class CommandParser {
                 && i.kickMsg == null)
               list += i.getName() + ", ";
         }
-        // server.runCommand("tell " + parent.getName()+ " " + list);
         player.addMessage(list);
         return true;
       }
       if (tokens[0].compareTo("!listips") == 0) {
         if (server.cmdAllowed(cmd, player)) {
-          // server.runCommand("tell " + parent.getName() + " IP Addresses: ");
           player.addMessage("IP Addresses:");
           for (Iterator<Player> itr = PlayerFactory.iterator(); itr.hasNext();) {
             Player i = itr.next();
-            // server.runCommand("tell " + parent.getName() + " " + i.getName()
-            // + " " + i.getIPAddress());
             if (i.getName() != null && i.getName() != "")
               player.addMessage(i.getName() + " " + i.getIPAddress());
           }
@@ -290,7 +273,7 @@ public class CommandParser {
           String chat = msg.substring(tokens[0].length());
           int numPlayers = server.localChat(player, chat);
           if (numPlayers <= 0)
-            player.addMessage("�cNobody is around to hear you.");
+            player.addMessage("\302\247cNobody is around to hear you.");
         }
         return true;
       }
@@ -388,16 +371,12 @@ public class CommandParser {
         if (server.cmdAllowed(cmd, player)) {
           if (tokens.length > 1) {
             if (server.ipBans.removeBan(tokens[1])) {
-              // server.runCommand("tell " + parent.getName() + " IP Address " +
-              // tokens[1] + " has been unbanned!");
               player.addMessage("IP Address " + tokens[1]
                   + " has been unbanned!");
               server.adminLog.addMessage("User " + player.getName()
                   + " unbanned ip:\t " + tokens[1]);
             }
             else {
-              // server.runCommand("tell " + parent.getName() +
-              // " no IP ban matching " + tokens[1] + "was found!");
               player.addMessage("No IP ban matching " + tokens[1]
                   + "was found!");
             }
@@ -417,14 +396,12 @@ public class CommandParser {
                 amt = 1;
               }
             }
-            // server.runCommand("give " + parent.getName() + " " + tokens[1] +
-            // " " + amt);
             int id = 0;
             try {
               id = Integer.valueOf(tokens[1]);
             }
             catch (Exception e) {
-              player.addMessage("�cInvalid format!");
+              player.addMessage("\302\247cInvalid format!");
               return true;
             }
             server.adminLog.addMessage("User " + player.getName()
@@ -455,22 +432,20 @@ public class CommandParser {
               group = Integer.valueOf(tokens[2]);
             }
             catch (Exception e) {
-              player.addMessage("�cInvalid format!");
+              player.addMessage("\302\247cInvalid format!");
               return true;
             }
             if (group >= player.getGroup()) {
-              player.addMessage("�cYou cannot promote a user to a higher group!");
+              player.addMessage("\302\247cYou cannot promote a user to a higher group!");
               return true;
             }
             Player p = server.findPlayer(tokens[1]);
             if (p != null) {
               if (player.getGroup() <= p.getGroup()) {
-                player.addMessage("�cYou cannot set the group of this user!");
+                player.addMessage("\302\247cYou cannot set the group of this user!");
                 return true;
               }
               server.members.setGroup(p.getName(), group);
-              // server.runCommand("tell " + parent.getName() + " Player " +
-              // tokens[1] + "'s rank was set to " + tokens[2] +"!");
               player.addMessage("Player " + p.getName()
                   + "'s group was set to " + group + "!");
               server.adminLog.addMessage("User " + player.getName()
@@ -480,12 +455,10 @@ public class CommandParser {
             else {
               String name = tokens[1];
               if (player.getGroup() <= server.members.checkName(name)) {
-                player.addMessage("�cYou cannot set the group of this user!");
+                player.addMessage("\302\247cYou cannot set the group of this user!");
                 return true;
               }
               server.members.setGroup(name, group);
-              // server.runCommand("tell " + parent.getName() + " Player " +
-              // tokens[1] + "'s rank was set to " + tokens[2] +"!");
               player.addMessage("Player " + name + "'s group was set to "
                   + group + "!");
               server.adminLog.addMessage("User " + player.getName()
@@ -500,8 +473,6 @@ public class CommandParser {
           if (tokens.length >= 2) {
             if (!server.whitelist.isWhitelisted(tokens[1])) {
               server.whitelist.addName(tokens[1]);
-              // server.runCommand("tell " + parent.getName() + " Player " +
-              // tokens[1] + " was whitelisted!");
               player.addMessage("Player " + tokens[1] + " was whitelisted!");
               server.adminLog.addMessage("User " + player.getName()
                   + " whitelisted player:\t " + tokens[1]);
@@ -514,15 +485,11 @@ public class CommandParser {
         if (server.cmdAllowed(cmd, player)) {
           if (tokens.length >= 2) {
             if (server.whitelist.removeName(tokens[1])) {
-              // server.runCommand("tell " + parent.getName() + " Player " +
-              // tokens[1] + " was un-whitelisted!");
               player.addMessage("Player " + tokens[1] + " was un-whitelisted!");
               server.adminLog.addMessage("User " + player.getName()
                   + " unwhitelisted player:\t " + tokens[1]);
             }
             else {
-              // server.runCommand("tell " + parent.getName() +
-              // " No such name: " + tokens[1] + "!");
               player.addMessage("No such name: " + tokens[1] + "!");
             }
           }
@@ -546,7 +513,7 @@ public class CommandParser {
               id = Integer.valueOf(tokens[2]);
             }
             catch (Exception e) {
-              player.addMessage("�cInvalid format!");
+              player.addMessage("\302\247cInvalid format!");
               return true;
             }
             String name = server.findName(tokens[1]);
