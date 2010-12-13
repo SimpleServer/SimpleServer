@@ -18,48 +18,54 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-package simpleserver.config;
+package simpleserver.command;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-
-import simpleserver.Group;
+import simpleserver.Command;
 import simpleserver.Player;
 
-public class CommandList extends PropertiesConfig {
-  private Map<String, int[]> commands;
+public class GiveCommand extends Command {
+  private int offset;
 
-  public CommandList() {
-    super("command-list.txt");
-
-    commands = new HashMap<String, int[]>();
-
-    loadDefaults();
+  public GiveCommand() {
+    this("give", 0);
   }
 
-  public boolean playerAllowed(String command, Player player) {
-    int[] groups = commands.get(command);
-    if (groups != null) {
-      return Group.contains(groups, player);
-    }
+  protected GiveCommand(String name, int offset) {
+    super(name);
 
-    return false;
-  }
-
-  public void setGroup(String command, int group) {
-    commands.put(command, new int[] { group });
-    setProperty(command, Integer.toString(group));
+    this.offset = offset;
   }
 
   @Override
-  public void load() {
-    super.load();
+  public void execute(Player player, String message)
+      throws InterruptedException {
+    String[] arguments = extractArguments(message);
 
-    commands.clear();
-    for (Entry<Object, Object> entry : entrySet()) {
-      commands.put(entry.getKey().toString(),
-                   Group.parseGroups(entry.getValue().toString()));
+    Player target = getTarget(player, arguments);
+    if (target == null) {
+      return;
     }
+
+    if (arguments.length > offset) {
+      String item = arguments[offset];
+
+      String amount = null;
+      if (arguments.length > offset + 1) {
+        amount = arguments[offset + 1];
+      }
+
+      target.give(item, amount);
+      player.server.adminLog.addMessage("User " + player.getName()
+          + " used giveplayer:\t " + target.getName() + "\t" + item + "\t("
+          + amount + ")");
+    }
+    else {
+      player.addMessage("\302\247cNo item or amount specified!");
+    }
+  }
+
+  protected Player getTarget(Player player, String[] arguments)
+      throws InterruptedException {
+    return player;
   }
 }

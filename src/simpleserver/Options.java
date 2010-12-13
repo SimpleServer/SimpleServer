@@ -170,7 +170,7 @@ public class Options {
     System.out.println("The Properties file format has changed! Command ranks are now set in command-list.txt!");
     System.out.println("Your previous settings for commands have been saved, and cleared from simpleserver.properties!");
     System.out.println("Press enter to continue...");
-    CommandList cmds = new CommandList(parent.options.useSlashes);
+    CommandList cmds = new CommandList();
     cmds.load();
     cmds.setGroup("warptome", warpPlayerRank);
     cmds.setGroup("warpmeto", warpPlayerRank);

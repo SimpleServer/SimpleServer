@@ -54,15 +54,15 @@ public class StreamTunnel implements Runnable {
 
   protected int motionCounter = 0;
 
-  private Player parent;
+  private Player player;
   private Server server;
 
   public StreamTunnel(InputStream in, OutputStream out, boolean isServerTunnel,
                       Player p) {
     this.in = in;
     this.out = out;
-    parent = p;
-    server = p.parent;
+    player = p;
+    server = p.server;
     buf = new byte[BUF_SIZE];
     inGame = false;
     lock = new Semaphore(1);
@@ -75,8 +75,8 @@ public class StreamTunnel implements Runnable {
                       Player p, int byteThreshold) {
     this.in = in;
     this.out = out;
-    parent = p;
-    server = p.parent;
+    player = p;
+    server = p.server;
     buf = new byte[BUF_SIZE];
     inGame = false;
     lock = new Semaphore(1);
@@ -102,7 +102,7 @@ public class StreamTunnel implements Runnable {
       r = 0;
       a = 0;
       lastRead = System.currentTimeMillis();
-      while (!parent.isClosed() && !Thread.interrupted()) {
+      while (!player.isClosed() && !Thread.interrupted()) {
         lock.acquire();
         int avail = 0;
         try {
@@ -126,9 +126,9 @@ public class StreamTunnel implements Runnable {
         lock.release();
 
         if (System.currentTimeMillis() - lastRead > IDLE_TIME) {
-          if (!parent.isRobot) {
+          if (!player.isRobot) {
             System.out.println("[SimpleServer] Disconnecting "
-                + parent.getIPAddress() + " due to inactivity.");
+                + player.getIPAddress() + " due to inactivity.");
           }
           try {
             in.close();
@@ -140,7 +140,7 @@ public class StreamTunnel implements Runnable {
           }
           catch (IOException e1) {
           }
-          parent.close();
+          player.close();
         }
         if (r == 0 && a > 0) {
           while (r < BYTE_THRESHOLD && r < a) {
@@ -168,20 +168,20 @@ public class StreamTunnel implements Runnable {
             }
             if (isServerTunnel) {
               // Messages
-              if (parent.isKicked()) {
-                out.write(makePacket((byte) 0xff, parent.getKickMsg()));
-                parent.delayClose();
+              if (player.isKicked()) {
+                out.write(makePacket((byte) 0xff, player.getKickMsg()));
+                player.delayClose();
                 break;
               }
-              while (parent.hasMessages()) {
-                byte[] m = makePacket(parent.getMessage());
+              while (player.hasMessages()) {
+                byte[] m = makePacket(player.getMessage());
                 out.write(m, 0, m.length);
               }
             }
             else {
-              if (parent.isKicked()) {
-                out.write(makePacket((byte) 0xff, parent.getKickMsg()));
-                parent.delayClose();
+              if (player.isKicked()) {
+                out.write(makePacket((byte) 0xff, player.getKickMsg()));
+                player.delayClose();
                 break;
               }
             }
@@ -202,7 +202,7 @@ public class StreamTunnel implements Runnable {
             a = 0;
           }
         }
-        if (parent.isClosed()) {
+        if (player.isClosed()) {
           throw new InterruptedException();
         }
         Thread.sleep(20);
@@ -218,8 +218,8 @@ public class StreamTunnel implements Runnable {
       e.printStackTrace();
     }
     try {
-      if (!parent.isClosed()) {
-        parent.close();
+      if (!player.isClosed()) {
+        player.close();
       }
     }
     catch (InterruptedException e) {
@@ -240,7 +240,7 @@ public class StreamTunnel implements Runnable {
     }
     in = null;
     out = null;
-    parent = null;
+    player = null;
     lock = null;
   }
 
@@ -294,7 +294,7 @@ public class StreamTunnel implements Runnable {
       case 0x0a:
         skipBytes(1);
         if (!inGame && !isServerTunnel) {
-          parent.parser.sendMOTD();
+          player.sendMOTD();
           inGame = true;
         }
         break;
@@ -312,13 +312,13 @@ public class StreamTunnel implements Runnable {
         for (int pst = 0; pst < sizeOfArray; pst++) {
           short s = readShort();
           if (s != -1) {
-            if (server.itemWatch.contains(s) && parent.getName() != null) {
+            if (server.itemWatch.contains(s) && player.getName() != null) {
               byte amtOfItem = readByte();
-              if (!server.itemWatch.playerAllowed(parent, s, amtOfItem)
-                  && parent.getName() != null) {
+              if (!server.itemWatch.playerAllowed(player, s, amtOfItem)
+                  && player.getName() != null) {
                 server.adminLog.addMessage("ItemWatchList banned player:\t"
-                    + parent.getName());
-                server.banKick(parent.getName());
+                    + player.getName());
+                server.banKick(player.getName());
               }
               skipBytes(2);
             }
@@ -327,7 +327,7 @@ public class StreamTunnel implements Runnable {
             }
           }
         }
-        if (parent.getGroup() < 0) {
+        if (player.getGroup() < 0) {
           removeBytes(r - oldCursor);
           break;
         }
@@ -341,16 +341,16 @@ public class StreamTunnel implements Runnable {
         int arraySize = readShort();
         skipBytes(arraySize);
         if (server.chests.hasLock(xC3b, yC3b, zC3b)) {
-          if (!parent.isAdmin()) {
-            if (!server.chests.ownsLock(xC3b, yC3b, zC3b, parent.getName())
-                || parent.getName() == null) {
+          if (!player.isAdmin()) {
+            if (!server.chests.ownsLock(xC3b, yC3b, zC3b, player.getName())
+                || player.getName() == null) {
               removeBytes(r - oldCursor);
               break;
             }
           }
         }
 
-        if (parent.getGroup() < 0 && !server.options.guestsCanViewComplex) {
+        if (player.getGroup() < 0 && !server.options.guestsCanViewComplex) {
           removeBytes(r - oldCursor);
           break;
         }
@@ -364,10 +364,10 @@ public class StreamTunnel implements Runnable {
           motionCounter++;
         }
         if (!isServerTunnel && motionCounter % 8 == 0) {
-          parent.x = readDouble();
-          parent.y = readDouble();
-          parent.stance = readDouble();
-          parent.z = readDouble();
+          player.x = readDouble();
+          player.y = readDouble();
+          player.stance = readDouble();
+          player.z = readDouble();
           skipBytes(1);
         }
         else {
@@ -382,10 +382,10 @@ public class StreamTunnel implements Runnable {
           motionCounter++;
         }
         if (!isServerTunnel && motionCounter % 8 == 0) {
-          parent.x = readDouble();
-          parent.y = readDouble();
-          parent.stance = readDouble();
-          parent.z = readDouble();
+          player.x = readDouble();
+          player.y = readDouble();
+          player.stance = readDouble();
+          player.z = readDouble();
           skipBytes(9);
         }
         else {
@@ -395,7 +395,7 @@ public class StreamTunnel implements Runnable {
       case 0x0e:
 
         if (!isServerTunnel) {
-          if (parent.getGroup() < 0) {
+          if (player.getGroup() < 0) {
             skipBytes(11);
             removeBytes(12);
             break;
@@ -406,11 +406,11 @@ public class StreamTunnel implements Runnable {
           int yC0e = readByte();
           int zC0e = readInt();
           readByte();
-          if (server.chests.hasLock(xC0e, yC0e, zC0e) && !parent.isAdmin()) {
+          if (server.chests.hasLock(xC0e, yC0e, zC0e) && !player.isAdmin()) {
             removeBytes(12);
             break;
           }
-          if (parent.destroy) {
+          if (player.destroy) {
             byte[] cpyPacket = new byte[12];
             byte[] cpyPacket2 = new byte[12];
             System.arraycopy(buf, r - 12, cpyPacket, 0, 12);
@@ -441,15 +441,15 @@ public class StreamTunnel implements Runnable {
       case 0x0f:
         short block = readShort();
         if (!isServerTunnel) {
-          if (server.blockFirewall.contains(block) || parent.getGroup() < 0) {
-            boolean allowed = server.blockFirewall.playerAllowed(parent, block);
-            if (!allowed || parent.getGroup() < 0) {
+          if (server.blockFirewall.contains(block) || player.getGroup() < 0) {
+            boolean allowed = server.blockFirewall.playerAllowed(player, block);
+            if (!allowed || player.getGroup() < 0) {
               // Remove the packet! : )
               int coord_x = readInt();
               if (!allowed && coord_x != -1) {
                 // printStream(buf);
                 server.sendToAll(String.format(server.l.get("BAD_BLOCK"),
-                                               parent.getName(),
+                                               player.getName(),
                                                Short.toString(block)));
                 // server.runCommand("say [ALERT]" + parent.getName() +
                 // " tried to create illegal block #" + block + "!");
@@ -461,7 +461,7 @@ public class StreamTunnel implements Runnable {
           }
           if (block == 54) {
             // Check if lock is ready and allowed
-            if (parent.attemptLock) {
+            if (player.attemptLock) {
               // calculate coordinates
               int xC0f = readInt();
               int yC0f = readByte();
@@ -489,18 +489,18 @@ public class StreamTunnel implements Runnable {
               }
               // create chest entry
               if (server.chests.hasLock(xC0f, yC0f, zC0f)) {
-                parent.addMessage("This block is locked already!");
-                parent.attemptLock = false;
+                player.addMessage("This block is locked already!");
+                player.attemptLock = false;
                 break;
               }
-              if (!server.chests.giveLock(parent.getName().toLowerCase(), xC0f,
+              if (!server.chests.giveLock(player.getName().toLowerCase(), xC0f,
                                           yC0f, zC0f, false)) {
-                parent.addMessage("You already have a lock, or this block is locked already!");
+                player.addMessage("You already have a lock, or this block is locked already!");
               }
               else {
-                parent.addMessage("Your locked chest is created! Do not add another chest to it!");
+                player.addMessage("Your locked chest is created! Do not add another chest to it!");
               }
-              parent.attemptLock = false;
+              player.attemptLock = false;
             }
             else {
               skipBytes(10);
@@ -525,7 +525,7 @@ public class StreamTunnel implements Runnable {
         break;
       case 0x15:
         skipBytes(22);
-        if (parent.getGroup() < 0) {
+        if (player.getGroup() < 0) {
           removeBytes(23);
           break;
         }
@@ -572,7 +572,7 @@ public class StreamTunnel implements Runnable {
       case 0x02:
         oldCursor = r - 1;
         if (!isServerTunnel) {
-          if (!parent.setName(readString())) {
+          if (!player.setName(readString())) {
             removeBytes(r - oldCursor);
           }
         }
@@ -623,7 +623,7 @@ public class StreamTunnel implements Runnable {
                   }
                 }
                 msg = String.format(format, p.getName(), title, color) + msg;
-                parent.addMessage(msg);
+                player.addMessage(msg);
               }
               removeBytes(r - oldCursor);
             }
@@ -634,13 +634,13 @@ public class StreamTunnel implements Runnable {
         }
 
         if (!isServerTunnel) {
-          if (parent.isMuted() && !msg.startsWith("/") && !msg.startsWith("!")) {
+          if (player.isMuted() && !msg.startsWith("/") && !msg.startsWith("!")) {
             removeBytes(msg.length() + 2 + 1);
-            parent.addMessage("You are muted! You may not send messages to all players.");
+            player.addMessage("You are muted! You may not send messages to all players.");
             break;
           }
           if (msg.equalsIgnoreCase("/home")) {
-            if (!server.cmdAllowed("home", parent)) {
+            if (!server.cmdAllowed("home", player)) {
               removeBytes(msg.length() + 2 + 1);
             }
             else {
@@ -650,7 +650,7 @@ public class StreamTunnel implements Runnable {
 
           if (msg.startsWith("!")
               || (server.options.useSlashes && msg.startsWith("/"))) {
-            boolean remove = parent.parseCommand(msg);
+            boolean remove = player.parseCommand(msg);
             // Remove the packet! : )
             if (remove) {
               removeBytes(msg.length() + 2 + 1);
@@ -661,9 +661,9 @@ public class StreamTunnel implements Runnable {
       case (byte) 0xff:
         String discMsg = readString();
         if (discMsg.startsWith("Took too long")) {
-          server.addRobot(parent);
+          server.addRobot(player);
         }
-        parent.delayClose();
+        player.delayClose();
         break;
       case 0x01:
         readInt();
@@ -699,7 +699,7 @@ public class StreamTunnel implements Runnable {
           streamType = "ServerStream";
         }
         new Thread(new EOFWriter(cpy, history, null, streamType + " "
-            + parent.getName() + " packetid: " + packetid + " totalsize: " + r
+            + player.getName() + " packetid: " + packetid + " totalsize: " + r
             + " amt: " + a)).start();
         throw new InterruptedException();
     }
@@ -737,7 +737,7 @@ public class StreamTunnel implements Runnable {
       return true;
     }
     while (a < r + n) {
-      if (parent.isClosed() || Thread.interrupted()) {
+      if (player.isClosed() || Thread.interrupted()) {
         throw new InterruptedException();
       }
       // readMore();

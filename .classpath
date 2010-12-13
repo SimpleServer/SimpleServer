@@ -3,5 +3,10 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="lib/guava-r07.jar" sourcepath="lib/guava-src-r07.zip"/>
+	<classpathentry kind="lib" path="lib/reflections-0.9.5-RC2.jar" sourcepath="lib/reflections-0.9.5-RC2-sources.jar"/>
+	<classpathentry kind="lib" path="lib/slf4j-api-1.6.1.jar"/>
+	<classpathentry kind="lib" path="lib/slf4j-nop-1.6.1.jar"/>
+	<classpathentry kind="lib" path="lib/dom4j-1.6.jar"/>
+	<classpathentry kind="lib" path="lib/javassist-3.8.0.GA.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

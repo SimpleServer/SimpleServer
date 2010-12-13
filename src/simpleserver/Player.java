@@ -20,8 +20,6 @@
  ******************************************************************************/
 package simpleserver;
 
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.LinkedList;
@@ -31,18 +29,17 @@ import simpleserver.threads.DelayClose;
 public class Player {
   // public SocketThread internal;
   // public SocketThread external;
-  public CommandParser parser;
   public Socket intsocket;
   public Socket extsocket;
   Thread t1;
   Thread t2;
   Thread timeout;
-  Server parent;
+  public Server server;
   private String name = null;
-  boolean closed = false;
+  public boolean closed = false;
   boolean isKicked = false;
-  boolean attemptLock = false;
-  boolean destroy = false;
+  public boolean attemptLock = false;
+  public boolean destroy = false;
   public String kickMsg = null;
   double x, y, z, stance;
   int uid;
@@ -59,13 +56,8 @@ public class Player {
 
   private LinkedList<String> messages = new LinkedList<String>();
 
-  public void sendHome() throws IOException {
-    ByteArrayOutputStream cpy = new ByteArrayOutputStream();
-    DataOutputStream s = new DataOutputStream(cpy);
-    s.writeByte(3);
-    s.writeUTF("/home");
-    byte[] msgBytes = cpy.toByteArray();
-    clientToServer.addPacket(msgBytes);
+  public void sendHome() {
+    clientToServer.addPacket(new byte[] { 0x03, 0x07, '/', 'h', 'o', 'm', 'e' });
   }
 
   public void warp(double[] coords) {
@@ -86,15 +78,15 @@ public class Player {
       kick("Invalid Name!");
       return false;
     }
-    if (parent.options.useWhitelist) {
-      if (!parent.whitelist.isWhitelisted(name)) {
+    if (server.options.useWhitelist) {
+      if (!server.whitelist.isWhitelisted(name)) {
         kick("You are not whitelisted!");
         return false;
       }
     }
     updateGroup(name.trim());
     this.name = name.trim();
-    parent.requireBackup = true;
+    server.requireBackup = true;
     return true;
   }
 
@@ -110,8 +102,8 @@ public class Player {
     }
   }
 
-  public void kick(String msg) {
-    kickMsg = msg;
+  public void kick(String reason) {
+    kickMsg = reason;
     isKicked = true;
     delayClose();
   }
@@ -125,7 +117,7 @@ public class Player {
   }
 
   public boolean isMuted() {
-    return parent.mutelist.isMuted(name);
+    return server.mutelist.isMuted(name);
   }
 
   public String getKickMsg() {
@@ -143,12 +135,29 @@ public class Player {
     return name;
   }
 
-  public boolean parseCommand(String msg) throws InterruptedException,
+  public boolean parseCommand(String message) throws InterruptedException,
       IOException {
-    if (!closed) {
-      return parser.parse(msg);
+    if (closed) {
+      return true;
     }
-    return true;
+
+    Command command = server.getCommandList().getCommand(message);
+    if (command == null) {
+      return false;
+    }
+
+    if (command.getName() != null && !commandAllowed(command.getName())) {
+      addMessage("\302\247cInsufficient permission.");
+      return true;
+    }
+
+    command.execute(this, message);
+    return !(command.passThrough() && server.options.useSMPAPI)
+        || message.startsWith("/");
+  }
+
+  public boolean commandAllowed(String command) {
+    return server.commands.playerAllowed(command, this);
   }
 
   public int getGroup() {
@@ -156,13 +165,13 @@ public class Player {
   }
 
   private void updateGroup(String name) {
-    int nameGroup = parent.members.checkName(name);
-    int ipGroup = parent.ipMembers.getGroup(this);
-    if ((nameGroup == -1 || ipGroup == -1 && parent.options.defaultGroup != -1)
-        || (nameGroup == -1 && ipGroup == -1 && parent.options.defaultGroup == -1)) {
+    int nameGroup = server.members.checkName(name);
+    int ipGroup = server.ipMembers.getGroup(this);
+    if ((nameGroup == -1 || ipGroup == -1 && server.options.defaultGroup != -1)
+        || (nameGroup == -1 && ipGroup == -1 && server.options.defaultGroup == -1)) {
       group = -1;
-      if (parent.groups.groupExists(group)) {
-        groupObject = parent.groups.getGroup(group);
+      if (server.groups.groupExists(group)) {
+        groupObject = server.groups.getGroup(group);
       }
       else {
         groupObject = null;
@@ -177,8 +186,8 @@ public class Player {
       group = nameGroup;
     }
 
-    if (parent.groups.groupExists(group)) {
-      groupObject = parent.groups.getGroup(group);
+    if (server.groups.groupExists(group)) {
+      groupObject = server.groups.getGroup(group);
     }
     else {
       group = 0;
@@ -205,8 +214,7 @@ public class Player {
   }
 
   public Player(Socket inc, Server parent) {
-    this.parent = parent;
-    parser = new CommandParser(this);
+    server = parent;
     extsocket = inc;
     if (parent.isRobot(extsocket.getInetAddress().getHostAddress())) {
       System.out.println("[SimpleServer] Robot Heartbeat: "
@@ -302,7 +310,7 @@ public class Player {
       return false;
     }
     if (!extsocket.isConnected() || !intsocket.isConnected()) {
-      parent.notifyClosed(this);
+      server.notifyClosed(this);
       close();
       return false;
 
@@ -313,8 +321,8 @@ public class Player {
   public void close() throws InterruptedException {
     // Don't spam the console! : )
     // And don't close if we're already closing!
-    if (!isKicked && parent != null) {
-      parent.notifyClosed(this);
+    if (!isKicked && server != null) {
+      server.notifyClosed(this);
     }
     if (!closed) {
       closed = true;
@@ -375,7 +383,7 @@ public class Player {
     groupObject = null;
     robotPort = 0;
 
-    if (parent.isRobot(extsocket.getInetAddress().getHostAddress())) {
+    if (server.isRobot(extsocket.getInetAddress().getHostAddress())) {
       System.out.println("[SimpleServer] Robot Heartbeat: "
           + extsocket.getInetAddress().getHostAddress() + ".");
       isRobot = true;
@@ -385,28 +393,28 @@ public class Player {
           + extsocket.getInetAddress().getHostAddress() + "!");
     }
     try {
-      parent.requestTracker.addRequest(extsocket.getInetAddress()
+      server.requestTracker.addRequest(extsocket.getInetAddress()
                                                 .getHostAddress());
     }
     catch (InterruptedException e2) {
       // TODO Auto-generated catch block
       e2.printStackTrace();
     }
-    if (parent.isIPBanned(extsocket.getInetAddress().getHostAddress())) {
+    if (server.isIPBanned(extsocket.getInetAddress().getHostAddress())) {
       System.out.println("[SimpleServer] IP "
           + extsocket.getInetAddress().getHostAddress() + " is banned!");
       kick("Banned IP!");
     }
     try {
-      intsocket = new Socket("localhost", parent.options.internalPort);
+      intsocket = new Socket("localhost", server.options.internalPort);
     }
     catch (Exception e2) {
       e2.printStackTrace();
-      if (parent.options.exitOnFailure) {
+      if (server.options.exitOnFailure) {
         System.exit(-1);
       }
       else {
-        parent.forceRestart();
+        server.forceRestart();
       }
     }
 
@@ -436,11 +444,70 @@ public class Player {
     }
 
     if (isRobot) {
-      parent.addRobotPort(intsocket.getLocalPort());
+      server.addRobotPort(intsocket.getLocalPort());
     }
   }
 
   public boolean isRobot() {
     return isRobot;
+  }
+
+  public boolean give(String rawItem, String rawAmount)
+      throws InterruptedException {
+    boolean success = true;
+
+    int item = 0;
+    try {
+      item = Integer.parseInt(rawItem);
+
+      if (item < 0) {
+        addMessage("\302\247cItem ID must be positive!");
+        success = false;
+      }
+    }
+    catch (NumberFormatException e) {
+      addMessage("\302\247cItem ID must be a number!");
+      success = false;
+    }
+
+    int amount = 1;
+    if (rawAmount != null) {
+      try {
+        amount = Integer.parseInt(rawAmount);
+
+        if ((amount < 1) || (amount > 1000)) {
+          addMessage("\302\247cAmount must be within 1-1000!");
+          success = false;
+        }
+      }
+      catch (NumberFormatException e) {
+        addMessage("\302\247cAmount must be a number!");
+        success = false;
+      }
+    }
+
+    if (!success) {
+      addMessage("\302\247cUnable to give " + rawItem);
+      return false;
+    }
+
+    String baseCommand = "give " + getName() + " " + item + " ";
+    for (int c = 0; c < amount / 64; ++c) {
+      server.runCommand(baseCommand + 64);
+    }
+    server.runCommand(baseCommand + amount % 64);
+
+    return true;
+  }
+
+  public void teleportTo(Player target) throws InterruptedException {
+    server.runCommand("tp " + getName() + " " + target.getName());
+  }
+
+  public void sendMOTD() {
+    String[] lines = server.getMOTD().split("\\r?\\n");
+    for (int i = 0; i < lines.length; i++) {
+      addMessage(lines[i]);
+    }
   }
 }

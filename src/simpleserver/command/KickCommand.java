@@ -18,48 +18,29 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-package simpleserver.config;
+package simpleserver.command;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-
-import simpleserver.Group;
 import simpleserver.Player;
 
-public class CommandList extends PropertiesConfig {
-  private Map<String, int[]> commands;
-
-  public CommandList() {
-    super("command-list.txt");
-
-    commands = new HashMap<String, int[]>();
-
-    loadDefaults();
-  }
-
-  public boolean playerAllowed(String command, Player player) {
-    int[] groups = commands.get(command);
-    if (groups != null) {
-      return Group.contains(groups, player);
-    }
-
-    return false;
-  }
-
-  public void setGroup(String command, int group) {
-    commands.put(command, new int[] { group });
-    setProperty(command, Integer.toString(group));
+public class KickCommand extends OnlinePlayerCommand {
+  public KickCommand() {
+    super("kick");
   }
 
   @Override
-  public void load() {
-    super.load();
+  protected void executeWithTarget(Player player, String message, Player target)
+      throws InterruptedException {
+    String reason = extractArgument(message, 1);
+    target.kick(reason);
 
-    commands.clear();
-    for (Entry<Object, Object> entry : entrySet()) {
-      commands.put(entry.getKey().toString(),
-                   Group.parseGroups(entry.getValue().toString()));
-    }
+    player.server.adminLog.addMessage("Admin " + player.getName()
+        + " kicked player:\t " + target.getName() + "\t(" + reason + ")");
+    player.server.runCommand("say Player " + target.getName()
+        + " has been kicked! (" + reason + ")");
+  }
+
+  @Override
+  protected void noTargetSpecified(Player player, String message) {
+    player.addMessage("\302\247cNo player or reason specified.");
   }
 }

@@ -18,48 +18,44 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-package simpleserver.config;
+package simpleserver.command;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-
-import simpleserver.Group;
 import simpleserver.Player;
 
-public class CommandList extends PropertiesConfig {
-  private Map<String, int[]> commands;
-
-  public CommandList() {
-    super("command-list.txt");
-
-    commands = new HashMap<String, int[]>();
-
-    loadDefaults();
-  }
-
-  public boolean playerAllowed(String command, Player player) {
-    int[] groups = commands.get(command);
-    if (groups != null) {
-      return Group.contains(groups, player);
-    }
-
-    return false;
-  }
-
-  public void setGroup(String command, int group) {
-    commands.put(command, new int[] { group });
-    setProperty(command, Integer.toString(group));
+public class SetGroupCommand extends PlayerCommand {
+  public SetGroupCommand() {
+    super("setgroup");
   }
 
   @Override
-  public void load() {
-    super.load();
+  protected void executeWithTarget(Player player, String message, String target)
+      throws InterruptedException {
+    if (player.getGroup() <= player.server.members.checkName(target)) {
+      player.addMessage("\302\247cYou cannot set the group of this user!");
+      return;
+    }
 
-    commands.clear();
-    for (Entry<Object, Object> entry : entrySet()) {
-      commands.put(entry.getKey().toString(),
-                   Group.parseGroups(entry.getValue().toString()));
+    String[] arguments = extractArguments(message);
+    if (arguments.length > 1) {
+      int group;
+      try {
+        group = Integer.parseInt(arguments[1]);
+      }
+      catch (NumberFormatException e) {
+        player.addMessage("\302\247cGroup must be a number!");
+        return;
+      }
+
+      if (group >= player.getGroup()) {
+        player.addMessage("\302\247cYou cannot promote a user to a higher group!");
+      }
+      else {
+        player.server.members.setGroup(target, group);
+        player.addMessage("Player " + target + "'s group was set to " + group
+            + "!");
+        player.server.adminLog.addMessage("User " + player.getName()
+            + " set player's group:\t " + target + "\t(" + group + ")");
+      }
     }
   }
 }

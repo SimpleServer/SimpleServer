@@ -1,4 +1,4 @@
 Manifest-Version: 1.0
 Main-Class: simpleserver.Server
-Class-Path: lib/guava-r07.jar
+Class-Path: lib/dom4j-1.6.jar lib/guava-r07.jar lib/javassist-3.8.0.GA.jar lib/reflections-0.9.5-RC2.jar lib/slf4j-api-1.6.1.jar lib/slf4j-nop-1.6.1.jar
 

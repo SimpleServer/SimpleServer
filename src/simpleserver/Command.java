@@ -18,48 +18,58 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-package simpleserver.config;
+package simpleserver;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
+import java.util.Arrays;
 
-import simpleserver.Group;
-import simpleserver.Player;
+public abstract class Command {
+  private String name;
 
-public class CommandList extends PropertiesConfig {
-  private Map<String, int[]> commands;
-
-  public CommandList() {
-    super("command-list.txt");
-
-    commands = new HashMap<String, int[]>();
-
-    loadDefaults();
+  protected Command(String name) {
+    this.name = name;
   }
 
-  public boolean playerAllowed(String command, Player player) {
-    int[] groups = commands.get(command);
-    if (groups != null) {
-      return Group.contains(groups, player);
-    }
+  public String getName() {
+    return name;
+  }
 
+  public String[] getAliases() {
+    return new String[] {};
+  }
+
+  /**
+   * @return true if command should be passed-through to SMP API also
+   */
+  public boolean passThrough() {
     return false;
   }
 
-  public void setGroup(String command, int group) {
-    commands.put(command, new int[] { group });
-    setProperty(command, Integer.toString(group));
+  public boolean isHidden() {
+    return false;
   }
 
-  @Override
-  public void load() {
-    super.load();
+  public abstract void execute(Player player, String message)
+      throws InterruptedException;
 
-    commands.clear();
-    for (Entry<Object, Object> entry : entrySet()) {
-      commands.put(entry.getKey().toString(),
-                   Group.parseGroups(entry.getValue().toString()));
+  protected String[] extractArguments(String message) {
+    String[] parts = message.split("\\s+");
+    return Arrays.copyOfRange(parts, 1, parts.length);
+  }
+
+  protected String extractArgument(String message, int startOffset) {
+    int argumentIndex = 0;
+    for (int c = 0; c <= startOffset; ++c) {
+      argumentIndex = message.indexOf(" ", argumentIndex) + 1;
+
+      if (argumentIndex == 0) {
+        return null;
+      }
     }
+
+    return message.substring(argumentIndex);
+  }
+
+  protected String extractArgument(String message) {
+    return extractArgument(message, 0);
   }
 }

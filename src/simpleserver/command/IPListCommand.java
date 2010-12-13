@@ -18,48 +18,28 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-package simpleserver.config;
+package simpleserver.command;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
+import java.util.Iterator;
 
-import simpleserver.Group;
+import simpleserver.Command;
 import simpleserver.Player;
+import simpleserver.PlayerFactory;
 
-public class CommandList extends PropertiesConfig {
-  private Map<String, int[]> commands;
-
-  public CommandList() {
-    super("command-list.txt");
-
-    commands = new HashMap<String, int[]>();
-
-    loadDefaults();
-  }
-
-  public boolean playerAllowed(String command, Player player) {
-    int[] groups = commands.get(command);
-    if (groups != null) {
-      return Group.contains(groups, player);
-    }
-
-    return false;
-  }
-
-  public void setGroup(String command, int group) {
-    commands.put(command, new int[] { group });
-    setProperty(command, Integer.toString(group));
+public class IPListCommand extends Command {
+  public IPListCommand() {
+    super("listips");
   }
 
   @Override
-  public void load() {
-    super.load();
-
-    commands.clear();
-    for (Entry<Object, Object> entry : entrySet()) {
-      commands.put(entry.getKey().toString(),
-                   Group.parseGroups(entry.getValue().toString()));
+  public void execute(Player player, String message)
+      throws InterruptedException {
+    player.addMessage("IP Addresses:");
+    for (Iterator<Player> itr = PlayerFactory.iterator(); itr.hasNext();) {
+      Player i = itr.next();
+      if (i.getName() != null && i.getName() != "") {
+        player.addMessage(i.getName() + " " + i.getIPAddress());
+      }
     }
   }
 }

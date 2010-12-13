@@ -18,48 +18,46 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-package simpleserver.config;
+package simpleserver.command;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-
-import simpleserver.Group;
+import simpleserver.Command;
+import simpleserver.CommandList;
 import simpleserver.Player;
 
-public class CommandList extends PropertiesConfig {
-  private Map<String, int[]> commands;
-
-  public CommandList() {
-    super("command-list.txt");
-
-    commands = new HashMap<String, int[]>();
-
-    loadDefaults();
-  }
-
-  public boolean playerAllowed(String command, Player player) {
-    int[] groups = commands.get(command);
-    if (groups != null) {
-      return Group.contains(groups, player);
-    }
-
-    return false;
-  }
-
-  public void setGroup(String command, int group) {
-    commands.put(command, new int[] { group });
-    setProperty(command, Integer.toString(group));
+public class HelpCommand extends Command {
+  public HelpCommand() {
+    super("help");
   }
 
   @Override
-  public void load() {
-    super.load();
+  public String[] getAliases() {
+    return new String[] { "", "commands" };
+  }
 
-    commands.clear();
-    for (Entry<Object, Object> entry : entrySet()) {
-      commands.put(entry.getKey().toString(),
-                   Group.parseGroups(entry.getValue().toString()));
+  @Override
+  public boolean passThrough() {
+    return true;
+  }
+
+  @Override
+  public void execute(Player player, String message)
+      throws InterruptedException {
+    StringBuffer line = new StringBuffer();
+    line.append("Available Commands: ");
+
+    CommandList commandList = player.server.getCommandList();
+    String prefix = commandList.commandPrefix();
+
+    for (Command command : commandList.getCommands()) {
+      if (command.isHidden() || !player.commandAllowed(command.getName())) {
+        continue;
+      }
+
+      line.append(prefix);
+      line.append(command.getName());
+      line.append(" ");
     }
+
+    player.addMessage(line.toString());
   }
 }

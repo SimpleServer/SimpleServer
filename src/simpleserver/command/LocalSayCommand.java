@@ -18,48 +18,28 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-package simpleserver.config;
+package simpleserver.command;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-
-import simpleserver.Group;
+import simpleserver.Command;
 import simpleserver.Player;
 
-public class CommandList extends PropertiesConfig {
-  private Map<String, int[]> commands;
-
-  public CommandList() {
-    super("command-list.txt");
-
-    commands = new HashMap<String, int[]>();
-
-    loadDefaults();
-  }
-
-  public boolean playerAllowed(String command, Player player) {
-    int[] groups = commands.get(command);
-    if (groups != null) {
-      return Group.contains(groups, player);
-    }
-
-    return false;
-  }
-
-  public void setGroup(String command, int group) {
-    commands.put(command, new int[] { group });
-    setProperty(command, Integer.toString(group));
+public class LocalSayCommand extends Command {
+  public LocalSayCommand() {
+    super("local");
   }
 
   @Override
-  public void load() {
-    super.load();
+  public String[] getAliases() {
+    return new String[] { "l" };
+  }
 
-    commands.clear();
-    for (Entry<Object, Object> entry : entrySet()) {
-      commands.put(entry.getKey().toString(),
-                   Group.parseGroups(entry.getValue().toString()));
+  @Override
+  public void execute(Player player, String message)
+      throws InterruptedException {
+    String chat = extractArgument(message);
+    int numPlayers = player.server.localChat(player, chat);
+    if (numPlayers <= 0) {
+      player.addMessage("\302\247cNobody is around to hear you.");
     }
   }
 }

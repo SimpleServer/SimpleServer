@@ -18,48 +18,40 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-package simpleserver.config;
+package simpleserver.command;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-
-import simpleserver.Group;
+import simpleserver.Command;
 import simpleserver.Player;
 
-public class CommandList extends PropertiesConfig {
-  private Map<String, int[]> commands;
-
-  public CommandList() {
-    super("command-list.txt");
-
-    commands = new HashMap<String, int[]>();
-
-    loadDefaults();
-  }
-
-  public boolean playerAllowed(String command, Player player) {
-    int[] groups = commands.get(command);
-    if (groups != null) {
-      return Group.contains(groups, player);
-    }
-
-    return false;
-  }
-
-  public void setGroup(String command, int group) {
-    commands.put(command, new int[] { group });
-    setProperty(command, Integer.toString(group));
+public class BanIPCommand extends Command {
+  public BanIPCommand() {
+    super("banip");
   }
 
   @Override
-  public void load() {
-    super.load();
+  public void execute(Player player, String message)
+      throws InterruptedException {
+    String[] arguments = extractArguments(message);
 
-    commands.clear();
-    for (Entry<Object, Object> entry : entrySet()) {
-      commands.put(entry.getKey().toString(),
-                   Group.parseGroups(entry.getValue().toString()));
+    if (arguments.length >= 1) {
+      Player p = player.server.findPlayer(arguments[0]);
+      if (p == null) {
+        player.server.ipBans.addBan(arguments[0]);
+        player.addMessage("IP Address " + arguments[0] + " has been banned!");
+        player.server.adminLog.addMessage("User " + player.getName()
+            + " banned ip:\t " + arguments[0]);
+      }
+      else {
+        player.server.ipBans.addBan(p.getIPAddress());
+        player.server.kick(p.getName(), "IP Banned!");
+        player.server.runCommand("say Player " + p.getName()
+            + " has been IP banned!");
+        player.server.adminLog.addMessage("User " + player.getName()
+            + " banned ip:\t " + arguments[0] + "\t(" + p.getName() + ")");
+      }
+    }
+    else {
+      player.addMessage("\302\247cNo player or IP specified.");
     }
   }
 }

@@ -18,48 +18,39 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-package simpleserver.config;
+package simpleserver.command;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-
-import simpleserver.Group;
+import simpleserver.Command;
 import simpleserver.Player;
 
-public class CommandList extends PropertiesConfig {
-  private Map<String, int[]> commands;
-
-  public CommandList() {
-    super("command-list.txt");
-
-    commands = new HashMap<String, int[]>();
-
-    loadDefaults();
-  }
-
-  public boolean playerAllowed(String command, Player player) {
-    int[] groups = commands.get(command);
-    if (groups != null) {
-      return Group.contains(groups, player);
-    }
-
-    return false;
-  }
-
-  public void setGroup(String command, int group) {
-    commands.put(command, new int[] { group });
-    setProperty(command, Integer.toString(group));
+public abstract class PlayerCommand extends Command {
+  protected PlayerCommand(String name) {
+    super(name);
   }
 
   @Override
-  public void load() {
-    super.load();
+  public void execute(Player player, String message)
+      throws InterruptedException {
+    String[] arguments = extractArguments(message);
 
-    commands.clear();
-    for (Entry<Object, Object> entry : entrySet()) {
-      commands.put(entry.getKey().toString(),
-                   Group.parseGroups(entry.getValue().toString()));
+    if (arguments.length > 0) {
+      String name = player.server.findName(arguments[0]);
+      if (name == null) {
+        name = arguments[0];
+      }
+
+      executeWithTarget(player, message, name);
     }
+    else {
+      noTargetSpecified(player, message);
+    }
+  }
+
+  protected abstract void executeWithTarget(Player player, String message,
+                                            String target)
+      throws InterruptedException;
+
+  protected void noTargetSpecified(Player player, String message) {
+    player.addMessage("\302\247cNo player specified.");
   }
 }

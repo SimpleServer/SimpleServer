@@ -314,7 +314,7 @@ public class ChestList extends AsciiConfig {
   }
 
   public boolean hasLock(String name) {
-    return chests.findLock(name);
+    return chests.findLock(name.toLowerCase());
   }
 
   public synchronized void releaseLock(String name) {

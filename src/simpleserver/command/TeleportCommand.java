@@ -18,48 +18,42 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-package simpleserver.config;
+package simpleserver.command;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-
-import simpleserver.Group;
 import simpleserver.Player;
 
-public class CommandList extends PropertiesConfig {
-  private Map<String, int[]> commands;
-
-  public CommandList() {
-    super("command-list.txt");
-
-    commands = new HashMap<String, int[]>();
-
-    loadDefaults();
-  }
-
-  public boolean playerAllowed(String command, Player player) {
-    int[] groups = commands.get(command);
-    if (groups != null) {
-      return Group.contains(groups, player);
-    }
-
-    return false;
-  }
-
-  public void setGroup(String command, int group) {
-    commands.put(command, new int[] { group });
-    setProperty(command, Integer.toString(group));
+public class TeleportCommand extends OnlinePlayerCommand {
+  public TeleportCommand() {
+    super("tp");
   }
 
   @Override
-  public void load() {
-    super.load();
+  protected void executeWithTarget(Player player, String message, Player target1)
+      throws InterruptedException {
+    String[] arguments = extractArguments(message);
 
-    commands.clear();
-    for (Entry<Object, Object> entry : entrySet()) {
-      commands.put(entry.getKey().toString(),
-                   Group.parseGroups(entry.getValue().toString()));
+    if (arguments.length > 1) {
+      Player target2 = player.server.findPlayer(arguments[1]);
+      if (target2 == null) {
+        player.addMessage("\302\247cPlayer not online (" + arguments[1] + ")");
+      }
+      else {
+        target1.teleportTo(target2);
+
+        player.addMessage("Teleported " + target1.getName() + " to "
+            + target2.getName() + "!");
+        player.server.adminLog.addMessage("User " + player.getName()
+            + " teleported:\t " + target1.getName() + "\tto\t"
+            + target2.getName());
+      }
     }
+    else {
+      player.addMessage("\302\247cMust specify two players.");
+    }
+  }
+
+  @Override
+  protected void noTargetSpecified(Player player, String message) {
+    player.addMessage("\302\247cNo players specified.");
   }
 }

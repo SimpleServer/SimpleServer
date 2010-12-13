@@ -56,8 +56,8 @@ public class Server {
   private static String version = "RC 6.6.6_stable";
   private static String license = "SimpleServer -- Copyright (C) 2010 Charles Wagner Jr.";
   private static String warranty = "This program is licensed under The MIT License.\nSee file LICENSE for details.";
-  @SuppressWarnings("unused")
-  private static Server server;
+
+  private simpleserver.CommandList commandList;
 
   boolean open = true;
   boolean debug = false;
@@ -133,7 +133,7 @@ public class Server {
     System.out.println(license);
     System.out.println(warranty);
     System.out.println(">> Starting SimpleServer " + version);
-    server = new Server();
+    new Server();
   }
 
   /*
@@ -189,7 +189,7 @@ public class Server {
     resources.add(robots = new RobotList());
     resources.add(ipMembers = new IPMemberList(options.defaultGroup));
     resources.add(chests = new ChestList(this));
-    resources.add(commands = new CommandList(options.useSlashes));
+    resources.add(commands = new CommandList());
     resources.add(blockFirewall = new BlockList());
     resources.add(itemWatch = new ItemWatchList());
     resources.add(groups = new GroupList());
@@ -424,10 +424,6 @@ public class Server {
     return commands.playerAllowed(cmd, p);
   }
 
-  public String getCommands(Player p) {
-    return commands.getCommandList(p);
-  }
-
   public int numPlayers() {
     int n = 0;
     for (Iterator<Player> itr = PlayerFactory.iterator(); itr.hasNext();) {
@@ -617,19 +613,13 @@ public class Server {
     return PlayerFactory.findPlayerExact(exact);
   }
 
-  public String kick(String userName, String msg) throws InterruptedException {
+  public void kick(String name, String reason) throws InterruptedException {
     synchronized (PlayerFactory.playerLock) {
-      Player p = PlayerFactory.findPlayer(userName);
-      if (p != null) {
-        p.kick(msg);
-        return p.getName();
+      Player player = PlayerFactory.findPlayer(name);
+      if (player != null) {
+        player.kick(reason);
       }
     }
-    return null;
-  }
-
-  public String kick(String userName) throws InterruptedException {
-    return kick(userName, "");
   }
 
   public void updateGroup(String name) throws InterruptedException {
@@ -722,6 +712,14 @@ public class Server {
 
   public boolean isOpen() {
     return open;
+  }
+
+  public simpleserver.CommandList getCommandList() {
+    if (commandList == null) {
+      commandList = new simpleserver.CommandList(options);
+    }
+
+    return commandList;
   }
 
 }

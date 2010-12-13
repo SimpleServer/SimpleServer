@@ -18,48 +18,30 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-package simpleserver.config;
+package simpleserver.command;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-
-import simpleserver.Group;
+import simpleserver.Command;
 import simpleserver.Player;
 
-public class CommandList extends PropertiesConfig {
-  private Map<String, int[]> commands;
-
-  public CommandList() {
-    super("command-list.txt");
-
-    commands = new HashMap<String, int[]>();
-
-    loadDefaults();
-  }
-
-  public boolean playerAllowed(String command, Player player) {
-    int[] groups = commands.get(command);
-    if (groups != null) {
-      return Group.contains(groups, player);
-    }
-
-    return false;
-  }
-
-  public void setGroup(String command, int group) {
-    commands.put(command, new int[] { group });
-    setProperty(command, Integer.toString(group));
+public class UnbanIPCommand extends Command {
+  public UnbanIPCommand() {
+    super("unbanip");
   }
 
   @Override
-  public void load() {
-    super.load();
+  public void execute(Player player, String message)
+      throws InterruptedException {
+    String[] arguments = extractArguments(message);
 
-    commands.clear();
-    for (Entry<Object, Object> entry : entrySet()) {
-      commands.put(entry.getKey().toString(),
-                   Group.parseGroups(entry.getValue().toString()));
+    if (arguments.length >= 1) {
+      player.server.ipBans.removeBan(arguments[0]);
+
+      player.server.adminLog.addMessage("User " + player.getName()
+          + " unbanned ip:\t " + arguments[0]);
+      player.addMessage("IP Address " + arguments[0] + " has been unbanned!");
+    }
+    else {
+      player.addMessage("\302\247cNo IP specified.");
     }
   }
 }

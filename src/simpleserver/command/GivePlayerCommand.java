@@ -18,48 +18,29 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-package simpleserver.config;
+package simpleserver.command;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-
-import simpleserver.Group;
 import simpleserver.Player;
 
-public class CommandList extends PropertiesConfig {
-  private Map<String, int[]> commands;
-
-  public CommandList() {
-    super("command-list.txt");
-
-    commands = new HashMap<String, int[]>();
-
-    loadDefaults();
-  }
-
-  public boolean playerAllowed(String command, Player player) {
-    int[] groups = commands.get(command);
-    if (groups != null) {
-      return Group.contains(groups, player);
-    }
-
-    return false;
-  }
-
-  public void setGroup(String command, int group) {
-    commands.put(command, new int[] { group });
-    setProperty(command, Integer.toString(group));
+public class GivePlayerCommand extends GiveCommand {
+  public GivePlayerCommand() {
+    super("giveplayer", 1);
   }
 
   @Override
-  public void load() {
-    super.load();
-
-    commands.clear();
-    for (Entry<Object, Object> entry : entrySet()) {
-      commands.put(entry.getKey().toString(),
-                   Group.parseGroups(entry.getValue().toString()));
+  protected Player getTarget(Player player, String[] arguments)
+      throws InterruptedException {
+    Player target = null;
+    if (arguments.length > 0) {
+      target = player.server.findPlayer(arguments[0]);
+      if (target == null) {
+        player.addMessage("\302\247cPlayer not online (" + arguments[0] + ")");
+      }
     }
+    else {
+      player.addMessage("\302\247cNo player or item specified!");
+    }
+
+    return target;
   }
 }
