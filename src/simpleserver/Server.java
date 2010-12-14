@@ -68,13 +68,11 @@ public class Server {
 
   public Semaphore saveLock = new Semaphore(1);
   public BlockList blockFirewall;
-  // public RankList ranks;
   public GroupList groups;
   public MemberList members;
   public RobotList robots;
   public MOTD motd;
   public KitList kits;
-  // public WarpList warps;
   public ChestList chests;
   public Rules rules;
   public IPMemberList ipMembers;
@@ -136,9 +134,6 @@ public class Server {
     new Server();
   }
 
-  /*
-   * Essential Functions
-   */
   private Server() {
     l = new Language();
     l.load();
@@ -311,13 +306,11 @@ public class Server {
     if (msg == null) {
       msg = "";
     }
-    // synchronized(players) {
     for (Iterator<Player> itr = PlayerFactory.iterator(); itr.hasNext();) {
       Player p = itr.next();
       p.kick(msg);
       // itr.remove();
     }
-    // }
   }
 
   private void kickAllRcons(String msg) {
@@ -464,18 +457,6 @@ public class Server {
         // itr.remove();
       }
     }
-    /*
-    synchronized(players) {
-      for (Iterator<Player> itr = players.iterator(); itr.hasNext(); ) {
-        Player p = itr.next();
-        if (p.extsocket.getInetAddress().getHostAddress().equals(ipAddress)) {
-          p.kick(reason);
-          adminLog.addMessage("Player " + p.getName() + " was ip-banned:\t " + reason);
-          itr.remove();
-        }
-      }
-    }
-    */
   }
 
   public void banKickIP(String ipAddress) throws InterruptedException {
@@ -490,18 +471,6 @@ public class Server {
         adminLog.addMessage("Player " + p.getName() + " was banned:\t " + msg);
         p.kick(msg);
       }
-      /*
-      synchronized(players) {
-        for (Iterator<Player> itr = players.iterator(); itr.hasNext(); ) {
-          Player p = itr.next();
-          if (p.getName().toLowerCase().equals(name.toLowerCase())) {
-            adminLog.addMessage("Player " + p.getName() + " was banned:\t " + msg);
-            p.kick(msg);
-            itr.remove();
-          }
-        }
-      }
-      */
     }
   }
 
@@ -522,26 +491,9 @@ public class Server {
   }
 
   public void notifyClosed(Player player) throws InterruptedException {
-    // synchronized(players) {
-    // players.remove(player);
-    // }
     PlayerFactory.removePlayer(player);
   }
 
-  /*
-  public int getRank(String name) throws InterruptedException {
-    playerLock.acquire();
-    for(Player i: players) {
-      if (i.getName()!=null) {
-        if (i.getName().toLowerCase().compareTo(name.toLowerCase())==0){
-          return i.getRank();
-        }
-      }
-    }
-    playerLock.release();
-    return options.defaultRank;
-  }
-  */
   public void loadAll() {
     for (Config i : resources) {
       i.load();
@@ -563,17 +515,6 @@ public class Server {
   }
 
   public String findName(String prefix) throws InterruptedException {
-    // synchronized(players) {
-    /*
-      for(Player i: players) {
-        if (i.getName()!=null) {
-          if (i.getName().toLowerCase().startsWith(prefix.toLowerCase().trim())) {
-            return i.getName();
-          }
-        }
-      }
-    */
-    // }
     Player i = PlayerFactory.findPlayer(prefix);
     if (i != null) {
       return i.getName();
@@ -584,32 +525,10 @@ public class Server {
   }
 
   public Player findPlayer(String prefix) throws InterruptedException {
-    // synchronized(players) {
-    /*
-      for(Player i: players) {
-        if (i.getName()!=null) {
-          if (i.getName().toLowerCase().startsWith(prefix.toLowerCase().trim())) {
-            return i;
-          }
-        }
-      }
-    */
-    // }
     return PlayerFactory.findPlayer(prefix);
   }
 
   public Player findPlayerExact(String exact) throws InterruptedException {
-    // synchronized(players) {
-    /*
-      for(Player i: players) {
-        if (i.getName()!=null) {
-          if (i.getName().equals(exact)) {
-            return i;
-          }
-        }
-      }
-    */
-    // }
     return PlayerFactory.findPlayerExact(exact);
   }
 
@@ -623,21 +542,10 @@ public class Server {
   }
 
   public void updateGroup(String name) throws InterruptedException {
-    // synchronized(players) {
     Player p = PlayerFactory.findPlayer(name);
     if (p != null) {
       p.updateGroup();
     }
-    /*
-      for(Player i: players) {
-        if (i.getName()!=null) {
-          if (i.getName().toLowerCase().compareTo(name.toLowerCase())==0){
-            i.updateGroup();
-          }
-        }
-      }
-      */
-    // }
   }
 
   public int localChat(Player p, String msg) {
@@ -646,7 +554,6 @@ public class Server {
     if (p.getName() == null) {
       return 0;
     }
-    // synchronized(players) {
     for (Iterator<Player> itr = PlayerFactory.iterator(); itr.hasNext();) {
       Player i = itr.next();
       if (i.getName() != null) {
@@ -660,7 +567,6 @@ public class Server {
         }
       }
     }
-    // }
     return j;
   }
 
