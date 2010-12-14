@@ -26,8 +26,8 @@ import java.io.PrintStream;
 import java.util.Calendar;
 
 public class ErrorLog implements Runnable {
-  Exception e;
-  String comments;
+  private Exception e;
+  private String comments;
 
   public ErrorLog(Exception e, String comments) {
     this.e = e;

@@ -23,7 +23,7 @@ package simpleserver;
 import java.util.concurrent.TimeUnit;
 
 public class ForceShutdown implements Runnable {
-  Server server;
+  private Server server;
 
   public ForceShutdown(Server s) {
     server = s;
@@ -39,5 +39,4 @@ public class ForceShutdown implements Runnable {
     }
     server.stop();
   }
-
 }

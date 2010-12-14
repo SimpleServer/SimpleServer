@@ -32,7 +32,7 @@ public abstract class Config {
   private String filename;
   private String header;
 
-  public Config(String filename) {
+  protected Config(String filename) {
     this.filename = filename;
 
     loadHeader();

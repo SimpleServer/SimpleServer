@@ -27,11 +27,11 @@ import java.util.Calendar;
 import java.util.LinkedList;
 
 public class AdminLog implements Runnable {
-  File logFile;
-  FileWriter writer;
-  LinkedList<String> lines = new LinkedList<String>();
-  Calendar date = Calendar.getInstance();
-  boolean changed = false;
+  private File logFile;
+  private FileWriter writer;
+  private LinkedList<String> lines = new LinkedList<String>();
+  private Calendar date = Calendar.getInstance();
+  private boolean changed = false;
 
   public AdminLog() {
     date = Calendar.getInstance();

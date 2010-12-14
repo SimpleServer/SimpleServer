@@ -21,7 +21,7 @@
 package simpleserver;
 
 public class ForceRestart implements Runnable {
-  Server parent;
+  private Server parent;
 
   public ForceRestart(Server s) {
     parent = s;

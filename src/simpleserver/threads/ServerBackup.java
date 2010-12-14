@@ -43,7 +43,7 @@ import simpleserver.log.ErrorLog;
  * SpiegalPwns
  */
 public class ServerBackup implements Runnable {
-  Server parent;
+  private Server parent;
 
   public ServerBackup(Server parent) {
     this.parent = parent;

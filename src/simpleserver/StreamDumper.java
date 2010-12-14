@@ -27,14 +27,12 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 public class StreamDumper implements Runnable {
-  InputStream in;
-  OutputStream out;
-  FileOutputStream file;
-  String filename;
-  boolean debug;
-  public long lastRead;
+  private InputStream in;
+  private OutputStream out;
+  private FileOutputStream file;
+  private String filename;
 
-  Player parent;
+  private Player parent;
 
   public StreamDumper(InputStream in, OutputStream out, boolean isServerTunnel,
                       Player p) {
@@ -163,8 +161,6 @@ public class StreamDumper implements Runnable {
         if (amt > 0) {
           amt = in.read(buf, 0, amt);
         }
-
-        lastRead = System.currentTimeMillis();
 
         if (amt > 0) {
           file.write(buf, 0, amt);

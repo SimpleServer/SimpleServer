@@ -27,13 +27,10 @@ import java.util.LinkedList;
 import simpleserver.threads.DelayClose;
 
 public class Player {
-  // public SocketThread internal;
-  // public SocketThread external;
   public Socket intsocket;
   public Socket extsocket;
-  Thread t1;
-  Thread t2;
-  Thread timeout;
+  private Thread t1;
+  private Thread t2;
   public Server server;
   private String name = null;
   public boolean closed = false;
@@ -42,27 +39,17 @@ public class Player {
   public boolean destroy = false;
   public String kickMsg = null;
   double x, y, z, stance;
-  int uid;
-  int group = 0;
+  private int group = 0;
   Group groupObject = null;
-  // test
-  double[] warpCoords = null;
-  double[] warpCoords2 = null;
   boolean isRobot = false;
-  int robotPort = 0;
 
-  StreamTunnel serverToClient, clientToServer;
-  // StreamDumper serverToClient, clientToServer;
+  private StreamTunnel serverToClient;
+  private StreamTunnel clientToServer;
 
   private LinkedList<String> messages = new LinkedList<String>();
 
   public void sendHome() {
     clientToServer.addPacket(new byte[] { 0x03, 0x07, '/', 'h', 'o', 'm', 'e' });
-  }
-
-  public void warp(double[] coords) {
-    warpCoords = coords;
-    warpCoords2 = coords.clone();
   }
 
   public boolean setName(String name) throws InterruptedException {
@@ -378,10 +365,8 @@ public class Player {
     y = 0;
     z = 0;
     stance = 0;
-    uid = 0;
     group = 0;
     groupObject = null;
-    robotPort = 0;
 
     if (server.isRobot(extsocket.getInetAddress().getHostAddress())) {
       System.out.println("[SimpleServer] Robot Heartbeat: "

@@ -23,8 +23,8 @@ package simpleserver;
 import java.util.LinkedList;
 
 public class RequestTracker implements Runnable {
-  public static final int MAX_REQUESTS = 30;
-  public static final int CLEAR_SECONDS = 60;
+  private static final int MAX_REQUESTS = 30;
+  private static final int CLEAR_SECONDS = 60;
 
   class Request {
     String ipAddress;

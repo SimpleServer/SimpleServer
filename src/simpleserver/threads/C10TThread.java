@@ -27,11 +27,11 @@ import simpleserver.Server;
 import simpleserver.log.ErrorLog;
 
 public class C10TThread implements Runnable {
-  Server parent;
-  Process c10t;
-  String command;
-  InputStream stdout;
-  InputStream stderr;
+  private Server parent;
+  private Process c10t;
+  private String command;
+  private InputStream stdout;
+  private InputStream stderr;
 
   class ErrGobblerThread extends Thread {
     @Override

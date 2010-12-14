@@ -24,7 +24,6 @@ import java.net.Socket;
 import java.util.Iterator;
 
 public class PlayerFactory {
-
   private static Server parent;
   private static Player[] players;
   public static Object playerLock = new Object();

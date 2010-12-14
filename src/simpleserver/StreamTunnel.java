@@ -35,24 +35,24 @@ import java.util.concurrent.Semaphore;
 import simpleserver.log.EOFWriter;
 
 public class StreamTunnel implements Runnable {
-  protected final int BUF_SIZE = 8192;
-  protected int BYTE_THRESHOLD = 32;
-  protected byte[] buf;
-  protected int r;
-  protected int a;
+  private final int BUF_SIZE = 8192;
+  private int BYTE_THRESHOLD = 32;
+  private byte[] buf;
+  private int r;
+  private int a;
   protected long lastRead;
-  protected InputStream in;
-  protected OutputStream out;
-  protected boolean inGame;
-  protected Semaphore lock;
-  protected boolean debug;
-  protected boolean isServerTunnel;
-  protected LinkedList<byte[]> packetBuffer = new LinkedList<byte[]>();
-  protected LinkedList<byte[]> history = new LinkedList<byte[]>();
+  private InputStream in;
+  private OutputStream out;
+  private boolean inGame;
+  private Semaphore lock;
+  private boolean debug;
+  private boolean isServerTunnel;
+  private LinkedList<byte[]> packetBuffer = new LinkedList<byte[]>();
+  private LinkedList<byte[]> history = new LinkedList<byte[]>();
   public static final int IDLE_TIME = 30 * 1000;
-  protected ByteBuffer bb = ByteBuffer.allocate(128);
+  private ByteBuffer bb = ByteBuffer.allocate(128);
 
-  protected int motionCounter = 0;
+  private int motionCounter = 0;
 
   private Player player;
   private Server server;

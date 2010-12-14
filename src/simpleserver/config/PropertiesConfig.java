@@ -35,7 +35,7 @@ import simpleserver.Config;
 public abstract class PropertiesConfig extends Config {
   private Properties properties;
 
-  public PropertiesConfig(String filename) {
+  protected PropertiesConfig(String filename) {
     super(filename);
 
     properties = new Properties();

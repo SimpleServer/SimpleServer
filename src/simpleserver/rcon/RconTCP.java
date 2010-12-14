@@ -28,39 +28,15 @@ import simpleserver.Rcon;
 import simpleserver.Server;
 
 public class RconTCP implements Rcon {
-  protected final int SERVERDATA_AUTH = 3;
-  protected final int SERVERDATA_EXECCOMMAND = 2;
-  protected final int SERVERDATA_AUTH_RESPONSE = 2;
-  protected final int SERVERDATA_RESPONSE_VALUE = 0;
-  protected final int INT = 4;
-  protected final int BB_DEFAULT = 128;
-  // public SocketThread internal;
-  // public SocketThread external;
-  // public RconParser parser;
-  public Socket current;
-  protected long lastRead;
-  Thread t1;
-  String name = null;
-  Thread timeout;
+  private Socket current;
+  long lastRead;
+  private Thread t1;
+  private String name = null;
   Server parent;
-  // private String name=null;
-  boolean closed = false;
-  boolean isKicked = false;
+  private boolean closed = false;
+  private boolean isKicked = false;
   boolean auth = true;
-  // boolean attemptLock=false;
-  // boolean destroy=false;
-  public String kickMsg = null;
-  // double x,y,z,stance;
-  // int uid;
-  // int group=0;
-  // Group groupObject=null;
-  // test
-  // double[] warpCoords=null;
-  // double[] warpCoords2=null;
-  // boolean isRobot=false;
-  // int robotPort=0;
-
-  // RconHandler rconHandler;
+  private String kickMsg = null;
 
   private LinkedList<String> messages = new LinkedList<String>();
 

@@ -119,6 +119,7 @@ public class Server {
 
   // Minecraft Process
   public Process p;
+
   // Pipe Threads
   private Thread t;
   private Thread t2;
@@ -134,7 +135,7 @@ public class Server {
   private Server() {
     l = new Language();
     l.load();
-    options = new Options(this);
+    options = new Options();
     options.load();
 
     new Thread(new RconServer(this, false)).start();
@@ -158,7 +159,7 @@ public class Server {
     autoRestartThread = new Thread(autoRestart);
     autoRestartThread.start();
 
-    playerScanner = new PlayerScanner(this);
+    playerScanner = new PlayerScanner();
     playerScannerThread = new Thread(playerScanner);
     playerScannerThread.start();
 

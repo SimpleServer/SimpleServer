@@ -23,7 +23,7 @@ package simpleserver.threads;
 import simpleserver.Server;
 
 public class ServerAutoSave implements Runnable {
-  Server parent;
+  private Server parent;
 
   public ServerAutoSave(Server parent) {
     this.parent = parent;

@@ -23,19 +23,17 @@ package simpleserver.threads;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.LinkedList;
 import java.util.Scanner;
 import java.util.concurrent.Semaphore;
 
 import simpleserver.Server;
 
 public class InputStreamRouter implements Runnable {
-  InputStream stream;
-  OutputStream out;
-  LinkedList<String> queue = new LinkedList<String>();
-  Server parent;
-  Scanner scan;
-  Semaphore outLock = new Semaphore(1);
+  private InputStream stream;
+  private OutputStream out;
+  private Server parent;
+  private Scanner scan;
+  private Semaphore outLock = new Semaphore(1);
 
   public InputStreamRouter(InputStream in, OutputStream out, Server parent) {
     stream = in;

@@ -24,15 +24,9 @@ import java.util.Iterator;
 
 import simpleserver.Player;
 import simpleserver.PlayerFactory;
-import simpleserver.Server;
 
 public class PlayerScanner implements Runnable {
-  Server parent;
-  boolean timedOut;
-
-  public PlayerScanner(Server server) {
-    parent = server;
-  }
+  private boolean timedOut;
 
   public void run() {
     while (true) {

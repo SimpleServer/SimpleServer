@@ -26,32 +26,28 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.util.LinkedList;
 import java.util.concurrent.Semaphore;
 
 import simpleserver.Server;
 
 public class RconHandler implements Runnable {
-  protected final int BUF_SIZE = 8192;
-  protected int BYTE_THRESHOLD = 32;
-  protected final int SERVERDATA_AUTH = 3;
-  protected final int SERVERDATA_EXECCOMMAND = 2;
-  protected final int SERVERDATA_AUTH_RESPONSE = 2;
-  protected final int SERVERDATA_RESPONSE_VALUE = 0;
-  protected final int INT = 4;
-  protected final int BB_DEFAULT = 128;
-  protected byte[] buf;
-  protected int r;
-  protected int a;
-  // protected boolean auth=false;
-  protected boolean done = false;
-  protected InputStream in;
-  protected OutputStream out;
-  protected Semaphore lock;
-  protected LinkedList<byte[]> packetBuffer = new LinkedList<byte[]>();
-  public static final int IDLE_TIME = 60 * 1000;
-  protected ByteBuffer bb = ByteBuffer.allocate(BB_DEFAULT);
-  protected ByteBuffer bbSend = ByteBuffer.allocate(4096);
+  private final int BUF_SIZE = 8192;
+  private final int SERVERDATA_AUTH = 3;
+  private final int SERVERDATA_EXECCOMMAND = 2;
+  private final int SERVERDATA_AUTH_RESPONSE = 2;
+  private final int SERVERDATA_RESPONSE_VALUE = 0;
+  private final int INT = 4;
+  private final int BB_DEFAULT = 128;
+  private byte[] buf;
+  private int r;
+  private int a;
+  private boolean done = false;
+  private InputStream in;
+  private OutputStream out;
+  private Semaphore lock;
+  static final int IDLE_TIME = 60 * 1000;
+  private ByteBuffer bb = ByteBuffer.allocate(BB_DEFAULT);
+  private ByteBuffer bbSend = ByteBuffer.allocate(4096);
 
   private Socket s;
   private RconTCP parent;
@@ -66,16 +62,6 @@ public class RconHandler implements Runnable {
     buf = new byte[BUF_SIZE];
     lock = new Semaphore(1);
     bb.order(ByteOrder.LITTLE_ENDIAN);
-  }
-
-  public void setByteThreshold(int n) {
-    if (n > BUF_SIZE) {
-      BYTE_THRESHOLD = BUF_SIZE;
-    }
-    if (n <= 0) {
-      BYTE_THRESHOLD = 32;
-    }
-    BYTE_THRESHOLD = n;
   }
 
   public void run() {

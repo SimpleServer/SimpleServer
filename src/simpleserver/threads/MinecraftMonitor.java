@@ -23,7 +23,7 @@ package simpleserver.threads;
 import simpleserver.Server;
 
 public class MinecraftMonitor extends Thread {
-  Server server;
+  private Server server;
 
   public MinecraftMonitor(Server p) {
     server = p;

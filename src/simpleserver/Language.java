@@ -26,15 +26,14 @@ import java.io.FileOutputStream;
 import java.util.Properties;
 
 public class Language {
-
-  public static final String[] defaults = { "BAD_BLOCK",
+  private static final String[] defaults = { "BAD_BLOCK",
       "%1$s has tried to place illegal block #%2$s", "SAVING_MAP",
       "Saving Map...", "SAVE_COMPLETE", "Save Complete!", "BACKING_UP",
       "Backing up...", "BACKUP_COMPLETE", "Backup Complete!",
       "SERVER_RESTART_60", "Server is restarting in 60 seconds!",
       "SERVER_RESTART_30", "Server is restarting in 30 seconds!",
       "SERVER_RESTART_3", "Server is restarting in 3 seconds!" };
-  Properties optionsLoader;
+  private Properties optionsLoader;
 
   public Language() {
     optionsLoader = new Properties();

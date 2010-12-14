@@ -34,8 +34,8 @@ import simpleserver.Server;
 public class RconServer implements Runnable {
   private Server parent;
   private DatagramSocket rconSocket;
-  byte[] receive = new byte[4096 + 4 * 3 + 2];
-  boolean udp;
+  private byte[] receive = new byte[4096 + 4 * 3 + 2];
+  private boolean udp;
 
   public RconServer(Server parent, boolean useUDP) {
     this.parent = parent;

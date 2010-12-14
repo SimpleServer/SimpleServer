@@ -32,7 +32,7 @@ import java.io.InputStream;
 import simpleserver.Config;
 
 public abstract class AsciiConfig extends Config {
-  public AsciiConfig(String filename) {
+  protected AsciiConfig(String filename) {
     super(filename);
   }
 

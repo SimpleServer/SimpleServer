@@ -53,24 +53,21 @@ public class Options {
   public String ipAddress = "0.0.0.0";
   public String javaArguments = "";
 
-  public int createWarpRank = 1;
-  public int useWarpRank = 1;
-  public int warpPlayerRank = 3;
-  public int teleportRank = 3;
-  public int homeCommandRank = 0;
-  public int giveRank = 1;
-  public int givePlayerRank = 2;
-  public int setRankRank = 3;
-  public int muteRank = 2;
+  private int warpPlayerRank = 3;
+  private int teleportRank = 3;
+  private int homeCommandRank = 0;
+  private int giveRank = 1;
+  private int givePlayerRank = 2;
+  private int setRankRank = 3;
+  private int muteRank = 2;
 
   public int defaultGroup = 0;
   public int localChatRadius = 30;
 
   public boolean useWhitelist = false;
   public boolean useSlashes = false;
-  public boolean onlineMode = true;
+  private boolean onlineMode = true;
   public boolean debug = false;
-  public boolean experimental = false;
   public String levelName = "world";
   public String alternateJarFile = "";
 
@@ -80,13 +77,11 @@ public class Options {
   public String msgFormat = "";
   public String msgTitleFormat = "";
 
-  Properties optionsLoader;
-  Properties serverOptions;
-  Server parent;
+  private Properties optionsLoader;
+  private Properties serverOptions;
 
-  public Options(Server s) {
+  public Options() {
     optionsLoader = new Properties();
-    parent = s;
   }
 
   public void save() {
@@ -308,11 +303,8 @@ public class Options {
       if (optionsLoader.getProperty("useSMPAPI") != null) {
         useSMPAPI = Boolean.valueOf(optionsLoader.getProperty("useSMPAPI"));
       }
-      if (optionsLoader.getProperty("experimental") != null) {
-        experimental = Boolean.valueOf(optionsLoader.getProperty("experimental"));
-      }
       if (optionsLoader.getProperty("exitOnFailure") != null) {
-        experimental = Boolean.valueOf(optionsLoader.getProperty("exitOnFailure"));
+        exitOnFailure = Boolean.valueOf(optionsLoader.getProperty("exitOnFailure"));
       }
       if (optionsLoader.getProperty("levelName") != null) {
         levelName = optionsLoader.getProperty("levelName");
@@ -374,12 +366,6 @@ public class Options {
         }
         if (optionsLoader.getProperty("setRankRank") != null) {
           setRankRank = Integer.valueOf(optionsLoader.getProperty("setRankRank"));
-        }
-        if (optionsLoader.getProperty("useWarpRank") != null) {
-          useWarpRank = Integer.valueOf(optionsLoader.getProperty("useWarpRank"));
-        }
-        if (optionsLoader.getProperty("createWarpRank") != null) {
-          createWarpRank = Integer.valueOf(optionsLoader.getProperty("createWarpRank"));
         }
         r.close();
         conversion();

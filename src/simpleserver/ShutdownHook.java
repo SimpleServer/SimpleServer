@@ -24,9 +24,9 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 public class ShutdownHook implements Runnable {
-  Process mc;
-  OutputStream stream;
-  Server parent;
+  private Process mc;
+  private OutputStream stream;
+  private Server parent;
 
   public ShutdownHook(Process minecraftServer, Server parent) {
     mc = minecraftServer;

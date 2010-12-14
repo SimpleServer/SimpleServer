@@ -26,8 +26,8 @@ import java.io.InputStream;
 import simpleserver.Server;
 
 public class ErrorStreamRouter implements Runnable {
-  InputStream stream;
-  Server parent;
+  private InputStream stream;
+  private Server parent;
 
   public ErrorStreamRouter(InputStream stream, Server parent) {
     this.stream = stream;

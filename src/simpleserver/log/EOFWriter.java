@@ -28,10 +28,10 @@ import java.util.Iterator;
 import java.util.LinkedList;
 
 public class EOFWriter implements Runnable {
-  byte[] buffer;
-  LinkedList<byte[]> buffer2;
-  Exception exception;
-  String comments;
+  private byte[] buffer;
+  private LinkedList<byte[]> buffer2;
+  private Exception exception;
+  private String comments;
 
   public EOFWriter(byte[] buf, LinkedList<byte[]> lastSent, Exception e,
                    String msg) {

@@ -23,7 +23,7 @@ package simpleserver.threads;
 import simpleserver.Player;
 
 public class DelayClose implements Runnable {
-  Player parent;
+  private Player parent;
 
   public DelayClose(Player p) {
     parent = p;

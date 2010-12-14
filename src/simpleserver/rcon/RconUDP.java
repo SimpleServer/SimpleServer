@@ -32,41 +32,19 @@ import simpleserver.Server;
 import simpleserver.StreamTunnel;
 
 public class RconUDP implements Rcon {
-  protected final int BUF_SIZE = 8192;
-  protected int BYTE_THRESHOLD = 32;
-  protected final int SERVERDATA_AUTH = 3;
-  protected final int SERVERDATA_EXECCOMMAND = 2;
-  protected final int SERVERDATA_AUTH_RESPONSE = 2;
-  protected final int SERVERDATA_RESPONSE_VALUE = 0;
-  protected final int INT = 4;
-  protected final int BB_DEFAULT = 128;
-  // public SocketThread internal;
-  // public SocketThread external;
-  // public RconParser parser;
-  public DatagramPacket current;
-  protected long lastRead;
-  Thread t1;
-  String name = null;
-  Thread timeout;
-  Server parent;
-  // private String name=null;
-  boolean closed = false;
-  boolean isKicked = false;
-  boolean auth = true;
-  // boolean attemptLock=false;
-  // boolean destroy=false;
-  public String kickMsg = null;
-  // double x,y,z,stance;
-  // int uid;
-  // int group=0;
-  // Group groupObject=null;
-  // test
-  // double[] warpCoords=null;
-  // double[] warpCoords2=null;
-  // boolean isRobot=false;
-  // int robotPort=0;
-
-  // RconHandler rconHandler;
+  private final int SERVERDATA_AUTH = 3;
+  private final int SERVERDATA_EXECCOMMAND = 2;
+  private final int SERVERDATA_AUTH_RESPONSE = 2;
+  private final int SERVERDATA_RESPONSE_VALUE = 0;
+  private final int INT = 4;
+  private DatagramPacket current;
+  private long lastRead;
+  private String name = null;
+  private Server parent;
+  private boolean closed = false;
+  private boolean isKicked = false;
+  private boolean auth = true;
+  private String kickMsg = null;
 
   private LinkedList<String> messages = new LinkedList<String>();
 
