@@ -22,7 +22,8 @@ package simpleserver;
 
 import java.io.IOException;
 import java.net.Socket;
-import java.util.LinkedList;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import simpleserver.command.AbstractCommand;
 import simpleserver.threads.DelayClose;
@@ -47,7 +48,7 @@ public class Player {
   private StreamTunnel serverToClient;
   private StreamTunnel clientToServer;
 
-  private LinkedList<String> messages = new LinkedList<String>();
+  private Queue<String> messages = new ConcurrentLinkedQueue<String>();
 
   public double distanceTo(Player player) {
     return Math.sqrt(Math.pow(x - player.x, 2) + Math.pow(x - player.y, 2)
@@ -118,15 +119,11 @@ public class Player {
   }
 
   public void addMessage(String msg) {
-    synchronized (messages) {
-      messages.addLast(msg);
-    }
+    messages.add(msg);
   }
 
   public String getMessage() {
-    synchronized (messages) {
-      return messages.removeFirst();
-    }
+    return messages.remove();
   }
 
   public void kick(String reason) {
@@ -152,10 +149,7 @@ public class Player {
   }
 
   public boolean hasMessages() {
-    if (messages.isEmpty()) {
-      return false;
-    }
-    return true;
+    return !messages.isEmpty();
   }
 
   public String getName() {

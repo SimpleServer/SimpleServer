@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.Semaphore;
 
 import simpleserver.config.AbstractConfig;
@@ -67,9 +68,10 @@ public class Server {
   public ServerSocket socket;
   public ServerSocket rconSocket;
 
-  private LinkedList<String> outputLog = new LinkedList<String>();
+  private List<String> outputLog = new LinkedList<String>();
 
   public Semaphore saveLock = new Semaphore(1);
+
   public BlockList blockFirewall;
   public GroupList groups;
   public MemberList members;
@@ -580,8 +582,9 @@ public class Server {
 
   public void addOutputLine(String s) {
     synchronized (outputLog) {
-      while (outputLog.size() > 30) {
-        outputLog.remove();
+      int size = outputLog.size();
+      for (int c = 0; c <= size - 30; ++c) {
+        outputLog.remove(0);
       }
       outputLog.add(s);
     }
@@ -589,8 +592,7 @@ public class Server {
 
   public String[] getOutputLog() {
     synchronized (outputLog) {
-      String[] a = new String[1];
-      return outputLog.toArray(a);
+      return outputLog.toArray(new String[outputLog.size()]);
     }
   }
 
