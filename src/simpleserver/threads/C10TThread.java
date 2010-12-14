@@ -39,12 +39,10 @@ public class C10TThread implements Runnable {
       byte[] buf = new byte[256];
       try {
         while (stderr.read(buf) >= 0) {
-          ;
         }
       }
       catch (IOException e) {
       }
-
     }
   }
 
@@ -54,12 +52,10 @@ public class C10TThread implements Runnable {
       byte[] buf = new byte[256];
       try {
         while (stdout.read(buf) >= 0) {
-          ;
         }
       }
       catch (IOException e) {
       }
-
     }
   }
 
@@ -71,7 +67,7 @@ public class C10TThread implements Runnable {
   public void run() {
     try {
       while (true) {
-        Thread.sleep(parent.options.c10tMins * 1000 * 60);
+        Thread.sleep(parent.options.getInt("c10tMins") * 1000 * 60);
         parent.saveLock.acquire();
         if (parent.requiresBackup()) {
           parent.runCommand("save-off");
@@ -110,5 +106,4 @@ public class C10TThread implements Runnable {
       }
     }
   }
-
 }

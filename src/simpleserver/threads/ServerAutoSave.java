@@ -32,8 +32,8 @@ public class ServerAutoSave implements Runnable {
   public void run() {
     try {
       while (true) {
-        while (parent.options.autoSave) {
-          Thread.sleep(parent.options.autoSaveMins * 1000 * 60);
+        while (parent.options.getBoolean("autoSave")) {
+          Thread.sleep(parent.options.getInt("autoSaveMins") * 1000 * 60);
           parent.saveLock.acquire();
           if (parent.requiresBackup()) {
             // parent.runCommand("say Saving Map...");
@@ -63,5 +63,4 @@ public class ServerAutoSave implements Runnable {
       }
     }
   }
-
 }

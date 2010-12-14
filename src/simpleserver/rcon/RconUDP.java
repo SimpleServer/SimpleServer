@@ -250,13 +250,13 @@ public class RconUDP implements Rcon {
   }
 
   protected String auth(String passwd) {
-    if (parent.options.rconPassword.equals("")) {
+    if (!parent.options.contains("rconPassword")) {
       System.out.println("[SimpleServer] RCON Auth Attempt from "
           + parent.socket.getInetAddress().getHostAddress()
           + "! (rconPassword is blank)");
       return null;
     }
-    if (passwd.equals(parent.options.rconPassword)) {
+    if (passwd.equals(parent.options.get("rconPassword"))) {
       auth = true;
       return "";
     }

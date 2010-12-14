@@ -140,7 +140,7 @@ public class Server {
 
     new Thread(new RconServer(this, false)).start();
 
-    PlayerFactory.initialize(this, options.maxPlayers);
+    PlayerFactory.initialize(this, options.getInt("maxPlayers"));
 
     startMinecraft();
     setShutdownHook();
@@ -171,8 +171,8 @@ public class Server {
 
     openSocket();
 
-    if (options.c10tArgs != null && options.c10tArgs.trim().length() > 0) {
-      c10t = new C10TThread(this, options.c10tArgs);
+    if (options.contains("c10tArgs")) {
+      c10t = new C10TThread(this, options.get("c10tArgs"));
       c10tThread = new Thread(c10t);
       c10tThread.start();
     }
@@ -180,7 +180,7 @@ public class Server {
 
   private void initResources() {
     resources.add(robots = new RobotList());
-    resources.add(ipMembers = new IPMemberList(options.defaultGroup));
+    resources.add(ipMembers = new IPMemberList(options.getInt("defaultGroup")));
     resources.add(chests = new ChestList(this));
     resources.add(commands = new CommandList());
     resources.add(blockFirewall = new BlockList());
@@ -197,20 +197,21 @@ public class Server {
   }
 
   private void startMinecraft() {
-    options.saveMinecraftProperties();
+    new MinecraftOptions(options).save();
     try {
       int minMemory = 1024;
-      if (options.memory < minMemory) {
-        minMemory = options.memory;
+      if (options.getInt("memory") < minMemory) {
+        minMemory = options.getInt("memory");
       }
-      String alternateJar = "minecraft_server.jar";
-      if (options.alternateJarFile.trim().length() != 0) {
-        alternateJar = options.alternateJarFile.trim();
+      String jar = "minecraft_server.jar";
+      if (options.contains("alternateJarFile")) {
+        jar = options.get("alternateJarFile");
       }
       // String[] cmd = {"java", "-Xmx" + options.memory + "M","-Xms" +
       // minMemory + "M", "-jar", alternateJar, "nogui"};
-      String cmd = "java " + options.javaArguments + " -Xmx" + options.memory
-          + "M -Xms" + minMemory + "M -jar " + alternateJar + " nogui";
+      String cmd = "java " + options.get("javaArguments") + " -Xmx"
+          + options.get("memory") + "M -Xms" + minMemory + "M -jar " + jar
+          + " nogui";
       // String[] cmd = {"cmd", "/C", "java -Xmx" + options.memory + "M -Xms" +
       // minMemory + "M -jar " + alternateJar +
       // " nogui 2>test1.txt 1>test.txt"};
@@ -555,9 +556,9 @@ public class Server {
     for (Iterator<Player> itr = PlayerFactory.iterator(); itr.hasNext();) {
       Player i = itr.next();
       if (i.getName() != null) {
-        if (Math.abs(i.x - p.x) < options.localChatRadius
-            && Math.abs(i.y - p.y) < options.localChatRadius
-            && Math.abs(i.z - p.z) < options.localChatRadius) {
+        int radius = options.getInt("localChatRadius");
+        if (Math.abs(i.x - p.x) < radius && Math.abs(i.y - p.y) < radius
+            && Math.abs(i.z - p.z) < radius) {
           i.addMessage(chat);
           if (p != i) {
             j++;

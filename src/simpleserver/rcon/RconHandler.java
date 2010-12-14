@@ -264,12 +264,12 @@ public class RconHandler implements Runnable {
   }
 
   protected String auth(String passwd) {
-    if (server.options.rconPassword.equals("")) {
+    if (!server.options.contains("rconPassword")) {
       System.out.println("[SimpleServer] RCON Auth Attempt from "
           + s.getInetAddress().getHostAddress() + "! (rconPassword is blank)");
       return null;
     }
-    if (passwd.equals(server.options.rconPassword)) {
+    if (passwd.equals(server.options.get("rconPassword"))) {
       parent.auth = true;
       return "";
     }

@@ -32,8 +32,8 @@ public class ServerAutoRestart implements Runnable {
   public void run() {
     try {
       while (true) {
-        while (parent.options.autoRestart) {
-          Thread.sleep(parent.options.autoRestartMins * 1000 * 60);
+        while (parent.options.getBoolean("autoRestart")) {
+          Thread.sleep(parent.options.getInt("autoRestartMins") * 1000 * 60);
           parent.saveLock.acquire();
           // parent.runCommand("say Server is restarting in 60 seconds!");
           parent.sendToAll(parent.l.get("SERVER_RESTART_60"));

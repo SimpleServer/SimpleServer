@@ -350,7 +350,8 @@ public class StreamTunnel implements Runnable {
           }
         }
 
-        if (player.getGroup() < 0 && !server.options.guestsCanViewComplex) {
+        if (player.getGroup() < 0
+            && !server.options.getBoolean("guestsCanViewComplex")) {
           removeBytes(r - oldCursor);
           break;
         }
@@ -583,7 +584,7 @@ public class StreamTunnel implements Runnable {
       case 0x03:
         oldCursor = r - 1;
         String msg = readString();
-        if (isServerTunnel && server.options.useMsgFormats) {
+        if (isServerTunnel && server.options.getBoolean("useMsgFormats")) {
           if (msg.startsWith("<")) {
             try {
               String nameTok = msg.substring(1);
@@ -603,23 +604,22 @@ public class StreamTunnel implements Runnable {
               if (p != null) {
                 int idx = msg.indexOf(">");
                 msg = msg.substring(idx + 1);
-                if (server.options.msgFormat.equals("")
-                    || server.options.msgFormat == null) {
-                  server.options.msgFormat = "<\302\247%3$s%1$s>\302\247f";
+                if (!server.options.contains("msgFormat")) {
+                  server.options.set("msgFormat", "<\302\247%3$s%1$s>\302\247f");
                 }
-                if (server.options.msgTitleFormat.equals("")
-                    || server.options.msgTitleFormat == null) {
-                  server.options.msgTitleFormat = "<\302\247%3$s[%2$s]%1$s>\302\247f";
+                if (!server.options.contains("msgTitleFormat")) {
+                  server.options.set("msgTitleFormat",
+                                     "<\302\247%3$s[%2$s]%1$s>\302\247f");
                 }
 
                 String color = "f";
                 String title = "";
-                String format = server.options.msgFormat;
+                String format = server.options.get("msgFormat");
                 if (p.groupObject != null) {
                   color = p.groupObject.getColor();
                   if (p.groupObject.showTitle()) {
                     title = p.groupObject.getName();
-                    format = server.options.msgTitleFormat;
+                    format = server.options.get("msgTitleFormat");
                   }
                 }
                 msg = String.format(format, p.getName(), title, color) + msg;
@@ -648,8 +648,8 @@ public class StreamTunnel implements Runnable {
             }
           }
 
-          if (msg.startsWith("!")
-              || (server.options.useSlashes && msg.startsWith("/"))) {
+          if ((server.options.getBoolean("useSlashes") && msg.startsWith("/"))
+              || msg.startsWith("!")) {
             boolean remove = player.parseCommand(msg);
             // Remove the packet! : )
             if (remove) {

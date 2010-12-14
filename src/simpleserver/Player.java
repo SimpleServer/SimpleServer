@@ -65,7 +65,7 @@ public class Player {
       kick("Invalid Name!");
       return false;
     }
-    if (server.options.useWhitelist) {
+    if (server.options.getBoolean("useWhitelist")) {
       if (!server.whitelist.isWhitelisted(name)) {
         kick("You are not whitelisted!");
         return false;
@@ -139,7 +139,7 @@ public class Player {
     }
 
     command.execute(this, message);
-    return !(command.passThrough() && server.options.useSMPAPI)
+    return !(command.passThrough() && server.options.getBoolean("useSMPAPI"))
         || message.startsWith("/");
   }
 
@@ -154,8 +154,9 @@ public class Player {
   private void updateGroup(String name) {
     int nameGroup = server.members.checkName(name);
     int ipGroup = server.ipMembers.getGroup(this);
-    if ((nameGroup == -1 || ipGroup == -1 && server.options.defaultGroup != -1)
-        || (nameGroup == -1 && ipGroup == -1 && server.options.defaultGroup == -1)) {
+    int defaultGroup = server.options.getInt("defaultGroup");
+    if ((nameGroup == -1 || ipGroup == -1 && defaultGroup != -1)
+        || (nameGroup == -1 && ipGroup == -1 && defaultGroup == -1)) {
       group = -1;
       if (server.groups.groupExists(group)) {
         groupObject = server.groups.getGroup(group);
@@ -226,11 +227,11 @@ public class Player {
       kick("Banned IP!");
     }
     try {
-      intsocket = new Socket("localhost", parent.options.internalPort);
+      intsocket = new Socket("localhost", parent.options.getInt("internalPort"));
     }
     catch (Exception e2) {
       e2.printStackTrace();
-      if (parent.options.exitOnFailure) {
+      if (parent.options.getBoolean("exitOnFailure")) {
         System.exit(-1);
       }
       else {
@@ -391,11 +392,11 @@ public class Player {
       kick("Banned IP!");
     }
     try {
-      intsocket = new Socket("localhost", server.options.internalPort);
+      intsocket = new Socket("localhost", server.options.getInt("internalPort"));
     }
     catch (Exception e2) {
       e2.printStackTrace();
-      if (server.options.exitOnFailure) {
+      if (server.options.getBoolean("exitOnFailure")) {
         System.exit(-1);
       }
       else {

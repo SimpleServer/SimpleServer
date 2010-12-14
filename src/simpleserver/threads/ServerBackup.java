@@ -52,9 +52,9 @@ public class ServerBackup implements Runnable {
 
   public void run() {
     while (!Thread.interrupted()) {
-      while (parent.options.autoBackup) {
+      while (parent.options.getBoolean("autoBackup")) {
         try {
-          Thread.sleep(parent.options.autoBackupMins * 1000 * 60);
+          Thread.sleep(parent.options.getInt("autoBackupMins") * 1000 * 60);
         }
         catch (InterruptedException e) {
         }
@@ -193,7 +193,7 @@ public class ServerBackup implements Runnable {
         + "-" + (date.get(Calendar.MONTH) + 1) + "-" + date.get(Calendar.DATE)
         + "-" + date.get(Calendar.HOUR_OF_DAY) + "_"
         + date.get(Calendar.MINUTE));
-    copyDirectory(new File(parent.options.levelName), backup);
+    copyDirectory(new File(parent.options.get("levelName")), backup);
     return backup;
   }
 
@@ -235,7 +235,7 @@ public class ServerBackup implements Runnable {
       String[] dirs = backupDir.list();
       for (int i = 0; i < dirs.length; i++) {
         File current = new File("backups" + File.separator + dirs[i]);
-        if (System.currentTimeMillis() - current.lastModified() > 1000 * 60 * 60 * parent.options.keepBackupHours) {
+        if (System.currentTimeMillis() - current.lastModified() > 1000 * 60 * 60 * parent.options.getInt("keepBackupHours")) {
           if (current.isDirectory()) {
             deleteDirectory(current);
           }

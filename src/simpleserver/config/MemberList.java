@@ -42,7 +42,7 @@ public class MemberList extends PropertiesConfig {
     if (group != null) {
       return group;
     }
-    return server.options.defaultGroup;
+    return server.options.getInt("defaultGroup");
   }
 
   public void setGroup(String name, int group) throws InterruptedException {

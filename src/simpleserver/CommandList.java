@@ -62,7 +62,7 @@ public class CommandList {
   }
 
   public String commandPrefix() {
-    if (options.useSlashes) {
+    if (options.getBoolean("useSlashes")) {
       return "/";
     }
     else {

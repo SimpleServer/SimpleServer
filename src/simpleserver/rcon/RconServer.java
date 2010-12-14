@@ -71,22 +71,21 @@ public class RconServer implements Runnable {
   }
 
   public void run() {
+    int port = parent.options.getInt("rconPort");
     if (!udp) {
       try {
-        parent.rconSocket = new ServerSocket(parent.options.rconPort);
-        System.out.println("Opened RCON on port: " + parent.options.rconPort
-            + "!");
+        parent.rconSocket = new ServerSocket(port);
+        System.out.println("Opened RCON on port: " + port + "!");
       }
       catch (IOException e) {
-        System.out.println("Could not listen on port "
-            + parent.options.rconPort
+        System.out.println("Could not listen on port " + port
             + "!\nIs it already in use? RCON is not available!");
         return;
       }
     }
     else {
       try {
-        rconSocket = new DatagramSocket(parent.options.rconPort);
+        rconSocket = new DatagramSocket(port);
       }
       catch (SocketException e1) {
         // TODO Auto-generated catch block

@@ -57,7 +57,7 @@ public class InputStreamRouter implements Runnable {
     catch (Exception e) {
       if (!parent.isRestarting()) {
         e.printStackTrace();
-        if (parent.options.exitOnFailure) {
+        if (parent.options.getBoolean("exitOnFailure")) {
           System.exit(-1);
         }
         else {
@@ -84,7 +84,7 @@ public class InputStreamRouter implements Runnable {
     if (line.startsWith("!reload")) {
       System.out.println("Reloading Resources...");
       parent.loadAll();
-      if (parent.options.useSMPAPI) {
+      if (parent.options.getBoolean("useSMPAPI")) {
         return line;
       }
       else {
@@ -94,7 +94,7 @@ public class InputStreamRouter implements Runnable {
     if (line.startsWith("!save")) {
       System.out.println("Saving Resources...");
       parent.saveAll();
-      if (parent.options.useSMPAPI) {
+      if (parent.options.getBoolean("useSMPAPI")) {
         return line;
       }
       else {
@@ -145,7 +145,7 @@ public class InputStreamRouter implements Runnable {
       catch (Exception e) {
         if (!parent.isRestarting()) {
           e.printStackTrace();
-          if (parent.options.exitOnFailure) {
+          if (parent.options.getBoolean("exitOnFailure")) {
             System.exit(-1);
           }
           else {

@@ -11,10 +11,10 @@
         </sealing>
     </manifest>
     <selectedElements exportClassFiles="true" exportJavaFiles="false" exportOutputFolder="false">
-        <file path="/SimpleServer/README"/>
         <javaElement handleIdentifier="=SimpleServer/src"/>
+        <file path="/SimpleServer/README"/>
         <file path="/SimpleServer/lib/guava-r07.jar"/>
-        <file path="/SimpleServer/CHANGES"/>
         <file path="/SimpleServer/LICENSE"/>
+        <file path="/SimpleServer/CHANGES"/>
     </selectedElements>
 </jardesc>

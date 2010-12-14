@@ -21,21 +21,21 @@
 package simpleserver;
 
 public class ForceRestart implements Runnable {
-  private Server parent;
+  private Server server;
 
-  public ForceRestart(Server s) {
-    parent = s;
+  public ForceRestart(Server server) {
+    this.server = server;
   }
 
   public void run() {
     try {
-      parent.saveLock.acquire();
+      server.saveLock.acquire();
     }
     catch (InterruptedException e) {
       e.printStackTrace();
       return;
     }
-    parent.restart();
-    parent.saveLock.release();
+    server.restart();
+    server.saveLock.release();
   }
 }

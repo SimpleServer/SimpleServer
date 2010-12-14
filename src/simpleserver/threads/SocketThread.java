@@ -35,20 +35,19 @@ public class SocketThread implements Runnable {
   }
 
   public void run() {
+    String ip = parent.options.get("ipAddress");
+    int port = parent.options.getInt("port");
     try {
-      if (parent.options.ipAddress.equals("0.0.0.0")) {
-        parent.socket = new ServerSocket(parent.options.port);
+      if (ip.equals("0.0.0.0")) {
+        parent.socket = new ServerSocket(port);
       }
       else {
-        parent.socket = new ServerSocket(
-                                         parent.options.port,
-                                         8,
-                                         InetAddress.getByName(parent.options.ipAddress));
+        parent.socket = new ServerSocket(port, 8, InetAddress.getByName(ip));
       }
 
     }
     catch (IOException e) {
-      System.out.println("Could not listen on port " + parent.options.port
+      System.out.println("Could not listen on port " + port
           + "!\nIs it already in use? Exiting application...");
       System.exit(-1);
     }
@@ -66,8 +65,7 @@ public class SocketThread implements Runnable {
       catch (IOException e) {
         if (!parent.isRestarting()) {
           e.printStackTrace();
-          System.out.println("Accept failed on port " + parent.options.port
-              + "!");
+          System.out.println("Accept failed on port " + port + "!");
         }
       }
     }

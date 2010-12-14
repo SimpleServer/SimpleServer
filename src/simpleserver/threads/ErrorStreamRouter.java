@@ -68,7 +68,7 @@ public class ErrorStreamRouter implements Runnable {
   }
 
   private void handleLine(String line) throws InterruptedException {
-    if (!parent.options.debug) {
+    if (!parent.options.getBoolean("debug")) {
       if (line.contains("\tat")) {
         return;
       }
