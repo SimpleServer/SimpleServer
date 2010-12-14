@@ -69,6 +69,7 @@ public class Options extends AbstractOptions {
     options.setProperty(option, value);
   }
 
+  @Override
   public void load() {
     super.load();
 
@@ -93,6 +94,7 @@ public class Options extends AbstractOptions {
     }
   }
 
+  @Override
   protected void missingFile() {
     super.missingFile();
 

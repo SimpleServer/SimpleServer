@@ -31,14 +31,14 @@ import java.util.Properties;
 
 public abstract class AbstractOptions {
   private static final String resourceLocation = "defaults";
-  
+
   protected String filename;
   protected Properties defaultOptions;
   protected Properties options;
 
   protected AbstractOptions(String filename) {
     this.filename = filename;
-    
+
     loadDefaults();
   }
 
@@ -85,11 +85,11 @@ public abstract class AbstractOptions {
       System.out.println("Could not write " + filename);
     }
   }
-  
+
   protected void missingFile() {
     save();
   }
-  
+
   protected String getComment() {
     return null;
   }
@@ -110,7 +110,7 @@ public abstract class AbstractOptions {
       e.printStackTrace();
       System.out.println("Could not read default " + filename);
     }
-    
+
     options = new Properties(defaultOptions);
   }
 }

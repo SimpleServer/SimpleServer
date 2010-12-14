@@ -80,7 +80,8 @@ public class PlayerFactory {
   public static Player findPlayer(String name) {
     for (Player i : players) {
       if (i != null) {
-        if (i.getName() != null && i.hasExternalConnection() && i.isClosed() == false) {
+        if (i.getName() != null && i.hasExternalConnection()
+            && i.isClosed() == false) {
           if (i.getName().toLowerCase().startsWith(name.toLowerCase())) {
             return i;
           }
@@ -93,7 +94,8 @@ public class PlayerFactory {
   public static Player findPlayerExact(String name) {
     for (Player i : players) {
       if (i != null) {
-        if (i.getName() != null && i.hasExternalConnection() && i.isClosed() == false) {
+        if (i.getName() != null && i.hasExternalConnection()
+            && i.isClosed() == false) {
           if (i.getName().equalsIgnoreCase(name)) {
             return i;
           }

@@ -36,7 +36,7 @@ public class KickCommand extends OnlinePlayerCommand {
     player.getServer().adminLog.addMessage("Admin " + player.getName()
         + " kicked player:\t " + target.getName() + "\t(" + reason + ")");
     player.getServer().runCommand("say Player " + target.getName()
-        + " has been kicked! (" + reason + ")");
+                                      + " has been kicked! (" + reason + ")");
   }
 
   @Override

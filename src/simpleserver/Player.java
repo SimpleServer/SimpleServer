@@ -49,8 +49,8 @@ public class Player {
   private LinkedList<String> messages = new LinkedList<String>();
 
   public double distanceTo(Player player) {
-    return Math.sqrt(Math.pow(this.x - player.x, 2)
-        + Math.pow(this.x - player.y, 2) + Math.pow(this.x - player.z, 2));
+    return Math.sqrt(Math.pow(x - player.x, 2) + Math.pow(x - player.y, 2)
+        + Math.pow(x - player.z, 2));
   }
 
   public boolean hasExternalConnection() {
@@ -60,7 +60,7 @@ public class Player {
   public boolean hasInternalConnection() {
     return intsocket != null;
   }
-  
+
   public void updateLocation(double x, double y, double z, double stance) {
     this.x = x;
     this.y = y;
