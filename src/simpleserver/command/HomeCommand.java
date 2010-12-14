@@ -20,10 +20,9 @@
  ******************************************************************************/
 package simpleserver.command;
 
-import simpleserver.Command;
 import simpleserver.Player;
 
-public class HomeCommand extends Command {
+public class HomeCommand extends AbstractCommand {
   public HomeCommand() {
     super("home");
   }

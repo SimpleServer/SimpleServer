@@ -30,9 +30,7 @@ import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 
-import simpleserver.Config;
-
-public abstract class PropertiesConfig extends Config {
+public abstract class PropertiesConfig extends AbstractConfig {
   private Properties properties;
 
   protected PropertiesConfig(String filename) {

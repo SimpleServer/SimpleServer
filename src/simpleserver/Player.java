@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.net.Socket;
 import java.util.LinkedList;
 
+import simpleserver.command.AbstractCommand;
 import simpleserver.threads.DelayClose;
 
 public class Player {
@@ -167,18 +168,20 @@ public class Player {
       return true;
     }
 
-    Command command = server.getCommandList().getCommand(message);
-    if (command == null) {
+    AbstractCommand abstractCommand = server.getCommandList()
+                                            .getCommand(message);
+    if (abstractCommand == null) {
       return false;
     }
 
-    if (command.getName() != null && !commandAllowed(command.getName())) {
+    if (abstractCommand.getName() != null
+        && !commandAllowed(abstractCommand.getName())) {
       addMessage("\302\247cInsufficient permission.");
       return true;
     }
 
-    command.execute(this, message);
-    return !(command.passThrough() && server.options.getBoolean("useSMPAPI"))
+    abstractCommand.execute(this, message);
+    return !(abstractCommand.passThrough() && server.options.getBoolean("useSMPAPI"))
         || message.startsWith("/");
   }
 

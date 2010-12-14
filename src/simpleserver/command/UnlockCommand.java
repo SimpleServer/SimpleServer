@@ -20,10 +20,9 @@
  ******************************************************************************/
 package simpleserver.command;
 
-import simpleserver.Command;
 import simpleserver.Player;
 
-public class UnlockCommand extends Command {
+public class UnlockCommand extends AbstractCommand {
   public UnlockCommand() {
     super("unlock");
   }

@@ -20,10 +20,9 @@
  ******************************************************************************/
 package simpleserver.command;
 
-import simpleserver.Command;
 import simpleserver.Player;
 
-public class ReloadCommand extends Command {
+public class ReloadCommand extends AbstractCommand {
   public ReloadCommand() {
     super("reload");
   }

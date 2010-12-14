@@ -18,58 +18,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-package simpleserver;
+package simpleserver.options;
 
-import java.util.Arrays;
-
-public abstract class Command {
-  private String name;
-
-  protected Command(String name) {
-    this.name = name;
-  }
-
-  public String getName() {
-    return name;
-  }
-
-  public String[] getAliases() {
-    return new String[] {};
-  }
-
-  /**
-   * @return true if command should be passed-through to SMP API also
-   */
-  public boolean passThrough() {
-    return false;
-  }
-
-  public boolean isHidden() {
-    return false;
-  }
-
-  public abstract void execute(Player player, String message)
-      throws InterruptedException;
-
-  protected String[] extractArguments(String message) {
-    String[] parts = message.split("\\s+");
-    return Arrays.copyOfRange(parts, 1, parts.length);
-  }
-
-  protected String extractArgument(String message, int startOffset) {
-    int argumentIndex = 0;
-    for (int c = 0; c <= startOffset; ++c) {
-      argumentIndex = message.indexOf(" ", argumentIndex) + 1;
-
-      if (argumentIndex == 0) {
-        return null;
-      }
-    }
-
-    return message.substring(argumentIndex);
-  }
-
-  protected String extractArgument(String message) {
-    return extractArgument(message, 0);
+public class Language extends AbstractOptions {
+  public Language() {
+    super("language.properties");
   }
 }

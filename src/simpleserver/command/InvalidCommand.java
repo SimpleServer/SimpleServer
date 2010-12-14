@@ -20,10 +20,9 @@
  ******************************************************************************/
 package simpleserver.command;
 
-import simpleserver.Command;
 import simpleserver.Player;
 
-public class InvalidCommand extends Command {
+public class InvalidCommand extends AbstractCommand {
   public InvalidCommand() {
     super(null);
   }

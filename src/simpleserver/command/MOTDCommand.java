@@ -20,10 +20,9 @@
  ******************************************************************************/
 package simpleserver.command;
 
-import simpleserver.Command;
 import simpleserver.Player;
 
-public class MOTDCommand extends Command {
+public class MOTDCommand extends AbstractCommand {
   public MOTDCommand() {
     super("motd");
   }

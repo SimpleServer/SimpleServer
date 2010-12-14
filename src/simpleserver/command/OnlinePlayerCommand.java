@@ -20,10 +20,9 @@
  ******************************************************************************/
 package simpleserver.command;
 
-import simpleserver.Command;
 import simpleserver.Player;
 
-public abstract class OnlinePlayerCommand extends Command {
+public abstract class OnlinePlayerCommand extends AbstractCommand {
   protected OnlinePlayerCommand(String name) {
     super(name);
   }

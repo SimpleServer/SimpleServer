@@ -20,10 +20,9 @@
  ******************************************************************************/
 package simpleserver.command;
 
-import simpleserver.Command;
 import simpleserver.Player;
 
-public class ModListCommand extends Command {
+public class ModListCommand extends AbstractCommand {
   public ModListCommand() {
     super("mods");
   }

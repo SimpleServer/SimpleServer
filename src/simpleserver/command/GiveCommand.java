@@ -20,10 +20,9 @@
  ******************************************************************************/
 package simpleserver.command;
 
-import simpleserver.Command;
 import simpleserver.Player;
 
-public class GiveCommand extends Command {
+public class GiveCommand extends AbstractCommand {
   private int offset;
 
   public GiveCommand() {

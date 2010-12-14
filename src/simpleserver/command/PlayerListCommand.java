@@ -22,11 +22,10 @@ package simpleserver.command;
 
 import java.util.Iterator;
 
-import simpleserver.Command;
 import simpleserver.Player;
 import simpleserver.PlayerFactory;
 
-public class PlayerListCommand extends Command {
+public class PlayerListCommand extends AbstractCommand {
   public PlayerListCommand() {
     super("who");
   }

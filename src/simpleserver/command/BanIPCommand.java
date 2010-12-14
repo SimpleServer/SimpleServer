@@ -20,11 +20,10 @@
  ******************************************************************************/
 package simpleserver.command;
 
-import simpleserver.Command;
 import simpleserver.Player;
 import simpleserver.Server;
 
-public class BanIPCommand extends Command {
+public class BanIPCommand extends AbstractCommand {
   public BanIPCommand() {
     super("banip");
   }

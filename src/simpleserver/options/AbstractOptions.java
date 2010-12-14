@@ -18,99 +18,99 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-package simpleserver;
+package simpleserver.options;
 
-import java.io.DataInputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.Properties;
 
-public abstract class Config {
+public abstract class AbstractOptions {
   private static final String resourceLocation = "defaults";
-  private static final String folder = "simpleserver";
 
-  private String filename;
-  private String header;
+  protected String filename;
+  protected Properties defaultOptions;
+  protected Properties options;
 
-  protected Config(String filename) {
+  protected AbstractOptions(String filename) {
     this.filename = filename;
 
-    loadHeader();
+    loadDefaults();
   }
 
-  public abstract void save();
-
-  public abstract void load();
-
-  protected String getFilename() {
-    return filename;
+  public String get(String key) {
+    return options.getProperty(key);
   }
 
-  protected String getHeader() {
-    return header;
-  }
+  public void load() {
+    options = new Properties(defaultOptions);
+    File file = new File(filename);
 
-  protected File getFile() {
-    File file = new File(folder + File.separator + filename);
-    if (file.exists()) {
-      return file;
-    }
-
-    new File(folder).mkdir();
-
-    File check = new File(filename);
-    if (check.exists()) {
-      check.renameTo(file);
-    }
-
-    return file;
-  }
-
-  protected String readFully(InputStream input) {
-    byte[] buffer;
     try {
-      DataInputStream dataInput = new DataInputStream(input);
+      InputStream stream = new FileInputStream(file);
       try {
-        buffer = new byte[dataInput.available()];
-        dataInput.readFully(buffer);
-        return new String(buffer, 0, buffer.length, "UTF-8");
+        options.load(stream);
       }
       finally {
-        dataInput.close();
+        stream.close();
+      }
+    }
+    catch (FileNotFoundException e) {
+      missingFile();
+    }
+    catch (IOException e) {
+      e.printStackTrace();
+      System.out.println("Could not read " + filename);
+    }
+  }
+
+  public void save() {
+    File file = new File(filename);
+
+    try {
+      OutputStream stream = new FileOutputStream(file);
+      try {
+        options.store(stream, getComment());
+      }
+      finally {
+        stream.close();
       }
     }
     catch (IOException e) {
       e.printStackTrace();
+      System.out.println("Could not write " + filename);
     }
+  }
 
+  protected void missingFile() {
+    save();
+  }
+
+  protected String getComment() {
     return null;
   }
 
-  protected InputStream getResourceStream() {
-    return getClass().getResourceAsStream(resourceLocation + "/" + filename);
-  }
-
-  private InputStream getHeaderResourceStream() {
-    return getClass().getResourceAsStream(resourceLocation + "/" + filename
-                                              + "-header");
-  }
-
-  private void loadHeader() {
-    InputStream headerStream = getHeaderResourceStream();
+  protected void loadDefaults() {
+    defaultOptions = new Properties();
+    InputStream stream = getClass().getResourceAsStream(resourceLocation + "/"
+                                                            + filename);
     try {
-      header = readFully(headerStream);
-    }
-    finally {
       try {
-        headerStream.close();
+        defaultOptions.load(stream);
       }
-      catch (IOException e) {
-        e.printStackTrace();
+      finally {
+        stream.close();
       }
+    }
+    catch (IOException e) {
+      e.printStackTrace();
+      System.out.println("Could not read default " + filename);
     }
 
-    if (header == null) {
-      System.out.println("Failed to load default header for " + getFilename());
-    }
+    options = new Properties(defaultOptions);
   }
 }

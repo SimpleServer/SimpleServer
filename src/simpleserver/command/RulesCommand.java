@@ -20,10 +20,9 @@
  ******************************************************************************/
 package simpleserver.command;
 
-import simpleserver.Command;
 import simpleserver.Player;
 
-public class RulesCommand extends Command {
+public class RulesCommand extends AbstractCommand {
   public RulesCommand() {
     super("rules");
   }

@@ -27,8 +27,11 @@ import java.util.Set;
 
 import org.reflections.Reflections;
 
+import simpleserver.command.AbstractCommand;
+import simpleserver.options.Options;
+
 public class CommandList {
-  private Map<String, Command> commands;
+  private Map<String, AbstractCommand> abstractCommands;
   private Map<String, String> aliases;
   private Options options;
 
@@ -38,7 +41,7 @@ public class CommandList {
     loadCommands();
   }
 
-  public Command getCommand(String message) {
+  public AbstractCommand getCommand(String message) {
     if (message.startsWith(commandPrefix())) {
       int splitIndex = message.indexOf(" ");
       if (splitIndex == -1) {
@@ -46,19 +49,20 @@ public class CommandList {
       }
 
       String name = message.substring(1, splitIndex).toLowerCase();
-      Command command = commands.get(name);
-      if (command == null) {
-        command = commands.get(aliases.get(name));
+      AbstractCommand abstractCommand = abstractCommands.get(name);
+      if (abstractCommand == null) {
+        abstractCommand = abstractCommands.get(aliases.get(name));
       }
 
-      return command;
+      return abstractCommand;
     }
 
     return null;
   }
 
-  public Command[] getCommands() {
-    return commands.values().toArray(new Command[commands.size()]);
+  public AbstractCommand[] getCommands() {
+    return abstractCommands.values()
+                           .toArray(new AbstractCommand[abstractCommands.size()]);
   }
 
   public String commandPrefix() {
@@ -71,20 +75,21 @@ public class CommandList {
   }
 
   private void loadCommands() {
-    commands = new HashMap<String, Command>();
+    abstractCommands = new HashMap<String, AbstractCommand>();
     aliases = new HashMap<String, String>();
 
     Reflections r = new Reflections("simpleserver");
-    Set<Class<? extends Command>> commandTypes = r.getSubTypesOf(Command.class);
+    Set<Class<? extends AbstractCommand>> commandTypes = r.getSubTypesOf(AbstractCommand.class);
 
-    for (Class<? extends Command> commandType : commandTypes) {
+    for (Class<? extends AbstractCommand> commandType : commandTypes) {
       if (Modifier.isAbstract(commandType.getModifiers())) {
         continue;
       }
 
-      Command command;
+      AbstractCommand abstractCommand;
       try {
-        command = commandType.getConstructor().newInstance(new Object[] {});
+        abstractCommand = commandType.getConstructor()
+                                     .newInstance(new Object[] {});
       }
       catch (Exception e) {
         e.printStackTrace();
@@ -93,9 +98,9 @@ public class CommandList {
         continue;
       }
 
-      commands.put(command.getName(), command);
-      for (String alias : command.getAliases()) {
-        aliases.put(alias, command.getName());
+      abstractCommands.put(abstractCommand.getName(), abstractCommand);
+      for (String alias : abstractCommand.getAliases()) {
+        aliases.put(alias, abstractCommand.getName());
       }
     }
   }

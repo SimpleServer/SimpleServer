@@ -20,11 +20,10 @@
  ******************************************************************************/
 package simpleserver.command;
 
-import simpleserver.Command;
 import simpleserver.Player;
 import simpleserver.Server;
 
-public class RestartCommand extends Command {
+public class RestartCommand extends AbstractCommand {
   public RestartCommand() {
     super("restart");
   }

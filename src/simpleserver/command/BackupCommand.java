@@ -20,10 +20,9 @@
  ******************************************************************************/
 package simpleserver.command;
 
-import simpleserver.Command;
 import simpleserver.Player;
 
-public class BackupCommand extends Command {
+public class BackupCommand extends AbstractCommand {
   public BackupCommand() {
     super("backup");
   }

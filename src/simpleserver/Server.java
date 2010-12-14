@@ -26,6 +26,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.concurrent.Semaphore;
 
+import simpleserver.config.AbstractConfig;
 import simpleserver.config.BlockList;
 import simpleserver.config.ChestList;
 import simpleserver.config.CommandList;
@@ -41,6 +42,9 @@ import simpleserver.config.RobotList;
 import simpleserver.config.Rules;
 import simpleserver.config.WhiteList;
 import simpleserver.log.AdminLog;
+import simpleserver.options.Language;
+import simpleserver.options.MinecraftOptions;
+import simpleserver.options.Options;
 import simpleserver.rcon.RconServer;
 import simpleserver.threads.C10TThread;
 import simpleserver.threads.ErrorStreamRouter;
@@ -114,7 +118,7 @@ public class Server {
   public boolean isRestarting = false;
   private boolean waitingForStart = false;
 
-  private LinkedList<Config> resources = new LinkedList<Config>();
+  private LinkedList<AbstractConfig> resources = new LinkedList<AbstractConfig>();
   public LinkedList<Rcon> rcons = new LinkedList<Rcon>();
 
   // Minecraft Process
@@ -494,7 +498,7 @@ public class Server {
   }
 
   public void loadAll() {
-    for (Config i : resources) {
+    for (AbstractConfig i : resources) {
       i.load();
     }
     l.load();
@@ -502,7 +506,7 @@ public class Server {
   }
 
   public void saveAll() {
-    for (Config i : resources) {
+    for (AbstractConfig i : resources) {
       i.save();
     }
     options.save();

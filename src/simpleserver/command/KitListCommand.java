@@ -20,10 +20,9 @@
  ******************************************************************************/
 package simpleserver.command;
 
-import simpleserver.Command;
 import simpleserver.Player;
 
-public class KitListCommand extends Command {
+public class KitListCommand extends AbstractCommand {
   public KitListCommand() {
     super("kits");
   }

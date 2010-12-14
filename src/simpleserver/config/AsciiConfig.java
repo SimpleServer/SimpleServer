@@ -30,9 +30,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Writer;
 
-import simpleserver.Config;
-
-public abstract class AsciiConfig extends Config {
+public abstract class AsciiConfig extends AbstractConfig {
   protected AsciiConfig(String filename) {
     super(filename);
   }

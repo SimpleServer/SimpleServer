@@ -20,11 +20,10 @@
  ******************************************************************************/
 package simpleserver.command;
 
-import simpleserver.Command;
 import simpleserver.CommandList;
 import simpleserver.Player;
 
-public class HelpCommand extends Command {
+public class HelpCommand extends AbstractCommand {
   public HelpCommand() {
     super("help");
   }
@@ -48,13 +47,14 @@ public class HelpCommand extends Command {
     CommandList commandList = player.getServer().getCommandList();
     String prefix = commandList.commandPrefix();
 
-    for (Command command : commandList.getCommands()) {
-      if (command.isHidden() || !player.commandAllowed(command.getName())) {
+    for (AbstractCommand abstractCommand : commandList.getCommands()) {
+      if (abstractCommand.isHidden()
+          || !player.commandAllowed(abstractCommand.getName())) {
         continue;
       }
 
       line.append(prefix);
-      line.append(command.getName());
+      line.append(abstractCommand.getName());
       line.append(" ");
     }
 

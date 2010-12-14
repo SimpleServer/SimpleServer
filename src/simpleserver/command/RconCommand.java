@@ -20,10 +20,9 @@
  ******************************************************************************/
 package simpleserver.command;
 
-import simpleserver.Command;
 import simpleserver.Player;
 
-public class RconCommand extends Command {
+public class RconCommand extends AbstractCommand {
   public RconCommand() {
     super("rcon");
   }

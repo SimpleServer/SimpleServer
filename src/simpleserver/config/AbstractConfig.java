@@ -18,99 +18,99 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-package simpleserver;
+package simpleserver.config;
 
+import java.io.DataInputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.Properties;
 
-public abstract class AbstractOptions {
+public abstract class AbstractConfig {
   private static final String resourceLocation = "defaults";
+  private static final String folder = "simpleserver";
 
-  protected String filename;
-  protected Properties defaultOptions;
-  protected Properties options;
+  private String filename;
+  private String header;
 
-  protected AbstractOptions(String filename) {
+  protected AbstractConfig(String filename) {
     this.filename = filename;
 
-    loadDefaults();
+    loadHeader();
   }
 
-  public String get(String key) {
-    return options.getProperty(key);
+  public abstract void save();
+
+  public abstract void load();
+
+  protected String getFilename() {
+    return filename;
   }
 
-  public void load() {
-    options = new Properties(defaultOptions);
-    File file = new File(filename);
+  protected String getHeader() {
+    return header;
+  }
 
+  protected File getFile() {
+    File file = new File(folder + File.separator + filename);
+    if (file.exists()) {
+      return file;
+    }
+
+    new File(folder).mkdir();
+
+    File check = new File(filename);
+    if (check.exists()) {
+      check.renameTo(file);
+    }
+
+    return file;
+  }
+
+  protected String readFully(InputStream input) {
+    byte[] buffer;
     try {
-      InputStream stream = new FileInputStream(file);
+      DataInputStream dataInput = new DataInputStream(input);
       try {
-        options.load(stream);
+        buffer = new byte[dataInput.available()];
+        dataInput.readFully(buffer);
+        return new String(buffer, 0, buffer.length, "UTF-8");
       }
       finally {
-        stream.close();
+        dataInput.close();
       }
-    }
-    catch (FileNotFoundException e) {
-      missingFile();
     }
     catch (IOException e) {
       e.printStackTrace();
-      System.out.println("Could not read " + filename);
     }
-  }
 
-  public void save() {
-    File file = new File(filename);
-
-    try {
-      OutputStream stream = new FileOutputStream(file);
-      try {
-        options.store(stream, getComment());
-      }
-      finally {
-        stream.close();
-      }
-    }
-    catch (IOException e) {
-      e.printStackTrace();
-      System.out.println("Could not write " + filename);
-    }
-  }
-
-  protected void missingFile() {
-    save();
-  }
-
-  protected String getComment() {
     return null;
   }
 
-  protected void loadDefaults() {
-    defaultOptions = new Properties();
-    InputStream stream = getClass().getResourceAsStream(resourceLocation + "/"
-                                                            + filename);
+  protected InputStream getResourceStream() {
+    return getClass().getResourceAsStream(resourceLocation + "/" + filename);
+  }
+
+  private InputStream getHeaderResourceStream() {
+    return getClass().getResourceAsStream(resourceLocation + "/" + filename
+                                              + "-header");
+  }
+
+  private void loadHeader() {
+    InputStream headerStream = getHeaderResourceStream();
     try {
-      try {
-        defaultOptions.load(stream);
-      }
-      finally {
-        stream.close();
-      }
+      header = readFully(headerStream);
     }
-    catch (IOException e) {
-      e.printStackTrace();
-      System.out.println("Could not read default " + filename);
+    finally {
+      try {
+        headerStream.close();
+      }
+      catch (IOException e) {
+        e.printStackTrace();
+      }
     }
 
-    options = new Properties(defaultOptions);
+    if (header == null) {
+      System.out.println("Failed to load default header for " + getFilename());
+    }
   }
 }

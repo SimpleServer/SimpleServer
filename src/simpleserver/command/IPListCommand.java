@@ -22,11 +22,10 @@ package simpleserver.command;
 
 import java.util.Iterator;
 
-import simpleserver.Command;
 import simpleserver.Player;
 import simpleserver.PlayerFactory;
 
-public class IPListCommand extends Command {
+public class IPListCommand extends AbstractCommand {
   public IPListCommand() {
     super("listips");
   }

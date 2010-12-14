@@ -20,10 +20,9 @@
  ******************************************************************************/
 package simpleserver.command;
 
-import simpleserver.Command;
 import simpleserver.Player;
 
-public class InstantDestroyCommand extends Command {
+public class InstantDestroyCommand extends AbstractCommand {
   public InstantDestroyCommand() {
     super("iddqd");
   }

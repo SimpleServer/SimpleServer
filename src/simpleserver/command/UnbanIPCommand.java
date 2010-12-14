@@ -20,10 +20,9 @@
  ******************************************************************************/
 package simpleserver.command;
 
-import simpleserver.Command;
 import simpleserver.Player;
 
-public class UnbanIPCommand extends Command {
+public class UnbanIPCommand extends AbstractCommand {
   public UnbanIPCommand() {
     super("unbanip");
   }

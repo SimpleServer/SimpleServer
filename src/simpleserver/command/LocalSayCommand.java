@@ -20,10 +20,9 @@
  ******************************************************************************/
 package simpleserver.command;
 
-import simpleserver.Command;
 import simpleserver.Player;
 
-public class LocalSayCommand extends Command {
+public class LocalSayCommand extends AbstractCommand {
   public LocalSayCommand() {
     super("local");
   }

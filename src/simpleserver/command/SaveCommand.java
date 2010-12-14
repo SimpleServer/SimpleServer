@@ -20,10 +20,9 @@
  ******************************************************************************/
 package simpleserver.command;
 
-import simpleserver.Command;
 import simpleserver.Player;
 
-public class SaveCommand extends Command {
+public class SaveCommand extends AbstractCommand {
   public SaveCommand() {
     super("save");
   }
