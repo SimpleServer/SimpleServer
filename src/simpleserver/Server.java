@@ -59,22 +59,21 @@ public class Server {
 
   private simpleserver.CommandList commandList;
 
-  boolean open = true;
-  boolean debug = false;
+  private boolean open = true;
   public ServerSocket socket;
   public ServerSocket rconSocket;
 
-  LinkedList<String> outputLog = new LinkedList<String>();
+  private LinkedList<String> outputLog = new LinkedList<String>();
 
   public Semaphore saveLock = new Semaphore(1);
   public BlockList blockFirewall;
   public GroupList groups;
   public MemberList members;
-  public RobotList robots;
-  public MOTD motd;
+  private RobotList robots;
+  private MOTD motd;
   public KitList kits;
   public ChestList chests;
-  public Rules rules;
+  private Rules rules;
   public IPMemberList ipMembers;
   public IPBanList ipBans;
   public ItemWatchList itemWatch;
@@ -84,48 +83,46 @@ public class Server {
   public CommandList commands;
 
   public AdminLog adminLog;
-  public Thread adminLogThread;
+  private Thread adminLogThread;
 
   public Language l;
 
-  InputStreamRouter input;
+  private InputStreamRouter input;
 
-  Thread backupThread;
-  Thread autoSaveThread;
-  Thread autoRestartThread;
-  Thread playerScannerThread;
-  Thread shutDownHook;
-  Thread socketThread;
+  private Thread backupThread;
+  private Thread autoSaveThread;
+  private Thread autoRestartThread;
+  private Thread playerScannerThread;
+  private Thread shutDownHook;
+  private Thread socketThread;
 
-  C10TThread c10t;
-  Thread c10tThread;
+  private C10TThread c10t;
+  private Thread c10tThread;
 
-  ServerBackup backup;
-  ServerAutoSave autosave;
-  ServerAutoRestart autoRestart;
-  PlayerScanner playerScanner;
-  MinecraftMonitor minecraftMonitor;
+  private ServerBackup backup;
+  private ServerAutoSave autosave;
+  private ServerAutoRestart autoRestart;
+  private PlayerScanner playerScanner;
+  private MinecraftMonitor minecraftMonitor;
   public RequestTracker requestTracker;
 
-  ForceShutdown forceShutdown;
-  ForceRestart forceRestart;
+  private ForceShutdown forceShutdown;
+  private ForceRestart forceRestart;
 
   boolean requireBackup = false;
-  boolean isSaving = false;
+  private boolean isSaving = false;
   public boolean isRestarting = false;
-  boolean waitingForStart = false;
-  boolean useDev = false;
+  private boolean waitingForStart = false;
 
-  LinkedList<Config> resources = new LinkedList<Config>();
-  // LinkedList<Player> players = new LinkedList<Player>();
+  private LinkedList<Config> resources = new LinkedList<Config>();
   public LinkedList<Rcon> rcons = new LinkedList<Rcon>();
 
   // Minecraft Process
   public Process p;
   // Pipe Threads
-  Thread t;
-  Thread t2;
-  Thread t3;
+  private Thread t;
+  private Thread t2;
+  private Thread t3;
 
   public static void main(String[] args) {
     System.out.println(license);
