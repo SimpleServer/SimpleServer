@@ -20,35 +20,38 @@
  ******************************************************************************/
 package simpleserver.config;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import simpleserver.Group;
 import simpleserver.Player;
 
 public class CommandList extends PropertiesConfig {
-  private Map<String, int[]> commands;
+  private Map<String, Set<Integer>> commands;
 
   public CommandList() {
     super("command-list.txt");
 
-    commands = new HashMap<String, int[]>();
+    commands = new HashMap<String, Set<Integer>>();
 
     loadDefaults();
   }
 
   public boolean playerAllowed(String command, Player player) {
-    int[] groups = commands.get(command);
+    Set<Integer> groups = commands.get(command);
     if (groups != null) {
-      return Group.contains(groups, player);
+      return Group.isMember(groups, player);
     }
 
     return false;
   }
 
   public void setGroup(String command, int group) {
-    commands.put(command, new int[] { group });
+    commands.put(command, new HashSet<Integer>(Arrays.asList(group)));
     setProperty(command, Integer.toString(group));
   }
 

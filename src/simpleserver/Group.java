@@ -20,26 +20,21 @@
  ******************************************************************************/
 package simpleserver;
 
-import java.util.Vector;
+import java.util.HashSet;
+import java.util.Set;
 
 public class Group {
-  private int id;
   private String groupName;
   private boolean showTitle;
   private boolean isAdmin;
   private String color;
 
-  public Group(int id, String groupName, boolean showTitle, boolean isAdmin,
+  public Group(String groupName, boolean showTitle, boolean isAdmin,
                String color) {
     this.groupName = groupName;
-    this.id = id;
     this.showTitle = showTitle;
-    this.color = color;
     this.isAdmin = isAdmin;
-  }
-
-  public int getID() {
-    return id;
+    this.color = color;
   }
 
   public String getName() {
@@ -58,73 +53,57 @@ public class Group {
     return color;
   }
 
-  public static boolean contains(int[] groups, Player p) {
-    if (groups != null) {
-      if (groups[0] == -1) {
-        return true;
-      }
-      if (p.getGroup() == -1) {
-        return false;
-      }
-      if (groups[0] == 0) {
-        return true;
-      }
-      for (int i : groups) {
-        if (p.getGroup() == i) {
-          return true;
-        }
-      }
-    }
-    return false;
+  public static boolean isMember(Set<Integer> groups, Player player) {
+    return groups.contains(player.getGroup()) || groups.contains(-1)
+        || (groups.contains(0) && (player.getGroup() != -1));
   }
 
-  public static int[] parseGroups(String idString) {
+  public static Set<Integer> parseGroups(String idString) {
     return parseGroups(idString, ",");
   }
 
-  public static int[] parseGroups(String idString, String delimiter) {
-    String[] tokens = idString.split(delimiter);
-    Vector<Integer> ranks = new Vector<Integer>();
-    for (String i : tokens) {
-      if (!i.startsWith("-")) {
-        String[] tokens2 = i.split("-");
-        if (tokens2.length < 2) {
-          try {
-            int tryInt = Integer.valueOf(i);
-            ranks.add(tryInt);
-          }
-          catch (Exception e) {
-          }
-        }
-        else if (tokens2.length == 2) {
-          try {
-            int lowInt = Integer.valueOf(tokens2[0]);
-            int highInt = Integer.valueOf(tokens2[1]);
-            if (lowInt <= highInt) {
-              for (int k = lowInt; k <= highInt; k++) {
-                ranks.add(k);
-              }
-            }
+  public static Set<Integer> parseGroups(String idString, String delimiter) {
+    String[] segments = idString.split(delimiter);
+    Set<Integer> groups = new HashSet<Integer>();
+    for (String segment : segments) {
+      if (segment.matches("^\\s*$")) {
+        continue;
+      }
 
-          }
-          catch (Exception e) {
-          }
-        }
+      try {
+        groups.add(Integer.valueOf(segment));
+        continue;
       }
-      else {
-        try {
-          int tryInt = Integer.valueOf(i);
-          ranks.add(tryInt);
-        }
-        catch (Exception e) {
-        }
+      catch (NumberFormatException e) {
+      }
+
+      String[] range = segment.split("-");
+      if (range.length != 2) {
+        System.out.println("Unable to parse group: " + segment);
+        continue;
+      }
+
+      int low;
+      int high;
+      try {
+        low = Integer.valueOf(range[0]);
+        high = Integer.valueOf(range[1]);
+      }
+      catch (NumberFormatException e) {
+        System.out.println("Unable to parse group: " + segment);
+        continue;
+      }
+
+      if (low > high) {
+        System.out.println("Unable to parse group: " + segment);
+        continue;
+      }
+
+      for (int k = low; k <= high; ++k) {
+        groups.add(k);
       }
     }
-    int[] ret = new int[ranks.size()];
-    int j = 0;
-    for (Integer num : ranks) {
-      ret[j++] = num;
-    }
-    return ret;
+
+    return groups;
   }
 }

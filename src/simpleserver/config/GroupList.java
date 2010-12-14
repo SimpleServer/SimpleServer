@@ -68,7 +68,7 @@ public class GroupList extends PropertiesConfig {
       boolean isAdmin = Boolean.parseBoolean(attributes[2].trim());
       String color = attributes[3].trim();
 
-      groups.put(group, new Group(group, name, showTitle, isAdmin, color));
+      groups.put(group, new Group(name, showTitle, isAdmin, color));
     }
   }
 }

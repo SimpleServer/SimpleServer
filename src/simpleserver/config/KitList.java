@@ -22,8 +22,10 @@ package simpleserver.config;
 
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import simpleserver.Group;
 import simpleserver.Player;
@@ -33,8 +35,8 @@ public class KitList extends PropertiesConfig {
   private Server server;
 
   private static final class Kit {
-    public int[] groups;
-    public LinkedList<Entry> items = new LinkedList<Entry>();
+    public Set<Integer> groups;
+    public List<Entry> items = new LinkedList<Entry>();
 
     private static final class Entry {
       int item;
@@ -46,7 +48,7 @@ public class KitList extends PropertiesConfig {
       }
     }
 
-    public Kit(int[] groups) {
+    public Kit(Set<Integer> groups) {
       this.groups = groups;
     }
 
@@ -67,7 +69,7 @@ public class KitList extends PropertiesConfig {
   public void giveKit(Player player, String kitName)
       throws InterruptedException {
     Kit kit = kits.get(kitName);
-    if ((kit != null) && (Group.contains(kit.groups, player))) {
+    if ((kit != null) && (Group.isMember(kit.groups, player))) {
       for (Kit.Entry entry : kit.items) {
         String baseCommand = "give " + player.getName() + " " + entry.item;
         for (int c = 0; c < entry.amount / 64; ++c) {
@@ -83,7 +85,7 @@ public class KitList extends PropertiesConfig {
     kitList.append("Allowed kits: ");
     for (String name : kits.keySet()) {
       Kit kit = kits.get(name);
-      if (Group.contains(kit.groups, player)) {
+      if (Group.isMember(kit.groups, player)) {
         kitList.append(name);
         kitList.append(", ");
       }
@@ -104,8 +106,7 @@ public class KitList extends PropertiesConfig {
         continue;
       }
 
-      int[] groups = Group.parseGroups(options[0], ";");
-      Kit kit = new Kit(groups);
+      Kit kit = new Kit(Group.parseGroups(options[0], ";"));
 
       for (int c = 1; c < options.length; ++c) {
         String[] item = options[c].split(":");

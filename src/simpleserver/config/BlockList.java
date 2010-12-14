@@ -23,17 +23,18 @@ package simpleserver.config;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import simpleserver.Group;
 import simpleserver.Player;
 
 public class BlockList extends PropertiesConfig {
-  private Map<Integer, int[]> blocks;
+  private Map<Integer, Set<Integer>> blocks;
 
   public BlockList() {
     super("block-list.txt");
 
-    blocks = new HashMap<Integer, int[]>();
+    blocks = new HashMap<Integer, Set<Integer>>();
 
     loadDefaults();
   }
@@ -43,9 +44,9 @@ public class BlockList extends PropertiesConfig {
   }
 
   public boolean playerAllowed(Player player, int blockID) {
-    int[] groups = blocks.get(blockID);
+    Set<Integer> groups = blocks.get(blockID);
     if (groups != null) {
-      return Group.contains(groups, player);
+      return Group.isMember(groups, player);
     }
     return true;
   }

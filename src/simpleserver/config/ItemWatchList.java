@@ -23,6 +23,7 @@ package simpleserver.config;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import simpleserver.Group;
 import simpleserver.Player;
@@ -30,9 +31,9 @@ import simpleserver.Player;
 public class ItemWatchList extends PropertiesConfig {
   private static final class Options {
     public int threshold;
-    public int[] groups;
+    public Set<Integer> groups;
 
-    public Options(int threshold, int[] groups) {
+    public Options(int threshold, Set<Integer> groups) {
       this.threshold = threshold;
       this.groups = groups;
     }
@@ -54,7 +55,7 @@ public class ItemWatchList extends PropertiesConfig {
     Options options = items.get(blockID);
     if (options != null) {
       return amount >= options.threshold
-          && Group.contains(options.groups, player);
+          && Group.isMember(options.groups, player);
     }
 
     return true;
