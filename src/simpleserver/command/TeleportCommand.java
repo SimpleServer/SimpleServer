@@ -21,6 +21,7 @@
 package simpleserver.command;
 
 import simpleserver.Player;
+import simpleserver.Server;
 
 public class TeleportCommand extends OnlinePlayerCommand {
   public TeleportCommand() {
@@ -31,9 +32,10 @@ public class TeleportCommand extends OnlinePlayerCommand {
   protected void executeWithTarget(Player player, String message, Player target1)
       throws InterruptedException {
     String[] arguments = extractArguments(message);
+    Server server = player.getServer();
 
     if (arguments.length > 1) {
-      Player target2 = player.server.findPlayer(arguments[1]);
+      Player target2 = server.findPlayer(arguments[1]);
       if (target2 == null) {
         player.addMessage("\302\247cPlayer not online (" + arguments[1] + ")");
       }
@@ -42,7 +44,7 @@ public class TeleportCommand extends OnlinePlayerCommand {
 
         player.addMessage("Teleported " + target1.getName() + " to "
             + target2.getName() + "!");
-        player.server.adminLog.addMessage("User " + player.getName()
+        server.adminLog.addMessage("User " + player.getName()
             + " teleported:\t " + target1.getName() + "\tto\t"
             + target2.getName());
       }

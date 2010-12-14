@@ -33,7 +33,7 @@ public class KitCommand extends Command {
       throws InterruptedException {
     String[] arguments = extractArguments(message);
     if (arguments.length >= 1) {
-      player.server.kits.giveKit(player, arguments[0]);
+      player.getServer().kits.giveKit(player, arguments[0]);
     }
     else {
       player.addMessage("\302\247cNo kit specified.");

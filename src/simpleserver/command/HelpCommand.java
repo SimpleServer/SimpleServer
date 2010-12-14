@@ -45,7 +45,7 @@ public class HelpCommand extends Command {
     StringBuffer line = new StringBuffer();
     line.append("Available Commands: ");
 
-    CommandList commandList = player.server.getCommandList();
+    CommandList commandList = player.getServer().getCommandList();
     String prefix = commandList.commandPrefix();
 
     for (Command command : commandList.getCommands()) {

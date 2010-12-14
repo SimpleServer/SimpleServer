@@ -390,7 +390,7 @@ public class Server {
   }
 
   public void addRobot(Player p) {
-    robots.addRobot(p.extsocket.getInetAddress().getHostAddress());
+    robots.addRobot(p.getIPAddress());
   }
 
   public boolean isRobot(String ipAddress) {
@@ -449,7 +449,7 @@ public class Server {
     adminLog.addMessage("IP Address " + ipAddress + " was banned:\t " + reason);
     for (Iterator<Player> itr = PlayerFactory.iterator(); itr.hasNext();) {
       Player p = itr.next();
-      if (p.extsocket.getInetAddress().getHostAddress().equals(ipAddress)) {
+      if (p.getIPAddress().equals(ipAddress)) {
         p.kick(reason);
         adminLog.addMessage("Player " + p.getName() + " was ip-banned:\t "
             + reason);
@@ -557,8 +557,7 @@ public class Server {
       Player i = itr.next();
       if (i.getName() != null) {
         int radius = options.getInt("localChatRadius");
-        if (Math.abs(i.x - p.x) < radius && Math.abs(i.y - p.y) < radius
-            && Math.abs(i.z - p.z) < radius) {
+        if (i.distanceTo(p) < radius) {
           i.addMessage(chat);
           if (p != i) {
             j++;

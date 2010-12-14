@@ -32,6 +32,6 @@ public class BackupCommand extends Command {
   public void execute(Player player, String message)
       throws InterruptedException {
     player.addMessage("Forcing backup!");
-    player.server.forceBackup();
+    player.getServer().forceBackup();
   }
 }

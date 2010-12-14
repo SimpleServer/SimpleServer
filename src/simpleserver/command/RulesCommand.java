@@ -31,7 +31,7 @@ public class RulesCommand extends Command {
   @Override
   public void execute(Player player, String message)
       throws InterruptedException {
-    String rules = player.server.getRules();
+    String rules = player.getServer().getRules();
     String[] lines = rules.split("\\r?\\n");
     for (int i = 0; i < lines.length; i++) {
       player.addMessage(lines[i]);

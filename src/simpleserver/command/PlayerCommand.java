@@ -34,7 +34,7 @@ public abstract class PlayerCommand extends Command {
     String[] arguments = extractArguments(message);
 
     if (arguments.length > 0) {
-      String name = player.server.findName(arguments[0]);
+      String name = player.getServer().findName(arguments[0]);
       if (name == null) {
         name = arguments[0];
       }

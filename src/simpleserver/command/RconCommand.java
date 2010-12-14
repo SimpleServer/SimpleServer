@@ -33,7 +33,7 @@ public class RconCommand extends Command {
       throws InterruptedException {
     String command = extractArgument(message);
     if (command != null) {
-      player.server.runCommand(command);
+      player.getServer().runCommand(command);
     }
     else {
       player.addMessage("\302\247cNo rcon command specified.");

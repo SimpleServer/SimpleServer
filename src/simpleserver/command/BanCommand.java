@@ -21,6 +21,7 @@
 package simpleserver.command;
 
 import simpleserver.Player;
+import simpleserver.Server;
 
 public class BanCommand extends PlayerCommand {
   public BanCommand() {
@@ -31,14 +32,15 @@ public class BanCommand extends PlayerCommand {
   protected void executeWithTarget(Player player, String message, String target)
       throws InterruptedException {
     String reason = extractArgument(message, 1);
+    Server server = player.getServer();
 
-    player.server.runCommand("ban " + target);
-    player.server.kick(target, reason);
+    server.runCommand("ban " + target);
+    server.kick(target, reason);
 
-    player.server.adminLog.addMessage("User " + player.getName()
+    server.adminLog.addMessage("User " + player.getName()
         + " banned player:\t " + target + "\t(" + reason + ")");
-    player.server.runCommand("say Player " + target + " has been banned! ("
-        + reason + ")");
+    server.runCommand("say Player " + target + " has been banned! (" + reason
+        + ")");
   }
 
   @Override

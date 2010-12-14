@@ -34,7 +34,7 @@ public abstract class OnlinePlayerCommand extends Command {
     String[] arguments = extractArguments(message);
 
     if (arguments.length > 0) {
-      Player target = player.server.findPlayer(arguments[0]);
+      Player target = player.getServer().findPlayer(arguments[0]);
       if (target == null) {
         player.addMessage("\302\247cPlayer not online (" + arguments[0] + ")");
       }

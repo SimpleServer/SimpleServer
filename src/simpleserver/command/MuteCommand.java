@@ -21,6 +21,7 @@
 package simpleserver.command;
 
 import simpleserver.Player;
+import simpleserver.Server;
 
 public class MuteCommand extends PlayerCommand {
   public MuteCommand() {
@@ -30,10 +31,11 @@ public class MuteCommand extends PlayerCommand {
   @Override
   protected void executeWithTarget(Player player, String message, String name)
       throws InterruptedException {
-    player.server.mutelist.addName(name);
+    Server server = player.getServer();
+    server.mutelist.addName(name);
 
-    player.server.adminLog.addMessage("Admin " + player.getName()
+    server.adminLog.addMessage("Admin " + player.getName()
         + " muted player:\t " + name);
-    player.server.runCommand("say Player " + name + " has been muted!");
+    server.runCommand("say Player " + name + " has been muted!");
   }
 }

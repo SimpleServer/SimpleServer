@@ -47,7 +47,7 @@ public class PlayerScanner implements Runnable {
           }
           try {
             // This is required to make it not try to call notifyClosed()
-            i.isKicked(true);
+            i.setKicked(true);
             i.close();
           }
           catch (InterruptedException e) {

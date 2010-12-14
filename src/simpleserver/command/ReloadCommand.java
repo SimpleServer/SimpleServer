@@ -36,7 +36,7 @@ public class ReloadCommand extends Command {
   @Override
   public void execute(Player player, String message)
       throws InterruptedException {
-    player.server.loadAll();
+    player.getServer().loadAll();
     player.addMessage("Resources Reloaded!");
   }
 }

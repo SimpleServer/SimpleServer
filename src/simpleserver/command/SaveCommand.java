@@ -36,8 +36,8 @@ public class SaveCommand extends Command {
   @Override
   public void execute(Player player, String message)
       throws InterruptedException {
-    player.server.saveAll();
-    player.server.runCommand("save-all");
+    player.getServer().saveAll();
+    player.getServer().runCommand("save-all");
     player.addMessage("Resources Saved!");
   }
 }

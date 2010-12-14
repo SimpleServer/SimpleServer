@@ -32,7 +32,7 @@ public class WarpToCommand extends OnlinePlayerCommand {
       throws InterruptedException {
     player.teleportTo(target);
 
-    player.server.adminLog.addMessage("Admin " + player.getName()
+    player.getServer().adminLog.addMessage("Admin " + player.getName()
         + " teleported:\t " + player.getName() + "\tto\t" + target.getName());
   }
 }

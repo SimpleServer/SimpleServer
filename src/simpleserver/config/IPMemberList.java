@@ -39,7 +39,7 @@ public class IPMemberList extends PropertiesConfig {
 
   public int getGroup(Player player) {
     String network = "";
-    String ip = player.extsocket.getInetAddress().getHostAddress();
+    String ip = player.getIPAddress();
     String[] octets = ip.split("\\.");
 
     for (String octet : octets) {
@@ -57,7 +57,7 @@ public class IPMemberList extends PropertiesConfig {
   }
 
   public void setGroup(Player player, int group) {
-    String ip = player.extsocket.getInetAddress().getHostAddress();
+    String ip = player.getIPAddress();
     members.put(ip, group);
     setProperty(ip, Integer.toString(group));
 

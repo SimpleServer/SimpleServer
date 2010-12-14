@@ -55,7 +55,7 @@ public class GiveCommand extends Command {
       }
 
       target.give(item, amount);
-      player.server.adminLog.addMessage("User " + player.getName()
+      player.getServer().adminLog.addMessage("User " + player.getName()
           + " used giveplayer:\t " + target.getName() + "\t" + item + "\t("
           + amount + ")");
     }

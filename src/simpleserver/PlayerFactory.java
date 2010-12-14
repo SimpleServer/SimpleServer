@@ -35,7 +35,7 @@ public class PlayerFactory {
     public boolean hasNext() {
       for (int j = i; j < PlayerFactory.players.length; j++) {
         if (PlayerFactory.players[j] != null) {
-          if (PlayerFactory.players[j].intsocket != null) {
+          if (PlayerFactory.players[j].hasInternalConnection()) {
             next = j;
             return true;
           }
@@ -51,7 +51,7 @@ public class PlayerFactory {
       }
       for (int j = i; j < PlayerFactory.players.length; j++) {
         if (PlayerFactory.players[j] != null) {
-          if (PlayerFactory.players[j].intsocket != null) {
+          if (PlayerFactory.players[j].hasInternalConnection()) {
             i = j + 1;
             return PlayerFactory.players[j];
           }
@@ -80,7 +80,7 @@ public class PlayerFactory {
   public static Player findPlayer(String name) {
     for (Player i : players) {
       if (i != null) {
-        if (i.getName() != null && i.extsocket != null && i.isClosed() == false) {
+        if (i.getName() != null && i.hasExternalConnection() && i.isClosed() == false) {
           if (i.getName().toLowerCase().startsWith(name.toLowerCase())) {
             return i;
           }
@@ -93,7 +93,7 @@ public class PlayerFactory {
   public static Player findPlayerExact(String name) {
     for (Player i : players) {
       if (i != null) {
-        if (i.getName() != null && i.extsocket != null && i.isClosed() == false) {
+        if (i.getName() != null && i.hasExternalConnection() && i.isClosed() == false) {
           if (i.getName().equalsIgnoreCase(name)) {
             return i;
           }
@@ -105,7 +105,7 @@ public class PlayerFactory {
 
   public static void removePlayer(Player p) {
     if (p != null) {
-      if (p.intsocket != null) {
+      if (p.hasInternalConnection()) {
         p.cleanup();
       }
     }
@@ -117,7 +117,7 @@ public class PlayerFactory {
         players[i] = new Player(sock, parent);
         return players[i];
       }
-      if (players[i].intsocket == null) {
+      if (players[i].hasInternalConnection()) {
         players[i].reinitialize(sock);
         return players[i];
       }

@@ -22,6 +22,7 @@ package simpleserver.command;
 
 import simpleserver.Command;
 import simpleserver.Player;
+import simpleserver.Server;
 
 public class RestartCommand extends Command {
   public RestartCommand() {
@@ -31,14 +32,16 @@ public class RestartCommand extends Command {
   @Override
   public void execute(Player player, String message)
       throws InterruptedException {
-    player.server.adminLog.addMessage("User " + player.getName()
+    Server server = player.getServer();
+
+    server.adminLog.addMessage("User " + player.getName()
         + " attempted a restart!");
-    if (player.server.saveLock.tryAcquire()) {
-      player.server.saveLock.release();
+    if (server.saveLock.tryAcquire()) {
+      server.saveLock.release();
     }
     else {
       player.addMessage("Server is currently Backing Up/Saving/Restarting...");
     }
-    player.server.forceRestart();
+    server.forceRestart();
   }
 }

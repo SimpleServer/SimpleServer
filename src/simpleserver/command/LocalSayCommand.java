@@ -37,7 +37,7 @@ public class LocalSayCommand extends Command {
   public void execute(Player player, String message)
       throws InterruptedException {
     String chat = extractArgument(message);
-    int numPlayers = player.server.localChat(player, chat);
+    int numPlayers = player.getServer().localChat(player, chat);
     if (numPlayers <= 0) {
       player.addMessage("\302\247cNobody is around to hear you.");
     }

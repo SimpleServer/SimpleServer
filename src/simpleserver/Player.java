@@ -27,26 +27,65 @@ import java.util.LinkedList;
 import simpleserver.threads.DelayClose;
 
 public class Player {
-  public Socket intsocket;
-  public Socket extsocket;
+  private Socket intsocket;
+  private Socket extsocket;
   private Thread t1;
   private Thread t2;
-  public Server server;
+  private Server server;
   private String name = null;
-  public boolean closed = false;
-  boolean isKicked = false;
-  public boolean attemptLock = false;
-  public boolean destroy = false;
-  public String kickMsg = null;
-  double x, y, z, stance;
+  private boolean closed = false;
+  private boolean isKicked = false;
+  private boolean attemptLock = false;
+  private boolean instantDestroy = false;
+  private String kickMsg = null;
+  private double x, y, z;
   private int group = 0;
-  Group groupObject = null;
-  boolean isRobot = false;
+  private Group groupObject = null;
+  private boolean isRobot = false;
 
   private StreamTunnel serverToClient;
   private StreamTunnel clientToServer;
 
   private LinkedList<String> messages = new LinkedList<String>();
+
+  public double distanceTo(Player player) {
+    return Math.sqrt(Math.pow(this.x - player.x, 2)
+        + Math.pow(this.x - player.y, 2) + Math.pow(this.x - player.z, 2));
+  }
+
+  public boolean hasExternalConnection() {
+    return extsocket != null;
+  }
+
+  public boolean hasInternalConnection() {
+    return intsocket != null;
+  }
+  
+  public void updateLocation(double x, double y, double z, double stance) {
+    this.x = x;
+    this.y = y;
+    this.z = z;
+  }
+
+  public boolean isAttemptLock() {
+    return attemptLock;
+  }
+
+  public void setAttemptLock(boolean state) {
+    attemptLock = state;
+  }
+
+  public boolean instantDestroyEnabled() {
+    return instantDestroy;
+  }
+
+  public void toggleInstantDestroy() {
+    instantDestroy = !instantDestroy;
+  }
+
+  public Server getServer() {
+    return server;
+  }
 
   public void sendHome() {
     clientToServer.addPacket(new byte[] { 0x03, 0x07, '/', 'h', 'o', 'm', 'e' });
@@ -99,7 +138,7 @@ public class Player {
     return isKicked;
   }
 
-  public void isKicked(boolean b) {
+  public void setKicked(boolean b) {
     isKicked = b;
   }
 
@@ -147,8 +186,12 @@ public class Player {
     return server.commands.playerAllowed(command, this);
   }
 
-  public int getGroup() {
+  public int getGroupId() {
     return group;
+  }
+
+  public Group getGroup() {
+    return groupObject;
   }
 
   private void updateGroup(String name) {
@@ -293,19 +336,6 @@ public class Player {
     return closed;
   }
 
-  public boolean isConnected() throws InterruptedException {
-    if (closed) {
-      return false;
-    }
-    if (!extsocket.isConnected() || !intsocket.isConnected()) {
-      server.notifyClosed(this);
-      close();
-      return false;
-
-    }
-    return true;
-  }
-
   public void close() throws InterruptedException {
     // Don't spam the console! : )
     // And don't close if we're already closing!
@@ -360,12 +390,11 @@ public class Player {
     closed = false;
     isKicked = false;
     attemptLock = false;
-    destroy = false;
+    instantDestroy = false;
     kickMsg = null;
     x = 0;
     y = 0;
     z = 0;
-    stance = 0;
     group = 0;
     groupObject = null;
 

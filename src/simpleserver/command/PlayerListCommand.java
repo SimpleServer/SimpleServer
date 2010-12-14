@@ -39,12 +39,13 @@ public class PlayerListCommand extends Command {
   @Override
   public void execute(Player player, String message)
       throws InterruptedException {
-    String list = "Connected Players (" + player.server.numPlayers() + "): ";
+    String list = "Connected Players (" + player.getServer().numPlayers()
+        + "): ";
     for (Iterator<Player> itr = PlayerFactory.iterator(); itr.hasNext();) {
       Player i = itr.next();
       if (i != null) {
-        if (i.getName() != null && i.getName() != "" && !i.closed
-            && i.kickMsg == null) {
+        if (i.getName() != null && i.getName() != "" && !i.isClosed()
+            && !i.isKicked()) {
           list += i.getName() + ", ";
         }
       }

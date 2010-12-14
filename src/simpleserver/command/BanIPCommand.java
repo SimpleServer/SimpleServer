@@ -22,6 +22,7 @@ package simpleserver.command;
 
 import simpleserver.Command;
 import simpleserver.Player;
+import simpleserver.Server;
 
 public class BanIPCommand extends Command {
   public BanIPCommand() {
@@ -32,21 +33,21 @@ public class BanIPCommand extends Command {
   public void execute(Player player, String message)
       throws InterruptedException {
     String[] arguments = extractArguments(message);
+    Server server = player.getServer();
 
     if (arguments.length >= 1) {
-      Player p = player.server.findPlayer(arguments[0]);
+      Player p = player.getServer().findPlayer(arguments[0]);
       if (p == null) {
-        player.server.ipBans.addBan(arguments[0]);
+        server.ipBans.addBan(arguments[0]);
         player.addMessage("IP Address " + arguments[0] + " has been banned!");
-        player.server.adminLog.addMessage("User " + player.getName()
+        server.adminLog.addMessage("User " + player.getName()
             + " banned ip:\t " + arguments[0]);
       }
       else {
-        player.server.ipBans.addBan(p.getIPAddress());
-        player.server.kick(p.getName(), "IP Banned!");
-        player.server.runCommand("say Player " + p.getName()
-            + " has been IP banned!");
-        player.server.adminLog.addMessage("User " + player.getName()
+        server.ipBans.addBan(p.getIPAddress());
+        server.kick(p.getName(), "IP Banned!");
+        server.runCommand("say Player " + p.getName() + " has been IP banned!");
+        server.adminLog.addMessage("User " + player.getName()
             + " banned ip:\t " + arguments[0] + "\t(" + p.getName() + ")");
       }
     }

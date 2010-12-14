@@ -31,6 +31,6 @@ public class KitListCommand extends Command {
   @Override
   public void execute(Player player, String message)
       throws InterruptedException {
-    player.server.kits.listKits(player);
+    player.getServer().kits.listKits(player);
   }
 }

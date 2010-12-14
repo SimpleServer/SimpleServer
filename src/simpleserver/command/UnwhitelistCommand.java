@@ -30,9 +30,9 @@ public class UnwhitelistCommand extends PlayerCommand {
   @Override
   protected void executeWithTarget(Player player, String message, String name)
       throws InterruptedException {
-    player.server.whitelist.removeName(name);
+    player.getServer().whitelist.removeName(name);
 
-    player.server.adminLog.addMessage("User " + player.getName()
+    player.getServer().adminLog.addMessage("User " + player.getName()
         + " unwhitelisted player:\t " + name);
     player.addMessage("Player " + name + " was un-whitelisted!");
   }

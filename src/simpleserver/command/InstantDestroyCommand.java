@@ -31,8 +31,8 @@ public class InstantDestroyCommand extends Command {
   @Override
   public void execute(Player player, String message)
       throws InterruptedException {
-    player.destroy = !player.destroy;
-    if (player.destroy) {
+    player.toggleInstantDestroy();
+    if (player.instantDestroyEnabled()) {
       player.addMessage("God-Mode Enabled!");
     }
     else {

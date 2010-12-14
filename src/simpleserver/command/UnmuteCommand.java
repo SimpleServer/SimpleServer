@@ -21,6 +21,7 @@
 package simpleserver.command;
 
 import simpleserver.Player;
+import simpleserver.Server;
 
 public class UnmuteCommand extends PlayerCommand {
   public UnmuteCommand() {
@@ -30,10 +31,11 @@ public class UnmuteCommand extends PlayerCommand {
   @Override
   protected void executeWithTarget(Player player, String message, String name)
       throws InterruptedException {
-    player.server.mutelist.removeName(name);
+    Server server = player.getServer();
+    server.mutelist.removeName(name);
 
-    player.server.adminLog.addMessage("Admin " + player.getName()
+    server.adminLog.addMessage("Admin " + player.getName()
         + " unmuted player:\t " + name);
-    player.server.runCommand("say Player " + name + " has been unmuted!");
+    server.runCommand("say Player " + name + " has been unmuted!");
   }
 }

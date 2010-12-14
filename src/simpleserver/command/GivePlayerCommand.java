@@ -32,7 +32,7 @@ public class GivePlayerCommand extends GiveCommand {
       throws InterruptedException {
     Player target = null;
     if (arguments.length > 0) {
-      target = player.server.findPlayer(arguments[0]);
+      target = player.getServer().findPlayer(arguments[0]);
       if (target == null) {
         player.addMessage("\302\247cPlayer not online (" + arguments[0] + ")");
       }

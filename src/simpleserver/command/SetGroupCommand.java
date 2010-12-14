@@ -21,6 +21,7 @@
 package simpleserver.command;
 
 import simpleserver.Player;
+import simpleserver.Server;
 
 public class SetGroupCommand extends PlayerCommand {
   public SetGroupCommand() {
@@ -30,7 +31,8 @@ public class SetGroupCommand extends PlayerCommand {
   @Override
   protected void executeWithTarget(Player player, String message, String target)
       throws InterruptedException {
-    if (player.getGroup() <= player.server.members.checkName(target)) {
+    Server server = player.getServer();
+    if (player.getGroupId() <= server.members.checkName(target)) {
       player.addMessage("\302\247cYou cannot set the group of this user!");
       return;
     }
@@ -46,14 +48,14 @@ public class SetGroupCommand extends PlayerCommand {
         return;
       }
 
-      if (group >= player.getGroup()) {
+      if (group >= player.getGroupId()) {
         player.addMessage("\302\247cYou cannot promote a user to a higher group!");
       }
       else {
-        player.server.members.setGroup(target, group);
+        server.members.setGroup(target, group);
         player.addMessage("Player " + target + "'s group was set to " + group
             + "!");
-        player.server.adminLog.addMessage("User " + player.getName()
+        server.adminLog.addMessage("User " + player.getName()
             + " set player's group:\t " + target + "\t(" + group + ")");
       }
     }

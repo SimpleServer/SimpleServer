@@ -54,8 +54,8 @@ public class Group {
   }
 
   public static boolean isMember(Set<Integer> groups, Player player) {
-    return groups.contains(player.getGroup()) || groups.contains(-1)
-        || (groups.contains(0) && (player.getGroup() != -1));
+    return groups.contains(player.getGroupId()) || groups.contains(-1)
+        || (groups.contains(0) && (player.getGroupId() != -1));
   }
 
   public static Set<Integer> parseGroups(String idString) {

@@ -62,7 +62,7 @@ public class StreamTunnel implements Runnable {
     this.in = in;
     this.out = out;
     player = p;
-    server = p.server;
+    server = p.getServer();
     buf = new byte[BUF_SIZE];
     inGame = false;
     lock = new Semaphore(1);
@@ -76,7 +76,7 @@ public class StreamTunnel implements Runnable {
     this.in = in;
     this.out = out;
     player = p;
-    server = p.server;
+    server = p.getServer();
     buf = new byte[BUF_SIZE];
     inGame = false;
     lock = new Semaphore(1);
@@ -126,7 +126,7 @@ public class StreamTunnel implements Runnable {
         lock.release();
 
         if (System.currentTimeMillis() - lastRead > IDLE_TIME) {
-          if (!player.isRobot) {
+          if (!player.isRobot()) {
             System.out.println("[SimpleServer] Disconnecting "
                 + player.getIPAddress() + " due to inactivity.");
           }
@@ -327,7 +327,7 @@ public class StreamTunnel implements Runnable {
             }
           }
         }
-        if (player.getGroup() < 0) {
+        if (player.getGroupId() < 0) {
           removeBytes(r - oldCursor);
           break;
         }
@@ -350,7 +350,7 @@ public class StreamTunnel implements Runnable {
           }
         }
 
-        if (player.getGroup() < 0
+        if (player.getGroupId() < 0
             && !server.options.getBoolean("guestsCanViewComplex")) {
           removeBytes(r - oldCursor);
           break;
@@ -365,10 +365,11 @@ public class StreamTunnel implements Runnable {
           motionCounter++;
         }
         if (!isServerTunnel && motionCounter % 8 == 0) {
-          player.x = readDouble();
-          player.y = readDouble();
-          player.stance = readDouble();
-          player.z = readDouble();
+          double x = readDouble();
+          double y = readDouble();
+          double stance = readDouble();
+          double z = readDouble();
+          player.updateLocation(x, y, z, stance);
           skipBytes(1);
         }
         else {
@@ -383,10 +384,11 @@ public class StreamTunnel implements Runnable {
           motionCounter++;
         }
         if (!isServerTunnel && motionCounter % 8 == 0) {
-          player.x = readDouble();
-          player.y = readDouble();
-          player.stance = readDouble();
-          player.z = readDouble();
+          double x = readDouble();
+          double y = readDouble();
+          double stance = readDouble();
+          double z = readDouble();
+          player.updateLocation(x, y, z, stance);
           skipBytes(9);
         }
         else {
@@ -396,7 +398,7 @@ public class StreamTunnel implements Runnable {
       case 0x0e:
 
         if (!isServerTunnel) {
-          if (player.getGroup() < 0) {
+          if (player.getGroupId() < 0) {
             skipBytes(11);
             removeBytes(12);
             break;
@@ -411,7 +413,7 @@ public class StreamTunnel implements Runnable {
             removeBytes(12);
             break;
           }
-          if (player.destroy) {
+          if (player.instantDestroyEnabled()) {
             byte[] cpyPacket = new byte[12];
             byte[] cpyPacket2 = new byte[12];
             System.arraycopy(buf, r - 12, cpyPacket, 0, 12);
@@ -442,9 +444,9 @@ public class StreamTunnel implements Runnable {
       case 0x0f:
         short block = readShort();
         if (!isServerTunnel) {
-          if (server.blockFirewall.contains(block) || player.getGroup() < 0) {
+          if (server.blockFirewall.contains(block) || player.getGroupId() < 0) {
             boolean allowed = server.blockFirewall.playerAllowed(player, block);
-            if (!allowed || player.getGroup() < 0) {
+            if (!allowed || player.getGroupId() < 0) {
               // Remove the packet! : )
               int coord_x = readInt();
               if (!allowed && coord_x != -1) {
@@ -462,7 +464,7 @@ public class StreamTunnel implements Runnable {
           }
           if (block == 54) {
             // Check if lock is ready and allowed
-            if (player.attemptLock) {
+            if (player.isAttemptLock()) {
               // calculate coordinates
               int xC0f = readInt();
               int yC0f = readByte();
@@ -491,7 +493,7 @@ public class StreamTunnel implements Runnable {
               // create chest entry
               if (server.chests.hasLock(xC0f, yC0f, zC0f)) {
                 player.addMessage("This block is locked already!");
-                player.attemptLock = false;
+                player.setAttemptLock(false);
                 break;
               }
               if (!server.chests.giveLock(player.getName().toLowerCase(), xC0f,
@@ -501,7 +503,7 @@ public class StreamTunnel implements Runnable {
               else {
                 player.addMessage("Your locked chest is created! Do not add another chest to it!");
               }
-              player.attemptLock = false;
+              player.setAttemptLock(false);
             }
             else {
               skipBytes(10);
@@ -526,7 +528,7 @@ public class StreamTunnel implements Runnable {
         break;
       case 0x15:
         skipBytes(22);
-        if (player.getGroup() < 0) {
+        if (player.getGroupId() < 0) {
           removeBytes(23);
           break;
         }
@@ -615,10 +617,11 @@ public class StreamTunnel implements Runnable {
                 String color = "f";
                 String title = "";
                 String format = server.options.get("msgFormat");
-                if (p.groupObject != null) {
-                  color = p.groupObject.getColor();
-                  if (p.groupObject.showTitle()) {
-                    title = p.groupObject.getName();
+                Group group = p.getGroup();
+                if (group != null) {
+                  color = group.getColor();
+                  if (group.showTitle()) {
+                    title = group.getName();
                     format = server.options.get("msgTitleFormat");
                   }
                 }
