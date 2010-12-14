@@ -28,6 +28,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Writer;
 
 import simpleserver.Config;
 
@@ -41,7 +42,7 @@ public abstract class AsciiConfig extends Config {
     boolean success = false;
     File outFile = getFile();
     try {
-      BufferedWriter writer = new BufferedWriter(new FileWriter(outFile));
+      Writer writer = new BufferedWriter(new FileWriter(outFile));
 
       try {
         writer.write(getHeader());

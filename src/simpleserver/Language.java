@@ -22,83 +22,84 @@ package simpleserver;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Properties;
 
 public class Language {
-  private static final String[] defaults = { "BAD_BLOCK",
-      "%1$s has tried to place illegal block #%2$s", "SAVING_MAP",
-      "Saving Map...", "SAVE_COMPLETE", "Save Complete!", "BACKING_UP",
-      "Backing up...", "BACKUP_COMPLETE", "Backup Complete!",
-      "SERVER_RESTART_60", "Server is restarting in 60 seconds!",
-      "SERVER_RESTART_30", "Server is restarting in 30 seconds!",
-      "SERVER_RESTART_3", "Server is restarting in 3 seconds!" };
-  private Properties optionsLoader;
+  private static final String resourceLocation = "defaults";
+  private static final String filename = "language.properties";
+  private Properties translations;
 
   public Language() {
-    optionsLoader = new Properties();
-  }
-
-  public void save() {
-    save(false);
-  }
-
-  private void loadDefaults() {
-    if (optionsLoader != null) {
-      for (int i = 0; i < defaults.length; i += 2) {
-        optionsLoader.setProperty(defaults[i], defaults[i + 1]);
-      }
-    }
+    loadDefaults();
   }
 
   public String get(String key) {
-    return optionsLoader.getProperty(key);
-  }
-
-  public void save(boolean createNew) {
-    try {
-      if (createNew) {
-        loadDefaults();
-      }
-      File file = new File("language.properties");
-      if (!file.exists()) {
-        file.createNewFile();
-      }
-      FileOutputStream w = new FileOutputStream(file);
-
-      optionsLoader.store(w, "");
-
-      w.close();
-    }
-    catch (Exception e) {
-      e.printStackTrace();
-      System.out.println("Could not write the properties file!");
-    }
-
+    return translations.getProperty(key);
   }
 
   public void load() {
+    loadDefaults();
+    File file = new File(filename);
+
     try {
-      loadDefaults();
-      File file = new File("language.properties");
-      if (!file.exists()) {
-        file.createNewFile();
-        save(true);
-        return;
+      InputStream stream = new FileInputStream(file);
+      try {
+        translations.load(stream);
       }
-      FileInputStream r = new FileInputStream(file);
-      if (r == null || r.available() == 0) {
-        file.createNewFile();
-        save(true);
-        return;
+      finally {
+        stream.close();
       }
-      optionsLoader.load(r);
-      r.close();
     }
-    catch (Exception e) {
+    catch (FileNotFoundException e) {
+      save();
+    }
+    catch (IOException e) {
       e.printStackTrace();
-      System.out.println("Could not read the properties file!");
+      System.out.println("Could not read language properties!");
     }
   }
 
+  private void save() {
+    File file = new File(filename);
+
+    try {
+      OutputStream stream = new FileOutputStream(file);
+      try {
+        translations.store(stream, null);
+      }
+      finally {
+        stream.close();
+      }
+    }
+    catch (FileNotFoundException e) {
+      save();
+    }
+    catch (IOException e) {
+      e.printStackTrace();
+      System.out.println("Could not write language properties!");
+    }
+  }
+
+  private void loadDefaults() {
+    translations = new Properties();
+    InputStream stream = getClass().getResourceAsStream(resourceLocation + "/"
+                                                            + filename);
+    try {
+      try {
+        translations.load(stream);
+      }
+      finally {
+        stream.close();
+      }
+    }
+    catch (IOException e) {
+      e.printStackTrace();
+      System.out.println("Could not read default language properties!");
+    }
+  }
 }
