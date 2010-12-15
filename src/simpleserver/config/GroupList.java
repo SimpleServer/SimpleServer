@@ -20,19 +20,19 @@
  ******************************************************************************/
 package simpleserver.config;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import simpleserver.Group;
 
 public class GroupList extends PropertiesConfig {
-  private Map<Integer, Group> groups;
+  private ConcurrentMap<Integer, Group> groups;
 
   public GroupList() {
     super("group-list.txt");
 
-    groups = new HashMap<Integer, Group>();
+    groups = new ConcurrentHashMap<Integer, Group>();
   }
 
   public boolean groupExists(int group) {

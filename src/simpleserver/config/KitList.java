@@ -26,6 +26,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 
 import simpleserver.Group;
 import simpleserver.Player;
@@ -35,12 +40,12 @@ public class KitList extends PropertiesConfig {
   private Server server;
 
   private static final class Kit {
-    public Set<Integer> groups;
-    public List<Entry> items = new LinkedList<Entry>();
+    public final ImmutableSet<Integer> groups;
+    public final ImmutableList<Entry> items;
 
     private static final class Entry {
-      int item;
-      int amount;
+      private final int item;
+      private final int amount;
 
       public Entry(int item, int amount) {
         this.item = item;
@@ -48,22 +53,19 @@ public class KitList extends PropertiesConfig {
       }
     }
 
-    public Kit(Set<Integer> groups) {
+    public Kit(ImmutableSet<Integer> groups, ImmutableList<Entry> items) {
       this.groups = groups;
-    }
-
-    public void addItem(int item, int amount) {
-      items.add(new Entry(item, amount));
+      this.items = items;
     }
   }
 
-  private Map<String, Kit> kits;
+  private ConcurrentMap<String, Kit> kits;
 
   public KitList(Server parent) {
     super("kit-list.txt");
 
     server = parent;
-    kits = new HashMap<String, Kit>();
+    kits = new ConcurrentHashMap<String, Kit>();
   }
 
   public void giveKit(Player player, String kitName)
@@ -106,8 +108,7 @@ public class KitList extends PropertiesConfig {
         continue;
       }
 
-      Kit kit = new Kit(Group.parseGroups(options[0], ";"));
-
+      ImmutableList.Builder<Kit.Entry> items = ImmutableList.builder();
       for (int c = 1; c < options.length; ++c) {
         String[] item = options[c].split(":");
         if (item.length != 2) {
@@ -126,9 +127,10 @@ public class KitList extends PropertiesConfig {
           continue;
         }
 
-        kit.addItem(block, amount);
+        items.add(new Kit.Entry(block, amount));
       }
 
+      Kit kit = new Kit(Group.parseGroups(options[0], ";"), items.build());
       kits.put(entry.getKey().toString(), kit);
     }
   }

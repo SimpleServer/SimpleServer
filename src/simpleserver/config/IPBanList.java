@@ -20,7 +20,9 @@
  ******************************************************************************/
 package simpleserver.config;
 
-import java.util.Map.Entry;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 public class IPBanList extends PropertiesConfig {
@@ -35,7 +37,7 @@ public class IPBanList extends PropertiesConfig {
   }
 
   public boolean removeBan(String ipAddress) {
-    if (setProperty(ipAddress, null) != null) {
+    if (removeProperty(ipAddress) != null) {
       save();
 
       return true;
@@ -66,11 +68,16 @@ public class IPBanList extends PropertiesConfig {
     super.load();
 
     Pattern trailingDot = Pattern.compile("\\.$");
-    for (Entry<Object, Object> entry : entrySet()) {
-      String ipAddress = entry.getKey().toString();
-      setProperty(ipAddress, null);
+    List<String> networks = new LinkedList<String>();
+    Set<Object> addresses = keySet();
+    
+    for (Object address : addresses) {
+      addresses.remove(address);
 
-      String network = trailingDot.matcher(ipAddress).replaceFirst("");
+      networks.add(trailingDot.matcher((String) address).replaceFirst(""));
+    }
+    
+    for (String network : networks) {
       setProperty(network, "");
     }
   }

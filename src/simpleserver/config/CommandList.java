@@ -20,29 +20,29 @@
  ******************************************************************************/
 package simpleserver.config;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import simpleserver.Group;
 import simpleserver.Player;
 
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableSortedSet;
+
 public class CommandList extends PropertiesConfig {
-  private Map<String, Set<Integer>> commands;
+  private ConcurrentMap<String, ImmutableSet<Integer>> commands;
 
   public CommandList() {
     super("command-list.txt");
 
-    commands = new HashMap<String, Set<Integer>>();
+    commands = new ConcurrentHashMap<String, ImmutableSet<Integer>>();
 
     loadDefaults();
   }
 
   public boolean playerAllowed(String command, Player player) {
-    Set<Integer> groups = commands.get(command);
+    ImmutableSet<Integer> groups = commands.get(command);
     if (groups != null) {
       return Group.isMember(groups, player);
     }
@@ -51,7 +51,7 @@ public class CommandList extends PropertiesConfig {
   }
 
   public void setGroup(String command, int group) {
-    commands.put(command, new HashSet<Integer>(Arrays.asList(group)));
+    commands.put(command, ImmutableSortedSet.of(group));
     setProperty(command, Integer.toString(group));
   }
 

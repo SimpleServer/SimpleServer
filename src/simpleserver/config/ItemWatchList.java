@@ -20,31 +20,32 @@
  ******************************************************************************/
 package simpleserver.config;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import simpleserver.Group;
 import simpleserver.Player;
 
+import com.google.common.collect.ImmutableSet;
+
 public class ItemWatchList extends PropertiesConfig {
   private static final class Options {
-    public int threshold;
-    public Set<Integer> groups;
+    private final int threshold;
+    private final ImmutableSet<Integer> groups;
 
-    public Options(int threshold, Set<Integer> groups) {
+    public Options(int threshold, ImmutableSet<Integer> groups) {
       this.threshold = threshold;
       this.groups = groups;
     }
   }
 
-  private Map<Integer, Options> items;
+  private ConcurrentMap<Integer, Options> items;
 
   public ItemWatchList() {
     super("item-watch-list.txt");
 
-    items = new HashMap<Integer, Options>();
+    items = new ConcurrentHashMap<Integer, Options>();
   }
 
   public boolean contains(int blockID) {

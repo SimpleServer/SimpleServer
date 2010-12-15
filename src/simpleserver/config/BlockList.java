@@ -20,21 +20,22 @@
  ******************************************************************************/
 package simpleserver.config;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import simpleserver.Group;
 import simpleserver.Player;
 
+import com.google.common.collect.ImmutableSet;
+
 public class BlockList extends PropertiesConfig {
-  private Map<Integer, Set<Integer>> blocks;
+  private ConcurrentMap<Integer, ImmutableSet<Integer>> blocks;
 
   public BlockList() {
     super("block-list.txt");
 
-    blocks = new HashMap<Integer, Set<Integer>>();
+    blocks = new ConcurrentHashMap<Integer, ImmutableSet<Integer>>();
 
     loadDefaults();
   }
@@ -44,7 +45,7 @@ public class BlockList extends PropertiesConfig {
   }
 
   public boolean playerAllowed(Player player, int blockID) {
-    Set<Integer> groups = blocks.get(blockID);
+    ImmutableSet<Integer> groups = blocks.get(blockID);
     if (groups != null) {
       return Group.isMember(groups, player);
     }

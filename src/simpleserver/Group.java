@@ -20,8 +20,8 @@
  ******************************************************************************/
 package simpleserver;
 
-import java.util.HashSet;
-import java.util.Set;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableSortedSet;
 
 public class Group {
   private String groupName;
@@ -53,18 +53,19 @@ public class Group {
     return color;
   }
 
-  public static boolean isMember(Set<Integer> groups, Player player) {
+  public static boolean isMember(ImmutableSet<Integer> groups, Player player) {
     return groups.contains(player.getGroupId()) || groups.contains(-1)
         || (groups.contains(0) && (player.getGroupId() != -1));
   }
 
-  public static Set<Integer> parseGroups(String idString) {
+  public static ImmutableSet<Integer> parseGroups(String idString) {
     return parseGroups(idString, ",");
   }
 
-  public static Set<Integer> parseGroups(String idString, String delimiter) {
+  public static ImmutableSet<Integer> parseGroups(String idString,
+                                                  String delimiter) {
     String[] segments = idString.split(delimiter);
-    Set<Integer> groups = new HashSet<Integer>();
+    ImmutableSortedSet.Builder<Integer> groups = ImmutableSortedSet.naturalOrder();
     for (String segment : segments) {
       if (segment.matches("^\\s*$")) {
         continue;
@@ -104,6 +105,6 @@ public class Group {
       }
     }
 
-    return groups;
+    return groups.build();
   }
 }

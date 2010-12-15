@@ -20,21 +20,22 @@
  ******************************************************************************/
 package simpleserver.config;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.regex.Pattern;
 
 import simpleserver.Player;
 
 public class IPMemberList extends PropertiesConfig {
   private int defaultGroup;
-  private Map<String, Integer> members;
+  private ConcurrentMap<String, Integer> members;
 
   public IPMemberList(int defaultGroup) {
     super("ip-member-list.txt");
 
     this.defaultGroup = defaultGroup;
-    members = new HashMap<String, Integer>();
+    members = new ConcurrentHashMap<String, Integer>();
   }
 
   public int getGroup(Player player) {
@@ -69,6 +70,7 @@ public class IPMemberList extends PropertiesConfig {
     super.load();
 
     members.clear();
+    Pattern trailingDot = Pattern.compile("\\.$");
     for (Entry<Object, Object> entry : entrySet()) {
       Integer group;
       try {
@@ -80,7 +82,9 @@ public class IPMemberList extends PropertiesConfig {
         continue;
       }
 
-      members.put(entry.getKey().toString(), group);
+      String network = trailingDot.matcher(entry.getKey().toString())
+                                  .replaceFirst("");
+      members.put(network, group);
     }
   }
 }

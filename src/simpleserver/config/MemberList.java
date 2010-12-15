@@ -20,21 +20,21 @@
  ******************************************************************************/
 package simpleserver.config;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import simpleserver.Server;
 
 public class MemberList extends PropertiesConfig {
   private Server server;
-  private Map<String, Integer> members;
+  private ConcurrentMap<String, Integer> members;
 
   public MemberList(Server server) {
     super("member-list.txt");
 
     this.server = server;
-    members = new HashMap<String, Integer>();
+    members = new ConcurrentHashMap<String, Integer>();
   }
 
   public int checkName(String name) {

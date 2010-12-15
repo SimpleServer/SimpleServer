@@ -20,7 +20,9 @@
  ******************************************************************************/
 package simpleserver.config;
 
-import java.util.Map.Entry;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 
 public class WhiteList extends PropertiesConfig {
   public WhiteList() {
@@ -50,10 +52,16 @@ public class WhiteList extends PropertiesConfig {
   public void load() {
     super.load();
 
-    for (Entry<Object, Object> entry : entrySet()) {
-      String name = entry.getKey().toString();
-      setProperty(name, null);
-      setProperty(name.toLowerCase(), "");
+    List<String> names = new LinkedList<String>();
+    Set<Object> rawNames = keySet();
+
+    for (Object name : rawNames) {
+      rawNames.remove(name);
+      names.add(((String) name).toLowerCase());
+    }
+
+    for (String name : names) {
+      setProperty(name, "");
     }
   }
 }
