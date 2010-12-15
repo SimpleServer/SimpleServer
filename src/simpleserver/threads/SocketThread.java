@@ -28,23 +28,22 @@ import simpleserver.PlayerFactory;
 import simpleserver.Server;
 
 public class SocketThread implements Runnable {
-  private Server parent;
+  private Server server;
 
   public SocketThread(Server parent) {
-    this.parent = parent;
+    this.server = parent;
   }
 
   public void run() {
-    String ip = parent.options.get("ipAddress");
-    int port = parent.options.getInt("port");
+    String ip = server.options.get("ipAddress");
+    int port = server.options.getInt("port");
     try {
       if (ip.equals("0.0.0.0")) {
-        parent.socket = new ServerSocket(port);
+        server.socket = new ServerSocket(port);
       }
       else {
-        parent.socket = new ServerSocket(port, 8, InetAddress.getByName(ip));
+        server.socket = new ServerSocket(port, 0, InetAddress.getByName(ip));
       }
-
     }
     catch (IOException e) {
       System.out.println("Could not listen on port " + port
@@ -52,31 +51,26 @@ public class SocketThread implements Runnable {
       System.exit(-1);
     }
 
-    while (parent.isOpen()) {
+    while (server.isOpen()) {
       try {
-        if (parent.isOpen()) {
-          PlayerFactory.addPlayer(parent.socket.accept());
-          // Player p = new Player(parent.socket.accept(),parent);
-          // synchronized(parent.players) {
-          // parent.players.add(p);
-          // }
+        if (server.isOpen()) {
+          PlayerFactory.addPlayer(server.socket.accept());
         }
       }
       catch (IOException e) {
-        if (!parent.isRestarting()) {
+        if (!server.isRestarting()) {
           e.printStackTrace();
           System.out.println("Accept failed on port " + port + "!");
         }
       }
     }
     try {
-      parent.socket.close();
+      server.socket.close();
     }
     catch (IOException e) {
-      if (!parent.isRestarting()) {
+      if (!server.isRestarting()) {
         e.printStackTrace();
       }
     }
   }
-
 }
