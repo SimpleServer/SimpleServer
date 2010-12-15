@@ -40,7 +40,7 @@ public class WhiteList extends PropertiesConfig {
   }
 
   public boolean removeName(String name) {
-    if (setProperty(name.toLowerCase(), null) != null) {
+    if (removeProperty(name.toLowerCase()) != null) {
       save();
       return true;
     }

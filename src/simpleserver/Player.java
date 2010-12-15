@@ -192,7 +192,7 @@ public class Player {
   }
 
   private void updateGroup(String name) {
-    int nameGroup = server.members.checkName(name);
+    int nameGroup = server.members.getGroup(name);
     int ipGroup = server.ipMembers.getGroup(this);
     int defaultGroup = server.options.getInt("defaultGroup");
     if ((nameGroup == -1 || ipGroup == -1 && defaultGroup != -1)

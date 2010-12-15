@@ -40,7 +40,12 @@ public class MuteList extends PropertiesConfig {
   }
 
   public boolean removeName(String name) {
-    return setProperty(name.toLowerCase(), null) != null;
+    if (removeProperty(name.toLowerCase()) != null) {
+      save();
+      return true;
+    }
+
+    return false;
   }
 
   @Override

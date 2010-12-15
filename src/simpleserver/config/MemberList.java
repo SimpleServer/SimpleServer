@@ -37,7 +37,7 @@ public class MemberList extends PropertiesConfig {
     members = new ConcurrentHashMap<String, Integer>();
   }
 
-  public int checkName(String name) {
+  public int getGroup(String name) {
     Integer group = members.get(name.toLowerCase());
     if (group != null) {
       return group;
