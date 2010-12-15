@@ -85,7 +85,7 @@ public abstract class PropertiesConfig extends AbstractConfig {
   protected String setProperty(String key, String value) {
     return (String) properties.setProperty(key, value);
   }
-  
+
   protected String removeProperty(String key) {
     return (String) properties.remove(key);
   }

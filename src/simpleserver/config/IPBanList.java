@@ -70,13 +70,13 @@ public class IPBanList extends PropertiesConfig {
     Pattern trailingDot = Pattern.compile("\\.$");
     List<String> networks = new LinkedList<String>();
     Set<Object> addresses = keySet();
-    
+
     for (Object address : addresses) {
       addresses.remove(address);
 
       networks.add(trailingDot.matcher((String) address).replaceFirst(""));
     }
-    
+
     for (String network : networks) {
       setProperty(network, "");
     }
