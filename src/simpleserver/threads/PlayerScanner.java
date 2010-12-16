@@ -23,7 +23,7 @@ package simpleserver.threads;
 import java.util.Iterator;
 
 import simpleserver.Player;
-import simpleserver.PlayerFactory;
+import simpleserver.PlayerList;
 
 public class PlayerScanner implements Runnable {
   private boolean timedOut;
@@ -36,7 +36,7 @@ public class PlayerScanner implements Runnable {
       catch (InterruptedException e) {
       }
       // synchronized(parent.players) {
-      for (Iterator<Player> itr = PlayerFactory.iterator(); itr.hasNext();) {
+      for (Iterator<Player> itr = PlayerList.iterator(); itr.hasNext();) {
         Player i = itr.next();
         timedOut = i.testTimeout();
         if (timedOut) {

@@ -39,6 +39,10 @@ public class ProcessWrapper implements Wrapper {
     run = false;
     wrapperThread.interrupt();
   }
+  
+  public void join() throws InterruptedException {
+    wrapperThread.join();
+  }
 
   private final class WrapperThread extends Thread {
     public void run() {

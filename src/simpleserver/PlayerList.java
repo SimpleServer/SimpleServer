@@ -20,22 +20,44 @@
  ******************************************************************************/
 package simpleserver;
 
-public class ForceRestart implements Runnable {
-  private Server server;
+import java.util.Iterator;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
-  public ForceRestart(Server server) {
-    this.server = server;
+public class PlayerList {
+  private ConcurrentMap<String, Player> players;
+
+  public PlayerList() {
+    players = new ConcurrentHashMap<String, Player>();
   }
 
-  public void run() {
-    try {
-      server.saveLock.acquire();
+  public Iterator<Player> iterator() {
+    return players.values().iterator();
+  }
+
+  public Player findPlayer(String prefix) {
+    prefix = prefix.toLowerCase();
+    for (String name : players.keySet()) {
+      if (name.startsWith(prefix)) {
+        return players.get(name);
+      }
     }
-    catch (InterruptedException e) {
-      e.printStackTrace();
-      return;
+    return null;
+  }
+
+  public Player findPlayerExact(String name) {
+    return players.get(name.toLowerCase());
+  }
+
+  public void removePlayer(Player player) {
+    players.remove(player.getName().toLowerCase());
+
+    if (player.hasInternalConnection()) {
+      player.cleanup();
     }
-    server.restart();
-    server.saveLock.release();
+  }
+
+  public void addPlayer(Player player) {
+    players.put(player.getName().toLowerCase(), player);
   }
 }

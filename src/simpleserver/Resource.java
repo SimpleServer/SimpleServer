@@ -18,59 +18,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-package simpleserver.threads;
+package simpleserver;
 
-import java.io.IOException;
-import java.net.InetAddress;
-import java.net.ServerSocket;
-
-import simpleserver.PlayerFactory;
-import simpleserver.Server;
-
-public class SocketThread implements Runnable {
-  private Server server;
-
-  public SocketThread(Server parent) {
-    this.server = parent;
-  }
-
-  public void run() {
-    String ip = server.options.get("ipAddress");
-    int port = server.options.getInt("port");
-    try {
-      if (ip.equals("0.0.0.0")) {
-        server.socket = new ServerSocket(port);
-      }
-      else {
-        server.socket = new ServerSocket(port, 0, InetAddress.getByName(ip));
-      }
-    }
-    catch (IOException e) {
-      System.out.println("Could not listen on port " + port
-          + "!\nIs it already in use? Exiting application...");
-      System.exit(-1);
-    }
-
-    while (server.isOpen()) {
-      try {
-        if (server.isOpen()) {
-          PlayerFactory.addPlayer(server.socket.accept());
-        }
-      }
-      catch (IOException e) {
-        if (!server.isRestarting()) {
-          e.printStackTrace();
-          System.out.println("Accept failed on port " + port + "!");
-        }
-      }
-    }
-    try {
-      server.socket.close();
-    }
-    catch (IOException e) {
-      if (!server.isRestarting()) {
-        e.printStackTrace();
-      }
-    }
-  }
+public interface Resource {
+  public void load();
+  public void save();
 }

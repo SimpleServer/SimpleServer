@@ -43,6 +43,10 @@ public class OutputWrapper implements Wrapper {
     run = false;
     scanner.close();
   }
+  
+  public void join() throws InterruptedException {
+    wrapperThread.join();
+  }
 
   private final class WrapperThread extends Thread {
     public void run() {
@@ -59,12 +63,16 @@ public class OutputWrapper implements Wrapper {
           catch (IllegalStateException e) {
             break;
           }
-          
+
           messageHandler.handleOutput(line);
         }
       }
       finally {
-        scanner.close();
+        try {
+          scanner.close();
+        }
+        catch (IllegalStateException e) {
+        }
       }
     }
   }

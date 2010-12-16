@@ -137,5 +137,4 @@ public class RconServer implements Runnable {
       rconSocket.close();
     }
   }
-
 }

@@ -29,19 +29,20 @@ import simpleserver.options.MinecraftOptions;
 import simpleserver.options.Options;
 import simpleserver.threads.SystemInputQueue;
 
-public class MinecraftWrapper implements Wrapper {
+public class MinecraftWrapper {
   private static final String COMMAND_FORMAT = "java %s -Xmx%sM -Xms%sM -jar %s nogui";
   private static final String SERVER_JAR = "minecraft_server.jar";
   private static final int MINIMUM_MEMORY = 1024;
 
-  private MessageHandler messageHandler;
-  private Options options;
-  private MinecraftOptions minecraftOptions;
-  private SystemInputQueue systemInput;
+  private final MessageHandler messageHandler;
+  private final Options options;
+  private final MinecraftOptions minecraftOptions;
+  private final SystemInputQueue systemInput;
 
   private Process minecraft;
   private List<Wrapper> wrappers;
   private InputWrapper inputWrapper;
+  private boolean active = false;
 
   public MinecraftWrapper(Server server, Options options,
                           SystemInputQueue systemInput) {
@@ -65,6 +66,7 @@ public class MinecraftWrapper implements Wrapper {
       System.exit(-1);
     }
 
+    active = true;
     wrappers = new LinkedList<Wrapper>();
     wrappers.add(new OutputWrapper(minecraft.getInputStream(), messageHandler));
     wrappers.add(new OutputWrapper(minecraft.getErrorStream(), messageHandler));
@@ -76,12 +78,25 @@ public class MinecraftWrapper implements Wrapper {
   }
 
   public void stop() {
-    execute("stop", "");
+    if (!active) {
+      return;
+    }
 
+    execute("stop", "");
     for (Wrapper wrapper : wrappers) {
       wrapper.stop();
     }
-    wrappers.clear();
+
+    while (wrappers.size() > 0) {
+      Wrapper wrapper = wrappers.get(0);
+      try {
+        wrapper.join();
+        wrappers.remove(wrapper);
+      }
+      catch (InterruptedException e) {
+      }
+    }
+    active = false;
   }
 
   public void execute(String command, String arguments) {

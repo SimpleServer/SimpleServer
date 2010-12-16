@@ -39,6 +39,10 @@ public class SystemInputQueue {
     return queue.take();
   }
   
+  public void appendLine(String line) {
+    queue.add(line);
+  }
+  
   public void stop() {
     scanner.close();
   }
@@ -46,12 +50,19 @@ public class SystemInputQueue {
   private final class Reader extends Thread {
     public void run() {
       while (true) {
+        String line;
         try {
-          queue.put(scanner.nextLine());
-        }
-        catch (InterruptedException e) {
+          line = scanner.nextLine();
         }
         catch (IllegalStateException e) {
+          break;
+        }
+        
+        try {
+          queue.put(line);
+        }
+        catch (InterruptedException e) {
+          continue;
         }
       }
     }

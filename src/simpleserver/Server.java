@@ -21,6 +21,7 @@
 package simpleserver;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -52,7 +53,6 @@ import simpleserver.threads.PlayerScanner;
 import simpleserver.threads.ServerAutoRestart;
 import simpleserver.threads.ServerAutoSave;
 import simpleserver.threads.ServerBackup;
-import simpleserver.threads.SocketThread;
 import simpleserver.threads.SystemInputQueue;
 
 public class Server {
@@ -110,14 +110,15 @@ public class Server {
   private PlayerScanner playerScanner;
   public RequestTracker requestTracker;
 
-  private ForceRestart forceRestart;
-
   boolean requireBackup = false;
   private boolean isSaving = false;
-  public boolean isRestarting = false;
 
-  private LinkedList<AbstractConfig> resources = new LinkedList<AbstractConfig>();
+  private boolean run = true;
+  private boolean restart = false;
+
+  private List<Resource> resources;
   public LinkedList<Rcon> rcons = new LinkedList<Rcon>();
+  private PlayerList playerList;
 
   public static void main(String[] args) {
     System.out.println(license);
@@ -127,74 +128,10 @@ public class Server {
   }
 
   private Server() {
-    systemInput = new SystemInputQueue();
     start();
   }
 
-  private void initResources() {
-    resources.add(robots = new RobotList());
-    resources.add(ipMembers = new IPMemberList(options.getInt("defaultGroup")));
-    resources.add(chests = new ChestList(this));
-    resources.add(commands = new CommandList());
-    resources.add(blockFirewall = new BlockList());
-    resources.add(itemWatch = new ItemWatchList());
-    resources.add(groups = new GroupList());
-    resources.add(members = new MemberList(this));
-    resources.add(motd = new MOTD());
-    resources.add(rules = new Rules());
-    resources.add(kits = new KitList(this));
-    resources.add(ipBans = new IPBanList());
-    resources.add(whitelist = new WhiteList());
-    resources.add(mutelist = new MuteList());
-  }
-
   public void start() {
-    l = new Language();
-    l.load();
-    options = new Options();
-    options.load();
-
-    new Thread(new RconServer(this, false)).start();
-
-    PlayerFactory.initialize(this, options.getInt("maxPlayers"));
-
-    minecraft = new MinecraftWrapper(this, options, systemInput);
-    minecraft.start();
-    initResources();
-    loadAll();
-
-    adminLog = new AdminLog();
-    adminLogThread = new Thread(adminLog);
-    adminLogThread.start();
-
-    backup = new ServerBackup(this);
-    backupThread = new Thread(backup);
-    backupThread.start();
-
-    autosave = new ServerAutoSave(this);
-    autoSaveThread = new Thread(autosave);
-    autoSaveThread.start();
-
-    autoRestart = new ServerAutoRestart(this);
-    autoRestartThread = new Thread(autoRestart);
-    autoRestartThread.start();
-
-    playerScanner = new PlayerScanner();
-    playerScannerThread = new Thread(playerScanner);
-    playerScannerThread.start();
-
-    forceRestart = new ForceRestart(this);
-
-    requestTracker = new RequestTracker(this);
-    new Thread(requestTracker).start();
-
-    openSocket();
-
-    if (options.contains("c10tArgs")) {
-      c10t = new C10TThread(this, options.get("c10tArgs"));
-      c10tThread = new Thread(c10t);
-      c10tThread.start();
-    }
   }
 
   public void restart() {
@@ -213,29 +150,6 @@ public class Server {
 
     isRestarting = false;
     openSocket();
-  }
-
-  private void kickAllPlayers(String msg) {
-    if (msg == null) {
-      msg = "";
-    }
-    for (Iterator<Player> itr = PlayerFactory.iterator(); itr.hasNext();) {
-      Player p = itr.next();
-      p.kick(msg);
-    }
-  }
-
-  private void kickAllRcons(String msg) {
-    if (msg == null) {
-      msg = "";
-    }
-    synchronized (rcons) {
-      for (Iterator<Rcon> itr = rcons.iterator(); itr.hasNext();) {
-        Rcon p = itr.next();
-        p.kick(msg);
-        itr.remove();
-      }
-    }
   }
 
   public void stop() {
@@ -278,7 +192,7 @@ public class Server {
       else {
         System.out.println("[SimpleServer] Server is currently Backing Up/Saving...");
       }
-      new Thread(forceRestart).start();
+      // new Thread(forceRestart).start();
     }
     else {
       minecraft.stop();
@@ -314,7 +228,7 @@ public class Server {
 
   public int numPlayers() {
     int n = 0;
-    for (Iterator<Player> itr = PlayerFactory.iterator(); itr.hasNext();) {
+    for (Iterator<Player> itr = playerList.iterator(); itr.hasNext();) {
       Player i = itr.next();
       if (i.getName() != null) {
         n++;
@@ -340,7 +254,7 @@ public class Server {
       ipBans.addBan(ipAddress);
     }
     adminLog.addMessage("IP Address " + ipAddress + " was banned:\t " + reason);
-    for (Iterator<Player> itr = PlayerFactory.iterator(); itr.hasNext();) {
+    for (Iterator<Player> itr = playerList.iterator(); itr.hasNext();) {
       Player p = itr.next();
       if (p.getIPAddress().equals(ipAddress)) {
         p.kick(reason);
@@ -358,7 +272,7 @@ public class Server {
   public void banKick(String name, String msg) {
     if (name != null) {
       runCommand("ban", name);
-      Player p = PlayerFactory.findPlayer(name);
+      Player p = playerList.findPlayer(name);
       if (p != null) {
         adminLog.addMessage("Player " + p.getName() + " was banned:\t " + msg);
         p.kick(msg);
@@ -371,22 +285,19 @@ public class Server {
   }
 
   public void notifyClosed(Player player) {
-    PlayerFactory.removePlayer(player);
+    playerList.removePlayer(player);
   }
 
-  public void loadAll() {
-    for (AbstractConfig i : resources) {
-      i.load();
+  public void loadResources() {
+    for (Resource resource : resources) {
+      resource.load();
     }
-    l.load();
-    options.load();
   }
 
-  public void saveAll() {
-    for (AbstractConfig i : resources) {
-      i.save();
+  public void saveResources() {
+    for (Resource resource : resources) {
+      resource.save();
     }
-    options.save();
   }
 
   public void forceBackup() {
@@ -395,34 +306,31 @@ public class Server {
   }
 
   public String findName(String prefix) {
-    Player i = PlayerFactory.findPlayer(prefix);
+    Player i = playerList.findPlayer(prefix);
     if (i != null) {
       return i.getName();
     }
-    else {
-      return null;
-    }
+
+    return null;
   }
 
   public Player findPlayer(String prefix) {
-    return PlayerFactory.findPlayer(prefix);
+    return playerList.findPlayer(prefix);
   }
 
   public Player findPlayerExact(String exact) {
-    return PlayerFactory.findPlayerExact(exact);
+    return playerList.findPlayerExact(exact);
   }
 
   public void kick(String name, String reason) {
-    synchronized (PlayerFactory.playerLock) {
-      Player player = PlayerFactory.findPlayer(name);
-      if (player != null) {
-        player.kick(reason);
-      }
+    Player player = playerList.findPlayer(name);
+    if (player != null) {
+      player.kick(reason);
     }
   }
 
   public void updateGroup(String name) {
-    Player p = PlayerFactory.findPlayer(name);
+    Player p = playerList.findPlayer(name);
     if (p != null) {
       p.updateGroup();
     }
@@ -431,7 +339,7 @@ public class Server {
   public int localChat(Player player, String msg) {
     String chat = "\302\2477" + player.getName() + " says: " + msg;
     int localPlayers = 0;
-    for (Iterator<Player> itr = PlayerFactory.iterator(); itr.hasNext();) {
+    for (Iterator<Player> itr = playerList.iterator(); itr.hasNext();) {
       Player i = itr.next();
       if (i.getName() != null) {
         int radius = options.getInt("localChatRadius");
@@ -468,10 +376,6 @@ public class Server {
     }
   }
 
-  public boolean isRestarting() {
-    return isRestarting;
-  }
-
   public boolean requiresBackup() {
     return requireBackup;
   }
@@ -493,14 +397,161 @@ public class Server {
   }
 
   public simpleserver.CommandList getCommandList() {
-    if (commandList == null) {
-      commandList = new simpleserver.CommandList(options);
-    }
-
     return commandList;
   }
 
   public void runCommand(String command, String arguments) {
     minecraft.execute(command, arguments);
+  }
+
+  private void initialize() {
+    resources = new LinkedList<Resource>();
+    resources.add(l = new Language());
+    resources.add(options = new Options());
+    resources.add(robots = new RobotList());
+    resources.add(ipMembers = new IPMemberList(options));
+    resources.add(chests = new ChestList());
+    resources.add(commands = new CommandList());
+    resources.add(blockFirewall = new BlockList());
+    resources.add(itemWatch = new ItemWatchList());
+    resources.add(groups = new GroupList());
+    resources.add(members = new MemberList(this));
+    resources.add(motd = new MOTD());
+    resources.add(rules = new Rules());
+    resources.add(kits = new KitList(this));
+    resources.add(ipBans = new IPBanList());
+    resources.add(whitelist = new WhiteList());
+    resources.add(mutelist = new MuteList());
+
+    systemInput = new SystemInputQueue();
+    adminLog = new AdminLog();
+
+    commandList = new simpleserver.CommandList(options);
+  }
+
+  private void cleanup() {
+    systemInput.stop();
+    adminLog.stop();
+  }
+
+  private void startup() {
+    loadResources();
+
+    new Thread(new RconServer(this, false)).start();
+
+    playerList = new PlayerList();
+
+    minecraft = new MinecraftWrapper(this, options, systemInput);
+    minecraft.start();
+
+    backup = new ServerBackup(this);
+    backupThread = new Thread(backup);
+    backupThread.start();
+
+    autosave = new ServerAutoSave(this);
+    autoSaveThread = new Thread(autosave);
+    autoSaveThread.start();
+
+    autoRestart = new ServerAutoRestart(this);
+    autoRestartThread = new Thread(autoRestart);
+    autoRestartThread.start();
+
+    playerScanner = new PlayerScanner();
+    playerScannerThread = new Thread(playerScanner);
+    playerScannerThread.start();
+
+    requestTracker = new RequestTracker(this);
+    new Thread(requestTracker).start();
+
+    openSocket();
+
+    if (options.contains("c10tArgs")) {
+      c10t = new C10TThread(this, options.get("c10tArgs"));
+      c10tThread = new Thread(c10t);
+      c10tThread.start();
+    }
+  }
+
+  private void shutdown() {
+    saveResources();
+  }
+
+  private void kickAllPlayers(String msg) {
+    if (msg == null) {
+      msg = "";
+    }
+    for (Iterator<Player> itr = playerList.iterator(); itr.hasNext();) {
+      Player p = itr.next();
+      p.kick(msg);
+    }
+  }
+
+  private void kickAllRcons(String msg) {
+    if (msg == null) {
+      msg = "";
+    }
+    synchronized (rcons) {
+      for (Iterator<Rcon> itr = rcons.iterator(); itr.hasNext();) {
+        Rcon p = itr.next();
+        p.kick(msg);
+        itr.remove();
+      }
+    }
+  }
+
+  private final class Listener extends Thread {
+    public void run() {
+      initialize();
+
+      while (run) {
+        startup();
+
+        String ip = options.get("ipAddress");
+        int port = options.getInt("port");
+
+        InetAddress address;
+        if (ip.equals("0.0.0.0")) {
+          address = null;
+        }
+        else {
+          address = InetAddress.getByName(ip);
+        }
+
+        try {
+          socket = new ServerSocket(port, 0, address);
+        }
+        catch (IOException e) {
+          e.printStackTrace();
+          System.out.println("Could not listen on port " + port
+              + "!\nIs it already in use? Exiting application...");
+          System.exit(-1);
+        }
+
+        try {
+          while (true) {
+            try {
+              PlayerList.addPlayer(socket.accept());
+            }
+            catch (IOException e) {
+              if (run && !restart) {
+                e.printStackTrace();
+                System.out.println("Accept failed on port " + port + "!");
+              }
+            }
+          }
+        }
+        finally {
+          try {
+            socket.close();
+          }
+          catch (IOException e) {
+          }
+        }
+
+        shutdown();
+      }
+
+      cleanup();
+    }
   }
 }

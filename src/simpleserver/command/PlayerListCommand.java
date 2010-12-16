@@ -23,7 +23,7 @@ package simpleserver.command;
 import java.util.Iterator;
 
 import simpleserver.Player;
-import simpleserver.PlayerFactory;
+import simpleserver.PlayerList;
 
 public class PlayerListCommand extends AbstractCommand {
   public PlayerListCommand() {
@@ -40,7 +40,7 @@ public class PlayerListCommand extends AbstractCommand {
       throws InterruptedException {
     String list = "Connected Players (" + player.getServer().numPlayers()
         + "): ";
-    for (Iterator<Player> itr = PlayerFactory.iterator(); itr.hasNext();) {
+    for (Iterator<Player> itr = PlayerList.iterator(); itr.hasNext();) {
       Player i = itr.next();
       if (i != null) {
         if (i.getName() != null && i.getName() != "" && !i.isClosed()

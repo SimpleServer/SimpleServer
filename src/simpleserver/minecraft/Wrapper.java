@@ -22,4 +22,5 @@ package simpleserver.minecraft;
 
 public interface Wrapper {
   public void stop();
+  public void join() throws InterruptedException;
 }

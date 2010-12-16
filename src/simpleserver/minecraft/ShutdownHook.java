@@ -34,6 +34,9 @@ public class ShutdownHook implements Wrapper {
   public void stop() {
     Runtime.getRuntime().removeShutdownHook(hook);
   }
+  
+  public void join() {
+  }
 
   private final class Hook extends Thread {
     public void run() {

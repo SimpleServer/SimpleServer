@@ -21,90 +21,86 @@
 package simpleserver.log;
 
 import java.io.File;
-import java.io.FileWriter;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Calendar;
-import java.util.LinkedList;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
-public class AdminLog implements Runnable {
-  private File logFile;
-  private FileWriter writer;
-  private LinkedList<String> lines = new LinkedList<String>();
-  private Calendar date = Calendar.getInstance();
-  private boolean changed = false;
+public class AdminLog {
+  private BlockingQueue<String> queue;
+  private FileOutputStream stream;
+  private Writer writer;
+
+  private boolean run = true;
 
   public AdminLog() {
-    date = Calendar.getInstance();
-    logFile = new File("logs" + File.separator + "adminlog_"
-        + date.get(Calendar.YEAR) + "-" + (date.get(Calendar.MONTH) + 1) + "-"
-        + date.get(Calendar.DATE) + "-" + date.get(Calendar.HOUR_OF_DAY) + "_"
-        + date.get(Calendar.MINUTE) + ".txt");
-    File dir = new File("logs");
-    if (!dir.exists()) {
-      dir.mkdir();
+    queue = new LinkedBlockingQueue<String>();
+    try {
+      stream = new FileOutputStream(getLogFile(), true);
     }
+    catch (FileNotFoundException e) {
+      e.printStackTrace();
+      System.out.println("Unable to open admin log for writing!");
+      return;
+    }
+
+    writer = new Writer();
+    writer.start();
   }
 
-  public void addMessage(String msg) {
-    synchronized (lines) {
-      lines.add("[SimpleServer]\t" + date.get(Calendar.HOUR_OF_DAY) + ":"
-          + date.get(Calendar.MINUTE) + "\t" + msg + "\n");
-    }
+  public void addMessage(String message) {
+    Calendar date = Calendar.getInstance();
+    queue.add("[SimpleServer]\t" + date.get(Calendar.HOUR_OF_DAY) + ":"
+        + date.get(Calendar.MINUTE) + "\t" + message + "\n");
   }
 
-  public void run() {
-    boolean write = false;
-    while (!Thread.interrupted()) {
-      synchronized (lines) {
-        while (lines.size() > 0) {
-          if (!changed) {
-            try {
-              if (!logFile.exists()) {
-                logFile.createNewFile();
-              }
-              writer = new FileWriter(logFile, true);
-            }
-            catch (IOException e) {
-              // TODO Auto-generated catch block
-              e.printStackTrace();
-            }
-            changed = true;
+  public void stop() {
+    run = false;
+    writer.interrupt();
+  }
+
+  private File getLogFile() {
+    File logDir = new File("logs");
+    logDir.mkdir();
+
+    Calendar date = Calendar.getInstance();
+    return new File(logDir, "adminlog_" + date.get(Calendar.YEAR) + "-"
+        + (date.get(Calendar.MONTH) + 1) + "-" + date.get(Calendar.DATE) + "-"
+        + date.get(Calendar.HOUR_OF_DAY) + "_" + date.get(Calendar.MINUTE)
+        + ".txt");
+  }
+
+  private final class Writer extends Thread {
+    public void run() {
+      try {
+        while (run) {
+          String line;
+          try {
+            line = queue.take();
+          }
+          catch (InterruptedException e1) {
+            continue;
           }
 
           try {
-            writer.write(lines.remove());
-            write = true;
+            stream.write(line.getBytes());
+            stream.flush();
           }
           catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
+            System.out.println("Writing to admin log failed!");
+            break;
           }
         }
-        if (write) {
-          try {
-            writer.flush();
-          }
-          catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-          }
-          write = false;
+      }
+      finally {
+        try {
+          stream.close();
         }
-      }
-      try {
-        Thread.sleep(100);
-      }
-      catch (InterruptedException e) {
-        break;
-      }
-    }
-    if (writer != null) {
-      try {
-        writer.close();
-      }
-      catch (IOException e) {
-        // TODO Auto-generated catch block
-        e.printStackTrace();
+        catch (IOException e) {
+        }
       }
     }
   }

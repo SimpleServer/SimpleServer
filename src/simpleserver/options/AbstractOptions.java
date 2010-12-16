@@ -29,7 +29,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Properties;
 
-public abstract class AbstractOptions {
+import simpleserver.Resource;
+
+public abstract class AbstractOptions implements Resource {
   private static final String resourceLocation = "defaults";
 
   protected String filename;

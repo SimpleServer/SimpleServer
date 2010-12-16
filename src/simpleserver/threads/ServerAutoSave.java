@@ -36,7 +36,6 @@ public class ServerAutoSave implements Runnable {
           Thread.sleep(parent.options.getInt("autoSaveMins") * 1000 * 60);
           parent.saveLock.acquire();
           if (parent.requiresBackup()) {
-            // parent.runCommand("say Saving Map...");
             parent.runCommand("say", parent.l.get("SAVING_MAP"));
             parent.isSaving(true);
             parent.runCommand("save-all", null);

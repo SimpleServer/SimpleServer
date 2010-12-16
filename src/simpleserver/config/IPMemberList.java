@@ -26,15 +26,16 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.regex.Pattern;
 
 import simpleserver.Player;
+import simpleserver.options.Options;
 
 public class IPMemberList extends PropertiesConfig {
-  private int defaultGroup;
+  private Options options;
   private ConcurrentMap<String, Integer> members;
 
-  public IPMemberList(int defaultGroup) {
+  public IPMemberList(Options options) {
     super("ip-member-list.txt");
 
-    this.defaultGroup = defaultGroup;
+    this.options = options;
     members = new ConcurrentHashMap<String, Integer>();
   }
 
@@ -54,7 +55,7 @@ public class IPMemberList extends PropertiesConfig {
       network += ".";
     }
 
-    return defaultGroup;
+    return options.getInt("defaultGroup");
   }
 
   public void setGroup(Player player, int group) {

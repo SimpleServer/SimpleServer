@@ -25,7 +25,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
-public abstract class AbstractConfig {
+import simpleserver.Resource;
+
+public abstract class AbstractConfig implements Resource {
   private static final String resourceLocation = "defaults";
   private static final String folder = "simpleserver";
 
