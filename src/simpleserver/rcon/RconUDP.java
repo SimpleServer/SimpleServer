@@ -214,14 +214,8 @@ public class RconUDP implements Rcon {
     if (tokens.length > 0) {
       if (tokens[0].equalsIgnoreCase("rcon")) {
         if (tokens.length > 1) {
-          int idx = command.indexOf(tokens[1]);
-          try {
-            parent.runCommand(command.substring(idx));
-          }
-          catch (InterruptedException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-          }
+          int idx = command.indexOf(tokens[1]) + tokens[1].length() + 1;
+          parent.runCommand(tokens[1], command.substring(idx));
           return command;
         }
         else {

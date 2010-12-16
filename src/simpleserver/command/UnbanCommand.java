@@ -30,7 +30,7 @@ public class UnbanCommand extends PlayerCommand {
   @Override
   protected void executeWithTarget(Player player, String message, String name)
       throws InterruptedException {
-    player.getServer().runCommand("pardon " + name);
+    player.getServer().runCommand("pardon", name);
 
     player.getServer().adminLog.addMessage("User " + player.getName()
         + " unbanned player:\t " + name);

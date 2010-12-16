@@ -18,25 +18,54 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-package simpleserver.command;
+package simpleserver.minecraft;
 
-import simpleserver.Player;
+import java.io.InputStream;
+import java.util.NoSuchElementException;
+import java.util.Scanner;
 
-public class RconCommand extends AbstractCommand {
-  public RconCommand() {
-    super("rcon");
+public class OutputWrapper implements Wrapper {
+  private Scanner scanner;
+  private MessageHandler messageHandler;
+
+  private Thread wrapperThread;
+  private boolean run = true;
+
+  public OutputWrapper(InputStream in, MessageHandler messageHandler) {
+    scanner = new Scanner(in);
+    this.messageHandler = messageHandler;
+
+    wrapperThread = new WrapperThread();
+    wrapperThread.start();
   }
 
-  @Override
-  public void execute(Player player, String message)
-      throws InterruptedException {
-    String[] arguments = extractArguments(message);
-    String commandArguments = extractArgument(message, 1);
-    if (arguments.length > 0) {
-      player.getServer().runCommand(arguments[0], commandArguments);
-    }
-    else {
-      player.addMessage("\302\247cNo rcon command specified.");
+  public void stop() {
+    run = false;
+    scanner.close();
+  }
+
+  private final class WrapperThread extends Thread {
+    public void run() {
+      try {
+        while (run) {
+          String line;
+          try {
+            line = scanner.nextLine();
+          }
+          catch (NoSuchElementException e) {
+            messageHandler.handleError(e);
+            break;
+          }
+          catch (IllegalStateException e) {
+            break;
+          }
+          
+          messageHandler.handleOutput(line);
+        }
+      }
+      finally {
+        scanner.close();
+      }
     }
   }
 }

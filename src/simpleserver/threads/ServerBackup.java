@@ -69,11 +69,7 @@ public class ServerBackup implements Runnable {
           break;
         }
         parent.isSaving(true);
-        try {
-          parent.runCommand("save-all");
-        }
-        catch (InterruptedException e1) {
-        }
+        parent.runCommand("save-all", null);
         while (parent.isSaving()) {
           try {
             Thread.sleep(500);
@@ -106,17 +102,17 @@ public class ServerBackup implements Runnable {
 
   }
 
-  public void backup() throws IOException, InterruptedException {
+  public void backup() throws IOException {
     if (parent.requiresBackup() || parent.numPlayers() > 0) {
-      parent.sendToAll(parent.l.get("BACKING_UP"));
-      parent.runCommand("save-off");
+      parent.runCommand("say", parent.l.get("BACKING_UP"));
+      parent.runCommand("save-off", null);
       System.out.println("[SimpleServer] Backing up server...");
       File backup = backupServer();
       zipDirectory(backup);
-      parent.runCommand("save-on");
+      parent.runCommand("save-on", null);
       deleteDirectory(backup);
       checkOldBackups(new File("backups"));
-      parent.sendToAll(parent.l.get("BACKUP_COMPLETE"));
+      parent.runCommand("say", parent.l.get("BACKUP_COMPLETE"));
     }
   }
 

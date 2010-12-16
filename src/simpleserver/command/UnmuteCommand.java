@@ -36,6 +36,6 @@ public class UnmuteCommand extends PlayerCommand {
 
     server.adminLog.addMessage("Admin " + player.getName()
         + " unmuted player:\t " + name);
-    server.runCommand("say Player " + name + " has been unmuted!");
+    server.runCommand("say", "Player " + name + " has been unmuted!");
   }
 }

@@ -36,6 +36,6 @@ public class MuteCommand extends PlayerCommand {
 
     server.adminLog.addMessage("Admin " + player.getName()
         + " muted player:\t " + name);
-    server.runCommand("say Player " + name + " has been muted!");
+    server.runCommand("say", "Player " + name + " has been muted!");
   }
 }

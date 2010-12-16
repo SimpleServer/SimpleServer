@@ -18,58 +18,55 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-package simpleserver;
+package simpleserver.minecraft;
 
-import java.io.IOException;
-import java.io.OutputStream;
+public class ProcessWrapper implements Wrapper {
+  private Process process;
+  private MessageHandler messageHandler;
 
-public class ShutdownHook implements Runnable {
-  private Process mc;
-  private OutputStream stream;
-  private Server parent;
+  private Thread wrapperThread;
+  private boolean run = true;
 
-  public ShutdownHook(Process minecraftServer, Server parent) {
-    mc = minecraftServer;
-    this.parent = parent;
-    stream = mc.getOutputStream();
+  public ProcessWrapper(Process process, MessageHandler messageHandler) {
+    this.process = process;
+    this.messageHandler = messageHandler;
+
+    wrapperThread = new WrapperThread();
+    wrapperThread.start();
   }
 
-  @Override
-  public void finalize() {
-    mc = null;
-    try {
-      stream.close();
-    }
-    catch (IOException e) {
-      // TODO Auto-generated catch block
-      // e.printStackTrace();
-    }
-    stream = null;
-    parent = null;
+  public void stop() {
+    run = false;
+    wrapperThread.interrupt();
   }
 
-  public void run() {
-    System.out.println("Shutdown Hook Enabled");
-    // parent.options.save();
-    // parent.saveAll();
-    stream = parent.p.getOutputStream();
-    String cmd = "stop" + "\n";
-    try {
-      stream.write(cmd.getBytes());
-      stream.flush();
-      stream.close();
-    }
-    catch (IOException e) {
-      // TODO Auto-generated catch block
-      // e.printStackTrace();
-    }
-    try {
-      finalize();
-    }
-    catch (Throwable e) {
-      // TODO Auto-generated catch block
-      // e.printStackTrace();
+  private final class WrapperThread extends Thread {
+    public void run() {
+      try {
+        while (run) {
+          try {
+            process.waitFor();
+            return;
+          }
+          catch (InterruptedException e) {
+          }
+        }
+
+        long time = System.currentTimeMillis();
+        while (System.currentTimeMillis() - time < 15000) {
+          try {
+            process.exitValue();
+            return;
+          }
+          catch (IllegalThreadStateException e) {
+          }
+        }
+
+        process.destroy();
+      }
+      finally {
+        messageHandler.handleQuit();
+      }
     }
   }
-
 }

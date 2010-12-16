@@ -18,25 +18,42 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-package simpleserver.command;
+package simpleserver.threads;
 
-import simpleserver.Player;
+import java.util.Scanner;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
-public class RconCommand extends AbstractCommand {
-  public RconCommand() {
-    super("rcon");
+public class SystemInputQueue {
+  private final BlockingQueue<String> queue;
+  private final Scanner scanner;
+  
+  public SystemInputQueue() {
+    queue = new LinkedBlockingQueue<String>();
+    scanner = new Scanner(System.in);
+    
+    new Reader().start();
   }
-
-  @Override
-  public void execute(Player player, String message)
-      throws InterruptedException {
-    String[] arguments = extractArguments(message);
-    String commandArguments = extractArgument(message, 1);
-    if (arguments.length > 0) {
-      player.getServer().runCommand(arguments[0], commandArguments);
-    }
-    else {
-      player.addMessage("\302\247cNo rcon command specified.");
+  
+  public String nextLine() throws InterruptedException {
+    return queue.take();
+  }
+  
+  public void stop() {
+    scanner.close();
+  }
+  
+  private final class Reader extends Thread {
+    public void run() {
+      while (true) {
+        try {
+          queue.put(scanner.nextLine());
+        }
+        catch (InterruptedException e) {
+        }
+        catch (IllegalStateException e) {
+        }
+      }
     }
   }
 }

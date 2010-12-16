@@ -70,14 +70,14 @@ public class C10TThread implements Runnable {
         Thread.sleep(parent.options.getInt("c10tMins") * 1000 * 60);
         parent.saveLock.acquire();
         if (parent.requiresBackup()) {
-          parent.runCommand("save-off");
-          parent.runCommand("say Mapping Server!");
+          parent.runCommand("save-off", null);
+          parent.runCommand("say", "Mapping Server!");
           try {
             c10t = Runtime.getRuntime().exec(command);
           }
           catch (IOException e) {
-            parent.runCommand("say Mapping Complete!");
-            parent.runCommand("save-on");
+            parent.runCommand("say", "Mapping Complete!");
+            parent.runCommand("save-on", null);
             e.printStackTrace();
             new Thread(new ErrorLog(e, "c10t Failure")).start();
             System.out.println("[SimpleServer] c10t Failed! Bad Command!");
@@ -92,8 +92,8 @@ public class C10TThread implements Runnable {
             System.out.println("[SimpleServer] c10t Failed! Exited with code "
                 + exitCode + "!");
           }
-          parent.runCommand("say Mapping Complete!");
-          parent.runCommand("save-on");
+          parent.runCommand("say", "Mapping Complete!");
+          parent.runCommand("save-on", null);
         }
         parent.saveLock.release();
       }

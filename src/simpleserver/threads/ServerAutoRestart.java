@@ -36,14 +36,14 @@ public class ServerAutoRestart implements Runnable {
           Thread.sleep(parent.options.getInt("autoRestartMins") * 1000 * 60);
           parent.saveLock.acquire();
           // parent.runCommand("say Server is restarting in 60 seconds!");
-          parent.sendToAll(parent.l.get("SERVER_RESTART_60"));
+          parent.runCommand("say", parent.l.get("SERVER_RESTART_60"));
           Thread.sleep(30 * 1000);
           // parent.runCommand("say Server is restarting in 30 seconds!");
-          parent.sendToAll(parent.l.get("SERVER_RESTART_30"));
+          parent.runCommand("say", parent.l.get("SERVER_RESTART_30"));
           Thread.sleep(27 * 1000);
 
           // parent.runCommand("say Server is restarting in 3 seconds!");
-          parent.sendToAll(parent.l.get("SERVER_RESTART_3"));
+          parent.runCommand("say", parent.l.get("SERVER_RESTART_3"));
           Thread.sleep(3 * 1000);
 
           if (!parent.isRestarting()) {

@@ -34,13 +34,13 @@ public class BanCommand extends PlayerCommand {
     String reason = extractArgument(message, 1);
     Server server = player.getServer();
 
-    server.runCommand("ban " + target);
+    server.runCommand("ban", target);
     server.kick(target, reason);
 
     server.adminLog.addMessage("User " + player.getName()
         + " banned player:\t " + target + "\t(" + reason + ")");
-    server.runCommand("say Player " + target + " has been banned! (" + reason
-        + ")");
+    server.runCommand("say", "Player " + target + " has been banned! ("
+        + reason + ")");
   }
 
   @Override

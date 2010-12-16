@@ -234,8 +234,8 @@ public class RconHandler implements Runnable {
     if (tokens.length > 0) {
       if (tokens[0].equalsIgnoreCase("rcon")) {
         if (tokens.length > 1) {
-          int idx = command.indexOf(tokens[1]);
-          server.runCommand(command.substring(idx));
+          int idx = command.indexOf(tokens[1]) + tokens[1].length() + 1;
+          server.runCommand(tokens[1], command.substring(idx));
           return command;
         }
         else {

@@ -18,25 +18,27 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-package simpleserver.command;
+package simpleserver.minecraft;
 
-import simpleserver.Player;
+public class ShutdownHook implements Wrapper {
+  private MinecraftWrapper minecraft;
+  private Hook hook;
 
-public class RconCommand extends AbstractCommand {
-  public RconCommand() {
-    super("rcon");
+  public ShutdownHook(MinecraftWrapper minecraft) {
+    this.minecraft = minecraft;
+
+    this.hook = new Hook();
+    Runtime.getRuntime().addShutdownHook(hook);
+  }
+  
+  public void stop() {
+    Runtime.getRuntime().removeShutdownHook(hook);
   }
 
-  @Override
-  public void execute(Player player, String message)
-      throws InterruptedException {
-    String[] arguments = extractArguments(message);
-    String commandArguments = extractArgument(message, 1);
-    if (arguments.length > 0) {
-      player.getServer().runCommand(arguments[0], commandArguments);
-    }
-    else {
-      player.addMessage("\302\247cNo rcon command specified.");
+  private final class Hook extends Thread {
+    public void run() {
+      System.out.println("Shutdown Hook Activated");
+      minecraft.execute("stop", null);
     }
   }
 }

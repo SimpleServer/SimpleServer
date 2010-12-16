@@ -450,12 +450,10 @@ public class StreamTunnel implements Runnable {
               // Remove the packet! : )
               int coord_x = readInt();
               if (!allowed && coord_x != -1) {
-                // printStream(buf);
-                server.sendToAll(String.format(server.l.get("BAD_BLOCK"),
-                                               player.getName(),
-                                               Short.toString(block)));
-                // server.runCommand("say [ALERT]" + parent.getName() +
-                // " tried to create illegal block #" + block + "!");
+                server.runCommand("say",
+                                  String.format(server.l.get("BAD_BLOCK"),
+                                                player.getName(),
+                                                Short.toString(block)));
               }
               skipBytes(6);
               removeBytes(13);

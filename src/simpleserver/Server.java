@@ -43,19 +43,17 @@ import simpleserver.config.RobotList;
 import simpleserver.config.Rules;
 import simpleserver.config.WhiteList;
 import simpleserver.log.AdminLog;
+import simpleserver.minecraft.MinecraftWrapper;
 import simpleserver.options.Language;
-import simpleserver.options.MinecraftOptions;
 import simpleserver.options.Options;
 import simpleserver.rcon.RconServer;
 import simpleserver.threads.C10TThread;
-import simpleserver.threads.ErrorStreamRouter;
-import simpleserver.threads.InputStreamRouter;
-import simpleserver.threads.MinecraftMonitor;
 import simpleserver.threads.PlayerScanner;
 import simpleserver.threads.ServerAutoRestart;
 import simpleserver.threads.ServerAutoSave;
 import simpleserver.threads.ServerBackup;
 import simpleserver.threads.SocketThread;
+import simpleserver.threads.SystemInputQueue;
 
 public class Server {
   private static String version = "RC 6.6.6_stable";
@@ -93,7 +91,8 @@ public class Server {
 
   public Language l;
 
-  private InputStreamRouter input;
+  private MinecraftWrapper minecraft;
+  private SystemInputQueue systemInput;
 
   private Thread backupThread;
   private Thread autoSaveThread;
@@ -109,27 +108,16 @@ public class Server {
   private ServerAutoSave autosave;
   private ServerAutoRestart autoRestart;
   private PlayerScanner playerScanner;
-  private MinecraftMonitor minecraftMonitor;
   public RequestTracker requestTracker;
 
-  private ForceShutdown forceShutdown;
   private ForceRestart forceRestart;
 
   boolean requireBackup = false;
   private boolean isSaving = false;
   public boolean isRestarting = false;
-  private boolean waitingForStart = false;
 
   private LinkedList<AbstractConfig> resources = new LinkedList<AbstractConfig>();
   public LinkedList<Rcon> rcons = new LinkedList<Rcon>();
-
-  // Minecraft Process
-  public Process p;
-
-  // Pipe Threads
-  private Thread t;
-  private Thread t2;
-  private Thread t3;
 
   public static void main(String[] args) {
     System.out.println(license);
@@ -139,49 +127,8 @@ public class Server {
   }
 
   private Server() {
-    l = new Language();
-    l.load();
-    options = new Options();
-    options.load();
-
-    new Thread(new RconServer(this, false)).start();
-
-    PlayerFactory.initialize(this, options.getInt("maxPlayers"));
-
-    startMinecraft();
-    setShutdownHook();
-    initResources();
-    loadAll();
-
-    backup = new ServerBackup(this);
-    backupThread = new Thread(backup);
-    backupThread.start();
-
-    autosave = new ServerAutoSave(this);
-    autoSaveThread = new Thread(autosave);
-    autoSaveThread.start();
-
-    autoRestart = new ServerAutoRestart(this);
-    autoRestartThread = new Thread(autoRestart);
-    autoRestartThread.start();
-
-    playerScanner = new PlayerScanner();
-    playerScannerThread = new Thread(playerScanner);
-    playerScannerThread.start();
-
-    forceShutdown = new ForceShutdown(this);
-    forceRestart = new ForceRestart(this);
-
-    requestTracker = new RequestTracker(this);
-    new Thread(requestTracker).start();
-
-    openSocket();
-
-    if (options.contains("c10tArgs")) {
-      c10t = new C10TThread(this, options.get("c10tArgs"));
-      c10tThread = new Thread(c10t);
-      c10tThread.start();
-    }
+    systemInput = new SystemInputQueue();
+    start();
   }
 
   private void initResources() {
@@ -199,92 +146,55 @@ public class Server {
     resources.add(ipBans = new IPBanList());
     resources.add(whitelist = new WhiteList());
     resources.add(mutelist = new MuteList());
-
   }
 
-  private void startMinecraft() {
-    new MinecraftOptions(options).save();
-    try {
-      int minMemory = 1024;
-      if (options.getInt("memory") < minMemory) {
-        minMemory = options.getInt("memory");
-      }
-      String jar = "minecraft_server.jar";
-      if (options.contains("alternateJarFile")) {
-        jar = options.get("alternateJarFile");
-      }
-      // String[] cmd = {"java", "-Xmx" + options.memory + "M","-Xms" +
-      // minMemory + "M", "-jar", alternateJar, "nogui"};
-      String cmd = "java " + options.get("javaArguments") + " -Xmx"
-          + options.get("memory") + "M -Xms" + minMemory + "M -jar " + jar
-          + " nogui";
-      // String[] cmd = {"cmd", "/C", "java -Xmx" + options.memory + "M -Xms" +
-      // minMemory + "M -jar " + alternateJar +
-      // " nogui 2>test1.txt 1>test.txt"};
+  public void start() {
+    l = new Language();
+    l.load();
+    options = new Options();
+    options.load();
 
-      p = Runtime.getRuntime().exec(cmd);
-    }
-    catch (IOException e) {
-      e.printStackTrace();
-      System.out.println("[SimpleServer] FATAL ERROR: Could not start minecraft_server.jar!");
-      System.exit(-1);
-    }
-    t = new Thread(new ErrorStreamRouter(p.getErrorStream(), this));
-    t2 = new Thread(new ErrorStreamRouter(p.getInputStream(), this));
-    t.start();
-    t2.start();
+    new Thread(new RconServer(this, false)).start();
 
-    if (t3 == null) {
-      input = new InputStreamRouter(System.in, p.getOutputStream(), this);
-      t3 = new Thread(input);
-      t3.start();
-    }
-    else {
-      input.setOut(p.getOutputStream());
-    }
-    minecraftMonitor = new MinecraftMonitor(this);
-    minecraftMonitor.start();
+    PlayerFactory.initialize(this, options.getInt("maxPlayers"));
 
-    waitingForStart = true;
-    while (waitingForStart) {
-      try {
-        Thread.sleep(20);
-      }
-      catch (InterruptedException e) {
-      }
-    }
+    minecraft = new MinecraftWrapper(this, options, systemInput);
+    minecraft.start();
+    initResources();
+    loadAll();
 
     adminLog = new AdminLog();
     adminLogThread = new Thread(adminLog);
     adminLogThread.start();
-  }
 
-  private void stopMinecraft() {
-    try {
-      runCommand("stop");
-    }
-    catch (InterruptedException e1) {
-    }
-    long timer = System.currentTimeMillis();
-    boolean stopped = false;
-    while (System.currentTimeMillis() - timer < 15 * 1000) {
-      try {
-        p.exitValue();
-        stopped = true;
-        break;
-      }
-      catch (Exception e) {
-      }
-    }
-    if (!stopped) {
-      p.destroy();
-    }
-    t.interrupt();
-    t2.interrupt();
+    backup = new ServerBackup(this);
+    backupThread = new Thread(backup);
+    backupThread.start();
 
-    adminLogThread.interrupt();
-    adminLog = null;
+    autosave = new ServerAutoSave(this);
+    autoSaveThread = new Thread(autosave);
+    autoSaveThread.start();
 
+    autoRestart = new ServerAutoRestart(this);
+    autoRestartThread = new Thread(autoRestart);
+    autoRestartThread.start();
+
+    playerScanner = new PlayerScanner();
+    playerScannerThread = new Thread(playerScanner);
+    playerScannerThread.start();
+
+    forceRestart = new ForceRestart(this);
+
+    requestTracker = new RequestTracker(this);
+    new Thread(requestTracker).start();
+
+    openSocket();
+
+    if (options.contains("c10tArgs")) {
+      c10t = new C10TThread(this, options.get("c10tArgs"));
+      c10tThread = new Thread(c10t);
+      c10tThread.start();
+    }
   }
 
   public void restart() {
@@ -293,15 +203,13 @@ public class Server {
     try {
       socket.close();
     }
-    catch (Exception e) {
+    catch (IOException e) {
     }
 
     kickAllPlayers("Server Restarting!");
 
-    minecraftMonitor.interrupt();
-    stopMinecraft();
-    startMinecraft();
-    setShutdownHook();
+    minecraft.stop();
+    minecraft.start();
 
     isRestarting = false;
     openSocket();
@@ -314,7 +222,6 @@ public class Server {
     for (Iterator<Player> itr = PlayerFactory.iterator(); itr.hasNext();) {
       Player p = itr.next();
       p.kick(msg);
-      // itr.remove();
     }
   }
 
@@ -342,11 +249,13 @@ public class Server {
     catch (Exception e) {
     }
 
+    adminLogThread.interrupt();
+    adminLog = null;
+
     kickAllPlayers("Server shutting down!");
     kickAllRcons("Server shutting down!");
     System.out.println("Stopping Server...");
-    minecraftMonitor.interrupt();
-    stopMinecraft();
+    minecraft.stop();
     Runtime.getRuntime().removeShutdownHook(shutDownHook);
     System.out.println("Server stopped successfully!");
     System.exit(0);
@@ -361,13 +270,7 @@ public class Server {
     socketThread.start();
   }
 
-  public void stopServer() {
-
-    new Thread(forceShutdown).start();
-  }
-
-  public void restartServer() {
-
+  public void forceRestart() {
     if (!isRestarting) {
       if (saveLock.tryAcquire()) {
         saveLock.release();
@@ -378,21 +281,8 @@ public class Server {
       new Thread(forceRestart).start();
     }
     else {
-      p.destroy();
+      minecraft.stop();
     }
-  }
-
-  public void forceRestart() {
-    restartServer();
-  }
-
-  private void setShutdownHook() {
-    if (shutDownHook != null) {
-      Runtime.getRuntime().removeShutdownHook(shutDownHook);
-    }
-    Runtime.getRuntime()
-           .addShutdownHook(shutDownHook = new Thread(new ShutdownHook(p, this)));
-
   }
 
   public void addRobot(Player p) {
@@ -426,10 +316,8 @@ public class Server {
     int n = 0;
     for (Iterator<Player> itr = PlayerFactory.iterator(); itr.hasNext();) {
       Player i = itr.next();
-      if (i != null) {
-        if (i.getName() != null) {
-          n++;
-        }
+      if (i.getName() != null) {
+        n++;
       }
     }
     return n;
@@ -447,8 +335,7 @@ public class Server {
     return ipBans.isBanned(ipAddress);
   }
 
-  public void banKickIP(String ipAddress, String reason)
-      throws InterruptedException {
+  public void banKickIP(String ipAddress, String reason) {
     if (!isIPBanned(ipAddress)) {
       ipBans.addBan(ipAddress);
     }
@@ -464,13 +351,13 @@ public class Server {
     }
   }
 
-  public void banKickIP(String ipAddress) throws InterruptedException {
+  public void banKickIP(String ipAddress) {
     banKickIP(ipAddress, "Banned!");
   }
 
-  public void banKick(String name, String msg) throws InterruptedException {
+  public void banKick(String name, String msg) {
     if (name != null) {
-      runCommand("ban " + name);
+      runCommand("ban", name);
       Player p = PlayerFactory.findPlayer(name);
       if (p != null) {
         adminLog.addMessage("Player " + p.getName() + " was banned:\t " + msg);
@@ -479,23 +366,11 @@ public class Server {
     }
   }
 
-  public void banKick(String name) throws InterruptedException {
+  public void banKick(String name) {
     banKick(name, "Banned!");
   }
 
-  public void runCommand(String msg) throws InterruptedException {
-    if (input != null) {
-      input.runCommand(msg);
-    }
-  }
-
-  public void sendToAll(String msg) throws InterruptedException {
-    if (input != null && msg != null && !msg.equalsIgnoreCase("")) {
-      input.runCommand("say " + msg);
-    }
-  }
-
-  public void notifyClosed(Player player) throws InterruptedException {
+  public void notifyClosed(Player player) {
     PlayerFactory.removePlayer(player);
   }
 
@@ -519,7 +394,7 @@ public class Server {
     backupThread.interrupt();
   }
 
-  public String findName(String prefix) throws InterruptedException {
+  public String findName(String prefix) {
     Player i = PlayerFactory.findPlayer(prefix);
     if (i != null) {
       return i.getName();
@@ -529,15 +404,15 @@ public class Server {
     }
   }
 
-  public Player findPlayer(String prefix) throws InterruptedException {
+  public Player findPlayer(String prefix) {
     return PlayerFactory.findPlayer(prefix);
   }
 
-  public Player findPlayerExact(String exact) throws InterruptedException {
+  public Player findPlayerExact(String exact) {
     return PlayerFactory.findPlayerExact(exact);
   }
 
-  public void kick(String name, String reason) throws InterruptedException {
+  public void kick(String name, String reason) {
     synchronized (PlayerFactory.playerLock) {
       Player player = PlayerFactory.findPlayer(name);
       if (player != null) {
@@ -546,32 +421,29 @@ public class Server {
     }
   }
 
-  public void updateGroup(String name) throws InterruptedException {
+  public void updateGroup(String name) {
     Player p = PlayerFactory.findPlayer(name);
     if (p != null) {
       p.updateGroup();
     }
   }
 
-  public int localChat(Player p, String msg) {
-    String chat = "\302\2477" + p.getName() + " says: " + msg;
-    int j = 0;
-    if (p.getName() == null) {
-      return 0;
-    }
+  public int localChat(Player player, String msg) {
+    String chat = "\302\2477" + player.getName() + " says: " + msg;
+    int localPlayers = 0;
     for (Iterator<Player> itr = PlayerFactory.iterator(); itr.hasNext();) {
       Player i = itr.next();
       if (i.getName() != null) {
         int radius = options.getInt("localChatRadius");
-        if (i.distanceTo(p) < radius) {
+        if (i.distanceTo(player) < radius) {
           i.addMessage(chat);
-          if (p != i) {
-            j++;
+          if (player != i) {
+            localPlayers++;
           }
         }
       }
     }
-    return j;
+    return localPlayers;
   }
 
   public void notifyClosedRcon(Rcon rcon) {
@@ -612,10 +484,6 @@ public class Server {
     isSaving = b;
   }
 
-  public void waitingForStart(boolean b) {
-    waitingForStart = b;
-  }
-
   public boolean isSaving() {
     return isSaving;
   }
@@ -632,4 +500,7 @@ public class Server {
     return commandList;
   }
 
+  public void runCommand(String command, String arguments) {
+    minecraft.execute(command, arguments);
+  }
 }

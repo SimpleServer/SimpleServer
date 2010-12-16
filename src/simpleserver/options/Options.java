@@ -37,34 +37,6 @@ public class Options extends AbstractOptions {
     super("simpleserver.properties");
   }
 
-  public boolean contains(String option) {
-    String value = options.getProperty(option);
-    return value != null && value.trim().length() > 0;
-  }
-
-  public int getInt(String option) {
-    String value = options.getProperty(option);
-    try {
-      return Integer.parseInt(value);
-    }
-    catch (NumberFormatException e) {
-      String defaultValue = options.getProperty(option);
-      if (!value.equals(defaultValue)) {
-        options.setProperty(option, defaultOptions.getProperty(option));
-        return getInt(option);
-      }
-      else {
-        e.printStackTrace();
-        System.out.println("Error: Asked for int value of " + option);
-        return Integer.MIN_VALUE;
-      }
-    }
-  }
-
-  public boolean getBoolean(String option) {
-    return Boolean.parseBoolean(options.getProperty(option));
-  }
-
   public void set(String option, String value) {
     options.setProperty(option, value);
   }

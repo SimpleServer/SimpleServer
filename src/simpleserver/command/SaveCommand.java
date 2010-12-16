@@ -36,7 +36,7 @@ public class SaveCommand extends AbstractCommand {
   public void execute(Player player, String message)
       throws InterruptedException {
     player.getServer().saveAll();
-    player.getServer().runCommand("save-all");
+    player.getServer().runCommand("save-all", null);
     player.addMessage("Resources Saved!");
   }
 }

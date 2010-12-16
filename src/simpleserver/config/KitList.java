@@ -68,11 +68,11 @@ public class KitList extends PropertiesConfig {
     Kit kit = kits.get(kitName);
     if ((kit != null) && (Group.isMember(kit.groups, player))) {
       for (Kit.Entry entry : kit.items) {
-        String baseCommand = "give " + player.getName() + " " + entry.item;
+        String baseCommand = player.getName() + " " + entry.item;
         for (int c = 0; c < entry.amount / 64; ++c) {
-          server.runCommand(baseCommand + " " + 64);
+          server.runCommand("give", baseCommand + " " + 64);
         }
-        server.runCommand(baseCommand + " " + entry.amount % 64);
+        server.runCommand("give", baseCommand + " " + entry.amount % 64);
       }
     }
   }

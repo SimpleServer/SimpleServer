@@ -45,7 +45,8 @@ public class BanIPCommand extends AbstractCommand {
       else {
         server.ipBans.addBan(p.getIPAddress());
         server.kick(p.getName(), "IP Banned!");
-        server.runCommand("say Player " + p.getName() + " has been IP banned!");
+        server.runCommand("say", "Player " + p.getName()
+            + " has been IP banned!");
         server.adminLog.addMessage("User " + player.getName()
             + " banned ip:\t " + arguments[0] + "\t(" + p.getName() + ")");
       }

@@ -18,84 +18,54 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-package simpleserver.threads;
-
-import java.io.IOException;
-import java.io.InputStream;
+package simpleserver.minecraft;
 
 import simpleserver.Server;
 
-public class ErrorStreamRouter implements Runnable {
-  private InputStream stream;
-  private Server parent;
-
-  public ErrorStreamRouter(InputStream stream, Server parent) {
-    this.stream = stream;
-    this.parent = parent;
+public class MessageHandler {
+  private Server server;
+  public MessageHandler(Server server) {
+    this.server = server;
   }
-
-  public void run() {
-    try {
-      InputStream in1 = stream;
-      byte[] buf = new byte[1024];
-      String soFar = "";
-      // loop forever...
-      while (!Thread.interrupted()) {
-        // collect all the bytes waiting on the input stream
-        int amt = in1.read(buf);
-        for (int i = 0; i < amt; i++) {
-          soFar += (char) buf[i];
-          if (buf[i] == (byte) '\n') {
-            handleLine(soFar);
-            soFar = "";
-          }
-        }
-      }
-    }
-    catch (Exception e) {
-      if (!parent.isRestarting()) {
-        e.printStackTrace();
-      }
-    }
-    try {
-      stream.close();
-    }
-    catch (IOException e) {
-      if (!parent.isRestarting()) {
-        e.printStackTrace();
-      }
-    }
+  
+  public void handleError(Exception exception) {
+    System.out.println("[SimpleServer] Minecraft process stopped unexpectedly! Automatically restarting...");
+    server.forceRestart();
   }
-
-  private void handleLine(String line) throws InterruptedException {
-    if (!parent.options.getBoolean("debug")) {
-      if (line.contains("\tat")) {
-        return;
-      }
+  
+  public void handleQuit() {
+  
+  }
+  
+  public void handleOutput(String line) {
+    if (!server.options.getBoolean("debug") && line.contains("\tat")) {
+      return;
     }
-    Integer[] ports = parent.getRobotPorts();
+    
+    Integer[] ports = server.getRobotPorts();
     if (ports != null) {
       for (int i = 0; i < ports.length; i++) {
         if (ports[i] != null) {
           if (line.contains(ports[i].toString())) {
-            parent.removeRobotPort(ports[i]);
+            server.removeRobotPort(ports[i]);
             return;
           }
         }
       }
     }
     if (line.contains("[INFO] CONSOLE: Save complete.")) {
-      parent.isSaving(false);
-      // parent.runCommand("say Save Complete.");
-      parent.sendToAll(parent.l.get("SAVE_COMPLETE"));
+      server.isSaving(false);
+      server.runCommand("say", server.l.get("SAVE_COMPLETE"));
     }
+    /*
     if (line.contains("[INFO] Done!")) {
-      parent.waitingForStart(false);
+      server.waitingForStart(false);
     }
+    */
     if (line.contains("[SEVERE] Unexpected exception")) {
-      parent.forceRestart();
+      server.forceRestart();
     }
-    parent.addOutputLine(line);
-    System.out.print(line);
+    server.addOutputLine(line);
+    System.out.println(line);
   }
 }

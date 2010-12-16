@@ -503,17 +503,17 @@ public class Player {
       return false;
     }
 
-    String baseCommand = "give " + getName() + " " + item + " ";
+    String baseCommand = getName() + " " + item + " ";
     for (int c = 0; c < amount / 64; ++c) {
-      server.runCommand(baseCommand + 64);
+      server.runCommand("give", baseCommand + 64);
     }
-    server.runCommand(baseCommand + amount % 64);
+    server.runCommand("give", baseCommand + amount % 64);
 
     return true;
   }
 
   public void teleportTo(Player target) throws InterruptedException {
-    server.runCommand("tp " + getName() + " " + target.getName());
+    server.runCommand("tp", getName() + " " + target.getName());
   }
 
   public void sendMOTD() {
