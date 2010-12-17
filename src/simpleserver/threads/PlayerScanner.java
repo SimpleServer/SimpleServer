@@ -23,10 +23,14 @@ package simpleserver.threads;
 import java.util.Iterator;
 
 import simpleserver.Player;
-import simpleserver.PlayerList;
+import simpleserver.Server;
 
 public class PlayerScanner implements Runnable {
-  private boolean timedOut;
+  private Server server;
+
+  public PlayerScanner(Server server) {
+    this.server = server;
+  }
 
   public void run() {
     while (true) {
@@ -35,34 +39,33 @@ public class PlayerScanner implements Runnable {
       }
       catch (InterruptedException e) {
       }
-      // synchronized(parent.players) {
-      for (Iterator<Player> itr = PlayerList.iterator(); itr.hasNext();) {
-        Player i = itr.next();
-        timedOut = i.testTimeout();
-        if (timedOut) {
-          itr.remove();
-          if (!i.isRobot()) {
-            System.out.println("[SimpleServer] Disconnecting "
-                + i.getIPAddress() + " due to inactivity.");
+      synchronized (server.playerList) {
+        for (Iterator<Player> itr = server.playerList.iterator(); itr.hasNext();) {
+          Player i = itr.next();
+          boolean timedOut = i.testTimeout();
+          if (timedOut) {
+            itr.remove();
+            if (!i.isRobot()) {
+              System.out.println("[SimpleServer] Disconnecting "
+                  + i.getIPAddress() + " due to inactivity.");
+            }
+            try {
+              // This is required to make it not try to call notifyClosed()
+              i.setKicked(true);
+              i.close();
+            }
+            catch (InterruptedException e) {
+              e.printStackTrace();
+            }
+
           }
           try {
-            // This is required to make it not try to call notifyClosed()
-            i.setKicked(true);
-            i.close();
+            Thread.sleep(100);
           }
           catch (InterruptedException e) {
-            e.printStackTrace();
           }
-
-        }
-        try {
-          Thread.sleep(100);
-        }
-        catch (InterruptedException e) {
         }
       }
-      // }
     }
   }
-
 }

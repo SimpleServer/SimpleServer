@@ -23,7 +23,6 @@ package simpleserver.command;
 import java.util.Iterator;
 
 import simpleserver.Player;
-import simpleserver.PlayerList;
 
 public class IPListCommand extends AbstractCommand {
   public IPListCommand() {
@@ -34,7 +33,7 @@ public class IPListCommand extends AbstractCommand {
   public void execute(Player player, String message)
       throws InterruptedException {
     player.addMessage("IP Addresses:");
-    for (Iterator<Player> itr = PlayerList.iterator(); itr.hasNext();) {
+    for (Iterator<Player> itr = player.getServer().playerList.iterator(); itr.hasNext();) {
       Player i = itr.next();
       if (i.getName() != null && i.getName() != "") {
         player.addMessage(i.getName() + " " + i.getIPAddress());

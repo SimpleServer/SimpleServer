@@ -41,6 +41,6 @@ public class RestartCommand extends AbstractCommand {
     else {
       player.addMessage("Server is currently Backing Up/Saving/Restarting...");
     }
-    server.forceRestart();
+    server.restart();
   }
 }

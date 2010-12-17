@@ -73,6 +73,7 @@ public class AdminLog {
   }
 
   private final class Writer extends Thread {
+    @Override
     public void run() {
       try {
         while (run) {

@@ -44,19 +44,20 @@ public class InputWrapper implements Wrapper {
   }
 
   public void injectCommand(String command, String arguments) {
-    in.appendLine(command + " " + arguments + "\n");
+    in.appendLine(command + " " + arguments);
   }
 
   public void stop() {
     run = false;
     wrapperThread.interrupt();
   }
-  
+
   public void join() throws InterruptedException {
     wrapperThread.join();
   }
 
   private final class WrapperThread extends Thread {
+    @Override
     public void run() {
       try {
         while (run) {

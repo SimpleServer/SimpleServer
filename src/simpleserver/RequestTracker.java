@@ -47,8 +47,7 @@ public class RequestTracker implements Runnable {
     parent = p;
   }
 
-  public synchronized void addRequest(String ipAddress)
-      throws InterruptedException {
+  public synchronized void addRequest(String ipAddress) {
     for (Request i : requests) {
       if (i.ipAddress.equals(ipAddress)) {
         i.addRequest();

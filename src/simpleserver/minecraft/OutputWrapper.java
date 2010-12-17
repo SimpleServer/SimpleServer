@@ -43,12 +43,13 @@ public class OutputWrapper implements Wrapper {
     run = false;
     scanner.close();
   }
-  
+
   public void join() throws InterruptedException {
     wrapperThread.join();
   }
 
   private final class WrapperThread extends Thread {
+    @Override
     public void run() {
       try {
         while (run) {

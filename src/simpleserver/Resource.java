@@ -22,5 +22,6 @@ package simpleserver;
 
 public interface Resource {
   public void load();
+
   public void save();
 }

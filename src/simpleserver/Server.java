@@ -23,12 +23,13 @@ package simpleserver;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
+import java.net.Socket;
+import java.net.UnknownHostException;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Semaphore;
 
-import simpleserver.config.AbstractConfig;
 import simpleserver.config.BlockList;
 import simpleserver.config.ChestList;
 import simpleserver.config.CommandList;
@@ -62,14 +63,14 @@ public class Server {
 
   private simpleserver.CommandList commandList;
 
-  private boolean open = true;
   public ServerSocket socket;
-  public ServerSocket rconSocket;
 
   private List<String> outputLog = new LinkedList<String>();
 
   public Semaphore saveLock = new Semaphore(1);
 
+  public Language l;
+  public Options options;
   public BlockList blockFirewall;
   public GroupList groups;
   public MemberList members;
@@ -83,42 +84,37 @@ public class Server {
   public ItemWatchList itemWatch;
   public WhiteList whitelist;
   public MuteList mutelist;
-  public Options options;
   public CommandList commands;
 
   public AdminLog adminLog;
-  private Thread adminLogThread;
-
-  public Language l;
+  private SystemInputQueue systemInput;
 
   private MinecraftWrapper minecraft;
-  private SystemInputQueue systemInput;
+  private RconServer rconServer;
 
   private Thread backupThread;
   private Thread autoSaveThread;
   private Thread autoRestartThread;
   private Thread playerScannerThread;
-  private Thread shutDownHook;
-  private Thread socketThread;
+
+  private final Listener listener;
 
   private C10TThread c10t;
   private Thread c10tThread;
 
-  private ServerBackup backup;
+  private ServerBackup serverBackup;
   private ServerAutoSave autosave;
   private ServerAutoRestart autoRestart;
   private PlayerScanner playerScanner;
   public RequestTracker requestTracker;
 
-  boolean requireBackup = false;
-  private boolean isSaving = false;
-
   private boolean run = true;
   private boolean restart = false;
+  private boolean backup = false;
+  private boolean save = false;
 
   private List<Resource> resources;
-  public LinkedList<Rcon> rcons = new LinkedList<Rcon>();
-  private PlayerList playerList;
+  public PlayerList playerList;
 
   public static void main(String[] args) {
     System.out.println(license);
@@ -128,74 +124,26 @@ public class Server {
   }
 
   private Server() {
-    start();
-  }
-
-  public void start() {
+    listener = new Listener();
+    listener.start();
   }
 
   public void restart() {
-    isRestarting = true;
-    open = false;
+    stop(true);
+  }
+
+  public void stop() {
+    stop(false);
+  }
+
+  private void stop(boolean restart) {
+    this.restart = restart;
+    run = restart;
+
     try {
       socket.close();
     }
     catch (IOException e) {
-    }
-
-    kickAllPlayers("Server Restarting!");
-
-    minecraft.stop();
-    minecraft.start();
-
-    isRestarting = false;
-    openSocket();
-  }
-
-  public void stop() {
-    saveAll();
-
-    isRestarting = true;
-    open = false;
-    try {
-      socket.close();
-    }
-    catch (Exception e) {
-    }
-
-    adminLogThread.interrupt();
-    adminLog = null;
-
-    kickAllPlayers("Server shutting down!");
-    kickAllRcons("Server shutting down!");
-    System.out.println("Stopping Server...");
-    minecraft.stop();
-    Runtime.getRuntime().removeShutdownHook(shutDownHook);
-    System.out.println("Server stopped successfully!");
-    System.exit(0);
-  }
-
-  public void openSocket() {
-    if (socketThread != null) {
-      socketThread.interrupt();
-    }
-    open = true;
-    socketThread = new Thread(new SocketThread(this));
-    socketThread.start();
-  }
-
-  public void forceRestart() {
-    if (!isRestarting) {
-      if (saveLock.tryAcquire()) {
-        saveLock.release();
-      }
-      else {
-        System.out.println("[SimpleServer] Server is currently Backing Up/Saving...");
-      }
-      // new Thread(forceRestart).start();
-    }
-    else {
-      minecraft.stop();
     }
   }
 
@@ -301,7 +249,7 @@ public class Server {
   }
 
   public void forceBackup() {
-    requireBackup = true;
+    backup = true;
     backupThread.interrupt();
   }
 
@@ -354,12 +302,6 @@ public class Server {
     return localPlayers;
   }
 
-  public void notifyClosedRcon(Rcon rcon) {
-    synchronized (rcons) {
-      rcons.remove(rcon);
-    }
-  }
-
   public void addOutputLine(String s) {
     synchronized (outputLog) {
       int size = outputLog.size();
@@ -376,32 +318,42 @@ public class Server {
     }
   }
 
-  public boolean requiresBackup() {
-    return requireBackup;
-  }
-
-  public void requiresBackup(boolean b) {
-    requireBackup = b;
-  }
-
-  public void isSaving(boolean b) {
-    isSaving = b;
-  }
-
-  public boolean isSaving() {
-    return isSaving;
-  }
-
-  public boolean isOpen() {
-    return open;
-  }
-
   public simpleserver.CommandList getCommandList() {
     return commandList;
   }
 
   public void runCommand(String command, String arguments) {
     minecraft.execute(command, arguments);
+  }
+
+  public boolean isRestarting() {
+    return restart;
+  }
+
+  public boolean isSaving() {
+    return save;
+  }
+
+  public void setSaving(boolean save) {
+    this.save = save;
+  }
+
+  public boolean requiresBackup() {
+    return backup;
+  }
+
+  public void setBackup(boolean backup) {
+    this.backup = backup;
+  }
+
+  private void kickAllPlayers(String msg) {
+    if (msg == null) {
+      msg = "";
+    }
+    for (Iterator<Player> itr = playerList.iterator(); itr.hasNext();) {
+      Player p = itr.next();
+      p.kick(msg);
+    }
   }
 
   private void initialize() {
@@ -427,25 +379,9 @@ public class Server {
     adminLog = new AdminLog();
 
     commandList = new simpleserver.CommandList(options);
-  }
 
-  private void cleanup() {
-    systemInput.stop();
-    adminLog.stop();
-  }
-
-  private void startup() {
-    loadResources();
-
-    new Thread(new RconServer(this, false)).start();
-
-    playerList = new PlayerList();
-
-    minecraft = new MinecraftWrapper(this, options, systemInput);
-    minecraft.start();
-
-    backup = new ServerBackup(this);
-    backupThread = new Thread(backup);
+    serverBackup = new ServerBackup(this);
+    backupThread = new Thread(serverBackup);
     backupThread.start();
 
     autosave = new ServerAutoSave(this);
@@ -456,14 +392,12 @@ public class Server {
     autoRestartThread = new Thread(autoRestart);
     autoRestartThread.start();
 
-    playerScanner = new PlayerScanner();
+    playerScanner = new PlayerScanner(this);
     playerScannerThread = new Thread(playerScanner);
     playerScannerThread.start();
 
     requestTracker = new RequestTracker(this);
     new Thread(requestTracker).start();
-
-    openSocket();
 
     if (options.contains("c10tArgs")) {
       c10t = new C10TThread(this, options.get("c10tArgs"));
@@ -472,34 +406,49 @@ public class Server {
     }
   }
 
+  private void cleanup() {
+    systemInput.stop();
+    adminLog.stop();
+  }
+
+  private void startup() {
+    restart = false;
+
+    loadResources();
+    playerList = new PlayerList();
+
+    minecraft = new MinecraftWrapper(this, options, systemInput);
+    minecraft.start();
+
+    rconServer = new RconServer(this);
+  }
+
   private void shutdown() {
-    saveResources();
-  }
-
-  private void kickAllPlayers(String msg) {
-    if (msg == null) {
-      msg = "";
-    }
-    for (Iterator<Player> itr = playerList.iterator(); itr.hasNext();) {
-      Player p = itr.next();
-      p.kick(msg);
-    }
-  }
-
-  private void kickAllRcons(String msg) {
-    if (msg == null) {
-      msg = "";
-    }
-    synchronized (rcons) {
-      for (Iterator<Rcon> itr = rcons.iterator(); itr.hasNext();) {
-        Rcon p = itr.next();
-        p.kick(msg);
-        itr.remove();
+    System.out.println("Stopping Server...");
+    if (!saveLock.tryAcquire()) {
+      System.out.println("[SimpleServer] Server is currently Backing Up/Saving...");
+      while (true) {
+        try {
+          saveLock.acquire();
+          break;
+        }
+        catch (InterruptedException e) {
+          e.printStackTrace();
+        }
       }
     }
+
+    kickAllPlayers("Server shutting down!");
+    saveResources();
+
+    rconServer.stop();
+    minecraft.stop();
+    System.out.println("Server stopped successfully!");
+    saveLock.release();
   }
 
   private final class Listener extends Thread {
+    @Override
     public void run() {
       initialize();
 
@@ -514,7 +463,14 @@ public class Server {
           address = null;
         }
         else {
-          address = InetAddress.getByName(ip);
+          try {
+            address = InetAddress.getByName(ip);
+          }
+          catch (UnknownHostException e) {
+            e.printStackTrace();
+            System.out.println("Invalid listening address " + ip);
+            break;
+          }
         }
 
         try {
@@ -524,20 +480,23 @@ public class Server {
           e.printStackTrace();
           System.out.println("Could not listen on port " + port
               + "!\nIs it already in use? Exiting application...");
-          System.exit(-1);
+          break;
         }
 
         try {
           while (true) {
+            Socket client;
             try {
-              PlayerList.addPlayer(socket.accept());
+              client = socket.accept();
             }
             catch (IOException e) {
               if (run && !restart) {
                 e.printStackTrace();
                 System.out.println("Accept failed on port " + port + "!");
               }
+              break;
             }
+            new Player(client, Server.this);
           }
         }
         finally {

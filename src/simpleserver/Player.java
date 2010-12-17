@@ -114,7 +114,9 @@ public class Player {
     }
     updateGroup(name.trim());
     this.name = name.trim();
-    server.requireBackup = true;
+    server.setBackup(true);
+    
+    server.playerList.addPlayer(this);
     return true;
   }
 
@@ -253,14 +255,8 @@ public class Player {
       System.out.println("[SimpleServer] IP Connection from "
           + extsocket.getInetAddress().getHostAddress() + "!");
     }
-    try {
-      parent.requestTracker.addRequest(extsocket.getInetAddress()
-                                                .getHostAddress());
-    }
-    catch (InterruptedException e2) {
-      // TODO Auto-generated catch block
-      e2.printStackTrace();
-    }
+    parent.requestTracker.addRequest(extsocket.getInetAddress()
+                                              .getHostAddress());
     if (parent.isIPBanned(extsocket.getInetAddress().getHostAddress())) {
       System.out.println("[SimpleServer] IP "
           + extsocket.getInetAddress().getHostAddress() + " is banned!");
@@ -275,7 +271,7 @@ public class Player {
         System.exit(-1);
       }
       else {
-        parent.forceRestart();
+        parent.restart();
       }
     }
 
@@ -404,14 +400,8 @@ public class Player {
       System.out.println("[SimpleServer] IP Connection from "
           + extsocket.getInetAddress().getHostAddress() + "!");
     }
-    try {
-      server.requestTracker.addRequest(extsocket.getInetAddress()
-                                                .getHostAddress());
-    }
-    catch (InterruptedException e2) {
-      // TODO Auto-generated catch block
-      e2.printStackTrace();
-    }
+    server.requestTracker.addRequest(extsocket.getInetAddress()
+                                              .getHostAddress());
     if (server.isIPBanned(extsocket.getInetAddress().getHostAddress())) {
       System.out.println("[SimpleServer] IP "
           + extsocket.getInetAddress().getHostAddress() + " is banned!");
@@ -426,7 +416,7 @@ public class Player {
         System.exit(-1);
       }
       else {
-        server.forceRestart();
+        server.restart();
       }
     }
 

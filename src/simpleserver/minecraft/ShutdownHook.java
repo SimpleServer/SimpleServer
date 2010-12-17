@@ -27,18 +27,19 @@ public class ShutdownHook implements Wrapper {
   public ShutdownHook(MinecraftWrapper minecraft) {
     this.minecraft = minecraft;
 
-    this.hook = new Hook();
+    hook = new Hook();
     Runtime.getRuntime().addShutdownHook(hook);
   }
-  
+
   public void stop() {
     Runtime.getRuntime().removeShutdownHook(hook);
   }
-  
+
   public void join() {
   }
 
   private final class Hook extends Thread {
+    @Override
     public void run() {
       System.out.println("Shutdown Hook Activated");
       minecraft.execute("stop", null);

@@ -53,12 +53,12 @@ public class RconHandler implements Runnable {
   private RconTCP parent;
   private Server server;
 
-  public RconHandler(Socket s, RconTCP r) throws IOException {
+  public RconHandler(Socket s, RconTCP r, Server server) throws IOException {
     this.s = s;
     in = s.getInputStream();
     out = s.getOutputStream();
     parent = r;
-    server = r.parent;
+    this.server = server;
     buf = new byte[BUF_SIZE];
     lock = new Semaphore(1);
     bb.order(ByteOrder.LITTLE_ENDIAN);
@@ -312,11 +312,9 @@ public class RconHandler implements Runnable {
       lock.release();
       throw e;
     }
-
   }
 
   protected boolean ensureRead(int n) throws InterruptedException, IOException {
-
     if (r + n > BUF_SIZE) {
       return false;
     }
@@ -453,5 +451,4 @@ public class RconHandler implements Runnable {
     double s = bb.getDouble(0);
     return s;
   }
-
 }

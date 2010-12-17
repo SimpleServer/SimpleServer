@@ -37,7 +37,7 @@ public class ServerAutoSave implements Runnable {
           parent.saveLock.acquire();
           if (parent.requiresBackup()) {
             parent.runCommand("say", parent.l.get("SAVING_MAP"));
-            parent.isSaving(true);
+            parent.setSaving(true);
             parent.runCommand("save-all", null);
 
           }

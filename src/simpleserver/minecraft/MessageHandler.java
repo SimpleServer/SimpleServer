@@ -24,24 +24,25 @@ import simpleserver.Server;
 
 public class MessageHandler {
   private Server server;
+
   public MessageHandler(Server server) {
     this.server = server;
   }
-  
+
   public void handleError(Exception exception) {
     System.out.println("[SimpleServer] Minecraft process stopped unexpectedly! Automatically restarting...");
-    server.forceRestart();
+    server.restart();
   }
-  
+
   public void handleQuit() {
-  
+
   }
-  
+
   public void handleOutput(String line) {
     if (!server.options.getBoolean("debug") && line.contains("\tat")) {
       return;
     }
-    
+
     Integer[] ports = server.getRobotPorts();
     if (ports != null) {
       for (int i = 0; i < ports.length; i++) {
@@ -54,7 +55,7 @@ public class MessageHandler {
       }
     }
     if (line.contains("[INFO] CONSOLE: Save complete.")) {
-      server.isSaving(false);
+      server.setSaving(false);
       server.runCommand("say", server.l.get("SAVE_COMPLETE"));
     }
     /*
@@ -63,7 +64,7 @@ public class MessageHandler {
     }
     */
     if (line.contains("[SEVERE] Unexpected exception")) {
-      server.forceRestart();
+      server.restart();
     }
     server.addOutputLine(line);
     System.out.println(line);

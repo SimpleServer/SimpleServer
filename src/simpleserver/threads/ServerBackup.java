@@ -68,7 +68,7 @@ public class ServerBackup implements Runnable {
           parent.saveLock.release();
           break;
         }
-        parent.isSaving(true);
+        parent.setSaving(true);
         parent.runCommand("save-all", null);
         while (parent.isSaving()) {
           try {
@@ -87,7 +87,7 @@ public class ServerBackup implements Runnable {
           System.out.println("[WARNING] Automated Server Backup Failure! Please run save-all and restart server!");
         }
         if (parent.numPlayers() == 0) {
-          parent.requiresBackup(false);
+          parent.setBackup(false);
         }
         parent.saveLock.release();
 

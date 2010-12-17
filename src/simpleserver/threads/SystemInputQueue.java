@@ -27,27 +27,28 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class SystemInputQueue {
   private final BlockingQueue<String> queue;
   private final Scanner scanner;
-  
+
   public SystemInputQueue() {
     queue = new LinkedBlockingQueue<String>();
     scanner = new Scanner(System.in);
-    
+
     new Reader().start();
   }
-  
+
   public String nextLine() throws InterruptedException {
     return queue.take();
   }
-  
+
   public void appendLine(String line) {
     queue.add(line);
   }
-  
+
   public void stop() {
     scanner.close();
   }
-  
+
   private final class Reader extends Thread {
+    @Override
     public void run() {
       while (true) {
         String line;
@@ -57,7 +58,7 @@ public class SystemInputQueue {
         catch (IllegalStateException e) {
           break;
         }
-        
+
         try {
           queue.put(line);
         }
