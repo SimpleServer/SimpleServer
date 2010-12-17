@@ -26,13 +26,10 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import simpleserver.command.AbstractCommand;
-import simpleserver.threads.DelayClose;
 
 public class Player {
   private Socket intsocket;
   private Socket extsocket;
-  private Thread t1;
-  private Thread t2;
   private Server server;
   private String name = null;
   private boolean closed = false;
@@ -89,10 +86,6 @@ public class Player {
     return server;
   }
 
-  public void sendHome() {
-    clientToServer.addPacket(new byte[] { 0x03, 0x07, '/', 'h', 'o', 'm', 'e' });
-  }
-
   public boolean setName(String name) throws InterruptedException {
     t1.setName(t1.getName() + "-serverToClient-" + name);
     t2.setName(t2.getName() + "-clientToServer-" + name);
@@ -115,7 +108,7 @@ public class Player {
     updateGroup(name.trim());
     this.name = name.trim();
     server.setBackup(true);
-    
+
     server.playerList.addPlayer(this);
     return true;
   }
@@ -131,7 +124,6 @@ public class Player {
   public void kick(String reason) {
     kickMsg = reason;
     isKicked = true;
-    delayClose();
   }
 
   public boolean isKicked() {
@@ -239,10 +231,6 @@ public class Player {
     return extsocket.getInetAddress().getHostAddress();
   }
 
-  public void delayClose() {
-    new Thread(new DelayClose(this)).start();
-  }
-
   public Player(Socket inc, Server parent) {
     server = parent;
     extsocket = inc;
@@ -276,28 +264,16 @@ public class Player {
     }
 
     try {
-
-      t1 = new Thread(
-                      serverToClient = new StreamTunnel(
-                                                        intsocket.getInputStream(),
-                                                        extsocket.getOutputStream(),
-                                                        true, this, 2048));
-      t2 = new Thread(
-                      clientToServer = new StreamTunnel(
-                                                        extsocket.getInputStream(),
-                                                        intsocket.getOutputStream(),
-                                                        false, this));
-      t1.start();
-      t2.start();
+      serverToClient = new StreamTunnel(intsocket.getInputStream(),
+                                        extsocket.getOutputStream(), true,
+                                        this);
+      clientToServer = new StreamTunnel(extsocket.getInputStream(),
+                                        intsocket.getOutputStream(), false,
+                                        this);
     }
     catch (Exception e) {
       e.printStackTrace();
-      try {
-        close();
-      }
-      catch (InterruptedException e1) {
-        e1.printStackTrace();
-      }
+      close();
     }
 
     if (isRobot) {
@@ -329,7 +305,7 @@ public class Player {
     return closed;
   }
 
-  public void close() throws InterruptedException {
+  public void close() {
     // Don't spam the console! : )
     // And don't close if we're already closing!
     if (!isKicked && server != null) {
@@ -342,16 +318,6 @@ public class Player {
   }
 
   public void cleanup() {
-    try {
-      t1.interrupt();
-    }
-    catch (Exception e) {
-    }
-    try {
-      t2.interrupt();
-    }
-    catch (Exception e) {
-    }
     try {
       extsocket.close();
     }
@@ -368,12 +334,9 @@ public class Player {
           + extsocket.getInetAddress().getHostAddress());
     }
     extsocket = null;
-    t1 = null;
-    t2 = null;
     clientToServer = null;
     serverToClient = null;
     name = null;
-
   }
 
   public void reinitialize(Socket inc) {
@@ -421,28 +384,16 @@ public class Player {
     }
 
     try {
-
-      t1 = new Thread(
-                      serverToClient = new StreamTunnel(
-                                                        intsocket.getInputStream(),
-                                                        extsocket.getOutputStream(),
-                                                        true, this, 2048));
-      t2 = new Thread(
-                      clientToServer = new StreamTunnel(
-                                                        extsocket.getInputStream(),
-                                                        intsocket.getOutputStream(),
-                                                        false, this));
-      t1.start();
-      t2.start();
+      serverToClient = new StreamTunnel(intsocket.getInputStream(),
+                                        extsocket.getOutputStream(), true,
+                                        this);
+      clientToServer = new StreamTunnel(extsocket.getInputStream(),
+                                        intsocket.getOutputStream(), false,
+                                        this);
     }
-    catch (Exception e) {
+    catch (IOException e) {
       e.printStackTrace();
-      try {
-        close();
-      }
-      catch (InterruptedException e1) {
-        e1.printStackTrace();
-      }
+      close();
     }
 
     if (isRobot) {

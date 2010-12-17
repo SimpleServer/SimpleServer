@@ -214,13 +214,7 @@ public class StreamDumper implements Runnable {
       }
       catch (IOException e1) {
       }
-      try {
-        parent.close();
-      }
-      catch (InterruptedException e1) {
-        // TODO Auto-generated catch block
-        e1.printStackTrace();
-      }
+      parent.close();
       return;
     }
     try {
@@ -238,13 +232,7 @@ public class StreamDumper implements Runnable {
     }
     catch (IOException e1) {
     }
-    try {
-      parent.close();
-    }
-    catch (InterruptedException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    }
+    parent.close();
   }
   /*
   private void print(byte[] buf, int amt) {

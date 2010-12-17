@@ -49,15 +49,9 @@ public class PlayerScanner implements Runnable {
               System.out.println("[SimpleServer] Disconnecting "
                   + i.getIPAddress() + " due to inactivity.");
             }
-            try {
-              // This is required to make it not try to call notifyClosed()
-              i.setKicked(true);
-              i.close();
-            }
-            catch (InterruptedException e) {
-              e.printStackTrace();
-            }
-
+            // This is required to make it not try to call notifyClosed()
+            i.setKicked(true);
+            i.close();
           }
           try {
             Thread.sleep(100);

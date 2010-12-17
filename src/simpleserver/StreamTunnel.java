@@ -20,6 +20,8 @@
  ******************************************************************************/
 package simpleserver;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
@@ -29,419 +31,241 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.IllegalFormatException;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.Semaphore;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import simpleserver.log.EOFWriter;
 
-public class StreamTunnel implements Runnable {
-  private final int BUF_SIZE = 8192;
-  private int BYTE_THRESHOLD = 32;
-  private byte[] buf;
-  private int r;
-  private int a;
-  protected long lastRead;
-  private InputStream in;
-  private OutputStream out;
-  private boolean inGame;
-  private Semaphore lock;
-  private boolean debug;
-  private boolean isServerTunnel;
-  private LinkedList<byte[]> packetBuffer = new LinkedList<byte[]>();
-  private LinkedList<byte[]> history = new LinkedList<byte[]>();
+public class StreamTunnel {
   public static final int IDLE_TIME = 30 * 1000;
-  private ByteBuffer bb = ByteBuffer.allocate(128);
+  private static final int BUFFER_SIZE = 128;
+  private static final int DESTROY_HITS = 14;
+  private static final byte BLOCK_DESTROYED_STATUS = 3;
+  private static final Pattern MESSAGE_PATTERN = Pattern.compile("^<([^>]+)> (.*)$");
+
+  private final boolean isServerTunnel;
+  private final Player player;
+  private final Server server;
+  private final DataInputStream in;
+  private final DataOutputStream out;
+  private final byte[] buffer;
+
+  private boolean run = true;
+  private boolean inGame = false;
+  protected long lastRead;
 
   private int motionCounter = 0;
 
-  private Player player;
-  private Server server;
-
   public StreamTunnel(InputStream in, OutputStream out, boolean isServerTunnel,
-                      Player p) {
-    this.in = in;
-    this.out = out;
-    player = p;
-    server = p.getServer();
-    buf = new byte[BUF_SIZE];
-    inGame = false;
-    lock = new Semaphore(1);
-    debug = false;
+                      Player player) {
     this.isServerTunnel = isServerTunnel;
-    bb.order(ByteOrder.BIG_ENDIAN);
+
+    this.player = player;
+    server = player.getServer();
+
+    this.in = new DataInputStream(new BufferedInputStream(in));
+    this.out = new DataOutputStream(new BufferedOutputStream(out));
+
+    buffer = new byte[BUFFER_SIZE];
   }
 
-  public StreamTunnel(InputStream in, OutputStream out, boolean isServerTunnel,
-                      Player p, int byteThreshold) {
-    this.in = in;
-    this.out = out;
-    player = p;
-    server = p.getServer();
-    buf = new byte[BUF_SIZE];
-    inGame = false;
-    lock = new Semaphore(1);
-    debug = false;
-    this.isServerTunnel = isServerTunnel;
-    BYTE_THRESHOLD = byteThreshold;
-    bb.order(ByteOrder.BIG_ENDIAN);
+  public void stop() {
+    run = false;
   }
 
-  public void setByteThreshold(int n) {
-    if (n > BUF_SIZE) {
-      BYTE_THRESHOLD = BUF_SIZE;
-    }
-    if (n <= 0) {
-      BYTE_THRESHOLD = 32;
-    }
-    BYTE_THRESHOLD = n;
-  }
+  private void handlePacket() throws IOException {
+    Byte packetId = in.readByte();
+    switch (packetId) {
+      case 0: // Keep Alive
+        write(packetId);
+        break;
+      case 0x01: // Login Request/Response
+        write(packetId);
+        write(in.readInt());
+        write(in.readUTF());
+        write(in.readUTF());
+        write(in.readLong());
+        write(in.readByte());
+        break;
+      case 0x02: // Handshake
+        String name = in.readUTF();
+        if (isServerTunnel || player.setName(name)) {
+          write(packetId);
+          write(in.readUTF());
+        }
+        break;
+      case 0x03: // Chat Message
+        String message = in.readUTF();
+        if (isServerTunnel && server.options.getBoolean("useMsgFormats")) {
+          Matcher messageMatcher = MESSAGE_PATTERN.matcher(message);
+          if (messageMatcher.find()) {
+            Player friend = server.findPlayerExact(messageMatcher.group(1));
 
-  public void run() {
-    int packetid = 0;
-    try {
-      r = 0;
-      a = 0;
-      lastRead = System.currentTimeMillis();
-      while (!player.isClosed() && !Thread.interrupted()) {
-        lock.acquire();
-        int avail = 0;
-        try {
-          avail = in.available();
-        }
-        catch (IOException ee) {
-          break;
-        }
-        if (avail > 0) {
-          lastRead = System.currentTimeMillis();
-          if (avail > buf.length - a) {
-            avail = buf.length - a;
-          }
-          if (a < buf.length) {
-            int read = in.read(buf, a, avail);
-            if (read > 0) {
-              a += read;
-            }
-          }
-        }
-        lock.release();
+            if (friend != null) {
+              String color = "f";
+              String title = "";
+              String format = server.options.get("msgFormat");
+              Group group = friend.getGroup();
 
-        if (System.currentTimeMillis() - lastRead > IDLE_TIME) {
-          if (!player.isRobot()) {
-            System.out.println("[SimpleServer] Disconnecting "
-                + player.getIPAddress() + " due to inactivity.");
-          }
-          try {
-            in.close();
-          }
-          catch (IOException e1) {
-          }
-          try {
-            out.close();
-          }
-          catch (IOException e1) {
-          }
-          player.close();
-        }
-        if (r == 0 && a > 0) {
-          while (r < BYTE_THRESHOLD && r < a) {
-            packetid = readByte();
-            if (debug) {
-              // System.out.println("pid: " + packetid + " size: " + r +
-              // " amt: " + a);
-            }
-            parsePacket(packetid);
-          }
-        }
-        while (history.size() > 64) {
-          history.removeFirst();
-        }
-        if (r > 0) {
-          if (r <= a) {
-            out.write(buf, 0, r);
-            byte[] hist = new byte[r];
-            System.arraycopy(buf, 0, hist, 0, r);
-            history.addLast(hist);
-            while (!packetBuffer.isEmpty()) {
-              byte[] b = packetBuffer.removeFirst();
-              out.write(b);
-              // printStream(b);
-            }
-            if (isServerTunnel) {
-              // Messages
-              if (player.isKicked()) {
-                out.write(makePacket((byte) 0xff, player.getKickMsg()));
-                player.delayClose();
-                break;
+              if (group != null) {
+                color = group.getColor();
+                if (group.showTitle()) {
+                  title = group.getName();
+                  format = server.options.get("msgTitleFormat");
+                }
               }
-              while (player.hasMessages()) {
-                byte[] m = makePacket(player.getMessage());
-                out.write(m, 0, m.length);
+
+              try {
+                message = String.format(format, friend.getName(), title, color)
+                    + messageMatcher.group(2);
+              }
+              catch (IllegalFormatException e) {
+                System.out.println("[SimpleServer] There is an error in your msgFormat/msgTitleFormat settings!");
               }
             }
-            else {
-              if (player.isKicked()) {
-                out.write(makePacket((byte) 0xff, player.getKickMsg()));
-                player.delayClose();
-                break;
-              }
-            }
-            if (r < a) {
-              // byte[] cpy = new byte[a-r];
-              System.arraycopy(buf, r, buf, 0, a - r);
-              // System.arraycopy(cpy, 0, buf, 0, a-r);
-            }
-            a -= r;
-            r = 0;
-          }
-          else {
-            out.write(buf, 0, a);
-            byte[] hist = new byte[a];
-            System.arraycopy(buf, 0, hist, 0, a);
-            history.addLast(hist);
-            r -= a;
-            a = 0;
           }
         }
-        if (player.isClosed()) {
-          throw new InterruptedException();
+
+        if (!isServerTunnel) {
+          if (player.isMuted() && !message.startsWith("/")
+              && !message.startsWith("!")) {
+            player.addMessage("You are muted! You may not send messages to all players.");
+            break;
+          }
+
+          if (server.options.getBoolean("useSlashes")
+              && message.startsWith("/") || message.startsWith("!")
+              && player.parseCommand(message)) {
+            break;
+          }
         }
-        Thread.sleep(20);
-      }
-    }
-    catch (InterruptedException e1) {
-      // We don't care about an Interrupted Exception.
-      // Don't even print out to the console that we received the exception.
-      // We are only interrupted if we are closing.
-      // e1.printStackTrace();
-    }
-    catch (Exception e) {
-      e.printStackTrace();
-    }
-    try {
-      if (!player.isClosed()) {
-        player.close();
-      }
-    }
-    catch (InterruptedException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    }
-    history.clear();
-    history = null;
-    try {
-      in.close();
-    }
-    catch (IOException e2) {
-    }
-    try {
-      out.close();
-    }
-    catch (IOException e2) {
-    }
-    in = null;
-    out = null;
-    player = null;
-    lock = null;
-  }
 
-  private byte[] makePacket(String msg) throws IOException {
-    return makePacket((byte) 0x03, msg);
-  }
-
-  private byte[] makePacket(byte packetid, String msg) throws IOException {
-    ByteArrayOutputStream cpy = new ByteArrayOutputStream();
-    DataOutputStream s = new DataOutputStream(cpy);
-    s.writeByte(packetid);
-    s.writeUTF(msg);
-    byte[] msgBytes = cpy.toByteArray();
-    s.close();
-    return msgBytes;
-  }
-
-  public void addPacket(byte[] packet) {
-    packetBuffer.add(packet);
-  }
-
-  static void putShort(byte[] b, int off, short val) {
-    b[off + 1] = (byte) (val >>> 0);
-    b[off + 0] = (byte) (val >>> 8);
-  }
-
-  protected void parsePacket(int packetid) throws IOException,
-      InterruptedException {
-    int oldCursor = 0;
-
-    switch (packetid) {
-      /* 0.2.7 Update */
-      case 0x3c:
-        skipBytes(28);
-        skipBytes(readInt() * 3);
+        write(packetId);
+        write(message);
         break;
-      /* 0.2.5 Update */
-      case 0x08:
-        skipBytes(1);
+      case 0x04: // Time Update
+        write(packetId);
+        copyNBytes(8);
         break;
-      case 0x09:
+      case 0x05: // Player Inventory
+        boolean guest = player.getGroupId() < 0;
+        int inventoryType = in.readInt();
+        short itemCount = in.readShort();
+        if (!guest) {
+          write(packetId);
+          write(inventoryType);
+          write(itemCount);
+        }
+
+        for (int c = 0; c < itemCount; ++c) {
+          short itemId = in.readShort();
+          if (!guest) {
+            write(itemId);
+          }
+
+          if (itemId != -1) {
+            byte itemAmount = in.readByte();
+            short itemUses = in.readShort();
+            if (!guest) {
+              write(itemAmount);
+              write(itemUses);
+            }
+
+            if (!server.itemWatch.playerAllowed(player, itemId, itemAmount)) {
+              server.adminLog.addMessage("ItemWatchList banned player:\t"
+                  + player.getName());
+              server.banKick(player.getName());
+            }
+          }
+        }
         break;
-      case 0x26:
-        skipBytes(5);
+      case 0x06: // Spawn Position
+        write(packetId);
+        copyNBytes(12);
         break;
-      case 0x07:
-        // skipBytes(8);
-        skipBytes(9);
+      case 0x07: // Use Entity?
+        write(packetId);
+        copyNBytes(9);
         break;
-      /* old */
-      case 0x0a:
-        skipBytes(1);
+      case 0x08: // Update Health
+        write(packetId);
+        copyNBytes(1);
+        break;
+      case 0x09: // Respawn
+        write(packetId);
+        break;
+      case 0x0a: // Player
+        write(packetId);
+        copyNBytes(1);
         if (!inGame && !isServerTunnel) {
           player.sendMOTD();
           inGame = true;
         }
         break;
-      case 0x04:
-        skipBytes(8);
+      case 0x0b: // Player Position
+        write(packetId);
+        copyPlayerLocation();
         break;
-      // Format:
-      // int, short
-      // Then, each entry in the array is either s or sbs
-      // it will be just s if it is -1
-      case 0x05:
-        oldCursor = r - 1;
-        readInt();
-        short sizeOfArray = readShort();
-        for (int pst = 0; pst < sizeOfArray; pst++) {
-          short s = readShort();
-          if (s != -1) {
-            if (server.itemWatch.contains(s) && player.getName() != null) {
-              byte amtOfItem = readByte();
-              if (!server.itemWatch.playerAllowed(player, s, amtOfItem)
-                  && player.getName() != null) {
-                server.adminLog.addMessage("ItemWatchList banned player:\t"
-                    + player.getName());
-                server.banKick(player.getName());
-              }
-              skipBytes(2);
-            }
-            else {
-              skipBytes(3);
-            }
-          }
-        }
-        if (player.getGroupId() < 0) {
-          removeBytes(r - oldCursor);
-          break;
-        }
-        // printStream(buf,i-2,size+4);
+      case 0x0c: // Player Look
+        write(packetId);
+        copyNBytes(9);
         break;
-      case 0x3b:
-        oldCursor = r - 1;
-        int xC3b = readInt();
-        int yC3b = readShort();
-        int zC3b = readInt();
-        int arraySize = readShort();
-        skipBytes(arraySize);
-        if (server.chests.hasLock(xC3b, yC3b, zC3b)) {
-          if (!player.isAdmin()) {
-            if (!server.chests.ownsLock(xC3b, yC3b, zC3b, player.getName())
-                || player.getName() == null) {
-              removeBytes(r - oldCursor);
-              break;
-            }
-          }
-        }
-
-        if (player.getGroupId() < 0
-            && !server.options.getBoolean("guestsCanViewComplex")) {
-          removeBytes(r - oldCursor);
-          break;
-        }
-
+      case 0x0d: // Player Position & Look
+        write(packetId);
+        copyPlayerLocation();
+        copyNBytes(8);
         break;
-      case 0x06:
-        skipBytes(12);
-        break;
-      case 0x0b:
-        if (!isServerTunnel) {
-          motionCounter++;
-        }
-        if (!isServerTunnel && motionCounter % 8 == 0) {
-          double x = readDouble();
-          double y = readDouble();
-          double stance = readDouble();
-          double z = readDouble();
-          player.updateLocation(x, y, z, stance);
-          skipBytes(1);
-        }
-        else {
-          skipBytes(33);
-        }
-        break;
-      case 0x0c:
-        skipBytes(9);
-        break;
-      case 0x0d:
-        if (!isServerTunnel) {
-          motionCounter++;
-        }
-        if (!isServerTunnel && motionCounter % 8 == 0) {
-          double x = readDouble();
-          double y = readDouble();
-          double stance = readDouble();
-          double z = readDouble();
-          player.updateLocation(x, y, z, stance);
-          skipBytes(9);
-        }
-        else {
-          skipBytes(41);
-        }
-        break;
-      case 0x0e:
-
+      case 0x0e: // Player Digging
         if (!isServerTunnel) {
           if (player.getGroupId() < 0) {
-            skipBytes(11);
-            removeBytes(12);
+            skipNBytes(11);
             break;
           }
-          @SuppressWarnings("unused")
-          int status = readByte();
-          int xC0e = readInt();
-          int yC0e = readByte();
-          int zC0e = readInt();
-          readByte();
-          if (server.chests.hasLock(xC0e, yC0e, zC0e) && !player.isAdmin()) {
-            removeBytes(12);
+
+          int status = in.readByte();
+          int x = in.readInt();
+          int y = in.readByte();
+          int z = in.readInt();
+          byte face = in.readByte();
+          if (server.chests.hasLock(x, y, z) && !player.isAdmin()) {
             break;
           }
+          write(packetId);
+          write(status);
+          write(x);
+          write(y);
+          write(z);
+          write(face);
+
           if (player.instantDestroyEnabled()) {
-            byte[] cpyPacket = new byte[12];
-            byte[] cpyPacket2 = new byte[12];
-            System.arraycopy(buf, r - 12, cpyPacket, 0, 12);
-            cpyPacket[1] = 1;
-            cpyPacket2 = cpyPacket.clone();
-            cpyPacket2[1] = 3;
-            addPacket(cpyPacket);
-            addPacket(cpyPacket.clone());
-            addPacket(cpyPacket.clone());
-            addPacket(cpyPacket.clone());
-            addPacket(cpyPacket.clone());
-            addPacket(cpyPacket.clone());
-            addPacket(cpyPacket.clone());
-            addPacket(cpyPacket.clone());
-            addPacket(cpyPacket.clone());
-            addPacket(cpyPacket.clone());
-            addPacket(cpyPacket.clone());
-            addPacket(cpyPacket.clone());
-            addPacket(cpyPacket.clone());
-            addPacket(cpyPacket2);
+            for (int c = 1; c < DESTROY_HITS; ++c) {
+              write(packetId);
+              write(status);
+              write(x);
+              write(y);
+              write(z);
+              write(face);
+            }
+
+            write(packetId);
+            write(BLOCK_DESTROYED_STATUS);
+            write(x);
+            write(y);
+            write(z);
+            write(face);
           }
         }
         else {
-          skipBytes(11);
+          write(packetId);
+          copyNBytes(11);
         }
         break;
       // CHECK THIS
-      case 0x0f:
+      case 0x0f: // Player Block Placement
         short block = readShort();
         if (!isServerTunnel) {
           if (server.blockFirewall.contains(block) || player.getGroupId() < 0) {
@@ -515,182 +339,135 @@ public class StreamTunnel implements Runnable {
           skipBytes(10);
         }
         break;
-      case 0x10:
-        skipBytes(6);
+      case 0x10: // Holding Change
+        write(packetId);
+        copyNBytes(6);
         break;
-      case 0x11:
-        skipBytes(5);
+      case 0x11: // Add To Inventory
+        write(packetId);
+        copyNBytes(5);
         break;
-      case 0x12:
-        skipBytes(5);
+      case 0x12: // Animation
+        write(packetId);
+        copyNBytes(5);
         break;
-      case 0x15:
-        skipBytes(22);
+      case 0x14: // Named Entity Spawn
+        write(packetId);
+        write(in.readInt());
+        write(in.readUTF());
+        copyNBytes(16);
+        break;
+      case 0x15: // Pickup spawn
         if (player.getGroupId() < 0) {
-          removeBytes(23);
+          skipNBytes(22);
           break;
         }
+        write(packetId);
+        copyNBytes(22);
         break;
-      case 0x16:
-        skipBytes(8);
+      case 0x16: // Collect Item
+        write(packetId);
+        copyNBytes(8);
         break;
-      case 0x17:
-        skipBytes(17);
+      case 0x17: // Add Object/Vehicle
+        write(packetId);
+        copyNBytes(17);
         break;
-      case 0x18:
-        skipBytes(19);
+      case 0x18: // Mob Spawn
+        write(packetId);
+        copyNBytes(19);
         break;
-      case 0x1D:
-        skipBytes(4);
+      case 0x1c: // Entity Velocity?
+        write(packetId);
+        copyNBytes(10);
         break;
-      case 0x1E:
-        skipBytes(4);
+      case 0x1D: // Destroy Entity
+        write(packetId);
+        copyNBytes(4);
         break;
-      case 0x1F:
-        skipBytes(7);
+      case 0x1E: // Entity
+        write(packetId);
+        copyNBytes(4);
         break;
-      case 0x20:
-        skipBytes(6);
+      case 0x1F: // Entity Relative Move
+        write(packetId);
+        copyNBytes(7);
         break;
-      case 0x21:
-        skipBytes(9);
+      case 0x20: // Entity Look
+        write(packetId);
+        copyNBytes(6);
         break;
-      case 0x22:
-        skipBytes(18);
+      case 0x21: // Entity Look and Relative Move
+        write(packetId);
+        copyNBytes(9);
         break;
-      case 0x32:
-        skipBytes(9);
+      case 0x22: // Entity Teleport
+        write(packetId);
+        copyNBytes(18);
         break;
-      case 0x35:
-        skipBytes(11);
+      case 0x26: // Entity damage, death and explosion?
+        write(packetId);
+        copyNBytes(5);
         break;
-      case 0x1c:
-        skipBytes(10);
+      case 0x27: // Attach Entity?
+        write(packetId);
+        copyNBytes(8);
         break;
-      case 0x27:
-        skipBytes(8);
+      case 0x32: // Pre-Chunk
+        write(packetId);
+        copyNBytes(9);
         break;
-      case 0x02:
-        oldCursor = r - 1;
-        if (!isServerTunnel) {
-          if (!player.setName(readString())) {
-            removeBytes(r - oldCursor);
-          }
-        }
-        else {
-          readString();
-        }
-        break;
-      case 0x03:
-        oldCursor = r - 1;
-        String msg = readString();
-        if (isServerTunnel && server.options.getBoolean("useMsgFormats")) {
-          if (msg.startsWith("<")) {
-            try {
-              String nameTok = msg.substring(1);
-              if (nameTok.startsWith("\302\247")) {
-                nameTok = msg.substring(3);
-              }
-              int sidx = nameTok.indexOf("\302\247");
-              if (sidx > 0) {
-                nameTok = nameTok.substring(0, sidx);
-              }
-              else {
-                sidx = nameTok.indexOf(">");
-                nameTok = nameTok.substring(0, sidx);
-              }
-              Player p = server.findPlayerExact(nameTok);
-
-              if (p != null) {
-                int idx = msg.indexOf(">");
-                msg = msg.substring(idx + 1);
-                if (!server.options.contains("msgFormat")) {
-                  server.options.set("msgFormat", "<\302\247%3$s%1$s>\302\247f");
-                }
-                if (!server.options.contains("msgTitleFormat")) {
-                  server.options.set("msgTitleFormat",
-                                     "<\302\247%3$s[%2$s]%1$s>\302\247f");
-                }
-
-                String color = "f";
-                String title = "";
-                String format = server.options.get("msgFormat");
-                Group group = p.getGroup();
-                if (group != null) {
-                  color = group.getColor();
-                  if (group.showTitle()) {
-                    title = group.getName();
-                    format = server.options.get("msgTitleFormat");
-                  }
-                }
-                msg = String.format(format, p.getName(), title, color) + msg;
-                player.addMessage(msg);
-              }
-              removeBytes(r - oldCursor);
-            }
-            catch (Exception e) {
-              System.out.println("[SimpleServer] There is an error in your msgFormat/msgTitleFormat settings!");
-            }
-          }
-        }
-
-        if (!isServerTunnel) {
-          if (player.isMuted() && !msg.startsWith("/") && !msg.startsWith("!")) {
-            removeBytes(msg.length() + 2 + 1);
-            player.addMessage("You are muted! You may not send messages to all players.");
-            break;
-          }
-          if (msg.equalsIgnoreCase("/home")) {
-            if (!server.cmdAllowed("home", player)) {
-              removeBytes(msg.length() + 2 + 1);
-            }
-            else {
-              break;
-            }
-          }
-
-          if ((server.options.getBoolean("useSlashes") && msg.startsWith("/"))
-              || msg.startsWith("!")) {
-            boolean remove = player.parseCommand(msg);
-            // Remove the packet! : )
-            if (remove) {
-              removeBytes(msg.length() + 2 + 1);
-            }
-          }
-        }
-        break;
-      case (byte) 0xff:
-        String discMsg = readString();
-        if (discMsg.startsWith("Took too long")) {
-          server.addRobot(player);
-        }
-        player.delayClose();
-        break;
-      case 0x01:
-        readInt();
-        readString();
-        readString();
-        readInt();
-        readInt();
-        readByte();
-        break;
-      case (byte) 0x14:
-        readInt();
-        readString();
-        skipBytes(16);
+      case 0x33: // Map Chunk
+        write(packetId);
+        copyNBytes(13);
+        int chunkSize = in.readInt();
+        write(chunkSize);
+        copyNBytes(chunkSize);
         break;
       // THIS DOESNT WORK :(
-      case (byte) 0x34:
+      case 0x34: // Multi Block Change
         skipBytes(8);
         short chunkSize34 = readShort();
         skipBytes(chunkSize34 * 4);
         break;
-      case (byte) 0x33:
-        skipBytes(13);
-        int chunkSize33 = readInt();
-        skipBytes(chunkSize33);
+      case 0x35: // Block Change
+        write(packetId);
+        copyNBytes(11);
         break;
-      case 0:
+      case 0x3b: // Complex Entities
+        oldCursor = r - 1;
+        int xC3b = readInt();
+        int yC3b = readShort();
+        int zC3b = readInt();
+        int arraySize = readShort();
+        skipBytes(arraySize);
+        if (server.chests.hasLock(xC3b, yC3b, zC3b)) {
+          if (!player.isAdmin()) {
+            if (!server.chests.ownsLock(xC3b, yC3b, zC3b, player.getName())
+                || player.getName() == null) {
+              removeBytes(r - oldCursor);
+              break;
+            }
+          }
+        }
+
+        if (player.getGroupId() < 0
+            && !server.options.getBoolean("guestsCanViewComplex")) {
+          removeBytes(r - oldCursor);
+          break;
+        }
+
+        break;
+      case 0x3c: // Explosion
+        skipBytes(28);
+        skipBytes(readInt() * 3);
+        break;
+      case 0xff: // Disconnect/Kick
+        String discMsg = readString();
+        if (discMsg.startsWith("Took too long")) {
+          server.addRobot(player);
+        }
+        player.close();
         break;
       default:
         byte[] cpy = new byte[a];
@@ -706,158 +483,107 @@ public class StreamTunnel implements Runnable {
     }
   }
 
-  private int readMore(int num) throws InterruptedException, IOException {
-    int tmp = 0;
-    try {
-      lock.acquire();
-      tmp = in.read(buf, a, num);
-      if (tmp > 0) {
-        a += tmp;
+  private void copyPlayerLocation() throws IOException {
+    if (!isServerTunnel) {
+      motionCounter++;
+    }
+    if (!isServerTunnel && motionCounter % 8 == 0) {
+      double x = in.readDouble();
+      double y = in.readDouble();
+      double stance = in.readDouble();
+      double z = in.readDouble();
+      player.updateLocation(x, y, z, stance);
+      copyNBytes(1);
+    }
+    else {
+      copyNBytes(33);
+    }
+  }
+
+  private void write(byte b) throws IOException {
+    out.writeByte(b);
+  }
+
+  private void write(short s) throws IOException {
+    out.writeShort(s);
+  }
+
+  private void write(int i) throws IOException {
+    out.writeInt(i);
+  }
+
+  private void write(long l) throws IOException {
+    out.writeLong(l);
+  }
+
+  private void write(float f) throws IOException {
+    out.writeFloat(f);
+  }
+
+  private void write(double d) throws IOException {
+    out.writeDouble(d);
+  }
+
+  private void write(String s) throws IOException {
+    out.writeUTF(s);
+  }
+
+  private void write(boolean b) throws IOException {
+    out.writeBoolean(b);
+  }
+
+  private void skipNBytes(int bytes) throws IOException {
+    in.readFully(buffer, 0, bytes);
+  }
+
+  private void copyNBytes(int bytes) throws IOException {
+    in.readFully(buffer, 0, bytes);
+    out.write(buffer, 0, bytes);
+  }
+
+  private final class Tunneler {
+    public void run() {
+      while (run) {
         lastRead = System.currentTimeMillis();
+        handlePacket();
+
+        if (isServerTunnel) {
+          if (player.isKicked()) {
+            out.write(makePacket((byte) 0xff, player.getKickMsg()));
+            out.flush();
+            break;
+          }
+          while (player.hasMessages()) {
+            byte[] m = makePacket(player.getMessage());
+            out.write(m, 0, m.length);
+          }
+        }
+        else {
+          if (player.isKicked()) {
+            out.write(makePacket((byte) 0xff, player.getKickMsg()));
+            out.flush();
+            break;
+          }
+        }
+
+        if (System.currentTimeMillis() - lastRead > IDLE_TIME) {
+          if (!player.isRobot()) {
+            System.out.println("[SimpleServer] Disconnecting "
+                + player.getIPAddress() + " due to inactivity.");
+          }
+        }
       }
-      lock.release();
-      return a;
-    }
-    catch (IOException e) {
-      lock.release();
-      throw e;
-    }
-    catch (InterruptedException e) {
-      lock.release();
-      throw e;
-    }
 
-  }
-
-  protected boolean ensureRead(int n) throws InterruptedException, IOException {
-
-    if (r + n > BUF_SIZE) {
-      return false;
-    }
-    if (a >= r + n) {
-      return true;
-    }
-    while (a < r + n) {
-      if (player.isClosed() || Thread.interrupted()) {
-        throw new InterruptedException();
+      try {
+        in.close();
       }
-      // readMore();
-      // System.out.println((r+n) + " " + a);
-      readMore((r + n) - a);
+      catch (IOException e) {
+      }
+      try {
+        out.close();
+      }
+      catch (IOException e) {
+      }
     }
-    return true;
   }
-
-  protected String readString() throws IOException, InterruptedException {
-    ensureRead(2);
-    byte[] strLenBytes = readBytes(2);
-    short strLen = bytesToShort(strLenBytes);
-    ensureRead(strLen);
-    byte[] cpy = new byte[strLen + 3];
-    System.arraycopy(buf, r - 3, cpy, 0, strLen + 3);
-    r += strLen;
-    DataInputStream s = new DataInputStream(new ByteArrayInputStream(cpy));
-    s.readByte();
-    String str = s.readUTF();
-    s.close();
-    return str;
-  }
-
-  protected int readInt() throws IOException, InterruptedException {
-    ensureRead(4);
-    byte[] cpy = new byte[4];
-    cpy[0] = buf[r];
-    cpy[1] = buf[r + 1];
-    cpy[2] = buf[r + 2];
-    cpy[3] = buf[r + 3];
-    r += 4;
-    return bytesToInt(cpy);
-  }
-
-  protected double readDouble() throws IOException, InterruptedException {
-    ensureRead(8);
-    byte[] cpy = new byte[8];
-    cpy[0] = buf[r];
-    cpy[1] = buf[r + 1];
-    cpy[2] = buf[r + 2];
-    cpy[3] = buf[r + 3];
-    cpy[4] = buf[r + 4];
-    cpy[5] = buf[r + 5];
-    cpy[6] = buf[r + 6];
-    cpy[7] = buf[r + 7];
-    r += 8;
-    return bytesToDouble(cpy);
-  }
-
-  protected short readShort() throws IOException, InterruptedException {
-    ensureRead(2);
-    byte[] cpy = new byte[2];
-    cpy[0] = buf[r];
-    cpy[1] = buf[r + 1];
-    r += 2;
-    return bytesToShort(cpy);
-  }
-
-  protected byte[] readBytes(int n) throws IOException, InterruptedException {
-    ensureRead(n);
-    byte[] cpy = new byte[n];
-    System.arraycopy(buf, r, cpy, 0, n);
-    r += n;
-    return cpy;
-  }
-
-  protected byte readByte() throws IOException, InterruptedException {
-    ensureRead(1);
-    return buf[r++];
-  }
-
-  protected void skipBytes(int n) {
-    r += n;
-  }
-
-  protected void removeBytes(int n) throws IOException, InterruptedException {
-    ensureRead(0);
-    lock.acquire();
-    if (a - r != 0) {
-      // byte[] cpy = new byte[a-r];
-      System.arraycopy(buf, r, buf, r - n, a - r);
-      // System.arraycopy(cpy, 0, buf, r-n, a-r);
-    }
-    r -= n;
-    a -= n;
-    lock.release();
-  }
-
-  private short bytesToShort(byte[] data) {
-    bb.clear();
-    bb.put(data[0]);
-    bb.put(data[1]);
-    short s = bb.getShort(0);
-    return s;
-  }
-
-  private int bytesToInt(byte[] data) {
-    bb.clear();
-    bb.put(data[0]);
-    bb.put(data[1]);
-    bb.put(data[2]);
-    bb.put(data[3]);
-    int s = bb.getInt(0);
-    return s;
-  }
-
-  private double bytesToDouble(byte[] data) {
-    bb.clear();
-    bb.put(data[0]);
-    bb.put(data[1]);
-    bb.put(data[2]);
-    bb.put(data[3]);
-    bb.put(data[4]);
-    bb.put(data[5]);
-    bb.put(data[6]);
-    bb.put(data[7]);
-    double s = bb.getDouble(0);
-    return s;
-  }
-
 }
