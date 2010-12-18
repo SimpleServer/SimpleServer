@@ -32,8 +32,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.IllegalFormatException;
-import java.util.concurrent.BrokenBarrierException;
-import java.util.concurrent.CyclicBarrier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -51,7 +49,6 @@ public class StreamTunnel {
 
   private final boolean isServerTunnel;
   private final String streamType;
-  private final CyclicBarrier barrier;
   private final Player player;
   private final Server server;
   private final byte[] buffer;
@@ -59,15 +56,16 @@ public class StreamTunnel {
 
   private DataInput in;
   private DataOutput out;
+  private StreamDumper inputDumper;
+  private StreamDumper outputDumper;
 
   private int motionCounter = 0;
   private boolean run = true;
   private boolean inGame = false;
-
-  protected long lastRead;
+  private long lastRead;
 
   public StreamTunnel(InputStream in, OutputStream out, boolean isServerTunnel,
-                      CyclicBarrier barrier, Player player) {
+                      Player player) {
     this.isServerTunnel = isServerTunnel;
     if (isServerTunnel) {
       streamType = "ServerStream";
@@ -76,7 +74,6 @@ public class StreamTunnel {
       streamType = "PlayerStream";
     }
 
-    this.barrier = barrier;
     this.player = player;
     server = player.getServer();
 
@@ -84,8 +81,10 @@ public class StreamTunnel {
     DataOutputStream dOut = new DataOutputStream(new BufferedOutputStream(out));
     if (EXPENSIVE_DEBUG_LOGGING) {
       try {
-        OutputStream outDump = new FileOutputStream(streamType + "Input.debug");
-        this.in = new InputStreamDumper(dIn, outDump);
+        OutputStream dump = new FileOutputStream(streamType + "Input.debug");
+        InputStreamDumper dumper = new InputStreamDumper(dIn, dump);
+        inputDumper = dumper;
+        this.in = dumper;
       }
       catch (FileNotFoundException e) {
         System.out.println("Unable to open input debug dump!");
@@ -93,8 +92,10 @@ public class StreamTunnel {
       }
 
       try {
-        OutputStream outDump = new FileOutputStream(streamType + "Output.debug");
-        this.out = new OutputStreamDumper(dOut, outDump);
+        OutputStream dump = new FileOutputStream(streamType + "Output.debug");
+        OutputStreamDumper dumper = new OutputStreamDumper(dOut, dump);
+        outputDumper = dumper;
+        this.out = dumper;
       }
       catch (FileNotFoundException e) {
         System.out.println("Unable to open output debug dump!");
@@ -110,6 +111,8 @@ public class StreamTunnel {
 
     tunneler = new Tunneler();
     tunneler.start();
+
+    lastRead = System.currentTimeMillis();
   }
 
   public void stop() {
@@ -612,16 +615,19 @@ public class StreamTunnel {
 
   private void packetFinished() throws IOException {
     if (EXPENSIVE_DEBUG_LOGGING) {
-      ((InputStreamDumper) in).packetFinished();
-      ((OutputStreamDumper) out).packetFinished();
+      inputDumper.packetFinished();
+      outputDumper.packetFinished();
     }
   }
 
   private void flushAll() throws IOException {
-    ((OutputStream) out).flush();
-
-    if (EXPENSIVE_DEBUG_LOGGING) {
-      ((InputStreamDumper) in).flush();
+    try {
+      ((OutputStream) out).flush();
+    }
+    finally {
+      if (EXPENSIVE_DEBUG_LOGGING) {
+        inputDumper.flush();
+      }
     }
   }
 
@@ -653,36 +659,19 @@ public class StreamTunnel {
           }
         }
 
-        if (player.isKicked()) {
-          try {
-            kick(player.getKickMsg());
-            flushAll();
-          }
-          catch (IOException e) {
-          }
-        }
-
         try {
-          barrier.await();
+          if (player.isKicked()) {
+            kick(player.getKickMsg());
+          }
+          flushAll();
         }
-        catch (InterruptedException e) {
-          e.printStackTrace();
-        }
-        catch (BrokenBarrierException e) {
-          e.printStackTrace();
+        catch (IOException e) {
         }
       }
       finally {
-        try {
-          ((InputStream) in).close();
-        }
-        catch (IOException e) {
-        }
-
-        try {
-          ((OutputStream) out).close();
-        }
-        catch (IOException e) {
+        if (EXPENSIVE_DEBUG_LOGGING) {
+          inputDumper.cleanup();
+          outputDumper.cleanup();
         }
       }
     }

@@ -28,7 +28,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 
-public class InputStreamDumper extends FilterInputStream implements DataInput {
+public class InputStreamDumper extends FilterInputStream implements DataInput,
+    StreamDumper {
   private final DataInputStream in;
   private final BufferedWriter dump;
 
@@ -39,6 +40,14 @@ public class InputStreamDumper extends FilterInputStream implements DataInput {
 
     this.in = in;
     this.dump = new BufferedWriter(new OutputStreamWriter(dump));
+  }
+
+  public void cleanup() {
+    try {
+      dump.close();
+    }
+    catch (IOException e) {
+    }
   }
 
   public void packetFinished() throws IOException {

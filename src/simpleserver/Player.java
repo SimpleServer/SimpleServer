@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.net.Socket;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.CyclicBarrier;
 
 import simpleserver.command.AbstractCommand;
 import simpleserver.stream.StreamTunnel;
@@ -255,26 +254,24 @@ public class Player {
     try {
       intsocket = new Socket("localhost", parent.options.getInt("internalPort"));
     }
-    catch (Exception e2) {
-      e2.printStackTrace();
+    catch (Exception e) {
+      e.printStackTrace();
       if (parent.options.getBoolean("exitOnFailure")) {
-        System.exit(-1);
+        server.stop();
       }
       else {
         parent.restart();
       }
     }
 
-    CyclicBarrier barrier = new CyclicBarrier(2);
     try {
       serverToClient = new StreamTunnel(intsocket.getInputStream(),
-                                        extsocket.getOutputStream(), true,
-                                        barrier, this);
+                                        extsocket.getOutputStream(), true, this);
       clientToServer = new StreamTunnel(extsocket.getInputStream(),
                                         intsocket.getOutputStream(), false,
-                                        barrier, this);
+                                        this);
     }
-    catch (Exception e) {
+    catch (IOException e) {
       e.printStackTrace();
       cleanup();
     }

@@ -29,7 +29,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 
 public class OutputStreamDumper extends FilterOutputStream implements
-    DataOutput {
+    DataOutput, StreamDumper {
   private final DataOutputStream out;
   private final BufferedWriter dump;
 
@@ -40,6 +40,14 @@ public class OutputStreamDumper extends FilterOutputStream implements
 
     this.out = out;
     this.dump = new BufferedWriter(new OutputStreamWriter(dump));
+  }
+
+  public void cleanup() {
+    try {
+      dump.close();
+    }
+    catch (IOException e) {
+    }
   }
 
   public void packetFinished() throws IOException {
