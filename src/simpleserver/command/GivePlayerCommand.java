@@ -28,8 +28,7 @@ public class GivePlayerCommand extends GiveCommand {
   }
 
   @Override
-  protected Player getTarget(Player player, String[] arguments)
-      throws InterruptedException {
+  protected Player getTarget(Player player, String[] arguments) {
     Player target = null;
     if (arguments.length > 0) {
       target = player.getServer().findPlayer(arguments[0]);

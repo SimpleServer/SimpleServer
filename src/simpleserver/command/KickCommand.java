@@ -28,8 +28,7 @@ public class KickCommand extends OnlinePlayerCommand {
   }
 
   @Override
-  protected void executeWithTarget(Player player, String message, Player target)
-      throws InterruptedException {
+  protected void executeWithTarget(Player player, String message, Player target) {
     String reason = extractArgument(message, 1);
     target.kick(reason);
 

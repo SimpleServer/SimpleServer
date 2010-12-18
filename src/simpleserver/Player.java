@@ -26,6 +26,7 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import simpleserver.command.AbstractCommand;
+import simpleserver.stream.StreamTunnel;
 
 public class Player {
   private Socket intsocket;
@@ -86,10 +87,7 @@ public class Player {
     return server;
   }
 
-  public boolean setName(String name) throws InterruptedException {
-    t1.setName(t1.getName() + "-serverToClient-" + name);
-    t2.setName(t2.getName() + "-clientToServer-" + name);
-    // timeout.setName("timeoutThread-"+name);
+  public boolean setName(String name) {
     if (name == null) {
       kick("Invalid Name!");
       return false;
@@ -150,8 +148,7 @@ public class Player {
     return name;
   }
 
-  public boolean parseCommand(String message) throws InterruptedException,
-      IOException {
+  public boolean parseCommand(String message) {
     if (closed) {
       return true;
     }
@@ -265,8 +262,7 @@ public class Player {
 
     try {
       serverToClient = new StreamTunnel(intsocket.getInputStream(),
-                                        extsocket.getOutputStream(), true,
-                                        this);
+                                        extsocket.getOutputStream(), true, this);
       clientToServer = new StreamTunnel(extsocket.getInputStream(),
                                         intsocket.getOutputStream(), false,
                                         this);
@@ -281,33 +277,11 @@ public class Player {
     }
   }
 
-  // Public Methods:
-  public boolean testTimeout() {
-    if (!closed) {
-      if (System.currentTimeMillis() - serverToClient.lastRead > StreamTunnel.IDLE_TIME
-          || System.currentTimeMillis() - clientToServer.lastRead > StreamTunnel.IDLE_TIME) {
-        /*
-        if (!isRobot)
-          System.out.println("[SimpleServer] Disconnecting " + getIPAddress() + " due to inactivity.");
-        try {
-          close();
-        } catch (InterruptedException e) {
-          e.printStackTrace();
-        }
-        */
-        return true;
-      }
-    }
-    return false;
-  }
-
   public boolean isClosed() {
     return closed;
   }
 
   public void close() {
-    // Don't spam the console! : )
-    // And don't close if we're already closing!
     if (!isKicked && server != null) {
       server.notifyClosed(this);
     }
@@ -318,15 +292,17 @@ public class Player {
   }
 
   public void cleanup() {
+    serverToClient.stop();
+    clientToServer.stop();
     try {
       extsocket.close();
     }
-    catch (Exception e) {
+    catch (IOException e) {
     }
     try {
       intsocket.close();
     }
-    catch (Exception e) {
+    catch (IOException e) {
     }
     intsocket = null;
     if (!isRobot && extsocket != null) {
@@ -385,8 +361,7 @@ public class Player {
 
     try {
       serverToClient = new StreamTunnel(intsocket.getInputStream(),
-                                        extsocket.getOutputStream(), true,
-                                        this);
+                                        extsocket.getOutputStream(), true, this);
       clientToServer = new StreamTunnel(extsocket.getInputStream(),
                                         intsocket.getOutputStream(), false,
                                         this);
@@ -405,8 +380,7 @@ public class Player {
     return isRobot;
   }
 
-  public boolean give(String rawItem, String rawAmount)
-      throws InterruptedException {
+  public boolean give(String rawItem, String rawAmount) {
     boolean success = true;
 
     int item = 0;
@@ -453,7 +427,7 @@ public class Player {
     return true;
   }
 
-  public void teleportTo(Player target) throws InterruptedException {
+  public void teleportTo(Player target) {
     server.runCommand("tp", getName() + " " + target.getName());
   }
 

@@ -63,8 +63,7 @@ public class KitList extends PropertiesConfig {
     kits = new ConcurrentHashMap<String, Kit>();
   }
 
-  public void giveKit(Player player, String kitName)
-      throws InterruptedException {
+  public void giveKit(Player player, String kitName) {
     Kit kit = kits.get(kitName);
     if ((kit != null) && (Group.isMember(kit.groups, player))) {
       for (Kit.Entry entry : kit.items) {

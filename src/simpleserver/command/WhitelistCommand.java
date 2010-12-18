@@ -28,8 +28,7 @@ public class WhitelistCommand extends PlayerCommand {
   }
 
   @Override
-  protected void executeWithTarget(Player player, String message, String name)
-      throws InterruptedException {
+  protected void executeWithTarget(Player player, String message, String name) {
     player.getServer().whitelist.addName(name);
 
     player.getServer().adminLog.addMessage("User " + player.getName()

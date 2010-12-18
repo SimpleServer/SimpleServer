@@ -29,8 +29,7 @@ public class TeleportCommand extends OnlinePlayerCommand {
   }
 
   @Override
-  protected void executeWithTarget(Player player, String message, Player target1)
-      throws InterruptedException {
+  protected void executeWithTarget(Player player, String message, Player target1) {
     String[] arguments = extractArguments(message);
     Server server = player.getServer();
 

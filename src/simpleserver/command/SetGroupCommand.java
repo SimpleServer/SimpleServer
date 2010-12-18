@@ -29,8 +29,7 @@ public class SetGroupCommand extends PlayerCommand {
   }
 
   @Override
-  protected void executeWithTarget(Player player, String message, String target)
-      throws InterruptedException {
+  protected void executeWithTarget(Player player, String message, String target) {
     Server server = player.getServer();
     if (player.getGroupId() <= server.members.getGroup(target)) {
       player.addMessage("\302\247cYou cannot set the group of this user!");

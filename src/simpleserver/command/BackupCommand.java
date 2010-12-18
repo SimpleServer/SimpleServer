@@ -28,8 +28,7 @@ public class BackupCommand extends AbstractCommand {
   }
 
   @Override
-  public void execute(Player player, String message)
-      throws InterruptedException {
+  public void execute(Player player, String message) {
     player.addMessage("Forcing backup!");
     player.getServer().forceBackup();
   }

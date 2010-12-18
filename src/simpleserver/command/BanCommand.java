@@ -29,8 +29,7 @@ public class BanCommand extends PlayerCommand {
   }
 
   @Override
-  protected void executeWithTarget(Player player, String message, String target)
-      throws InterruptedException {
+  protected void executeWithTarget(Player player, String message, String target) {
     String reason = extractArgument(message, 1);
     Server server = player.getServer();
 

@@ -33,8 +33,7 @@ public class LocalSayCommand extends AbstractCommand {
   }
 
   @Override
-  public void execute(Player player, String message)
-      throws InterruptedException {
+  public void execute(Player player, String message) {
     String chat = extractArgument(message);
     int numPlayers = player.getServer().localChat(player, chat);
     if (numPlayers <= 0) {

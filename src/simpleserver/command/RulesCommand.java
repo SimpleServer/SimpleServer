@@ -28,8 +28,7 @@ public class RulesCommand extends AbstractCommand {
   }
 
   @Override
-  public void execute(Player player, String message)
-      throws InterruptedException {
+  public void execute(Player player, String message) {
     String rules = player.getServer().getRules();
     String[] lines = rules.split("\\r?\\n");
     for (int i = 0; i < lines.length; i++) {

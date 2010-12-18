@@ -28,8 +28,7 @@ public class KitListCommand extends AbstractCommand {
   }
 
   @Override
-  public void execute(Player player, String message)
-      throws InterruptedException {
+  public void execute(Player player, String message) {
     player.getServer().kits.listKits(player);
   }
 }

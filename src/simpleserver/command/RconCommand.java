@@ -28,8 +28,7 @@ public class RconCommand extends AbstractCommand {
   }
 
   @Override
-  public void execute(Player player, String message)
-      throws InterruptedException {
+  public void execute(Player player, String message) {
     String[] arguments = extractArguments(message);
     String commandArguments = extractArgument(message, 1);
     if (arguments.length > 0) {

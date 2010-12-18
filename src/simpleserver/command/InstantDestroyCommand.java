@@ -28,8 +28,7 @@ public class InstantDestroyCommand extends AbstractCommand {
   }
 
   @Override
-  public void execute(Player player, String message)
-      throws InterruptedException {
+  public void execute(Player player, String message) {
     player.toggleInstantDestroy();
     if (player.instantDestroyEnabled()) {
       player.addMessage("God-Mode Enabled!");

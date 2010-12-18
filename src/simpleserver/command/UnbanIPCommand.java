@@ -28,8 +28,7 @@ public class UnbanIPCommand extends AbstractCommand {
   }
 
   @Override
-  public void execute(Player player, String message)
-      throws InterruptedException {
+  public void execute(Player player, String message) {
     String[] arguments = extractArguments(message);
 
     if (arguments.length >= 1) {

@@ -28,8 +28,7 @@ public class KitCommand extends AbstractCommand {
   }
 
   @Override
-  public void execute(Player player, String message)
-      throws InterruptedException {
+  public void execute(Player player, String message) {
     String[] arguments = extractArguments(message);
     if (arguments.length >= 1) {
       player.getServer().kits.giveKit(player, arguments[0]);

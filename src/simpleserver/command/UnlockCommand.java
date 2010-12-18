@@ -33,8 +33,7 @@ public class UnlockCommand extends AbstractCommand {
   }
 
   @Override
-  public void execute(Player player, String message)
-      throws InterruptedException {
+  public void execute(Player player, String message) {
     player.getServer().chests.releaseLock(player.getName().toLowerCase());
     player.addMessage("Your lock has been released!");
   }

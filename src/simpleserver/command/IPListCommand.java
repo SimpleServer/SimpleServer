@@ -30,8 +30,7 @@ public class IPListCommand extends AbstractCommand {
   }
 
   @Override
-  public void execute(Player player, String message)
-      throws InterruptedException {
+  public void execute(Player player, String message) {
     player.addMessage("IP Addresses:");
     for (Iterator<Player> itr = player.getServer().playerList.iterator(); itr.hasNext();) {
       Player i = itr.next();

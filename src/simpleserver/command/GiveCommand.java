@@ -36,8 +36,7 @@ public class GiveCommand extends AbstractCommand {
   }
 
   @Override
-  public void execute(Player player, String message)
-      throws InterruptedException {
+  public void execute(Player player, String message) {
     String[] arguments = extractArguments(message);
 
     Player target = getTarget(player, arguments);
@@ -63,8 +62,7 @@ public class GiveCommand extends AbstractCommand {
     }
   }
 
-  protected Player getTarget(Player player, String[] arguments)
-      throws InterruptedException {
+  protected Player getTarget(Player player, String[] arguments) {
     return player;
   }
 }

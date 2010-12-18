@@ -33,8 +33,7 @@ public class SaveCommand extends AbstractCommand {
   }
 
   @Override
-  public void execute(Player player, String message)
-      throws InterruptedException {
+  public void execute(Player player, String message) {
     player.getServer().saveResources();
     player.getServer().runCommand("save-all", null);
     player.addMessage("Resources Saved!");

@@ -29,8 +29,7 @@ public class UnmuteCommand extends PlayerCommand {
   }
 
   @Override
-  protected void executeWithTarget(Player player, String message, String name)
-      throws InterruptedException {
+  protected void executeWithTarget(Player player, String message, String name) {
     Server server = player.getServer();
     server.mutelist.removeName(name);
 

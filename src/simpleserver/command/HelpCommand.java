@@ -39,8 +39,7 @@ public class HelpCommand extends AbstractCommand {
   }
 
   @Override
-  public void execute(Player player, String message)
-      throws InterruptedException {
+  public void execute(Player player, String message) {
     StringBuffer line = new StringBuffer();
     line.append("Available Commands: ");
 

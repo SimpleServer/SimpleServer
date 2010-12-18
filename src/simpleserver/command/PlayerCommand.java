@@ -28,8 +28,7 @@ public abstract class PlayerCommand extends AbstractCommand {
   }
 
   @Override
-  public void execute(Player player, String message)
-      throws InterruptedException {
+  public void execute(Player player, String message) {
     String[] arguments = extractArguments(message);
 
     if (arguments.length > 0) {
@@ -46,8 +45,7 @@ public abstract class PlayerCommand extends AbstractCommand {
   }
 
   protected abstract void executeWithTarget(Player player, String message,
-                                            String target)
-      throws InterruptedException;
+                                            String target);
 
   protected void noTargetSpecified(Player player, String message) {
     player.addMessage("\302\247cNo player specified.");

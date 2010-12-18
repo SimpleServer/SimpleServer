@@ -50,8 +50,7 @@ public abstract class AbstractCommand {
     return false;
   }
 
-  public abstract void execute(Player player, String message)
-      throws InterruptedException;
+  public abstract void execute(Player player, String message);
 
   protected String[] extractArguments(String message) {
     String[] parts = message.split("\\s+");

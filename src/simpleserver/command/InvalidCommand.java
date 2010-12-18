@@ -33,8 +33,7 @@ public class InvalidCommand extends AbstractCommand {
   }
 
   @Override
-  public void execute(Player player, String message)
-      throws InterruptedException {
+  public void execute(Player player, String message) {
     player.addMessage("\302\247cNo such command " + message);
   }
 }

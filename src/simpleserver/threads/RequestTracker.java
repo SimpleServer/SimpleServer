@@ -18,9 +18,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-package simpleserver;
+package simpleserver.threads;
 
 import java.util.LinkedList;
+
+import simpleserver.Server;
 
 public class RequestTracker implements Runnable {
   private static final int MAX_REQUESTS = 30;

@@ -28,8 +28,7 @@ public class UnbanCommand extends PlayerCommand {
   }
 
   @Override
-  protected void executeWithTarget(Player player, String message, String name)
-      throws InterruptedException {
+  protected void executeWithTarget(Player player, String message, String name) {
     player.getServer().runCommand("pardon", name);
 
     player.getServer().adminLog.addMessage("User " + player.getName()

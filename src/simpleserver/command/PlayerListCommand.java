@@ -35,8 +35,7 @@ public class PlayerListCommand extends AbstractCommand {
   }
 
   @Override
-  public void execute(Player player, String message)
-      throws InterruptedException {
+  public void execute(Player player, String message) {
     String list = "Connected Players (" + player.getServer().numPlayers()
         + "): ";
     for (Iterator<Player> itr = player.getServer().playerList.iterator(); itr.hasNext();) {

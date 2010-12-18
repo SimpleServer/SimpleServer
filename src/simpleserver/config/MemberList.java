@@ -45,7 +45,7 @@ public class MemberList extends PropertiesConfig {
     return server.options.getInt("defaultGroup");
   }
 
-  public void setGroup(String name, int group) throws InterruptedException {
+  public void setGroup(String name, int group) {
     if (!server.groups.groupExists(group)) {
       return;
     }

@@ -50,7 +50,7 @@ import simpleserver.options.Language;
 import simpleserver.options.Options;
 import simpleserver.rcon.RconServer;
 import simpleserver.threads.C10TThread;
-import simpleserver.threads.PlayerScanner;
+import simpleserver.threads.RequestTracker;
 import simpleserver.threads.ServerAutoRestart;
 import simpleserver.threads.ServerAutoSave;
 import simpleserver.threads.ServerBackup;
@@ -95,7 +95,6 @@ public class Server {
   private Thread backupThread;
   private Thread autoSaveThread;
   private Thread autoRestartThread;
-  private Thread playerScannerThread;
 
   private final Listener listener;
 
@@ -105,7 +104,6 @@ public class Server {
   private ServerBackup serverBackup;
   private ServerAutoSave autosave;
   private ServerAutoRestart autoRestart;
-  private PlayerScanner playerScanner;
   public RequestTracker requestTracker;
 
   private boolean run = true;
@@ -391,10 +389,6 @@ public class Server {
     autoRestart = new ServerAutoRestart(this);
     autoRestartThread = new Thread(autoRestart);
     autoRestartThread.start();
-
-    playerScanner = new PlayerScanner(this);
-    playerScannerThread = new Thread(playerScanner);
-    playerScannerThread.start();
 
     requestTracker = new RequestTracker(this);
     new Thread(requestTracker).start();

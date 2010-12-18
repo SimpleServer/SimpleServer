@@ -28,8 +28,7 @@ public class WarpHereCommand extends OnlinePlayerCommand {
   }
 
   @Override
-  protected void executeWithTarget(Player player, String message, Player target)
-      throws InterruptedException {
+  protected void executeWithTarget(Player player, String message, Player target) {
     target.teleportTo(player);
 
     player.getServer().adminLog.addMessage("Admin " + player.getName()

@@ -18,59 +18,88 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-package simpleserver;
+package simpleserver.stream;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
+import java.io.DataInput;
 import java.io.DataInputStream;
+import java.io.DataOutput;
 import java.io.DataOutputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.util.IllegalFormatException;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.concurrent.Semaphore;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import simpleserver.log.EOFWriter;
+import simpleserver.Group;
+import simpleserver.Player;
+import simpleserver.Server;
 
 public class StreamTunnel {
-  public static final int IDLE_TIME = 30 * 1000;
-  private static final int BUFFER_SIZE = 128;
+  private static final boolean EXPENSIVE_DEBUG_LOGGING = Boolean.getBoolean("EXPENSIVE_DEBUG_LOGGING");
+
+  private static final int IDLE_TIME = 30000;
+  private static final int BUFFER_SIZE = 1024;
   private static final int DESTROY_HITS = 14;
   private static final byte BLOCK_DESTROYED_STATUS = 3;
   private static final Pattern MESSAGE_PATTERN = Pattern.compile("^<([^>]+)> (.*)$");
 
   private final boolean isServerTunnel;
+  private final String streamType;
   private final Player player;
   private final Server server;
-  private final DataInputStream in;
-  private final DataOutputStream out;
   private final byte[] buffer;
+  private final Tunneler tunneler;
+  private final Watchdog watchdog;
 
-  private boolean run = true;
-  private boolean inGame = false;
-  protected long lastRead;
+  private DataInput in;
+  private DataOutput out;
 
   private int motionCounter = 0;
+  private boolean run = true;
+  private boolean inGame = false;
+
+  protected long lastRead;
 
   public StreamTunnel(InputStream in, OutputStream out, boolean isServerTunnel,
                       Player player) {
     this.isServerTunnel = isServerTunnel;
+    if (isServerTunnel) {
+      streamType = "ServerStream";
+    }
+    else {
+      streamType = "PlayerStream";
+    }
 
     this.player = player;
     server = player.getServer();
 
-    this.in = new DataInputStream(new BufferedInputStream(in));
+    DataInputStream dataInput = new DataInputStream(new BufferedInputStream(in));
+    if (EXPENSIVE_DEBUG_LOGGING) {
+      try {
+        OutputStream outDump = new FileOutputStream(streamType + "Input");
+        this.in = new InputStreamDumper(dataInput, outDump);
+      }
+      catch (FileNotFoundException e) {
+        e.printStackTrace();
+      }
+    }
+    else {
+      this.in = dataInput;
+    }
     this.out = new DataOutputStream(new BufferedOutputStream(out));
 
     buffer = new byte[BUFFER_SIZE];
+
+    tunneler = new Tunneler();
+    tunneler.start();
+
+    watchdog = new Watchdog();
+    watchdog.start();
   }
 
   public void stop() {
@@ -80,7 +109,7 @@ public class StreamTunnel {
   private void handlePacket() throws IOException {
     Byte packetId = in.readByte();
     switch (packetId) {
-      case 0: // Keep Alive
+      case 0x00: // Keep Alive
         write(packetId);
         break;
       case 0x01: // Login Request/Response
@@ -93,7 +122,10 @@ public class StreamTunnel {
         break;
       case 0x02: // Handshake
         String name = in.readUTF();
-        if (isServerTunnel || player.setName(name)) {
+        tunneler.setName(tunneler.getName() + "-" + streamType + "T-" + name);
+        watchdog.setName(watchdog.getName() + "-" + streamType + "WD-" + name);
+
+        if (!isServerTunnel || player.setName(name)) {
           write(packetId);
           write(in.readUTF());
         }
@@ -223,40 +255,42 @@ public class StreamTunnel {
         if (!isServerTunnel) {
           if (player.getGroupId() < 0) {
             skipNBytes(11);
-            break;
           }
+          else {
+            int status = in.readByte();
+            int x = in.readInt();
+            int y = in.readByte();
+            int z = in.readInt();
+            byte face = in.readByte();
 
-          int status = in.readByte();
-          int x = in.readInt();
-          int y = in.readByte();
-          int z = in.readInt();
-          byte face = in.readByte();
-          if (server.chests.hasLock(x, y, z) && !player.isAdmin()) {
-            break;
-          }
-          write(packetId);
-          write(status);
-          write(x);
-          write(y);
-          write(z);
-          write(face);
-
-          if (player.instantDestroyEnabled()) {
-            for (int c = 1; c < DESTROY_HITS; ++c) {
+            if (!server.chests.hasLock(x, y, z) || player.isAdmin()) {
               write(packetId);
               write(status);
               write(x);
               write(y);
               write(z);
               write(face);
-            }
 
-            write(packetId);
-            write(BLOCK_DESTROYED_STATUS);
-            write(x);
-            write(y);
-            write(z);
-            write(face);
+              if (player.instantDestroyEnabled()) {
+                for (int c = 1; c < DESTROY_HITS; ++c) {
+                  packetFinished();
+                  write(packetId);
+                  write(status);
+                  write(x);
+                  write(y);
+                  write(z);
+                  write(face);
+                }
+
+                packetFinished();
+                write(packetId);
+                write(BLOCK_DESTROYED_STATUS);
+                write(x);
+                write(y);
+                write(z);
+                write(face);
+              }
+            }
           }
         }
         else {
@@ -264,79 +298,69 @@ public class StreamTunnel {
           copyNBytes(11);
         }
         break;
-      // CHECK THIS
       case 0x0f: // Player Block Placement
-        short block = readShort();
-        if (!isServerTunnel) {
-          if (server.blockFirewall.contains(block) || player.getGroupId() < 0) {
-            boolean allowed = server.blockFirewall.playerAllowed(player, block);
-            if (!allowed || player.getGroupId() < 0) {
-              // Remove the packet! : )
-              int coord_x = readInt();
-              if (!allowed && coord_x != -1) {
-                server.runCommand("say",
-                                  String.format(server.l.get("BAD_BLOCK"),
-                                                player.getName(),
-                                                Short.toString(block)));
-              }
-              skipBytes(6);
-              removeBytes(13);
-              break;
-            }
-          }
-          if (block == 54) {
-            // Check if lock is ready and allowed
-            if (player.isAttemptLock()) {
-              // calculate coordinates
-              int xC0f = readInt();
-              int yC0f = readByte();
-              int zC0f = readInt();
-              int dir = readByte();
-              switch (dir) {
-                case 0:
-                  yC0f--;
-                  break;
-                case 1:
-                  yC0f++;
-                  break;
-                case 2:
-                  zC0f--;
-                  break;
-                case 3:
-                  zC0f++;
-                  break;
-                case 4:
-                  xC0f--;
-                  break;
-                case 5:
-                  xC0f++;
-                  break;
-              }
-              // create chest entry
-              if (server.chests.hasLock(xC0f, yC0f, zC0f)) {
-                player.addMessage("This block is locked already!");
-                player.setAttemptLock(false);
-                break;
-              }
-              if (!server.chests.giveLock(player.getName().toLowerCase(), xC0f,
-                                          yC0f, zC0f, false)) {
-                player.addMessage("You already have a lock, or this block is locked already!");
-              }
-              else {
-                player.addMessage("Your locked chest is created! Do not add another chest to it!");
-              }
-              player.setAttemptLock(false);
-            }
-            else {
-              skipBytes(10);
-            }
-          }
-          else {
-            skipBytes(10);
+        short blockId = in.readShort();
+        if (!isServerTunnel && (player.getGroupId() < 0)
+            || !server.blockFirewall.playerAllowed(player, blockId)) {
+          int x = in.readInt();
+          skipNBytes(6);
+          if (x != -1) {
+            server.runCommand("say",
+                              String.format(server.l.get("BAD_BLOCK"),
+                                            player.getName(),
+                                            Short.toString(blockId)));
           }
         }
+        else if (!isServerTunnel && (blockId == 54) && player.isAttemptLock()) {
+          int x = in.readInt();
+          byte y = in.readByte();
+          int z = in.readInt();
+          byte direction = in.readByte();
+          switch (direction) {
+            case 0:
+              y--;
+              break;
+            case 1:
+              y++;
+              break;
+            case 2:
+              z--;
+              break;
+            case 3:
+              z++;
+              break;
+            case 4:
+              x--;
+              break;
+            case 5:
+              x++;
+              break;
+          }
+          // create chest entry
+          if (server.chests.hasLock(x, y, z)) {
+            player.addMessage("This block is locked already!");
+          }
+          else if (server.chests.giveLock(player.getName().toLowerCase(), x, y,
+                                          z, false)) {
+            player.addMessage("Your locked chest is created! Do not add another chest to it!");
+          }
+          else {
+            player.addMessage("You already have a lock, or this block is locked already!");
+
+          }
+          player.setAttemptLock(false);
+
+          write(packetId);
+          write(blockId);
+          write(x);
+          write(y);
+          write(z);
+          write(direction);
+        }
         else {
-          skipBytes(10);
+          write(packetId);
+          write(blockId);
+          copyNBytes(10);
         }
         break;
       case 0x10: // Holding Change
@@ -424,63 +448,59 @@ public class StreamTunnel {
         write(chunkSize);
         copyNBytes(chunkSize);
         break;
-      // THIS DOESNT WORK :(
       case 0x34: // Multi Block Change
-        skipBytes(8);
-        short chunkSize34 = readShort();
-        skipBytes(chunkSize34 * 4);
+        write(packetId);
+        copyNBytes(8);
+        short arraySize = in.readShort();
+        write(arraySize);
+        copyNBytes(arraySize * 4);
         break;
       case 0x35: // Block Change
         write(packetId);
         copyNBytes(11);
         break;
       case 0x3b: // Complex Entities
-        oldCursor = r - 1;
-        int xC3b = readInt();
-        int yC3b = readShort();
-        int zC3b = readInt();
-        int arraySize = readShort();
-        skipBytes(arraySize);
-        if (server.chests.hasLock(xC3b, yC3b, zC3b)) {
-          if (!player.isAdmin()) {
-            if (!server.chests.ownsLock(xC3b, yC3b, zC3b, player.getName())
-                || player.getName() == null) {
-              removeBytes(r - oldCursor);
-              break;
-            }
-          }
+        int x = in.readInt();
+        short y = in.readShort();
+        int z = in.readInt();
+        short payloadSize = in.readShort();
+        if (server.chests.hasLock(x, y, z) && !player.isAdmin()
+            && !server.chests.ownsLock(x, y, z, player.getName())) {
+          skipNBytes(payloadSize);
         }
-
-        if (player.getGroupId() < 0
+        else if (player.getGroupId() < 0
             && !server.options.getBoolean("guestsCanViewComplex")) {
-          removeBytes(r - oldCursor);
-          break;
+          skipNBytes(payloadSize);
         }
-
+        else {
+          write(packetId);
+          write(x);
+          write(y);
+          write(z);
+          write(payloadSize);
+          copyNBytes(payloadSize);
+        }
         break;
       case 0x3c: // Explosion
-        skipBytes(28);
-        skipBytes(readInt() * 3);
+        write(packetId);
+        copyNBytes(28);
+        int recordCount = in.readInt();
+        copyNBytes(recordCount * 3);
         break;
-      case 0xff: // Disconnect/Kick
-        String discMsg = readString();
-        if (discMsg.startsWith("Took too long")) {
+      case (byte) 0xff: // Disconnect/Kick
+        write(packetId);
+        String reason = in.readUTF();
+        write(reason);
+        if (reason.startsWith("Took too long")) {
           server.addRobot(player);
         }
         player.close();
         break;
       default:
-        byte[] cpy = new byte[a];
-        System.arraycopy(buf, 0, cpy, 0, a);
-        String streamType = "PlayerStream";
-        if (isServerTunnel) {
-          streamType = "ServerStream";
-        }
-        new Thread(new EOFWriter(cpy, history, null, streamType + " "
-            + player.getName() + " packetid: " + packetid + " totalsize: " + r
-            + " amt: " + a)).start();
-        throw new InterruptedException();
+        throw new IOException("Unable to parse unknown " + streamType
+            + " packet " + packetId + " for player " + player.getName());
     }
+    packetFinished();
   }
 
   private void copyPlayerLocation() throws IOException {
@@ -493,6 +513,10 @@ public class StreamTunnel {
       double stance = in.readDouble();
       double z = in.readDouble();
       player.updateLocation(x, y, z, stance);
+      write(x);
+      write(y);
+      write(stance);
+      write(z);
       copyNBytes(1);
     }
     else {
@@ -516,6 +540,7 @@ public class StreamTunnel {
     out.writeLong(l);
   }
 
+  @SuppressWarnings("unused")
   private void write(float f) throws IOException {
     out.writeFloat(f);
   }
@@ -528,61 +553,94 @@ public class StreamTunnel {
     out.writeUTF(s);
   }
 
+  @SuppressWarnings("unused")
   private void write(boolean b) throws IOException {
     out.writeBoolean(b);
   }
 
   private void skipNBytes(int bytes) throws IOException {
-    in.readFully(buffer, 0, bytes);
+    int overflow = bytes / buffer.length;
+    for (int c = 0; c < overflow; ++c) {
+      in.readFully(buffer, 0, buffer.length);
+    }
+    in.readFully(buffer, 0, bytes % buffer.length);
   }
 
   private void copyNBytes(int bytes) throws IOException {
-    in.readFully(buffer, 0, bytes);
-    out.write(buffer, 0, bytes);
+    int overflow = bytes / buffer.length;
+    for (int c = 0; c < overflow; ++c) {
+      in.readFully(buffer, 0, buffer.length);
+      out.write(buffer, 0, buffer.length);
+    }
+    in.readFully(buffer, 0, bytes % buffer.length);
+    out.write(buffer, 0, bytes % buffer.length);
   }
 
-  private final class Tunneler {
+  private void kick(String reason) throws IOException {
+    write((byte) 0xff);
+    write(reason);
+    packetFinished();
+  }
+
+  private void sendMessage(String message) throws IOException {
+    write(0x03);
+    write(message);
+    packetFinished();
+  }
+
+  private void packetFinished() throws IOException {
+    if (EXPENSIVE_DEBUG_LOGGING) {
+      ((InputStreamDumper) in).packetFinished();
+    }
+  }
+
+  private final class Tunneler extends Thread {
+    @Override
     public void run() {
       while (run) {
         lastRead = System.currentTimeMillis();
-        handlePacket();
 
-        if (isServerTunnel) {
+        try {
+          handlePacket();
+
+          if (isServerTunnel) {
+            while (player.hasMessages()) {
+              sendMessage(player.getMessage());
+            }
+          }
+
           if (player.isKicked()) {
-            out.write(makePacket((byte) 0xff, player.getKickMsg()));
-            out.flush();
-            break;
+            kick(player.getKickMsg());
           }
-          while (player.hasMessages()) {
-            byte[] m = makePacket(player.getMessage());
-            out.write(m, 0, m.length);
+          ((OutputStream) out).flush();
+        }
+        catch (IOException e) {
+          if (run) {
+            e.printStackTrace();
+            System.out.println(streamType + " error handling traffic for "
+                + player.getName());
           }
         }
-        else {
-          if (player.isKicked()) {
-            out.write(makePacket((byte) 0xff, player.getKickMsg()));
-            out.flush();
-            break;
-          }
+      }
+    }
+  }
+
+  private final class Watchdog extends Thread {
+    @Override
+    public void run() {
+      while (tunneler.isAlive()) {
+        if (System.currentTimeMillis() - lastRead > IDLE_TIME
+            && !player.isRobot()) {
+          System.out.println("[SimpleServer] Disconnecting "
+              + player.getIPAddress() + " due to inactivity.");
+          player.close();
         }
 
-        if (System.currentTimeMillis() - lastRead > IDLE_TIME) {
-          if (!player.isRobot()) {
-            System.out.println("[SimpleServer] Disconnecting "
-                + player.getIPAddress() + " due to inactivity.");
-          }
+        try {
+          Thread.sleep(10000);
         }
-      }
-
-      try {
-        in.close();
-      }
-      catch (IOException e) {
-      }
-      try {
-        out.close();
-      }
-      catch (IOException e) {
+        catch (InterruptedException e) {
+        }
       }
     }
   }

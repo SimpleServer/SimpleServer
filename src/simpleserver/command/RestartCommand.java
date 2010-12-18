@@ -29,8 +29,7 @@ public class RestartCommand extends AbstractCommand {
   }
 
   @Override
-  public void execute(Player player, String message)
-      throws InterruptedException {
+  public void execute(Player player, String message) {
     Server server = player.getServer();
 
     server.adminLog.addMessage("User " + player.getName()

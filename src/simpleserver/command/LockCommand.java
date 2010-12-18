@@ -28,8 +28,7 @@ public class LockCommand extends AbstractCommand {
   }
 
   @Override
-  public void execute(Player player, String message)
-      throws InterruptedException {
+  public void execute(Player player, String message) {
     if (!player.getServer().chests.hasLock(player.getName())) {
       player.addMessage("Create a single box chest, and it will be locked to your username!");
       player.addMessage("You only get ONE locked chest! Release the lock by saying !unlock");
