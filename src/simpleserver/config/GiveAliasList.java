@@ -18,55 +18,41 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-package simpleserver.command;
+package simpleserver.config;
 
-import simpleserver.Player;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 
-public class GiveCommand extends AbstractCommand {
-  private int offset;
+public class GiveAliasList extends PropertiesConfig {
+  private Map<String, Integer> aliases;
 
-  public GiveCommand() {
-    this("give", 0);
+  public GiveAliasList() {
+    super("give-aliases-list.txt");
+
+    aliases = new HashMap<String, Integer>();
   }
 
-  protected GiveCommand(String name, int offset) {
-    super(name);
-
-    this.offset = offset;
+  public Integer getId(String itemAlias) {
+    return aliases.get(itemAlias);
   }
 
   @Override
-  public void execute(Player player, String message) {
-    String[] arguments = extractArguments(message);
+  public void load() {
+    super.load();
 
-    Player target = getTarget(player, arguments);
-    if (target == null) {
-      return;
-    }
-
-    if (arguments.length > offset) {
-      String item = arguments[offset];
-      Integer id = player.getServer().giveAliasList.getId(item);
-      if (id != null) {
-        item = id.toString();
+    aliases.clear();
+    for (Entry<Object, Object> alias : entrySet()) {
+      Integer id;
+      try {
+        id = Integer.valueOf((String) alias.getValue());
+      }
+      catch (NumberFormatException e) {
+        System.out.println("Invalid give alias: " + alias.toString());
+        continue;
       }
 
-      String amount = null;
-      if (arguments.length > offset + 1) {
-        amount = arguments[offset + 1];
-      }
-
-      target.give(item, amount);
-      player.getServer().adminLog.addMessage("User " + player.getName()
-          + " used giveplayer:\t " + target.getName() + "\t" + item + "\t("
-          + amount + ")");
+      aliases.put(((String) alias.getKey()).toLowerCase(), id);
     }
-    else {
-      player.addMessage("\302\247cNo item or amount specified!");
-    }
-  }
-
-  protected Player getTarget(Player player, String[] arguments) {
-    return player;
   }
 }

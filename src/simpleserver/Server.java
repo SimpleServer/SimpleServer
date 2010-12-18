@@ -32,6 +32,7 @@ import java.util.concurrent.Semaphore;
 import simpleserver.config.BlockList;
 import simpleserver.config.ChestList;
 import simpleserver.config.CommandList;
+import simpleserver.config.GiveAliasList;
 import simpleserver.config.GroupList;
 import simpleserver.config.IPBanList;
 import simpleserver.config.IPMemberList;
@@ -83,6 +84,8 @@ public class Server {
   public ItemWatchList itemWatch;
   public WhiteList whitelist;
   public MuteList mutelist;
+  public GiveAliasList giveAliasList;
+
   public CommandList commands;
 
   public AdminLog adminLog;
@@ -355,6 +358,7 @@ public class Server {
     resources.add(ipBans = new IPBanList());
     resources.add(whitelist = new WhiteList());
     resources.add(mutelist = new MuteList());
+    resources.add(giveAliasList = new GiveAliasList());
 
     systemInput = new SystemInputQueue();
     adminLog = new AdminLog();
