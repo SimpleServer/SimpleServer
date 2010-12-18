@@ -32,6 +32,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.IllegalFormatException;
+import java.util.concurrent.BrokenBarrierException;
+import java.util.concurrent.CyclicBarrier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -41,7 +43,6 @@ import simpleserver.Server;
 
 public class StreamTunnel {
   private static final boolean EXPENSIVE_DEBUG_LOGGING = Boolean.getBoolean("EXPENSIVE_DEBUG_LOGGING");
-
   private static final int IDLE_TIME = 30000;
   private static final int BUFFER_SIZE = 1024;
   private static final int DESTROY_HITS = 14;
@@ -50,11 +51,11 @@ public class StreamTunnel {
 
   private final boolean isServerTunnel;
   private final String streamType;
+  private final CyclicBarrier barrier;
   private final Player player;
   private final Server server;
   private final byte[] buffer;
   private final Tunneler tunneler;
-  private final Watchdog watchdog;
 
   private DataInput in;
   private DataOutput out;
@@ -66,7 +67,7 @@ public class StreamTunnel {
   protected long lastRead;
 
   public StreamTunnel(InputStream in, OutputStream out, boolean isServerTunnel,
-                      Player player) {
+                      CyclicBarrier barrier, Player player) {
     this.isServerTunnel = isServerTunnel;
     if (isServerTunnel) {
       streamType = "ServerStream";
@@ -75,35 +76,53 @@ public class StreamTunnel {
       streamType = "PlayerStream";
     }
 
+    this.barrier = barrier;
     this.player = player;
     server = player.getServer();
 
-    DataInputStream dataInput = new DataInputStream(new BufferedInputStream(in));
+    DataInputStream dIn = new DataInputStream(new BufferedInputStream(in));
+    DataOutputStream dOut = new DataOutputStream(new BufferedOutputStream(out));
     if (EXPENSIVE_DEBUG_LOGGING) {
       try {
-        OutputStream outDump = new FileOutputStream(streamType + "Input");
-        this.in = new InputStreamDumper(dataInput, outDump);
+        OutputStream outDump = new FileOutputStream(streamType + "Input.debug");
+        this.in = new InputStreamDumper(dIn, outDump);
       }
       catch (FileNotFoundException e) {
-        e.printStackTrace();
+        System.out.println("Unable to open input debug dump!");
+        throw new RuntimeException(e);
+      }
+
+      try {
+        OutputStream outDump = new FileOutputStream(streamType + "Output.debug");
+        this.out = new OutputStreamDumper(dOut, outDump);
+      }
+      catch (FileNotFoundException e) {
+        System.out.println("Unable to open output debug dump!");
+        throw new RuntimeException(e);
       }
     }
     else {
-      this.in = dataInput;
+      this.in = dIn;
+      this.out = dOut;
     }
-    this.out = new DataOutputStream(new BufferedOutputStream(out));
 
     buffer = new byte[BUFFER_SIZE];
 
     tunneler = new Tunneler();
     tunneler.start();
-
-    watchdog = new Watchdog();
-    watchdog.start();
   }
 
   public void stop() {
     run = false;
+  }
+
+  public boolean isAlive() {
+    return tunneler.isAlive();
+  }
+
+  public boolean isActive() {
+    return System.currentTimeMillis() - lastRead < IDLE_TIME
+        || player.isRobot();
   }
 
   private void handlePacket() throws IOException {
@@ -122,12 +141,12 @@ public class StreamTunnel {
         break;
       case 0x02: // Handshake
         String name = in.readUTF();
-        tunneler.setName(tunneler.getName() + "-" + streamType + "T-" + name);
-        watchdog.setName(watchdog.getName() + "-" + streamType + "WD-" + name);
 
-        if (!isServerTunnel || player.setName(name)) {
+        if (isServerTunnel || player.setName(name)) {
+          tunneler.setName(tunneler.getName() + "-" + streamType + "-"
+              + player.getName());
           write(packetId);
-          write(in.readUTF());
+          write(name);
         }
         break;
       case 0x03: // Chat Message
@@ -257,9 +276,9 @@ public class StreamTunnel {
             skipNBytes(11);
           }
           else {
-            int status = in.readByte();
+            byte status = in.readByte();
             int x = in.readInt();
-            int y = in.readByte();
+            byte y = in.readByte();
             int z = in.readInt();
             byte face = in.readByte();
 
@@ -429,7 +448,7 @@ public class StreamTunnel {
         write(packetId);
         copyNBytes(18);
         break;
-      case 0x26: // Entity damage, death and explosion?
+      case 0x26: // Entity status?
         write(packetId);
         copyNBytes(5);
         break;
@@ -485,6 +504,7 @@ public class StreamTunnel {
         write(packetId);
         copyNBytes(28);
         int recordCount = in.readInt();
+        write(recordCount);
         copyNBytes(recordCount * 3);
         break;
       case (byte) 0xff: // Disconnect/Kick
@@ -497,8 +517,10 @@ public class StreamTunnel {
         player.close();
         break;
       default:
+        flushAll();
         throw new IOException("Unable to parse unknown " + streamType
-            + " packet " + packetId + " for player " + player.getName());
+            + " packet " + Integer.toHexString(packetId) + " for player "
+            + player.getName());
     }
     packetFinished();
   }
@@ -591,55 +613,76 @@ public class StreamTunnel {
   private void packetFinished() throws IOException {
     if (EXPENSIVE_DEBUG_LOGGING) {
       ((InputStreamDumper) in).packetFinished();
+      ((OutputStreamDumper) out).packetFinished();
+    }
+  }
+
+  private void flushAll() throws IOException {
+    ((OutputStream) out).flush();
+
+    if (EXPENSIVE_DEBUG_LOGGING) {
+      ((InputStreamDumper) in).flush();
     }
   }
 
   private final class Tunneler extends Thread {
     @Override
     public void run() {
-      while (run) {
-        lastRead = System.currentTimeMillis();
+      try {
+        while (run) {
+          lastRead = System.currentTimeMillis();
 
-        try {
-          handlePacket();
+          try {
+            handlePacket();
 
-          if (isServerTunnel) {
-            while (player.hasMessages()) {
-              sendMessage(player.getMessage());
+            if (isServerTunnel) {
+              while (player.hasMessages()) {
+                sendMessage(player.getMessage());
+              }
             }
-          }
 
-          if (player.isKicked()) {
+            flushAll();
+          }
+          catch (IOException e) {
+            if (run) {
+              e.printStackTrace();
+              System.out.println(streamType + " error handling traffic for "
+                  + player.getName());
+            }
+            break;
+          }
+        }
+
+        if (player.isKicked()) {
+          try {
             kick(player.getKickMsg());
+            flushAll();
           }
-          ((OutputStream) out).flush();
-        }
-        catch (IOException e) {
-          if (run) {
-            e.printStackTrace();
-            System.out.println(streamType + " error handling traffic for "
-                + player.getName());
+          catch (IOException e) {
           }
-        }
-      }
-    }
-  }
-
-  private final class Watchdog extends Thread {
-    @Override
-    public void run() {
-      while (tunneler.isAlive()) {
-        if (System.currentTimeMillis() - lastRead > IDLE_TIME
-            && !player.isRobot()) {
-          System.out.println("[SimpleServer] Disconnecting "
-              + player.getIPAddress() + " due to inactivity.");
-          player.close();
         }
 
         try {
-          Thread.sleep(10000);
+          barrier.await();
         }
         catch (InterruptedException e) {
+          e.printStackTrace();
+        }
+        catch (BrokenBarrierException e) {
+          e.printStackTrace();
+        }
+      }
+      finally {
+        try {
+          ((InputStream) in).close();
+        }
+        catch (IOException e) {
+        }
+
+        try {
+          ((OutputStream) out).close();
+        }
+        catch (IOException e) {
         }
       }
     }

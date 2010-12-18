@@ -20,8 +20,6 @@
  ******************************************************************************/
 package simpleserver.command;
 
-import java.util.Iterator;
-
 import simpleserver.Player;
 
 public class IPListCommand extends AbstractCommand {
@@ -32,11 +30,8 @@ public class IPListCommand extends AbstractCommand {
   @Override
   public void execute(Player player, String message) {
     player.addMessage("IP Addresses:");
-    for (Iterator<Player> itr = player.getServer().playerList.iterator(); itr.hasNext();) {
-      Player i = itr.next();
-      if (i.getName() != null && i.getName() != "") {
-        player.addMessage(i.getName() + " " + i.getIPAddress());
-      }
+    for (Player friend : player.getServer().playerList.getArray()) {
+      player.addMessage(friend.getName() + " " + friend.getIPAddress());
     }
   }
 }

@@ -30,8 +30,11 @@ public class KickCommand extends OnlinePlayerCommand {
   @Override
   protected void executeWithTarget(Player player, String message, Player target) {
     String reason = extractArgument(message, 1);
-    target.kick(reason);
+    if (reason == null) {
+      reason = "Kicked by admin.";
+    }
 
+    target.kick(reason);
     player.getServer().adminLog.addMessage("Admin " + player.getName()
         + " kicked player:\t " + target.getName() + "\t(" + reason + ")");
     player.getServer().runCommand("say",

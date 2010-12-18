@@ -25,7 +25,6 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Semaphore;
@@ -173,14 +172,7 @@ public class Server {
   }
 
   public int numPlayers() {
-    int n = 0;
-    for (Iterator<Player> itr = playerList.iterator(); itr.hasNext();) {
-      Player i = itr.next();
-      if (i.getName() != null) {
-        n++;
-      }
-    }
-    return n;
+    return playerList.size();
   }
 
   public String getMOTD() {
@@ -200,13 +192,11 @@ public class Server {
       ipBans.addBan(ipAddress);
     }
     adminLog.addMessage("IP Address " + ipAddress + " was banned:\t " + reason);
-    for (Iterator<Player> itr = playerList.iterator(); itr.hasNext();) {
-      Player p = itr.next();
-      if (p.getIPAddress().equals(ipAddress)) {
-        p.kick(reason);
-        adminLog.addMessage("Player " + p.getName() + " was ip-banned:\t "
+    for (Player player : playerList.getArray()) {
+      if (player.getIPAddress().equals(ipAddress)) {
+        player.kick(reason);
+        adminLog.addMessage("Player " + player.getName() + " was ip-banned:\t "
             + reason);
-        // itr.remove();
       }
     }
   }
@@ -228,10 +218,6 @@ public class Server {
 
   public void banKick(String name) {
     banKick(name, "Banned!");
-  }
-
-  public void notifyClosed(Player player) {
-    playerList.removePlayer(player);
   }
 
   public void loadResources() {
@@ -285,15 +271,12 @@ public class Server {
   public int localChat(Player player, String msg) {
     String chat = "\302\2477" + player.getName() + " says: " + msg;
     int localPlayers = 0;
-    for (Iterator<Player> itr = playerList.iterator(); itr.hasNext();) {
-      Player i = itr.next();
-      if (i.getName() != null) {
-        int radius = options.getInt("localChatRadius");
-        if (i.distanceTo(player) < radius) {
-          i.addMessage(chat);
-          if (player != i) {
-            localPlayers++;
-          }
+    for (Player friend : playerList.getArray()) {
+      int radius = options.getInt("localChatRadius");
+      if (friend.distanceTo(player) < radius) {
+        friend.addMessage(chat);
+        if (player != friend) {
+          localPlayers++;
         }
       }
     }
@@ -328,6 +311,10 @@ public class Server {
     return restart;
   }
 
+  public boolean isStopping() {
+    return !run;
+  }
+
   public boolean isSaving() {
     return save;
   }
@@ -344,13 +331,9 @@ public class Server {
     this.backup = backup;
   }
 
-  private void kickAllPlayers(String msg) {
-    if (msg == null) {
-      msg = "";
-    }
-    for (Iterator<Player> itr = playerList.iterator(); itr.hasNext();) {
-      Player p = itr.next();
-      p.kick(msg);
+  private void kickAllPlayers(String message) {
+    for (Player p : playerList.getArray()) {
+      p.kick(message);
     }
   }
 
@@ -433,9 +416,17 @@ public class Server {
     }
 
     kickAllPlayers("Server shutting down!");
+    rconServer.stop();
     saveResources();
 
-    rconServer.stop();
+    while (playerList.size() > 0) {
+      try {
+        Thread.sleep(100);
+      }
+      catch (InterruptedException e) {
+      }
+    }
+
     minecraft.stop();
     System.out.println("Server stopped successfully!");
     saveLock.release();

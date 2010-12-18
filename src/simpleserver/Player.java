@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.net.Socket;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.CyclicBarrier;
 
 import simpleserver.command.AbstractCommand;
 import simpleserver.stream.StreamTunnel;
@@ -45,6 +46,7 @@ public class Player {
 
   private StreamTunnel serverToClient;
   private StreamTunnel clientToServer;
+  private final Watchdog watchdog;
 
   private Queue<String> messages = new ConcurrentLinkedQueue<String>();
 
@@ -122,6 +124,9 @@ public class Player {
   public void kick(String reason) {
     kickMsg = reason;
     isKicked = true;
+
+    serverToClient.stop();
+    clientToServer.stop();
   }
 
   public boolean isKicked() {
@@ -260,21 +265,26 @@ public class Player {
       }
     }
 
+    CyclicBarrier barrier = new CyclicBarrier(2);
     try {
       serverToClient = new StreamTunnel(intsocket.getInputStream(),
-                                        extsocket.getOutputStream(), true, this);
+                                        extsocket.getOutputStream(), true,
+                                        barrier, this);
       clientToServer = new StreamTunnel(extsocket.getInputStream(),
                                         intsocket.getOutputStream(), false,
-                                        this);
+                                        barrier, this);
     }
     catch (Exception e) {
       e.printStackTrace();
-      close();
+      cleanup();
     }
 
     if (isRobot) {
       parent.addRobotPort(intsocket.getLocalPort());
     }
+
+    watchdog = new Watchdog();
+    watchdog.start();
   }
 
   public boolean isClosed() {
@@ -282,97 +292,35 @@ public class Player {
   }
 
   public void close() {
-    if (!isKicked && server != null) {
-      server.notifyClosed(this);
-    }
-    if (!closed) {
-      closed = true;
-      cleanup();
-    }
+    serverToClient.stop();
+    clientToServer.stop();
   }
 
   public void cleanup() {
-    serverToClient.stop();
-    clientToServer.stop();
-    try {
-      extsocket.close();
-    }
-    catch (IOException e) {
-    }
-    try {
-      intsocket.close();
-    }
-    catch (IOException e) {
-    }
-    intsocket = null;
-    if (!isRobot && extsocket != null) {
-      System.out.println("[SimpleServer] Socket Closed: "
-          + extsocket.getInetAddress().getHostAddress());
-    }
-    extsocket = null;
-    clientToServer = null;
-    serverToClient = null;
-    name = null;
-  }
+    if (!closed) {
+      closed = true;
+      serverToClient.stop();
+      clientToServer.stop();
 
-  public void reinitialize(Socket inc) {
-    extsocket = inc;
-    isRobot = false;
-    name = null;
-    closed = false;
-    isKicked = false;
-    attemptLock = false;
-    instantDestroy = false;
-    kickMsg = null;
-    x = 0;
-    y = 0;
-    z = 0;
-    group = 0;
-    groupObject = null;
-
-    if (server.isRobot(extsocket.getInetAddress().getHostAddress())) {
-      System.out.println("[SimpleServer] Robot Heartbeat: "
-          + extsocket.getInetAddress().getHostAddress() + ".");
-      isRobot = true;
-    }
-    if (!isRobot) {
-      System.out.println("[SimpleServer] IP Connection from "
-          + extsocket.getInetAddress().getHostAddress() + "!");
-    }
-    server.requestTracker.addRequest(extsocket.getInetAddress()
-                                              .getHostAddress());
-    if (server.isIPBanned(extsocket.getInetAddress().getHostAddress())) {
-      System.out.println("[SimpleServer] IP "
-          + extsocket.getInetAddress().getHostAddress() + " is banned!");
-      kick("Banned IP!");
-    }
-    try {
-      intsocket = new Socket("localhost", server.options.getInt("internalPort"));
-    }
-    catch (Exception e2) {
-      e2.printStackTrace();
-      if (server.options.getBoolean("exitOnFailure")) {
-        System.exit(-1);
+      if (name != null) {
+        server.playerList.removePlayer(this);
       }
-      else {
-        server.restart();
+
+      try {
+        extsocket.close();
       }
-    }
+      catch (IOException e) {
+      }
+      try {
+        intsocket.close();
+      }
+      catch (IOException e) {
+      }
 
-    try {
-      serverToClient = new StreamTunnel(intsocket.getInputStream(),
-                                        extsocket.getOutputStream(), true, this);
-      clientToServer = new StreamTunnel(extsocket.getInputStream(),
-                                        intsocket.getOutputStream(), false,
-                                        this);
-    }
-    catch (IOException e) {
-      e.printStackTrace();
-      close();
-    }
-
-    if (isRobot) {
-      server.addRobotPort(intsocket.getLocalPort());
+      if (!isRobot) {
+        System.out.println("[SimpleServer] Socket Closed: "
+            + extsocket.getInetAddress().getHostAddress());
+      }
     }
   }
 
@@ -435,6 +383,28 @@ public class Player {
     String[] lines = server.getMOTD().split("\\r?\\n");
     for (int i = 0; i < lines.length; i++) {
       addMessage(lines[i]);
+    }
+  }
+
+  private final class Watchdog extends Thread {
+    @Override
+    public void run() {
+      while (serverToClient.isAlive() || clientToServer.isAlive()) {
+        if (!serverToClient.isActive() || !clientToServer.isActive()) {
+          System.out.println("[SimpleServer] Disconnecting " + getIPAddress()
+              + " due to inactivity.");
+          close();
+          break;
+        }
+
+        try {
+          Thread.sleep(2000);
+        }
+        catch (InterruptedException e) {
+        }
+      }
+
+      cleanup();
     }
   }
 }

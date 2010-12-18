@@ -30,8 +30,19 @@ public class MessageHandler {
   }
 
   public void handleError(Exception exception) {
-    System.out.println("[SimpleServer] Minecraft process stopped unexpectedly! Automatically restarting...");
-    server.restart();
+    String baseError = "[SimpleServer] Minecraft process stopped unexpectedly!";
+    if (!server.isRestarting() && !server.isStopping()) {
+      exception.printStackTrace();
+
+      if (server.options.getBoolean("exitOnFailure")) {
+        System.out.println(baseError);
+        server.stop();
+      }
+      else {
+        System.out.println(baseError + " Automatically restarting...");
+        server.restart();
+      }
+    }
   }
 
   public void handleQuit() {
@@ -54,18 +65,16 @@ public class MessageHandler {
         }
       }
     }
+
     if (line.contains("[INFO] CONSOLE: Save complete.")) {
       server.setSaving(false);
       server.runCommand("say", server.l.get("SAVE_COMPLETE"));
     }
-    /*
-    if (line.contains("[INFO] Done!")) {
-      server.waitingForStart(false);
-    }
-    */
+
     if (line.contains("[SEVERE] Unexpected exception")) {
-      server.restart();
+      handleError(new Exception(line));
     }
+
     server.addOutputLine(line);
     System.out.println(line);
   }

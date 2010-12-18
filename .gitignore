@@ -6,8 +6,9 @@
 /simpleserver/
 /tmp/
 /world*/
+/*\.debug
 /*\.log*
-/*.properties
+/*\.properties
 /API.jar
 /banned-ips.txt
 /banned-players.txt

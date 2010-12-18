@@ -46,6 +46,20 @@ public class InputStreamDumper extends FilterInputStream implements DataInput {
     dump.flush();
   }
 
+  @Override
+  public void close() throws IOException {
+    try {
+      in.close();
+    }
+    finally {
+      dump.close();
+    }
+  }
+
+  public void flush() throws IOException {
+    dump.flush();
+  }
+
   public void readFully(byte b[]) throws IOException {
     in.readFully(b, 0, b.length);
   }
@@ -54,7 +68,7 @@ public class InputStreamDumper extends FilterInputStream implements DataInput {
     in.readFully(b, off, len);
 
     for (int c = off; c < off + len; ++c) {
-      dump.write(Integer.toHexString(b[c]));
+      dump.write(String.format("%02x ", b[c]));
     }
 
     if (len > 0) {
@@ -72,7 +86,7 @@ public class InputStreamDumper extends FilterInputStream implements DataInput {
     byte newByte = in.readByte();
     if (!inPacket) {
       inPacket = true;
-      dump.write("\nPacket ID: 0x" + Integer.toHexString(newByte) + "\n");
+      dump.write(String.format("\nPacket ID: 0x%02x\n", newByte));
     }
     else {
       dump.write(newByte + "b\n");

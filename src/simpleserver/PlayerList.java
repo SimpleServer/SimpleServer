@@ -20,7 +20,6 @@
  ******************************************************************************/
 package simpleserver;
 
-import java.util.Iterator;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -31,8 +30,12 @@ public class PlayerList {
     players = new ConcurrentHashMap<String, Player>();
   }
 
-  public Iterator<Player> iterator() {
-    return players.values().iterator();
+  public synchronized Player[] getArray() {
+    return players.values().toArray(new Player[0]);
+  }
+
+  public int size() {
+    return players.size();
   }
 
   public Player findPlayer(String prefix) {
@@ -49,15 +52,11 @@ public class PlayerList {
     return players.get(name.toLowerCase());
   }
 
-  public void removePlayer(Player player) {
+  public synchronized void removePlayer(Player player) {
     players.remove(player.getName().toLowerCase());
-
-    if (player.hasInternalConnection()) {
-      player.cleanup();
-    }
   }
 
-  public void addPlayer(Player player) {
+  public synchronized void addPlayer(Player player) {
     players.put(player.getName().toLowerCase(), player);
   }
 }

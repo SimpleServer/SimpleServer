@@ -20,8 +20,6 @@
  ******************************************************************************/
 package simpleserver.command;
 
-import java.util.Iterator;
-
 import simpleserver.Player;
 
 public class PlayerListCommand extends AbstractCommand {
@@ -38,14 +36,8 @@ public class PlayerListCommand extends AbstractCommand {
   public void execute(Player player, String message) {
     String list = "Connected Players (" + player.getServer().numPlayers()
         + "): ";
-    for (Iterator<Player> itr = player.getServer().playerList.iterator(); itr.hasNext();) {
-      Player i = itr.next();
-      if (i != null) {
-        if (i.getName() != null && i.getName() != "" && !i.isClosed()
-            && !i.isKicked()) {
-          list += i.getName() + ", ";
-        }
-      }
+    for (Player friend : player.getServer().playerList.getArray()) {
+      list += friend.getName() + ", ";
     }
     player.addMessage(list);
   }
