@@ -23,12 +23,11 @@ package simpleserver.command;
 import simpleserver.Player;
 import simpleserver.Server;
 
-public class BanIPCommand extends AbstractCommand {
+public class BanIPCommand extends AbstractCommand implements PlayerCommand {
   public BanIPCommand() {
     super("banip");
   }
 
-  @Override
   public void execute(Player player, String message) {
     String[] arguments = extractArguments(message);
     Server server = player.getServer();

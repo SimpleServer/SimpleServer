@@ -23,7 +23,7 @@ package simpleserver.command;
 import simpleserver.Player;
 import simpleserver.Server;
 
-public class UnmuteCommand extends PlayerCommand {
+public class UnmuteCommand extends PlayerArgCommand {
   public UnmuteCommand() {
     super("unmute");
   }

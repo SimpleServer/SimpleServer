@@ -22,7 +22,7 @@ package simpleserver.command;
 
 import simpleserver.Player;
 
-public class WarpHereCommand extends OnlinePlayerCommand {
+public class WarpHereCommand extends OnlinePlayerArgCommand {
   public WarpHereCommand() {
     super("warptome");
   }

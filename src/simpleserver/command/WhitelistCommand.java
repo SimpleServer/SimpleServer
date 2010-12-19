@@ -22,7 +22,7 @@ package simpleserver.command;
 
 import simpleserver.Player;
 
-public class WhitelistCommand extends PlayerCommand {
+public class WhitelistCommand extends PlayerArgCommand {
   public WhitelistCommand() {
     super("whitelist");
   }

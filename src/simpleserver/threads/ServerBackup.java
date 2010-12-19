@@ -99,7 +99,6 @@ public class ServerBackup implements Runnable {
         return;
       }
     }
-
   }
 
   public void backup() throws IOException {
@@ -166,13 +165,11 @@ public class ServerBackup implements Runnable {
         }
         // close the Stream
         fis.close();
-
       }
     }
     catch (Exception e) {
       e.printStackTrace();
     }
-
   }
 
   public File backupServer() throws IOException {
@@ -257,5 +254,4 @@ public class ServerBackup implements Runnable {
     }
     return (path.delete());
   }
-
 }

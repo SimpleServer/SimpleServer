@@ -21,17 +21,25 @@
 package simpleserver.command;
 
 import simpleserver.Player;
+import simpleserver.Server;
 
-public class IPListCommand extends AbstractCommand {
+public class IPListCommand extends AbstractCommand implements PlayerCommand,
+    ServerCommand {
   public IPListCommand() {
     super("listips");
   }
 
-  @Override
   public void execute(Player player, String message) {
     player.addMessage("IP Addresses:");
     for (Player friend : player.getServer().playerList.getArray()) {
       player.addMessage(friend.getName() + " " + friend.getIPAddress());
+    }
+  }
+
+  public void execute(Server server, String message) {
+    System.out.println("IP Addresses:");
+    for (Player friend : server.playerList.getArray()) {
+      System.out.println(friend.getName() + " " + friend.getIPAddress());
     }
   }
 }

@@ -22,12 +22,11 @@ package simpleserver.command;
 
 import simpleserver.Player;
 
-public class LockCommand extends AbstractCommand {
+public class LockCommand extends AbstractCommand implements PlayerCommand {
   public LockCommand() {
     super("lock");
   }
 
-  @Override
   public void execute(Player player, String message) {
     if (!player.getServer().chests.hasLock(player.getName())) {
       player.addMessage("Create a single box chest, and it will be locked to your username!");

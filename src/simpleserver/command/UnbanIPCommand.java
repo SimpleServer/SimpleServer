@@ -22,12 +22,11 @@ package simpleserver.command;
 
 import simpleserver.Player;
 
-public class UnbanIPCommand extends AbstractCommand {
+public class UnbanIPCommand extends AbstractCommand implements PlayerCommand {
   public UnbanIPCommand() {
     super("unbanip");
   }
 
-  @Override
   public void execute(Player player, String message) {
     String[] arguments = extractArguments(message);
 

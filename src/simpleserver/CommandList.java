@@ -23,46 +23,45 @@ package simpleserver;
 import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 import org.reflections.Reflections;
 
-import simpleserver.command.AbstractCommand;
+import simpleserver.command.Command;
+import simpleserver.command.PlayerCommand;
+import simpleserver.command.ServerCommand;
 import simpleserver.options.Options;
 
 public class CommandList {
-  private Map<String, AbstractCommand> abstractCommands;
+  private Map<String, PlayerCommand> playerCommands;
+  private Map<String, ServerCommand> serverCommands;
   private Map<String, String> aliases;
   private Options options;
 
   public CommandList(Options options) {
     this.options = options;
 
-    loadCommands();
+    playerCommands = new HashMap<String, PlayerCommand>();
+    serverCommands = new HashMap<String, ServerCommand>();
+    aliases = new HashMap<String, String>();
+    loadCommands(PlayerCommand.class, playerCommands);
+    loadCommands(ServerCommand.class, serverCommands);
   }
 
-  public AbstractCommand getCommand(String message) {
+  public PlayerCommand getPlayerCommand(String message) {
     if (message.startsWith(commandPrefix())) {
-      int splitIndex = message.indexOf(" ");
-      if (splitIndex == -1) {
-        splitIndex = message.length();
-      }
-
-      String name = message.substring(1, splitIndex).toLowerCase();
-      AbstractCommand abstractCommand = abstractCommands.get(name);
-      if (abstractCommand == null) {
-        abstractCommand = abstractCommands.get(aliases.get(name));
-      }
-
-      return abstractCommand;
+      return playerCommands.get(extractName(message, 1));
     }
 
     return null;
   }
 
-  public AbstractCommand[] getCommands() {
-    return abstractCommands.values()
-                           .toArray(new AbstractCommand[abstractCommands.size()]);
+  public ServerCommand getServerCommand(String message) {
+    return serverCommands.get(extractName(message, 0));
+  }
+
+  public PlayerCommand[] getPlayerCommands() {
+    return playerCommands.values()
+                         .toArray(new PlayerCommand[playerCommands.size()]);
   }
 
   public String commandPrefix() {
@@ -74,22 +73,31 @@ public class CommandList {
     }
   }
 
-  private void loadCommands() {
-    abstractCommands = new HashMap<String, AbstractCommand>();
-    aliases = new HashMap<String, String>();
+  private String extractName(String message, int offset) {
+    int splitIndex = message.indexOf(" ");
+    if (splitIndex == -1) {
+      splitIndex = message.length();
+    }
 
+    String name = message.substring(offset, splitIndex).toLowerCase();
+    String alias = aliases.get(name);
+    if (alias != null) {
+      name = alias;
+    }
+    return name;
+  }
+
+  private <T extends Command> void loadCommands(Class<T> type,
+                                                Map<String, T> commands) {
     Reflections r = new Reflections("simpleserver");
-    Set<Class<? extends AbstractCommand>> commandTypes = r.getSubTypesOf(AbstractCommand.class);
-
-    for (Class<? extends AbstractCommand> commandType : commandTypes) {
+    for (Class<? extends T> commandType : r.getSubTypesOf(type)) {
       if (Modifier.isAbstract(commandType.getModifiers())) {
         continue;
       }
 
-      AbstractCommand abstractCommand;
+      T command;
       try {
-        abstractCommand = commandType.getConstructor()
-                                     .newInstance(new Object[] {});
+        command = commandType.getConstructor().newInstance(new Object[] {});
       }
       catch (Exception e) {
         e.printStackTrace();
@@ -98,9 +106,9 @@ public class CommandList {
         continue;
       }
 
-      abstractCommands.put(abstractCommand.getName(), abstractCommand);
-      for (String alias : abstractCommand.getAliases()) {
-        aliases.put(alias, abstractCommand.getName());
+      commands.put(command.getName(), command);
+      for (String alias : command.getAliases()) {
+        aliases.put(alias, command.getName());
       }
     }
   }

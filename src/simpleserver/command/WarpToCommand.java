@@ -22,7 +22,7 @@ package simpleserver.command;
 
 import simpleserver.Player;
 
-public class WarpToCommand extends OnlinePlayerCommand {
+public class WarpToCommand extends OnlinePlayerArgCommand {
   public WarpToCommand() {
     super("warpmeto");
   }

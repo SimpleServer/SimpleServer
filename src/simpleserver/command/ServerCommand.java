@@ -20,27 +20,8 @@
  ******************************************************************************/
 package simpleserver.command;
 
-import simpleserver.Player;
 import simpleserver.Server;
 
-public class ReloadCommand extends AbstractCommand implements PlayerCommand,
-    ServerCommand {
-  public ReloadCommand() {
-    super("reload");
-  }
-
-  @Override
-  public boolean passThrough() {
-    return true;
-  }
-
-  public void execute(Player player, String message) {
-    player.getServer().loadResources();
-    player.addMessage("Resources Reloaded!");
-  }
-
-  public void execute(Server server, String message) {
-    server.loadResources();
-    System.out.println("Resources Reloaded!");
-  }
+public interface ServerCommand extends Command {
+  public void execute(Server server, String message);
 }

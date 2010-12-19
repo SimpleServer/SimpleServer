@@ -23,23 +23,21 @@ package simpleserver.command;
 import simpleserver.Player;
 import simpleserver.Server;
 
-public class RestartCommand extends AbstractCommand {
+public class RestartCommand extends AbstractCommand implements PlayerCommand,
+    ServerCommand {
   public RestartCommand() {
     super("restart");
   }
 
-  @Override
   public void execute(Player player, String message) {
     Server server = player.getServer();
 
     server.adminLog.addMessage("User " + player.getName()
         + " attempted a restart!");
-    if (server.saveLock.tryAcquire()) {
-      server.saveLock.release();
-    }
-    else {
-      player.addMessage("Server is currently Backing Up/Saving/Restarting...");
-    }
+    server.restart();
+  }
+
+  public void execute(Server server, String message) {
     server.restart();
   }
 }

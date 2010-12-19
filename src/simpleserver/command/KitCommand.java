@@ -22,12 +22,11 @@ package simpleserver.command;
 
 import simpleserver.Player;
 
-public class KitCommand extends AbstractCommand {
+public class KitCommand extends AbstractCommand implements PlayerCommand {
   public KitCommand() {
     super("kit");
   }
 
-  @Override
   public void execute(Player player, String message) {
     String[] arguments = extractArguments(message);
     if (arguments.length >= 1) {

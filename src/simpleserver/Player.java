@@ -25,7 +25,7 @@ import java.net.Socket;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import simpleserver.command.AbstractCommand;
+import simpleserver.command.PlayerCommand;
 import simpleserver.stream.StreamTunnel;
 
 public class Player {
@@ -157,20 +157,18 @@ public class Player {
       return true;
     }
 
-    AbstractCommand abstractCommand = server.getCommandList()
-                                            .getCommand(message);
-    if (abstractCommand == null) {
+    PlayerCommand command = server.getCommandList().getPlayerCommand(message);
+    if (command == null) {
       return false;
     }
 
-    if (abstractCommand.getName() != null
-        && !commandAllowed(abstractCommand.getName())) {
+    if (command.getName() != null && !commandAllowed(command.getName())) {
       addMessage("\302\247cInsufficient permission.");
       return true;
     }
 
-    abstractCommand.execute(this, message);
-    return !(abstractCommand.passThrough() && server.options.getBoolean("useSMPAPI"))
+    command.execute(this, message);
+    return !(command.passThrough() && server.options.getBoolean("useSMPAPI"))
         || message.startsWith("/");
   }
 

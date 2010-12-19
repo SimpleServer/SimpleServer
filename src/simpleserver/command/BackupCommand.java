@@ -21,15 +21,21 @@
 package simpleserver.command;
 
 import simpleserver.Player;
+import simpleserver.Server;
 
-public class BackupCommand extends AbstractCommand {
+public class BackupCommand extends AbstractCommand implements PlayerCommand,
+    ServerCommand {
   public BackupCommand() {
     super("backup");
   }
 
-  @Override
   public void execute(Player player, String message) {
     player.addMessage("Forcing backup!");
     player.getServer().forceBackup();
+  }
+
+  public void execute(Server server, String message) {
+    System.out.println("Forcing backup!");
+    server.forceBackup();
   }
 }

@@ -21,8 +21,10 @@
 package simpleserver.command;
 
 import simpleserver.Player;
+import simpleserver.Server;
 
-public class SaveCommand extends AbstractCommand {
+public class SaveCommand extends AbstractCommand implements PlayerCommand,
+    ServerCommand {
   public SaveCommand() {
     super("save");
   }
@@ -32,10 +34,15 @@ public class SaveCommand extends AbstractCommand {
     return true;
   }
 
-  @Override
   public void execute(Player player, String message) {
     player.getServer().saveResources();
     player.getServer().runCommand("save-all", null);
     player.addMessage("Resources Saved!");
+  }
+
+  public void execute(Server server, String message) {
+    server.saveResources();
+    server.runCommand("save-all", null);
+    System.out.println("Resources Saved!");
   }
 }

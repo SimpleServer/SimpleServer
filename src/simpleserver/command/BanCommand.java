@@ -23,7 +23,7 @@ package simpleserver.command;
 import simpleserver.Player;
 import simpleserver.Server;
 
-public class BanCommand extends PlayerCommand {
+public class BanCommand extends PlayerArgCommand {
   public BanCommand() {
     super("ban");
   }

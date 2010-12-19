@@ -69,6 +69,10 @@ public class InputWrapper implements Wrapper {
             continue;
           }
 
+          if (messageHandler.parseCommand(line)) {
+            continue;
+          }
+
           line += "\n";
           try {
             out.write(line.getBytes());

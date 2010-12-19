@@ -23,7 +23,7 @@ package simpleserver.command;
 import simpleserver.Player;
 import simpleserver.Server;
 
-public class MuteCommand extends PlayerCommand {
+public class MuteCommand extends PlayerArgCommand {
   public MuteCommand() {
     super("mute");
   }

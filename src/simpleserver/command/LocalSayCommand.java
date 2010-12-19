@@ -22,7 +22,7 @@ package simpleserver.command;
 
 import simpleserver.Player;
 
-public class LocalSayCommand extends AbstractCommand {
+public class LocalSayCommand extends AbstractCommand implements PlayerCommand {
   public LocalSayCommand() {
     super("local");
   }
@@ -32,7 +32,6 @@ public class LocalSayCommand extends AbstractCommand {
     return new String[] { "l" };
   }
 
-  @Override
   public void execute(Player player, String message) {
     String chat = extractArgument(message);
     int numPlayers = player.getServer().localChat(player, chat);

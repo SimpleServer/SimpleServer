@@ -22,12 +22,11 @@ package simpleserver.command;
 
 import simpleserver.Player;
 
-public class RconCommand extends AbstractCommand {
+public class RconCommand extends AbstractCommand implements PlayerCommand {
   public RconCommand() {
     super("rcon");
   }
 
-  @Override
   public void execute(Player player, String message) {
     String[] arguments = extractArguments(message);
     String commandArguments = extractArgument(message, 1);

@@ -21,8 +21,10 @@
 package simpleserver.command;
 
 import simpleserver.Player;
+import simpleserver.Server;
 
-public class InvalidCommand extends AbstractCommand {
+public class InvalidCommand extends AbstractCommand implements PlayerCommand,
+    ServerCommand {
   public InvalidCommand() {
     super(null);
   }
@@ -32,8 +34,11 @@ public class InvalidCommand extends AbstractCommand {
     return true;
   }
 
-  @Override
   public void execute(Player player, String message) {
     player.addMessage("\302\247cNo such command " + message);
+  }
+
+  public void execute(Server server, String message) {
+    System.out.println("\302\247cNo such command " + message);
   }
 }

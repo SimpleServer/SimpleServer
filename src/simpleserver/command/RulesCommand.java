@@ -22,12 +22,11 @@ package simpleserver.command;
 
 import simpleserver.Player;
 
-public class RulesCommand extends AbstractCommand {
+public class RulesCommand extends AbstractCommand implements PlayerCommand {
   public RulesCommand() {
     super("rules");
   }
 
-  @Override
   public void execute(Player player, String message) {
     String rules = player.getServer().getRules();
     String[] lines = rules.split("\\r?\\n");

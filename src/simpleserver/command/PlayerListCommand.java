@@ -21,8 +21,10 @@
 package simpleserver.command;
 
 import simpleserver.Player;
+import simpleserver.Server;
 
-public class PlayerListCommand extends AbstractCommand {
+public class PlayerListCommand extends AbstractCommand implements
+    PlayerCommand, ServerCommand {
   public PlayerListCommand() {
     super("who");
   }
@@ -32,13 +34,19 @@ public class PlayerListCommand extends AbstractCommand {
     return new String[] { "list" };
   }
 
-  @Override
   public void execute(Player player, String message) {
-    String list = "Connected Players (" + player.getServer().numPlayers()
-        + "): ";
-    for (Player friend : player.getServer().playerList.getArray()) {
+    player.addMessage(getList(player.getServer()));
+  }
+
+  public void execute(Server server, String message) {
+    System.out.println(getList(server));
+  }
+
+  private String getList(Server server) {
+    String list = "Connected Players (" + server.numPlayers() + "): ";
+    for (Player friend : server.playerList.getArray()) {
       list += friend.getName() + ", ";
     }
-    player.addMessage(list);
+    return list;
   }
 }

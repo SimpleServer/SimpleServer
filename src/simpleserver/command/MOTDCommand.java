@@ -22,12 +22,11 @@ package simpleserver.command;
 
 import simpleserver.Player;
 
-public class MOTDCommand extends AbstractCommand {
+public class MOTDCommand extends AbstractCommand implements PlayerCommand {
   public MOTDCommand() {
     super("motd");
   }
 
-  @Override
   public void execute(Player player, String message) {
     player.sendMOTD();
   }

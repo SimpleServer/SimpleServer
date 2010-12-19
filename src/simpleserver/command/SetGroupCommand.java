@@ -23,7 +23,7 @@ package simpleserver.command;
 import simpleserver.Player;
 import simpleserver.Server;
 
-public class SetGroupCommand extends PlayerCommand {
+public class SetGroupCommand extends PlayerArgCommand {
   public SetGroupCommand() {
     super("setgroup");
   }

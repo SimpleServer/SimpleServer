@@ -23,7 +23,7 @@ package simpleserver.command;
 import simpleserver.Player;
 import simpleserver.Server;
 
-public class TeleportCommand extends OnlinePlayerCommand {
+public class TeleportCommand extends OnlinePlayerArgCommand {
   public TeleportCommand() {
     super("tp");
   }

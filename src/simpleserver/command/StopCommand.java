@@ -20,13 +20,11 @@
  ******************************************************************************/
 package simpleserver.command;
 
-import simpleserver.Player;
 import simpleserver.Server;
 
-public class ReloadCommand extends AbstractCommand implements PlayerCommand,
-    ServerCommand {
-  public ReloadCommand() {
-    super("reload");
+public class StopCommand extends AbstractCommand implements ServerCommand {
+  public StopCommand() {
+    super("stop");
   }
 
   @Override
@@ -34,13 +32,7 @@ public class ReloadCommand extends AbstractCommand implements PlayerCommand,
     return true;
   }
 
-  public void execute(Player player, String message) {
-    player.getServer().loadResources();
-    player.addMessage("Resources Reloaded!");
-  }
-
   public void execute(Server server, String message) {
-    server.loadResources();
-    System.out.println("Resources Reloaded!");
+    server.stop();
   }
 }

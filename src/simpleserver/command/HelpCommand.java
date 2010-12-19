@@ -23,7 +23,7 @@ package simpleserver.command;
 import simpleserver.CommandList;
 import simpleserver.Player;
 
-public class HelpCommand extends AbstractCommand {
+public class HelpCommand extends AbstractCommand implements PlayerCommand {
   public HelpCommand() {
     super("help");
   }
@@ -38,7 +38,6 @@ public class HelpCommand extends AbstractCommand {
     return true;
   }
 
-  @Override
   public void execute(Player player, String message) {
     StringBuffer line = new StringBuffer();
     line.append("Available Commands: ");
@@ -46,14 +45,13 @@ public class HelpCommand extends AbstractCommand {
     CommandList commandList = player.getServer().getCommandList();
     String prefix = commandList.commandPrefix();
 
-    for (AbstractCommand abstractCommand : commandList.getCommands()) {
-      if (abstractCommand.isHidden()
-          || !player.commandAllowed(abstractCommand.getName())) {
+    for (PlayerCommand command : commandList.getPlayerCommands()) {
+      if (command.isHidden() || !player.commandAllowed(command.getName())) {
         continue;
       }
 
       line.append(prefix);
-      line.append(abstractCommand.getName());
+      line.append(command.getName());
       line.append(" ");
     }
 

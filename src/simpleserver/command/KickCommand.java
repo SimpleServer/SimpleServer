@@ -22,7 +22,7 @@ package simpleserver.command;
 
 import simpleserver.Player;
 
-public class KickCommand extends OnlinePlayerCommand {
+public class KickCommand extends OnlinePlayerArgCommand {
   public KickCommand() {
     super("kick");
   }

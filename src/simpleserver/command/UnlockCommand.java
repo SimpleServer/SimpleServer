@@ -22,7 +22,7 @@ package simpleserver.command;
 
 import simpleserver.Player;
 
-public class UnlockCommand extends AbstractCommand {
+public class UnlockCommand extends AbstractCommand implements PlayerCommand {
   public UnlockCommand() {
     super("unlock");
   }
@@ -32,7 +32,6 @@ public class UnlockCommand extends AbstractCommand {
     return new String[] { "releaselock" };
   }
 
-  @Override
   public void execute(Player player, String message) {
     player.getServer().chests.releaseLock(player.getName().toLowerCase());
     player.addMessage("Your lock has been released!");

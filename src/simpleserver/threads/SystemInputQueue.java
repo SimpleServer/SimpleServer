@@ -20,19 +20,25 @@
  ******************************************************************************/
 package simpleserver.threads;
 
-import java.util.Scanner;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public class SystemInputQueue {
   private final BlockingQueue<String> queue;
-  private final Scanner scanner;
+  private final BufferedReader input;
+  private final Reader reader;
+
+  private boolean run = true;
 
   public SystemInputQueue() {
     queue = new LinkedBlockingQueue<String>();
-    scanner = new Scanner(System.in);
+    input = new BufferedReader(new InputStreamReader(System.in));
 
-    new Reader().start();
+    reader = new Reader();
+    reader.start();
   }
 
   public String nextLine() throws InterruptedException {
@@ -44,26 +50,50 @@ public class SystemInputQueue {
   }
 
   public void stop() {
-    scanner.close();
+    run = false;
+    reader.interrupt();
   }
 
   private final class Reader extends Thread {
     @Override
     public void run() {
-      while (true) {
-        String line;
+      while (run) {
         try {
-          line = scanner.nextLine();
+          StringBuffer buffer = new StringBuffer();
+          while (input.ready()) {
+            int character = input.read();
+            if (character == -1) {
+              run = false;
+              break;
+            }
+            else if ((char) character != '\n') {
+              buffer.append((char) character);
+            }
+            else {
+              String line = buffer.toString();
+              buffer = new StringBuffer();
+
+              if (line.endsWith("\r")) {
+                line = line.substring(0, line.length() - 1);
+              }
+
+              try {
+                queue.put(line);
+              }
+              catch (InterruptedException e) {
+                continue;
+              }
+            }
+          }
         }
-        catch (IllegalStateException e) {
+        catch (IOException e) {
           break;
         }
 
         try {
-          queue.put(line);
+          Thread.sleep(50);
         }
         catch (InterruptedException e) {
-          continue;
         }
       }
     }

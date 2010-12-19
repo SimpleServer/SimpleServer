@@ -129,15 +129,11 @@ public class Server {
   }
 
   public void restart() {
-    stop(true);
+    restart = true;
+    stop();
   }
 
   public void stop() {
-    stop(false);
-  }
-
-  private void stop(boolean restart) {
-    this.restart = restart;
     run = restart;
 
     try {
@@ -334,7 +330,12 @@ public class Server {
     this.backup = backup;
   }
 
-  private void kickAllPlayers(String message) {
+  private void kickAllPlayers() {
+    String message = "Server shutting down!";
+    if (restart) {
+      message = "Server restarting!";
+    }
+
     for (Player p : playerList.getArray()) {
       p.kick(message);
     }
@@ -419,7 +420,7 @@ public class Server {
       }
     }
 
-    kickAllPlayers("Server shutting down!");
+    kickAllPlayers();
     rconServer.stop();
     saveResources();
 

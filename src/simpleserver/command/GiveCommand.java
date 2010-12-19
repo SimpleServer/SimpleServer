@@ -22,7 +22,7 @@ package simpleserver.command;
 
 import simpleserver.Player;
 
-public class GiveCommand extends AbstractCommand {
+public class GiveCommand extends AbstractCommand implements PlayerCommand {
   private int offset;
 
   public GiveCommand() {
@@ -35,7 +35,6 @@ public class GiveCommand extends AbstractCommand {
     this.offset = offset;
   }
 
-  @Override
   public void execute(Player player, String message) {
     String[] arguments = extractArguments(message);
 

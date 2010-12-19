@@ -21,26 +21,34 @@
 package simpleserver.command;
 
 import simpleserver.Player;
-import simpleserver.Server;
 
-public class ReloadCommand extends AbstractCommand implements PlayerCommand,
-    ServerCommand {
-  public ReloadCommand() {
-    super("reload");
-  }
-
-  @Override
-  public boolean passThrough() {
-    return true;
+public abstract class OnlinePlayerArgCommand extends AbstractCommand implements
+    PlayerCommand {
+  protected OnlinePlayerArgCommand(String name) {
+    super(name);
   }
 
   public void execute(Player player, String message) {
-    player.getServer().loadResources();
-    player.addMessage("Resources Reloaded!");
+    String[] arguments = extractArguments(message);
+
+    if (arguments.length > 0) {
+      Player target = player.getServer().findPlayer(arguments[0]);
+      if (target == null) {
+        player.addMessage("\302\247cPlayer not online (" + arguments[0] + ")");
+      }
+      else {
+        executeWithTarget(player, message, target);
+      }
+    }
+    else {
+      noTargetSpecified(player, message);
+    }
   }
 
-  public void execute(Server server, String message) {
-    server.loadResources();
-    System.out.println("Resources Reloaded!");
+  protected abstract void executeWithTarget(Player player, String message,
+                                            Player target);
+
+  protected void noTargetSpecified(Player player, String message) {
+    player.addMessage("\302\247cNo player specified.");
   }
 }

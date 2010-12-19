@@ -22,12 +22,12 @@ package simpleserver.command;
 
 import simpleserver.Player;
 
-public class InstantDestroyCommand extends AbstractCommand {
+public class InstantDestroyCommand extends AbstractCommand implements
+    PlayerCommand {
   public InstantDestroyCommand() {
     super("iddqd");
   }
 
-  @Override
   public void execute(Player player, String message) {
     player.toggleInstantDestroy();
     if (player.instantDestroyEnabled()) {

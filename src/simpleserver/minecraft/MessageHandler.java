@@ -21,6 +21,7 @@
 package simpleserver.minecraft;
 
 import simpleserver.Server;
+import simpleserver.command.ServerCommand;
 
 public class MessageHandler {
   private Server server;
@@ -77,5 +78,14 @@ public class MessageHandler {
 
     server.addOutputLine(line);
     System.out.println(line);
+  }
+
+  public boolean parseCommand(String line) {
+    ServerCommand command = server.getCommandList().getServerCommand(line);
+    if (command != null) {
+      command.execute(server, line);
+      return !command.passThrough();
+    }
+    return false;
   }
 }

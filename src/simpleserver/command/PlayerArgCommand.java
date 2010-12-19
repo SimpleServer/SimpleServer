@@ -22,23 +22,22 @@ package simpleserver.command;
 
 import simpleserver.Player;
 
-public abstract class OnlinePlayerCommand extends AbstractCommand {
-  protected OnlinePlayerCommand(String name) {
+public abstract class PlayerArgCommand extends AbstractCommand implements
+    PlayerCommand {
+  protected PlayerArgCommand(String name) {
     super(name);
   }
 
-  @Override
   public void execute(Player player, String message) {
     String[] arguments = extractArguments(message);
 
     if (arguments.length > 0) {
-      Player target = player.getServer().findPlayer(arguments[0]);
-      if (target == null) {
-        player.addMessage("\302\247cPlayer not online (" + arguments[0] + ")");
+      String name = player.getServer().findName(arguments[0]);
+      if (name == null) {
+        name = arguments[0];
       }
-      else {
-        executeWithTarget(player, message, target);
-      }
+
+      executeWithTarget(player, message, name);
     }
     else {
       noTargetSpecified(player, message);
@@ -46,7 +45,7 @@ public abstract class OnlinePlayerCommand extends AbstractCommand {
   }
 
   protected abstract void executeWithTarget(Player player, String message,
-                                            Player target);
+                                            String target);
 
   protected void noTargetSpecified(Player player, String message) {
     player.addMessage("\302\247cNo player specified.");

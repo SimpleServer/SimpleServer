@@ -22,32 +22,6 @@ package simpleserver.command;
 
 import simpleserver.Player;
 
-public abstract class PlayerCommand extends AbstractCommand {
-  protected PlayerCommand(String name) {
-    super(name);
-  }
-
-  @Override
-  public void execute(Player player, String message) {
-    String[] arguments = extractArguments(message);
-
-    if (arguments.length > 0) {
-      String name = player.getServer().findName(arguments[0]);
-      if (name == null) {
-        name = arguments[0];
-      }
-
-      executeWithTarget(player, message, name);
-    }
-    else {
-      noTargetSpecified(player, message);
-    }
-  }
-
-  protected abstract void executeWithTarget(Player player, String message,
-                                            String target);
-
-  protected void noTargetSpecified(Player player, String message) {
-    player.addMessage("\302\247cNo player specified.");
-  }
+public interface PlayerCommand extends Command {
+  public void execute(Player player, String message);
 }

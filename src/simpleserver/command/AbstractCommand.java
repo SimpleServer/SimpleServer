@@ -22,9 +22,7 @@ package simpleserver.command;
 
 import java.util.Arrays;
 
-import simpleserver.Player;
-
-public abstract class AbstractCommand {
+public abstract class AbstractCommand implements Command {
   private String name;
 
   protected AbstractCommand(String name) {
@@ -49,8 +47,6 @@ public abstract class AbstractCommand {
   public boolean isHidden() {
     return false;
   }
-
-  public abstract void execute(Player player, String message);
 
   protected String[] extractArguments(String message) {
     String[] parts = message.split("\\s+");
