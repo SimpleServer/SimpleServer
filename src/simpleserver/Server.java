@@ -119,6 +119,7 @@ public class Server {
   private Server() {
     listener = new Listener();
     listener.start();
+    listener.setName("SimpleServerListener");
   }
 
   public void restart() {

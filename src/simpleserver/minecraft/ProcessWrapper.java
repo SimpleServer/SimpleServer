@@ -24,24 +24,25 @@ public class ProcessWrapper implements Wrapper {
   private Process process;
   private MessageHandler messageHandler;
 
-  private Thread wrapperThread;
+  private Thread wrapper;
   private boolean run = true;
 
   public ProcessWrapper(Process process, MessageHandler messageHandler) {
     this.process = process;
     this.messageHandler = messageHandler;
 
-    wrapperThread = new WrapperThread();
-    wrapperThread.start();
+    wrapper = new WrapperThread();
+    wrapper.start();
+    wrapper.setName("MinecraftProcessWrapper");
   }
 
   public void stop() {
     run = false;
-    wrapperThread.interrupt();
+    wrapper.interrupt();
   }
 
   public void join() throws InterruptedException {
-    wrapperThread.join();
+    wrapper.join();
   }
 
   private final class WrapperThread extends Thread {

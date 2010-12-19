@@ -39,6 +39,7 @@ public class AutoSave {
 
     saver = new Saver();
     saver.start();
+    saver.setName("AutoSave");
   }
 
   public void stop() {

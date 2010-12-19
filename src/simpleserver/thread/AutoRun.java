@@ -43,6 +43,7 @@ public class AutoRun {
 
     runner = new Runner();
     runner.start();
+    runner.setName("AutoRun");
   }
 
   public void stop() {
@@ -133,6 +134,12 @@ public class AutoRun {
             server.runCommand("save-on", null);
             server.saveLock.release();
           }
+        }
+
+        try {
+          Thread.sleep(60000);
+        }
+        catch (InterruptedException e) {
         }
       }
     }

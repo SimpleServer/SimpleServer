@@ -146,8 +146,7 @@ public class StreamTunnel {
         String name = in.readUTF();
 
         if (isServerTunnel || player.setName(name)) {
-          tunneler.setName(tunneler.getName() + "-" + streamType + "-"
-              + player.getName());
+          tunneler.setName(streamType + "-" + player.getName());
           write(packetId);
           write(name);
         }

@@ -52,6 +52,7 @@ public class AutoBackup {
 
     archiver = new Archiver();
     archiver.start();
+    archiver.setName("AutoBackup");
   }
 
   public void stop() {

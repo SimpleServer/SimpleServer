@@ -68,11 +68,14 @@ public class MinecraftWrapper {
 
     active = true;
     wrappers = new LinkedList<Wrapper>();
-    wrappers.add(new OutputWrapper(minecraft.getInputStream(), messageHandler));
-    wrappers.add(new OutputWrapper(minecraft.getErrorStream(), messageHandler));
-    wrappers.add(inputWrapper = new InputWrapper(systemInput,
-                                                 minecraft.getOutputStream(),
-                                                 messageHandler));
+    wrappers.add(new OutputWrapper(minecraft.getInputStream(), messageHandler,
+                                   "stdout"));
+    wrappers.add(new OutputWrapper(minecraft.getErrorStream(), messageHandler,
+                                   "stderr"));
+
+    inputWrapper = new InputWrapper(systemInput, minecraft.getOutputStream(),
+                                    messageHandler);
+    wrappers.add(inputWrapper);
     wrappers.add(new ProcessWrapper(minecraft, messageHandler));
     wrappers.add(new ShutdownHook(this));
   }

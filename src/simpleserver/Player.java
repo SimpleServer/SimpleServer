@@ -102,6 +102,7 @@ public class Player {
     this.name = name;
     updateGroup(name);
 
+    watchdog.setName("PlayerWatchdog-" + name);
     server.connectionLog("player", extsocket, name);
     server.playerList.addPlayer(this);
     return true;

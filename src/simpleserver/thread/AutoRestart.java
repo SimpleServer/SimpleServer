@@ -38,6 +38,7 @@ public class AutoRestart {
 
     restarter = new Restarter();
     restarter.start();
+    restarter.setName("AutoRestart");
   }
 
   public void stop() {

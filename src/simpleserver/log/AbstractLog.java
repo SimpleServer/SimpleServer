@@ -32,7 +32,7 @@ public class AbstractLog {
   private String name;
   private BlockingQueue<String> queue;
   private FileOutputStream stream;
-  private Writer writer;
+  private Logger logger;
 
   private boolean run = true;
 
@@ -49,8 +49,9 @@ public class AbstractLog {
       return;
     }
 
-    writer = new Writer();
-    writer.start();
+    logger = new Logger();
+    logger.start();
+    logger.setName("Logger-" + name);
   }
 
   protected void addMessage(String message) {
@@ -59,7 +60,7 @@ public class AbstractLog {
 
   public void stop() {
     run = false;
-    writer.interrupt();
+    logger.interrupt();
   }
 
   private File getLogFile() {
@@ -71,7 +72,7 @@ public class AbstractLog {
     return new File(logDir, fileName);
   }
 
-  private final class Writer extends Thread {
+  private final class Logger extends Thread {
     @Override
     public void run() {
       try {

@@ -28,15 +28,17 @@ public class OutputWrapper implements Wrapper {
   private Scanner scanner;
   private MessageHandler messageHandler;
 
-  private Thread wrapperThread;
+  private Thread wrapper;
   private boolean run = true;
 
-  public OutputWrapper(InputStream in, MessageHandler messageHandler) {
+  public OutputWrapper(InputStream in, MessageHandler messageHandler,
+                       String type) {
     scanner = new Scanner(in);
     this.messageHandler = messageHandler;
 
-    wrapperThread = new WrapperThread();
-    wrapperThread.start();
+    wrapper = new WrapperThread();
+    wrapper.start();
+    wrapper.setName("MinecraftOutputWrapper-" + type);
   }
 
   public void stop() {
@@ -45,7 +47,7 @@ public class OutputWrapper implements Wrapper {
   }
 
   public void join() throws InterruptedException {
-    wrapperThread.join();
+    wrapper.join();
   }
 
   private final class WrapperThread extends Thread {

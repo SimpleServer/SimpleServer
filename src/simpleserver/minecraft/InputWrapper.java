@@ -30,7 +30,7 @@ public class InputWrapper implements Wrapper {
   private OutputStream out;
   private MessageHandler messageHandler;
 
-  private Thread wrapperThread;
+  private Thread wrapper;
   private boolean run = true;
 
   public InputWrapper(SystemInputQueue in, OutputStream out,
@@ -39,8 +39,9 @@ public class InputWrapper implements Wrapper {
     this.out = out;
     this.messageHandler = messageHandler;
 
-    wrapperThread = new WrapperThread();
-    wrapperThread.start();
+    wrapper = new WrapperThread();
+    wrapper.start();
+    wrapper.setName("MinecraftInputWrapper");
   }
 
   public void injectCommand(String command, String arguments) {
@@ -49,11 +50,11 @@ public class InputWrapper implements Wrapper {
 
   public void stop() {
     run = false;
-    wrapperThread.interrupt();
+    wrapper.interrupt();
   }
 
   public void join() throws InterruptedException {
-    wrapperThread.join();
+    wrapper.join();
   }
 
   private final class WrapperThread extends Thread {

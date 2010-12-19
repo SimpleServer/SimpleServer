@@ -43,6 +43,7 @@ public class RconServer {
     connections = new LinkedList<RconTCP>();
     listener = new Listener();
     listener.start();
+    listener.setName("RconServer");
   }
 
   public void stop() {

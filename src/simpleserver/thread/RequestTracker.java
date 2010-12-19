@@ -41,6 +41,7 @@ public class RequestTracker {
 
     tracker = new Tracker();
     tracker.start();
+    tracker.setName("RequestTracker");
   }
 
   public void stop() {

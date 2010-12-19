@@ -39,6 +39,7 @@ public class SystemInputQueue {
 
     reader = new Reader();
     reader.start();
+    reader.setName("SystemInputQueue");
   }
 
   public String nextLine() throws InterruptedException {
