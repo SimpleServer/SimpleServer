@@ -45,16 +45,18 @@ public class Options extends AbstractOptions {
   public void load() {
     super.load();
 
-    boolean needsConversion = false;
-    for (String rank : ranks) {
-      if (options.contains(rank)) {
-        needsConversion = true;
-        break;
-      }
+    if (get("msgFormat").equals("")) {
+      set("msgFormat", defaultOptions.getProperty("msgFormat"));
+    }
+    if (get("msgTitleFormat").equals("")) {
+      set("msgTitleFormat", defaultOptions.getProperty("msgTitleFormat"));
     }
 
-    if (needsConversion) {
-      conversion();
+    for (String rank : ranks) {
+      if (options.contains(rank)) {
+        conversion();
+        break;
+      }
     }
 
     if (getInt("internalPort") == getInt("port")) {
