@@ -63,13 +63,8 @@ public class Server {
 
   private final Listener listener;
 
-  private simpleserver.CommandList commandList;
-
   private ServerSocket socket;
-
   private List<String> outputLog = new LinkedList<String>();
-
-  public Semaphore saveLock = new Semaphore(1);
 
   public Language l;
   public Options options;
@@ -87,13 +82,14 @@ public class Server {
   public WhiteList whitelist;
   public MuteList mutelist;
   public GiveAliasList giveAliasList;
-
   public CommandList commands;
+
+  private List<Resource> resources;
+  public PlayerList playerList;
+  private simpleserver.CommandList commandList;
 
   public AdminLog adminLog;
   private SystemInputQueue systemInput;
-
-  private Thread autoRestartThread;
 
   private MinecraftWrapper minecraft;
   private RconServer rconServer;
@@ -107,8 +103,7 @@ public class Server {
   private boolean restart = false;
   private boolean save = false;
 
-  private List<Resource> resources;
-  public PlayerList playerList;
+  public Semaphore saveLock = new Semaphore(1);
 
   public static void main(String[] args) {
     System.out.println(license);
@@ -351,10 +346,6 @@ public class Server {
     adminLog = new AdminLog();
 
     commandList = new simpleserver.CommandList(options);
-
-    autoRestart = new ServerAutoRestart(this);
-    autoRestartThread = new Thread(autoRestart);
-    autoRestartThread.start();
   }
 
   private void cleanup() {
@@ -375,6 +366,7 @@ public class Server {
     rconServer = new RconServer(this);
     serverBackup = new ServerBackup(this);
     autosave = new ServerAutoSave(this);
+    autoRestart = new ServerAutoRestart(this);
     c10t = new C10TThread(this, options.get("c10tArgs"));
   }
 
@@ -399,6 +391,7 @@ public class Server {
     rconServer.stop();
     serverBackup.stop();
     autosave.stop();
+    autoRestart.stop();
     requestTracker.stop();
     c10t.stop();
     saveResources();

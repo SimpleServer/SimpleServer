@@ -22,46 +22,63 @@ package simpleserver.threads;
 
 import simpleserver.Server;
 
-public class ServerAutoRestart implements Runnable {
-  private Server parent;
+public class ServerAutoRestart {
+  private static final long MILLISECONDS_PER_MINUTE = 1000 * 60;
 
-  public ServerAutoRestart(Server parent) {
-    this.parent = parent;
+  private final Server server;
+  private final Restarter restarter;
+
+  private boolean run = true;
+  private long lastRestart;
+
+  public ServerAutoRestart(Server server) {
+    this.server = server;
+
+    lastRestart = System.currentTimeMillis();
+
+    restarter = new Restarter();
+    restarter.start();
   }
 
-  public void run() {
-    try {
-      while (true) {
-        while (parent.options.getBoolean("autoRestart")) {
-          Thread.sleep(parent.options.getInt("autoRestartMins") * 1000 * 60);
-          parent.saveLock.acquire();
-          // parent.runCommand("say Server is restarting in 60 seconds!");
-          parent.runCommand("say", parent.l.get("SERVER_RESTART_60"));
-          Thread.sleep(30 * 1000);
-          // parent.runCommand("say Server is restarting in 30 seconds!");
-          parent.runCommand("say", parent.l.get("SERVER_RESTART_30"));
-          Thread.sleep(27 * 1000);
+  public void stop() {
+    run = false;
+    restarter.interrupt();
+  }
 
-          // parent.runCommand("say Server is restarting in 3 seconds!");
-          parent.runCommand("say", parent.l.get("SERVER_RESTART_3"));
-          Thread.sleep(3 * 1000);
+  private boolean needsRestart() {
+    long maxAge = System.currentTimeMillis() - MILLISECONDS_PER_MINUTE
+        * server.options.getInt("autoRestartMins");
+    return server.options.getBoolean("autoRestart") && maxAge > lastRestart;
+  }
 
-          if (!parent.isRestarting()) {
-            parent.restart();
+  private final class Restarter extends Thread {
+    @Override
+    public void run() {
+      while (run) {
+        if (needsRestart()) {
+          server.runCommand("say", server.l.get("SERVER_RESTART_60"));
+          try {
+            Thread.sleep(30000);
+            server.runCommand("say", server.l.get("SERVER_RESTART_30"));
+            Thread.sleep(27000);
+            server.runCommand("say", server.l.get("SERVER_RESTART_3"));
+            Thread.sleep(3000);
           }
-          parent.saveLock.release();
-        }
-        Thread.sleep(1000);
-      }
-    }
-    catch (InterruptedException e) {
-      parent.saveLock.release();
-      if (!parent.isRestarting()) {
-        e.printStackTrace();
-        System.out.println("[WARNING] Automated Server Restart Failure! Server will no longer automatically restart until SimpleServer is manually restarted!");
+          catch (InterruptedException e) {
+            continue;
+          }
 
+          if (!server.isStopping()) {
+            server.restart();
+          }
+        }
+
+        try {
+          Thread.sleep(60000);
+        }
+        catch (InterruptedException e) {
+        }
       }
     }
   }
-
 }

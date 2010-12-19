@@ -54,7 +54,7 @@ public class ServerAutoSave {
   private boolean needsSave() {
     long maxAge = System.currentTimeMillis() - MILLISECONDS_PER_MINUTE
         * server.options.getInt("autoSaveMins");
-    return server.options.getBoolean("autoBackup") && maxAge > lastSave
+    return server.options.getBoolean("autoSave") && maxAge > lastSave
         && server.numPlayers() > 0 || forceSave;
   }
 
