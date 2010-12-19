@@ -77,7 +77,7 @@ public abstract class AbstractOptions implements Resource {
   }
 
   public void load() {
-    options = new Properties(defaultOptions);
+    options = (Properties) defaultOptions.clone();
     File file = new File(filename);
 
     try {
@@ -141,6 +141,6 @@ public abstract class AbstractOptions implements Resource {
       System.out.println("Could not read default " + filename);
     }
 
-    options = new Properties(defaultOptions);
+    options = (Properties) defaultOptions.clone();
   }
 }

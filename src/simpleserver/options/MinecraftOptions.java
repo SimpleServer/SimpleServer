@@ -32,12 +32,8 @@ public class MinecraftOptions extends AbstractOptions {
   }
 
   @Override
-  public void load() {
-    throw new RuntimeException("Attempted to load " + filename);
-  }
-
-  @Override
   public void save() {
+    load();
     options = new Properties();
     options.setProperty("online-mode", simpleServerOptions.get("onlineMode"));
     options.setProperty("server-ip", "127.0.0.1");
@@ -55,6 +51,11 @@ public class MinecraftOptions extends AbstractOptions {
 
   @Override
   protected void loadDefaults() {
+    defaultOptions = new Properties();
+  }
+
+  @Override
+  protected void missingFile() {
     // skip
   }
 }
