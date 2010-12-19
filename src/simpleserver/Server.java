@@ -45,6 +45,7 @@ import simpleserver.config.RobotList;
 import simpleserver.config.Rules;
 import simpleserver.config.WhiteList;
 import simpleserver.log.AdminLog;
+import simpleserver.log.ConnectionLog;
 import simpleserver.log.ErrorLog;
 import simpleserver.minecraft.MinecraftWrapper;
 import simpleserver.options.Language;
@@ -91,6 +92,7 @@ public class Server {
 
   private AdminLog adminLog;
   private ErrorLog errorLog;
+  private ConnectionLog connectionLog;
   private SystemInputQueue systemInput;
 
   private MinecraftWrapper minecraft;
@@ -219,7 +221,6 @@ public class Server {
     for (Resource resource : resources) {
       resource.save();
     }
-    autosave.forceSave();
   }
 
   public void forceBackup() {
@@ -304,6 +305,10 @@ public class Server {
     errorLog.addMessage(exception, message);
   }
 
+  public void connectionLog(String type, Socket socket, String comments) {
+    connectionLog.addMessage(type, socket, comments);
+  }
+
   public boolean isRestarting() {
     return restart;
   }
@@ -354,6 +359,7 @@ public class Server {
     systemInput = new SystemInputQueue();
     adminLog = new AdminLog();
     errorLog = new ErrorLog();
+    connectionLog = new ConnectionLog();
 
     commandList = new simpleserver.CommandList(options);
   }
@@ -362,6 +368,7 @@ public class Server {
     systemInput.stop();
     adminLog.stop();
     errorLog.stop();
+    connectionLog.stop();
   }
 
   private void startup() {

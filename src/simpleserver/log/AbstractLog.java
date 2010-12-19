@@ -54,7 +54,7 @@ public class AbstractLog {
   }
 
   protected void addMessage(String message) {
-    queue.add(String.format("%tT\t%s", new Date(), message));
+    queue.add(String.format("%tF %1$tT\t%2$s\n", new Date(), message));
   }
 
   public void stop() {
@@ -66,8 +66,9 @@ public class AbstractLog {
     File logDir = new File("logs");
     logDir.mkdir();
 
-    return new File(logDir, String.format("%s_%tF-%2$tT.txt", name,
-                                          new Date()));
+    String fileName = String.format("%s_%tY%2$tm%2$td-%2$tH%2$tM%2$tS.txt",
+                                    name, new Date());
+    return new File(logDir, fileName);
   }
 
   private final class Writer extends Thread {

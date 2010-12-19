@@ -89,24 +89,20 @@ public class Player {
   }
 
   public boolean setName(String name) {
-    if (name == null) {
+    name = name.trim();
+    if (name.length() == 0 || this.name != null) {
       kick("Invalid Name!");
       return false;
     }
-    if (name.trim().compareTo("") == 0 || name.length() == 0
-        || name.trim().length() == 0 || this.name != null) {
-      kick("Invalid Name!");
+    if (server.options.getBoolean("useWhitelist")
+        && !server.whitelist.isWhitelisted(name)) {
+      kick("You are not whitelisted!");
       return false;
     }
-    if (server.options.getBoolean("useWhitelist")) {
-      if (!server.whitelist.isWhitelisted(name)) {
-        kick("You are not whitelisted!");
-        return false;
-      }
-    }
-    updateGroup(name.trim());
-    this.name = name.trim();
+    this.name = name;
+    updateGroup(name);
 
+    server.connectionLog("player", extsocket, name);
     server.playerList.addPlayer(this);
     return true;
   }
