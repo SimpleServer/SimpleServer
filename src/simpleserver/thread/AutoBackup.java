@@ -117,6 +117,7 @@ public class AutoBackup {
   }
 
   private File makeTemporaryCopy() throws IOException {
+    tempDirectory.mkdir();
     Calendar date = Calendar.getInstance();
     File backup = new File(tempDirectory, date.get(Calendar.YEAR) + "-"
         + (date.get(Calendar.MONTH) + 1) + "-" + date.get(Calendar.DATE) + "-"
@@ -232,6 +233,7 @@ public class AutoBackup {
           }
           forceBackup = false;
 
+          server.runCommand("say", server.l.get("SAVING_MAP"));
           server.setSaving(true);
           server.runCommand("save-all", null);
           while (server.isSaving()) {

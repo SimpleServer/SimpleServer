@@ -12,6 +12,7 @@
 /API.jar
 /banned-ips.txt
 /banned-players.txt
+/error_*\.txt
 /minecraft_server.jar
 /ops.txt
 /SimpleServer.jar
