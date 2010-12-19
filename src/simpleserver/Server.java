@@ -49,12 +49,12 @@ import simpleserver.minecraft.MinecraftWrapper;
 import simpleserver.options.Language;
 import simpleserver.options.Options;
 import simpleserver.rcon.RconServer;
-import simpleserver.threads.C10TThread;
-import simpleserver.threads.RequestTracker;
-import simpleserver.threads.ServerAutoRestart;
-import simpleserver.threads.ServerAutoSave;
-import simpleserver.threads.ServerBackup;
-import simpleserver.threads.SystemInputQueue;
+import simpleserver.thread.AutoBackup;
+import simpleserver.thread.AutoRestart;
+import simpleserver.thread.AutoRun;
+import simpleserver.thread.AutoSave;
+import simpleserver.thread.RequestTracker;
+import simpleserver.thread.SystemInputQueue;
 
 public class Server {
   private static final String version = "RC 6.6.6_stable";
@@ -93,10 +93,10 @@ public class Server {
 
   private MinecraftWrapper minecraft;
   private RconServer rconServer;
-  private C10TThread c10t;
-  private ServerBackup serverBackup;
-  private ServerAutoSave autosave;
-  private ServerAutoRestart autoRestart;
+  private AutoRun c10t;
+  private AutoBackup autoBackup;
+  private AutoSave autosave;
+  private AutoRestart autoRestart;
   public RequestTracker requestTracker;
 
   private boolean run = true;
@@ -222,7 +222,7 @@ public class Server {
   }
 
   public void forceBackup() {
-    serverBackup.forceBackup();
+    autoBackup.forceBackup();
   }
 
   public String findName(String prefix) {
@@ -364,10 +364,10 @@ public class Server {
     minecraft.start();
 
     rconServer = new RconServer(this);
-    serverBackup = new ServerBackup(this);
-    autosave = new ServerAutoSave(this);
-    autoRestart = new ServerAutoRestart(this);
-    c10t = new C10TThread(this, options.get("c10tArgs"));
+    autoBackup = new AutoBackup(this);
+    autosave = new AutoSave(this);
+    autoRestart = new AutoRestart(this);
+    c10t = new AutoRun(this, options.get("c10tArgs"));
   }
 
   private void shutdown() {
@@ -389,7 +389,7 @@ public class Server {
 
     kickAllPlayers();
     rconServer.stop();
-    serverBackup.stop();
+    autoBackup.stop();
     autosave.stop();
     autoRestart.stop();
     requestTracker.stop();

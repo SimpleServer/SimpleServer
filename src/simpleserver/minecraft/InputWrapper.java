@@ -23,7 +23,7 @@ package simpleserver.minecraft;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import simpleserver.threads.SystemInputQueue;
+import simpleserver.thread.SystemInputQueue;
 
 public class InputWrapper implements Wrapper {
   private SystemInputQueue in;

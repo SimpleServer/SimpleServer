@@ -18,7 +18,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-package simpleserver.threads;
+package simpleserver.thread;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,7 +26,7 @@ import java.io.InputStream;
 import simpleserver.Server;
 import simpleserver.log.ErrorLog;
 
-public class C10TThread {
+public class AutoRun {
   private static final long MILLISECONDS_PER_MINUTE = 1000 * 60;
 
   private final Server server;
@@ -36,7 +36,7 @@ public class C10TThread {
   private boolean run = true;
   private long lastRun;
 
-  public C10TThread(Server server, String command) {
+  public AutoRun(Server server, String command) {
     this.server = server;
     this.command = command;
 

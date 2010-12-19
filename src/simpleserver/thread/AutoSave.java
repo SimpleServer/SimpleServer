@@ -18,11 +18,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-package simpleserver.threads;
+package simpleserver.thread;
 
 import simpleserver.Server;
 
-public class ServerAutoSave {
+public class AutoSave {
   private static final long MILLISECONDS_PER_MINUTE = 1000 * 60;
 
   private final Server server;
@@ -32,7 +32,7 @@ public class ServerAutoSave {
   private boolean forceSave = false;
   private long lastSave;
 
-  public ServerAutoSave(Server server) {
+  public AutoSave(Server server) {
     this.server = server;
 
     lastSave = System.currentTimeMillis();

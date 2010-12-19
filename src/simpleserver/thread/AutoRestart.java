@@ -18,11 +18,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-package simpleserver.threads;
+package simpleserver.thread;
 
 import simpleserver.Server;
 
-public class ServerAutoRestart {
+public class AutoRestart {
   private static final long MILLISECONDS_PER_MINUTE = 1000 * 60;
 
   private final Server server;
@@ -31,7 +31,7 @@ public class ServerAutoRestart {
   private boolean run = true;
   private long lastRestart;
 
-  public ServerAutoRestart(Server server) {
+  public AutoRestart(Server server) {
     this.server = server;
 
     lastRestart = System.currentTimeMillis();

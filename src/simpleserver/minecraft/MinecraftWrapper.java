@@ -27,7 +27,7 @@ import java.util.List;
 import simpleserver.Server;
 import simpleserver.options.MinecraftOptions;
 import simpleserver.options.Options;
-import simpleserver.threads.SystemInputQueue;
+import simpleserver.thread.SystemInputQueue;
 
 public class MinecraftWrapper {
   private static final String COMMAND_FORMAT = "java %s -Xmx%sM -Xms%sM -jar %s nogui";

@@ -18,7 +18,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-package simpleserver.threads;
+package simpleserver.thread;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -34,7 +34,7 @@ import java.util.zip.ZipOutputStream;
 import simpleserver.Server;
 import simpleserver.log.ErrorLog;
 
-public class ServerBackup {
+public class AutoBackup {
   private static final long MILLISECONDS_PER_MINUTE = 1000 * 60;
   private static final long MILLISECONDS_PER_HOUR = MILLISECONDS_PER_MINUTE * 60;
   private static final File backupDirectory = new File("backups");
@@ -47,7 +47,7 @@ public class ServerBackup {
   private boolean forceBackup = false;
   private byte[] copyBuffer = new byte[8192];
 
-  public ServerBackup(Server server) {
+  public AutoBackup(Server server) {
     this.server = server;
     purgeOldBackups();
 
