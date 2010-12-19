@@ -20,59 +20,62 @@
  ******************************************************************************/
 package simpleserver.threads;
 
-import java.util.LinkedList;
+import java.util.HashMap;
+import java.util.Map;
 
 import simpleserver.Server;
 
-public class RequestTracker implements Runnable {
+public class RequestTracker {
   private static final int MAX_REQUESTS = 30;
   private static final int CLEAR_SECONDS = 60;
 
-  class Request {
-    String ipAddress;
-    int requests;
+  private final Server server;
+  private final Map<String, Integer> requests;
+  private final Tracker tracker;
 
-    Request(String ipAddress) {
-      this.ipAddress = ipAddress;
-      requests = 1;
-    }
+  private boolean run = true;
 
-    public void addRequest() {
-      requests++;
-    }
+  public RequestTracker(Server server) {
+    this.server = server;
+    requests = new HashMap<String, Integer>();
+
+    tracker = new Tracker();
+    tracker.start();
   }
 
-  Server parent;
-  LinkedList<Request> requests = new LinkedList<Request>();
-
-  public RequestTracker(Server p) {
-    parent = p;
+  public void stop() {
+    run = false;
+    tracker.interrupt();
   }
 
   public synchronized void addRequest(String ipAddress) {
-    for (Request i : requests) {
-      if (i.ipAddress.equals(ipAddress)) {
-        i.addRequest();
-        if (i.requests > MAX_REQUESTS) {
-          parent.adminLog.addMessage("RequestTracker banned " + i.ipAddress
-              + ":\t Too many requests!");
-          parent.banKickIP(ipAddress, "Banned: Too many requests!");
-        }
-        return;
-      }
+    Integer count = requests.get(ipAddress);
+    if (count == null) {
+      count = 0;
     }
-    requests.add(new Request(ipAddress));
+
+    requests.put(ipAddress, ++count);
+    if (count > MAX_REQUESTS) {
+      server.adminLog.addMessage("RequestTracker banned " + ipAddress
+          + ":\t Too many requests!");
+      server.banKickIP(ipAddress, "Banned: Too many requests!");
+    }
   }
 
-  public void run() {
-    while (true) {
-      try {
-        Thread.sleep(CLEAR_SECONDS * 1000);
-      }
-      catch (InterruptedException e) {
-      }
-      requests.clear();
+  private final class Tracker extends Thread {
+    @Override
+    public void run() {
+      while (run) {
+        synchronized (RequestTracker.this) {
+          requests.clear();
+        }
 
+        try {
+          Thread.sleep(CLEAR_SECONDS * 1000);
+        }
+        catch (InterruptedException e) {
+        }
+      }
     }
   }
 }

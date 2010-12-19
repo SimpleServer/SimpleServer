@@ -355,9 +355,6 @@ public class Server {
     autoRestart = new ServerAutoRestart(this);
     autoRestartThread = new Thread(autoRestart);
     autoRestartThread.start();
-
-    requestTracker = new RequestTracker(this);
-    new Thread(requestTracker).start();
   }
 
   private void cleanup() {
@@ -370,6 +367,7 @@ public class Server {
 
     loadResources();
     playerList = new PlayerList();
+    requestTracker = new RequestTracker(this);
 
     minecraft = new MinecraftWrapper(this, options, systemInput);
     minecraft.start();
@@ -401,6 +399,7 @@ public class Server {
     rconServer.stop();
     serverBackup.stop();
     autosave.stop();
+    requestTracker.stop();
     c10t.stop();
     saveResources();
 
