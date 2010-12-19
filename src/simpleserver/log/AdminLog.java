@@ -20,89 +20,13 @@
  ******************************************************************************/
 package simpleserver.log;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.Calendar;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
-
-public class AdminLog {
-  private BlockingQueue<String> queue;
-  private FileOutputStream stream;
-  private Writer writer;
-
-  private boolean run = true;
-
+public class AdminLog extends AbstractLog {
   public AdminLog() {
-    queue = new LinkedBlockingQueue<String>();
-    try {
-      stream = new FileOutputStream(getLogFile(), true);
-    }
-    catch (FileNotFoundException e) {
-      e.printStackTrace();
-      System.out.println("Unable to open admin log for writing!");
-      return;
-    }
-
-    writer = new Writer();
-    writer.start();
+    super("admin");
   }
 
+  @Override
   public void addMessage(String message) {
-    Calendar date = Calendar.getInstance();
-    queue.add("[SimpleServer]\t" + date.get(Calendar.HOUR_OF_DAY) + ":"
-        + date.get(Calendar.MINUTE) + "\t" + message + "\n");
-  }
-
-  public void stop() {
-    run = false;
-    writer.interrupt();
-  }
-
-  private File getLogFile() {
-    File logDir = new File("logs");
-    logDir.mkdir();
-
-    Calendar date = Calendar.getInstance();
-    return new File(logDir, "adminlog_" + date.get(Calendar.YEAR) + "-"
-        + (date.get(Calendar.MONTH) + 1) + "-" + date.get(Calendar.DATE) + "-"
-        + date.get(Calendar.HOUR_OF_DAY) + "_" + date.get(Calendar.MINUTE)
-        + ".txt");
-  }
-
-  private final class Writer extends Thread {
-    @Override
-    public void run() {
-      try {
-        while (run) {
-          String line;
-          try {
-            line = queue.take();
-          }
-          catch (InterruptedException e1) {
-            continue;
-          }
-
-          try {
-            stream.write(line.getBytes());
-            stream.flush();
-          }
-          catch (IOException e) {
-            e.printStackTrace();
-            System.out.println("Writing to admin log failed!");
-            break;
-          }
-        }
-      }
-      finally {
-        try {
-          stream.close();
-        }
-        catch (IOException e) {
-        }
-      }
-    }
+    super.addMessage(message);
   }
 }

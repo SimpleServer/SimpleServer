@@ -230,7 +230,7 @@ public class StreamTunnel {
             }
 
             if (!server.itemWatch.playerAllowed(player, itemId, itemAmount)) {
-              server.adminLog.addMessage("ItemWatchList banned player:\t"
+              server.adminLog("ItemWatchList banned player:\t"
                   + player.getName());
               server.banKick(player.getName());
             }

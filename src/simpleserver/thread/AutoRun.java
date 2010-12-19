@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import simpleserver.Server;
-import simpleserver.log.ErrorLog;
 
 public class AutoRun {
   private static final long MILLISECONDS_PER_MINUTE = 1000 * 60;
@@ -101,7 +100,7 @@ public class AutoRun {
               server.runCommand("say", "Mapping Failed!");
               e.printStackTrace();
               System.out.println("[SimpleServer] Cron Failed! Bad Command!");
-              new Thread(new ErrorLog(e, "Cron Failure")).start();
+              server.errorLog(e, "AutoRun Failure");
               continue;
             }
 

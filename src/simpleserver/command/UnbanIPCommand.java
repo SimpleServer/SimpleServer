@@ -33,8 +33,8 @@ public class UnbanIPCommand extends AbstractCommand implements PlayerCommand {
     if (arguments.length >= 1) {
       player.getServer().ipBans.removeBan(arguments[0]);
 
-      player.getServer().adminLog.addMessage("User " + player.getName()
-          + " unbanned ip:\t " + arguments[0]);
+      player.getServer().adminLog("User " + player.getName()
+                                      + " unbanned ip:\t " + arguments[0]);
       player.addMessage("IP Address " + arguments[0] + " has been unbanned!");
     }
     else {

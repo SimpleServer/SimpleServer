@@ -32,7 +32,6 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import simpleserver.Server;
-import simpleserver.log.ErrorLog;
 
 public class AutoBackup {
   private static final long MILLISECONDS_PER_MINUTE = 1000 * 60;
@@ -248,7 +247,7 @@ public class AutoBackup {
             backup();
           }
           catch (IOException e) {
-            new Thread(new ErrorLog(e, "Server Backup Failure")).start();
+            server.errorLog(e, "Server Backup Failure");
             e.printStackTrace();
             System.out.println("[WARNING] Automated Server Backup Failure!");
           }

@@ -32,8 +32,7 @@ public class RestartCommand extends AbstractCommand implements PlayerCommand,
   public void execute(Player player, String message) {
     Server server = player.getServer();
 
-    server.adminLog.addMessage("User " + player.getName()
-        + " attempted a restart!");
+    server.adminLog("User " + player.getName() + " attempted a restart!");
     server.restart();
   }
 

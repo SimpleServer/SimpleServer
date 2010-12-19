@@ -31,8 +31,8 @@ public class WhitelistCommand extends PlayerArgCommand {
   protected void executeWithTarget(Player player, String message, String name) {
     player.getServer().whitelist.addName(name);
 
-    player.getServer().adminLog.addMessage("User " + player.getName()
-        + " whitelisted player:\t " + name);
+    player.getServer().adminLog("User " + player.getName()
+                                    + " whitelisted player:\t " + name);
     player.addMessage("Player " + name + " was whitelisted!");
   }
 }

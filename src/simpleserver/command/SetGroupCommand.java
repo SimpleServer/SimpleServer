@@ -54,8 +54,8 @@ public class SetGroupCommand extends PlayerArgCommand {
         server.members.setGroup(target, group);
         player.addMessage("Player " + target + "'s group was set to " + group
             + "!");
-        server.adminLog.addMessage("User " + player.getName()
-            + " set player's group:\t " + target + "\t(" + group + ")");
+        server.adminLog("User " + player.getName() + " set player's group:\t "
+            + target + "\t(" + group + ")");
       }
     }
   }

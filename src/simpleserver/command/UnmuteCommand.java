@@ -33,8 +33,7 @@ public class UnmuteCommand extends PlayerArgCommand {
     Server server = player.getServer();
     server.mutelist.removeName(name);
 
-    server.adminLog.addMessage("Admin " + player.getName()
-        + " unmuted player:\t " + name);
+    server.adminLog("Admin " + player.getName() + " unmuted player:\t " + name);
     server.runCommand("say", "Player " + name + " has been unmuted!");
   }
 }

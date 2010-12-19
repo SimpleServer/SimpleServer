@@ -36,8 +36,8 @@ public class BanCommand extends PlayerArgCommand {
     server.runCommand("ban", target);
     server.kick(target, reason);
 
-    server.adminLog.addMessage("User " + player.getName()
-        + " banned player:\t " + target + "\t(" + reason + ")");
+    server.adminLog("User " + player.getName() + " banned player:\t " + target
+        + "\t(" + reason + ")");
     server.runCommand("say", "Player " + target + " has been banned! ("
         + reason + ")");
   }

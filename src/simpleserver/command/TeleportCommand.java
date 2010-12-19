@@ -43,9 +43,8 @@ public class TeleportCommand extends OnlinePlayerArgCommand {
 
         player.addMessage("Teleported " + target1.getName() + " to "
             + target2.getName() + "!");
-        server.adminLog.addMessage("User " + player.getName()
-            + " teleported:\t " + target1.getName() + "\tto\t"
-            + target2.getName());
+        server.adminLog("User " + player.getName() + " teleported:\t "
+            + target1.getName() + "\tto\t" + target2.getName());
       }
     }
     else {

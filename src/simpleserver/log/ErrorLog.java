@@ -20,41 +20,27 @@
  ******************************************************************************/
 package simpleserver.log;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.PrintStream;
-import java.util.Calendar;
+import java.io.CharArrayWriter;
+import java.io.PrintWriter;
 
-public class ErrorLog implements Runnable {
-  private Exception e;
-  private String comments;
-
-  public ErrorLog(Exception e, String comments) {
-    this.e = e;
-    this.comments = comments;
+public class ErrorLog extends AbstractLog {
+  public ErrorLog() {
+    super("error");
   }
 
-  public void run() {
-    Calendar date = Calendar.getInstance();
-    File dump = new File("error_" + date.get(Calendar.YEAR) + "-"
-        + (date.get(Calendar.MONTH) + 1) + "-" + date.get(Calendar.DATE) + "-"
-        + date.get(Calendar.HOUR_OF_DAY) + "_" + date.get(Calendar.MINUTE)
-        + ".txt");
-    try {
-      if (!dump.exists()) {
-        dump.createNewFile();
-      }
-      FileOutputStream f = new FileOutputStream(dump);
-      PrintStream p = new PrintStream(f);
-      p.println(comments);
-      if (e != null) {
-        e.printStackTrace(p);
-      }
-      p.close();
-      f.close();
+  public void addMessage(Exception exception, String message) {
+    CharArrayWriter charWriter = new CharArrayWriter();
+    PrintWriter writer = new PrintWriter(charWriter);
+
+    writer.append(message);
+    if (exception != null) {
+      writer.append("\n");
+      exception.printStackTrace(writer);
     }
-    catch (Exception e) {
-      e.printStackTrace();
-    }
+
+    super.addMessage(charWriter.toString());
+
+    writer.close();
+    charWriter.close();
   }
 }

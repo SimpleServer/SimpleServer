@@ -33,8 +33,7 @@ public class MuteCommand extends PlayerArgCommand {
     Server server = player.getServer();
     server.mutelist.addName(name);
 
-    server.adminLog.addMessage("Admin " + player.getName()
-        + " muted player:\t " + name);
+    server.adminLog("Admin " + player.getName() + " muted player:\t " + name);
     server.runCommand("say", "Player " + name + " has been muted!");
   }
 }

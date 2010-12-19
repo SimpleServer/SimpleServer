@@ -45,6 +45,7 @@ import simpleserver.config.RobotList;
 import simpleserver.config.Rules;
 import simpleserver.config.WhiteList;
 import simpleserver.log.AdminLog;
+import simpleserver.log.ErrorLog;
 import simpleserver.minecraft.MinecraftWrapper;
 import simpleserver.options.Language;
 import simpleserver.options.Options;
@@ -88,7 +89,8 @@ public class Server {
   public PlayerList playerList;
   private simpleserver.CommandList commandList;
 
-  public AdminLog adminLog;
+  private AdminLog adminLog;
+  private ErrorLog errorLog;
   private SystemInputQueue systemInput;
 
   private MinecraftWrapper minecraft;
@@ -179,12 +181,11 @@ public class Server {
     if (!isIPBanned(ipAddress)) {
       ipBans.addBan(ipAddress);
     }
-    adminLog.addMessage("IP Address " + ipAddress + " was banned:\t " + reason);
+    adminLog("IP Address " + ipAddress + " was banned:\t " + reason);
     for (Player player : playerList.getArray()) {
       if (player.getIPAddress().equals(ipAddress)) {
         player.kick(reason);
-        adminLog.addMessage("Player " + player.getName() + " was ip-banned:\t "
-            + reason);
+        adminLog("Player " + player.getName() + " was ip-banned:\t " + reason);
       }
     }
   }
@@ -198,7 +199,7 @@ public class Server {
       runCommand("ban", name);
       Player p = playerList.findPlayer(name);
       if (p != null) {
-        adminLog.addMessage("Player " + p.getName() + " was banned:\t " + msg);
+        adminLog("Player " + p.getName() + " was banned:\t " + msg);
         p.kick(msg);
       }
     }
@@ -295,6 +296,14 @@ public class Server {
     minecraft.execute(command, arguments);
   }
 
+  public void adminLog(String message) {
+    adminLog.addMessage(message);
+  }
+
+  public void errorLog(Exception exception, String message) {
+    errorLog.addMessage(exception, message);
+  }
+
   public boolean isRestarting() {
     return restart;
   }
@@ -344,6 +353,7 @@ public class Server {
 
     systemInput = new SystemInputQueue();
     adminLog = new AdminLog();
+    errorLog = new ErrorLog();
 
     commandList = new simpleserver.CommandList(options);
   }
@@ -351,6 +361,7 @@ public class Server {
   private void cleanup() {
     systemInput.stop();
     adminLog.stop();
+    errorLog.stop();
   }
 
   private void startup() {
