@@ -22,43 +22,75 @@ package simpleserver.threads;
 
 import simpleserver.Server;
 
-public class ServerAutoSave implements Runnable {
-  private Server parent;
+public class ServerAutoSave {
+  private static final long MILLISECONDS_PER_MINUTE = 1000 * 60;
 
-  public ServerAutoSave(Server parent) {
-    this.parent = parent;
+  private final Server server;
+  private final Saver saver;
+
+  private boolean run = true;
+  private boolean forceSave = false;
+  private long lastSave;
+
+  public ServerAutoSave(Server server) {
+    this.server = server;
+
+    lastSave = System.currentTimeMillis();
+
+    saver = new Saver();
+    saver.start();
   }
 
-  public void run() {
-    try {
-      while (true) {
-        while (parent.options.getBoolean("autoSave")) {
-          Thread.sleep(parent.options.getInt("autoSaveMins") * 1000 * 60);
-          parent.saveLock.acquire();
-          if (parent.requiresBackup()) {
-            parent.runCommand("say", parent.l.get("SAVING_MAP"));
-            parent.setSaving(true);
-            parent.runCommand("save-all", null);
+  public void stop() {
+    run = false;
+    saver.interrupt();
+  }
 
+  public void forceSave() {
+    forceSave = true;
+    saver.interrupt();
+  }
+
+  private boolean needsSave() {
+    long maxAge = System.currentTimeMillis() - MILLISECONDS_PER_MINUTE
+        * server.options.getInt("autoSaveMins");
+    return server.options.getBoolean("autoBackup") && maxAge > lastSave
+        && server.numPlayers() > 0 || forceSave;
+  }
+
+  private final class Saver extends Thread {
+    @Override
+    public void run() {
+      while (run) {
+        if (needsSave()) {
+          try {
+            server.saveLock.acquire();
           }
-          while (parent.isSaving()) {
+          catch (InterruptedException e) {
+            continue;
+          }
+          forceSave = false;
+
+          server.runCommand("say", server.l.get("SAVING_MAP"));
+          server.setSaving(true);
+          server.runCommand("save-all", null);
+          while (server.isSaving()) {
             try {
-              Thread.sleep(20);
+              Thread.sleep(100);
             }
-            catch (Exception e) {
-              break;
+            catch (InterruptedException e) {
             }
           }
-          parent.saveLock.release();
-        }
-        Thread.sleep(1000);
-      }
-    }
-    catch (InterruptedException e) {
-      if (!parent.isRestarting()) {
-        e.printStackTrace();
-        System.out.println("[WARNING] Automated Server Save Failure! Please run save-all and restart server!");
 
+          server.saveLock.release();
+          lastSave = System.currentTimeMillis();
+        }
+
+        try {
+          Thread.sleep(60000);
+        }
+        catch (InterruptedException e) {
+        }
       }
     }
   }

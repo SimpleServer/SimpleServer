@@ -57,13 +57,15 @@ import simpleserver.threads.ServerBackup;
 import simpleserver.threads.SystemInputQueue;
 
 public class Server {
-  private static String version = "RC 6.6.6_stable";
-  private static String license = "SimpleServer -- Copyright (C) 2010 Charles Wagner Jr.";
-  private static String warranty = "This program is licensed under The MIT License.\nSee file LICENSE for details.";
+  private static final String version = "RC 6.6.6_stable";
+  private static final String license = "SimpleServer -- Copyright (C) 2010 Charles Wagner Jr.";
+  private static final String warranty = "This program is licensed under The MIT License.\nSee file LICENSE for details.";
+
+  private final Listener listener;
 
   private simpleserver.CommandList commandList;
 
-  public ServerSocket socket;
+  private ServerSocket socket;
 
   private List<String> outputLog = new LinkedList<String>();
 
@@ -91,18 +93,11 @@ public class Server {
   public AdminLog adminLog;
   private SystemInputQueue systemInput;
 
-  private MinecraftWrapper minecraft;
-  private RconServer rconServer;
-
-  private Thread backupThread;
-  private Thread autoSaveThread;
   private Thread autoRestartThread;
 
-  private final Listener listener;
-
+  private MinecraftWrapper minecraft;
+  private RconServer rconServer;
   private C10TThread c10t;
-  private Thread c10tThread;
-
   private ServerBackup serverBackup;
   private ServerAutoSave autosave;
   private ServerAutoRestart autoRestart;
@@ -110,7 +105,6 @@ public class Server {
 
   private boolean run = true;
   private boolean restart = false;
-  private boolean backup = false;
   private boolean save = false;
 
   private List<Resource> resources;
@@ -229,11 +223,11 @@ public class Server {
     for (Resource resource : resources) {
       resource.save();
     }
+    autosave.forceSave();
   }
 
   public void forceBackup() {
-    backup = true;
-    backupThread.interrupt();
+    serverBackup.forceBackup();
   }
 
   public String findName(String prefix) {
@@ -322,14 +316,6 @@ public class Server {
     this.save = save;
   }
 
-  public boolean requiresBackup() {
-    return backup;
-  }
-
-  public void setBackup(boolean backup) {
-    this.backup = backup;
-  }
-
   private void kickAllPlayers() {
     String message = "Server shutting down!";
     if (restart) {
@@ -366,26 +352,12 @@ public class Server {
 
     commandList = new simpleserver.CommandList(options);
 
-    serverBackup = new ServerBackup(this);
-    backupThread = new Thread(serverBackup);
-    backupThread.start();
-
-    autosave = new ServerAutoSave(this);
-    autoSaveThread = new Thread(autosave);
-    autoSaveThread.start();
-
     autoRestart = new ServerAutoRestart(this);
     autoRestartThread = new Thread(autoRestart);
     autoRestartThread.start();
 
     requestTracker = new RequestTracker(this);
     new Thread(requestTracker).start();
-
-    if (options.contains("c10tArgs")) {
-      c10t = new C10TThread(this, options.get("c10tArgs"));
-      c10tThread = new Thread(c10t);
-      c10tThread.start();
-    }
   }
 
   private void cleanup() {
@@ -403,10 +375,15 @@ public class Server {
     minecraft.start();
 
     rconServer = new RconServer(this);
+    serverBackup = new ServerBackup(this);
+    autosave = new ServerAutoSave(this);
+    c10t = new C10TThread(this, options.get("c10tArgs"));
   }
 
   private void shutdown() {
     System.out.println("Stopping Server...");
+    save = false;
+
     if (!saveLock.tryAcquire()) {
       System.out.println("[SimpleServer] Server is currently Backing Up/Saving...");
       while (true) {
@@ -422,6 +399,9 @@ public class Server {
 
     kickAllPlayers();
     rconServer.stop();
+    serverBackup.stop();
+    autosave.stop();
+    c10t.stop();
     saveResources();
 
     while (playerList.size() > 0) {

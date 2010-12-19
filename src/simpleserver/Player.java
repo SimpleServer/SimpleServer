@@ -106,7 +106,6 @@ public class Player {
     }
     updateGroup(name.trim());
     this.name = name.trim();
-    server.setBackup(true);
 
     server.playerList.addPlayer(this);
     return true;

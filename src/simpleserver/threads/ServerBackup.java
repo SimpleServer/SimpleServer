@@ -34,224 +34,231 @@ import java.util.zip.ZipOutputStream;
 import simpleserver.Server;
 import simpleserver.log.ErrorLog;
 
-/*
- * I forgot where I got some of this code from.
- * Specifically copyDirectory and zipDirectory.
- * If someone finds the source, please let me know so I can
- * properly attribute the author.
- * Thanks,
- * SpiegalPwns
- */
-public class ServerBackup implements Runnable {
-  private Server parent;
+public class ServerBackup {
+  private static final long MILLISECONDS_PER_MINUTE = 1000 * 60;
+  private static final long MILLISECONDS_PER_HOUR = MILLISECONDS_PER_MINUTE * 60;
+  private static final File backupDirectory = new File("backups");
+  private static final File tempDirectory = new File("tmp");
 
-  public ServerBackup(Server parent) {
-    this.parent = parent;
-    checkOldBackups(new File("backups"));
+  private final Server server;
+  private final Archiver archiver;
+
+  private boolean run = true;
+  private boolean forceBackup = false;
+  private byte[] copyBuffer = new byte[8192];
+
+  public ServerBackup(Server server) {
+    this.server = server;
+    purgeOldBackups();
+
+    archiver = new Archiver();
+    archiver.start();
   }
 
-  public void run() {
-    while (!Thread.interrupted()) {
-      while (parent.options.getBoolean("autoBackup")) {
-        try {
-          Thread.sleep(parent.options.getInt("autoBackupMins") * 1000 * 60);
-        }
-        catch (InterruptedException e) {
-        }
-        try {
-          parent.saveLock.acquire();
-        }
-        catch (InterruptedException e1) {
-          return;
-        }
-        if (parent.isRestarting()) {
-          parent.saveLock.release();
-          break;
-        }
-        parent.setSaving(true);
-        parent.runCommand("save-all", null);
-        while (parent.isSaving()) {
-          try {
-            Thread.sleep(500);
-          }
-          catch (InterruptedException e) {
-          }
-        }
-
-        try {
-          backup();
-        }
-        catch (Exception e) {
-          new Thread(new ErrorLog(e, "Server Backup Failure")).start();
-          e.printStackTrace();
-          System.out.println("[WARNING] Automated Server Backup Failure! Please run save-all and restart server!");
-        }
-        if (parent.numPlayers() == 0) {
-          parent.setBackup(false);
-        }
-        parent.saveLock.release();
-
-      }
-      try {
-        Thread.sleep(1000);
-      }
-      catch (InterruptedException e) {
-        return;
-      }
-    }
+  public void stop() {
+    run = false;
+    archiver.interrupt();
   }
 
-  public void backup() throws IOException {
-    if (parent.requiresBackup() || parent.numPlayers() > 0) {
-      parent.runCommand("say", parent.l.get("BACKING_UP"));
-      parent.runCommand("save-off", null);
-      System.out.println("[SimpleServer] Backing up server...");
-      File backup = backupServer();
-      zipDirectory(backup);
-      parent.runCommand("save-on", null);
-      deleteDirectory(backup);
-      checkOldBackups(new File("backups"));
-      parent.runCommand("say", parent.l.get("BACKUP_COMPLETE"));
-    }
+  public void forceBackup() {
+    forceBackup = true;
+    archiver.interrupt();
   }
 
-  public void zipDirectory(File directory) throws IOException {
-    Calendar date = Calendar.getInstance();
-    File f = new File("backups" + File.separator + date.get(Calendar.YEAR)
-        + "-" + (date.get(Calendar.MONTH) + 1) + "-" + date.get(Calendar.DATE)
-        + "-" + date.get(Calendar.HOUR_OF_DAY) + "_"
-        + date.get(Calendar.MINUTE) + ".zip");
-    if (!f.exists()) {
-      f.createNewFile();
-    }
-    FileOutputStream dest = new FileOutputStream(f);
-    ZipOutputStream out = new ZipOutputStream(new BufferedOutputStream(dest));
-    zipDir(directory.getPath(), out, directory.getPath().length() + 1);
-    out.close();
-    dest.close();
-    System.out.println("[SimpleServer] Backup saved: " + f.getPath());
-  }
+  private void backup() throws IOException {
+    System.out.println("[SimpleServer] Backing up server...");
+    server.runCommand("say", server.l.get("BACKING_UP"));
+    server.runCommand("save-off", null);
 
-  public void zipDir(String dir2zip, ZipOutputStream zos, int prefixLength) {
+    File copy;
     try {
-      // create a new File object based on the directory we have to zip
-      File zipDir = new File(dir2zip);
-      // get a listing of the directory content
-      String[] dirList = zipDir.list();
-      byte[] readBuffer = new byte[2156];
-      int bytesIn = 0;
-      // loop through dirList, and zip the files
-      for (int i = 0; i < dirList.length; i++) {
-        File f = new File(zipDir, dirList[i]);
-        if (f.isDirectory()) {
-          // if the File object is a directory, call this
-          // function again to add its content recursively
-          String filePath = f.getPath();
-          zipDir(filePath, zos, prefixLength);
-          // loop again
-          continue;
-        }
-        // if we reached here, the File object f was not a directory
-        // create a FileInputStream on top of f
-        FileInputStream fis = new FileInputStream(f);
-        // create a new zip entry
-        ZipEntry anEntry = new ZipEntry(f.getPath().substring(prefixLength));
-        // place the zip entry in the ZipOutputStream object
-        zos.putNextEntry(anEntry);
-        // now write the content of the file to the ZipOutputStream
-        while ((bytesIn = fis.read(readBuffer, 0, readBuffer.length)) != -1) {
-          zos.write(readBuffer, 0, bytesIn);
-          Thread.yield();
-        }
-        // close the Stream
-        fis.close();
+      copy = makeTemporaryCopy();
+      server.runCommand("save-on", null);
+
+      zipBackup(copy);
+    }
+    finally {
+      deleteRecursively(tempDirectory);
+    }
+    purgeOldBackups();
+    server.runCommand("say", server.l.get("BACKUP_COMPLETE"));
+  }
+
+  private boolean needsBackup() {
+    long backupPeriod = MILLISECONDS_PER_MINUTE
+        * server.options.getInt("autoBackupMins");
+    return server.options.getBoolean("autoBackup")
+        && backupPeriod < lastBackupAge() && server.numPlayers() > 0
+        || forceBackup;
+  }
+
+  private long lastBackupAge() {
+    backupDirectory.mkdir();
+
+    long newest = 0;
+    for (File file : backupDirectory.listFiles()) {
+      long modified = file.lastModified();
+      if (modified > newest) {
+        newest = modified;
       }
     }
-    catch (Exception e) {
-      e.printStackTrace();
+    return System.currentTimeMillis() - newest;
+  }
+
+  private void purgeOldBackups() {
+    backupDirectory.mkdir();
+    long maxAge = MILLISECONDS_PER_HOUR
+        * server.options.getInt("keepBackupHours");
+    for (File file : backupDirectory.listFiles()) {
+      if (System.currentTimeMillis() - file.lastModified() > maxAge) {
+        deleteRecursively(file);
+      }
     }
   }
 
-  public File backupServer() throws IOException {
-    File backupDir = new File("tmp");
-    if (!backupDir.exists()) {
-      backupDir.mkdir();
-    }
-    File backupDir2 = new File("backups");
-    if (!backupDir2.exists()) {
-      backupDir2.mkdir();
-    }
+  private File makeTemporaryCopy() throws IOException {
     Calendar date = Calendar.getInstance();
-    File backup = new File("tmp" + File.separator + date.get(Calendar.YEAR)
-        + "-" + (date.get(Calendar.MONTH) + 1) + "-" + date.get(Calendar.DATE)
-        + "-" + date.get(Calendar.HOUR_OF_DAY) + "_"
-        + date.get(Calendar.MINUTE));
-    copyDirectory(new File(parent.options.get("levelName")), backup);
+    File backup = new File(tempDirectory, date.get(Calendar.YEAR) + "-"
+        + (date.get(Calendar.MONTH) + 1) + "-" + date.get(Calendar.DATE) + "-"
+        + date.get(Calendar.HOUR_OF_DAY) + "_" + date.get(Calendar.MINUTE));
+    copyRecursively(new File(server.options.get("levelName")), backup);
     return backup;
   }
 
-  // If targetLocation does not exist, it will be created.
-  public void copyDirectory(File sourceLocation, File targetLocation)
-      throws IOException {
+  private void zipBackup(File source) throws IOException {
+    Calendar date = Calendar.getInstance();
+    File backup = new File(backupDirectory, date.get(Calendar.YEAR) + "-"
+        + (date.get(Calendar.MONTH) + 1) + "-" + date.get(Calendar.DATE) + "-"
+        + date.get(Calendar.HOUR_OF_DAY) + "_" + date.get(Calendar.MINUTE)
+        + ".zip");
+    FileOutputStream fout = new FileOutputStream(backup);
+    try {
+      ZipOutputStream out = new ZipOutputStream(new BufferedOutputStream(fout));
+      try {
+        zipRecursively(source, out, source.getPath().length() + 1);
+      }
+      finally {
+        out.close();
+      }
+    }
+    finally {
+      fout.close();
+    }
+    System.out.println("[SimpleServer] Backup saved: " + backup.getPath());
+  }
 
-    if (sourceLocation.isDirectory()) {
-      if (!targetLocation.exists()) {
-        targetLocation.mkdir();
+  private void zipRecursively(File source, ZipOutputStream out, int prefixLength)
+      throws IOException {
+    if (source.isDirectory()) {
+      for (File file : source.listFiles()) {
+        zipRecursively(file, out, prefixLength);
+      }
+    }
+    else {
+      ZipEntry entry = new ZipEntry(source.getPath().substring(prefixLength));
+      out.putNextEntry(entry);
+
+      FileInputStream in = new FileInputStream(source);
+      try {
+        int length;
+        while ((length = in.read(copyBuffer)) != -1) {
+          out.write(copyBuffer, 0, length);
+          Thread.yield();
+        }
+      }
+      finally {
+        in.close();
       }
 
-      String[] children = sourceLocation.list();
-      for (int i = 0; i < children.length; i++) {
-        if (!children[i].contains("tmp_chunk.dat")) {
-          copyDirectory(new File(sourceLocation, children[i]),
-                        new File(targetLocation, children[i]));
+      out.closeEntry();
+    }
+  }
+
+  private void copyRecursively(File source, File target) throws IOException {
+    if (source.isDirectory()) {
+      target.mkdir();
+
+      for (String child : source.list()) {
+        if (!child.contains("tmp_chunk.dat")) {
+          copyRecursively(new File(source, child), new File(target, child));
         }
       }
     }
     else {
+      InputStream in = new FileInputStream(source);
+      OutputStream out = new FileOutputStream(target);
 
-      InputStream in = new FileInputStream(sourceLocation);
-      OutputStream out = new FileOutputStream(targetLocation);
-
-      // Copy the bits from instream to outstream
-      byte[] buf = new byte[1024];
-      int len;
-      while ((len = in.read(buf)) > 0) {
-        out.write(buf, 0, len);
+      try {
+        int length;
+        while ((length = in.read(copyBuffer)) > 0) {
+          out.write(copyBuffer, 0, length);
+        }
       }
-      in.close();
-      out.close();
-    }
-  }
-
-  private void checkOldBackups(File backupDir) {
-    if (backupDir.isDirectory()) {
-      String[] dirs = backupDir.list();
-      for (int i = 0; i < dirs.length; i++) {
-        File current = new File("backups" + File.separator + dirs[i]);
-        if (System.currentTimeMillis() - current.lastModified() > 1000 * 60 * 60 * parent.options.getInt("keepBackupHours")) {
-          if (current.isDirectory()) {
-            deleteDirectory(current);
-          }
-          else {
-            current.delete();
-          }
+      finally {
+        try {
+          in.close();
+        }
+        finally {
+          out.close();
         }
       }
     }
   }
 
-  private boolean deleteDirectory(File path) {
-    if (path.exists()) {
-      File[] files = path.listFiles();
-      for (int i = 0; i < files.length; i++) {
-        if (files[i].isDirectory()) {
-          deleteDirectory(files[i]);
+  private void deleteRecursively(File path) {
+    if (path.exists() && path.isDirectory()) {
+      for (File file : path.listFiles()) {
+        if (file.isDirectory()) {
+          deleteRecursively(file);
         }
         else {
-          files[i].delete();
+          file.delete();
         }
       }
     }
-    return (path.delete());
+    path.delete();
+  }
+
+  private final class Archiver extends Thread {
+    @Override
+    public void run() {
+      while (run) {
+        if (needsBackup()) {
+          try {
+            server.saveLock.acquire();
+          }
+          catch (InterruptedException e) {
+            continue;
+          }
+          forceBackup = false;
+
+          server.setSaving(true);
+          server.runCommand("save-all", null);
+          while (server.isSaving()) {
+            try {
+              Thread.sleep(100);
+            }
+            catch (InterruptedException e) {
+            }
+          }
+
+          try {
+            backup();
+          }
+          catch (IOException e) {
+            new Thread(new ErrorLog(e, "Server Backup Failure")).start();
+            e.printStackTrace();
+            System.out.println("[WARNING] Automated Server Backup Failure!");
+          }
+          server.saveLock.release();
+        }
+
+        try {
+          Thread.sleep(60000);
+        }
+        catch (InterruptedException e) {
+        }
+      }
+    }
   }
 }

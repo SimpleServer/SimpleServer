@@ -26,83 +26,115 @@ import java.io.InputStream;
 import simpleserver.Server;
 import simpleserver.log.ErrorLog;
 
-public class C10TThread implements Runnable {
-  private Server parent;
-  private Process c10t;
-  private String command;
-  private InputStream stdout;
-  private InputStream stderr;
+public class C10TThread {
+  private static final long MILLISECONDS_PER_MINUTE = 1000 * 60;
 
-  class ErrGobblerThread extends Thread {
-    @Override
-    public void run() {
-      byte[] buf = new byte[256];
-      try {
-        while (stderr.read(buf) >= 0) {
-        }
-      }
-      catch (IOException e) {
-      }
-    }
-  }
+  private final Server server;
+  private final String command;
+  private final Runner runner;
 
-  class OutGobblerThread extends Thread {
-    @Override
-    public void run() {
-      byte[] buf = new byte[256];
-      try {
-        while (stdout.read(buf) >= 0) {
-        }
-      }
-      catch (IOException e) {
-      }
-    }
-  }
+  private boolean run = true;
+  private long lastRun;
 
-  public C10TThread(Server parent, String command) {
-    this.parent = parent;
+  public C10TThread(Server server, String command) {
+    this.server = server;
     this.command = command;
+
+    lastRun = System.currentTimeMillis();
+
+    runner = new Runner();
+    runner.start();
   }
 
-  public void run() {
-    try {
-      while (true) {
-        Thread.sleep(parent.options.getInt("c10tMins") * 1000 * 60);
-        parent.saveLock.acquire();
-        if (parent.requiresBackup()) {
-          parent.runCommand("save-off", null);
-          parent.runCommand("say", "Mapping Server!");
+  public void stop() {
+    run = false;
+    runner.interrupt();
+  }
+
+  private boolean needsRun() {
+    long maxAge = System.currentTimeMillis() - MILLISECONDS_PER_MINUTE
+        * server.options.getInt("c10tMins");
+    return server.options.contains("c10tArgs") && maxAge > lastRun
+        && server.numPlayers() > 0;
+  }
+
+  private static final class OutputConsumer extends Thread {
+    private final InputStream in;
+
+    private OutputConsumer(InputStream in) {
+      this.in = in;
+    }
+
+    @Override
+    public void run() {
+      byte[] buf = new byte[256];
+      try {
+        while (in.read(buf) >= 0) {
+        }
+      }
+      catch (IOException e) {
+      }
+    }
+  }
+
+  private final class Runner extends Thread {
+    @Override
+    public void run() {
+      while (run) {
+        if (needsRun()) {
           try {
-            c10t = Runtime.getRuntime().exec(command);
+            server.saveLock.acquire();
           }
-          catch (IOException e) {
-            parent.runCommand("say", "Mapping Complete!");
-            parent.runCommand("save-on", null);
-            e.printStackTrace();
-            new Thread(new ErrorLog(e, "c10t Failure")).start();
-            System.out.println("[SimpleServer] c10t Failed! Bad Command!");
+          catch (InterruptedException e) {
             continue;
           }
-          stderr = c10t.getErrorStream();
-          stdout = c10t.getInputStream();
-          new OutGobblerThread().start();
-          new ErrGobblerThread().start();
-          int exitCode = c10t.waitFor();
-          if (exitCode < 0) {
-            System.out.println("[SimpleServer] c10t Failed! Exited with code "
-                + exitCode + "!");
-          }
-          parent.runCommand("say", "Mapping Complete!");
-          parent.runCommand("save-on", null);
-        }
-        parent.saveLock.release();
-      }
-    }
-    catch (InterruptedException e) {
-      if (!parent.isRestarting()) {
-        e.printStackTrace();
-        System.out.println("[WARNING] Automated Server Save Failure! Please run save-all and restart server!");
+          server.runCommand("say", "Mapping Server!");
+          server.runCommand("save-off", null);
 
+          lastRun = System.currentTimeMillis();
+          try {
+            Process process;
+            try {
+              process = Runtime.getRuntime().exec(command);
+            }
+            catch (IOException e) {
+              server.runCommand("say", "Mapping Failed!");
+              e.printStackTrace();
+              System.out.println("[SimpleServer] Cron Failed! Bad Command!");
+              new Thread(new ErrorLog(e, "Cron Failure")).start();
+              continue;
+            }
+
+            new OutputConsumer(process.getInputStream()).start();
+            new OutputConsumer(process.getErrorStream()).start();
+
+            int exitCode;
+            while (true) {
+              try {
+                exitCode = process.waitFor();
+                break;
+              }
+              catch (InterruptedException e) {
+                if (!run) {
+                  process.destroy();
+                }
+              }
+            }
+
+            if (exitCode < 0) {
+              System.out.println("[SimpleServer] c10t Failed! Exited with code "
+                  + exitCode + "!");
+              server.runCommand("say", "Mapping Failed!");
+            }
+            else {
+              server.runCommand("say", "Mapping Complete!");
+            }
+          }
+          finally {
+            server.runCommand("save-on", null);
+            server.saveLock.release();
+          }
+        }
       }
     }
   }
