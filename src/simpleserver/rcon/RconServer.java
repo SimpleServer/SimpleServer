@@ -48,12 +48,13 @@ public class RconServer {
 
   public void stop() {
     run = false;
-    try {
-      socket.close();
+    if (socket!=null) {
+      try {
+        socket.close();
+      }
+      catch (IOException e) {
+      }
     }
-    catch (IOException e) {
-    }
-
     for (RconTCP connection : connections) {
       connection.close();
     }

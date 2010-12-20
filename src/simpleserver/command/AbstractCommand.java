@@ -20,8 +20,6 @@
  ******************************************************************************/
 package simpleserver.command;
 
-import java.util.Arrays;
-
 public abstract class AbstractCommand implements Command {
   private String name;
 
@@ -50,7 +48,11 @@ public abstract class AbstractCommand implements Command {
 
   protected String[] extractArguments(String message) {
     String[] parts = message.split("\\s+");
-    return Arrays.copyOfRange(parts, 1, parts.length);
+    //return Arrays.copyOfRange(parts, 1, parts.length);
+    //JDK 1.5 Compatibility
+    String[] cpy = new String[parts.length-1];
+    System.arraycopy(parts, 1, cpy, 0, parts.length-1);
+    return cpy;
   }
 
   protected String extractArgument(String message, int startOffset) {

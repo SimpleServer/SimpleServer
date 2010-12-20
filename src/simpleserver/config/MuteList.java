@@ -20,6 +20,7 @@
  ******************************************************************************/
 package simpleserver.config;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -55,9 +56,12 @@ public class MuteList extends PropertiesConfig {
     List<String> names = new LinkedList<String>();
     Set<Object> rawNames = keySet();
 
-    for (Object name : rawNames) {
-      rawNames.remove(name);
+    //for (Object name : rawNames) {
+    for (Iterator<Object> itr = rawNames.iterator();itr.hasNext();) {
+      Object name = itr.next();
+      //rawNames.remove(name);
       names.add(((String) name).toLowerCase());
+      itr.remove();
     }
 
     for (String name : names) {

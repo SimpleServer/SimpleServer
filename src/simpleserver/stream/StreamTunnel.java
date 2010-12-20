@@ -544,7 +544,7 @@ public class StreamTunnel {
         write(packetId);
         write(in.readByte());
         break;
-      case 0x66:  // Inventory Item Move
+      case 0x66: // Inventory Item Move
         write(packetId);
         write(in.readByte());
         write(in.readShort());
@@ -557,7 +557,7 @@ public class StreamTunnel {
           write(in.readByte());
         }
         break;
-      case 0x67:  // Inventory Item Update
+      case 0x67: // Inventory Item Update
         write(packetId);
         write(in.readByte());
         write(in.readShort());
@@ -568,7 +568,7 @@ public class StreamTunnel {
           write(in.readByte());
         }
         break;
-      case 0x68:  // Inventory
+      case 0x68: // Inventory
         write(packetId);
         write(in.readByte());
         short count = in.readShort();
@@ -576,7 +576,7 @@ public class StreamTunnel {
         for (int c = 0; c < count; ++c) {
           short item = in.readShort();
           write(item);
-          
+
           if (item != -1) {
             write(in.readByte());
             write(in.readShort());

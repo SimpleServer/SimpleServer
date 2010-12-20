@@ -20,6 +20,7 @@
  ******************************************************************************/
 package simpleserver.config;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -71,10 +72,12 @@ public class IPBanList extends PropertiesConfig {
     List<String> networks = new LinkedList<String>();
     Set<Object> addresses = keySet();
 
-    for (Object address : addresses) {
-      addresses.remove(address);
-
+    //for (Object address : addresses) {
+    for (Iterator<Object> itr = addresses.iterator();itr.hasNext();) {
+      Object address = itr.next();
+      //addresses.remove(address);
       networks.add(trailingDot.matcher((String) address).replaceFirst(""));
+      itr.remove();
     }
 
     for (String network : networks) {
