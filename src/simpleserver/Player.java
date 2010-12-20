@@ -49,17 +49,61 @@ public class Player {
 
   private Queue<String> messages = new ConcurrentLinkedQueue<String>();
 
+  public Player(Socket inc, Server parent) {
+    server = parent;
+    extsocket = inc;
+    if (server.isRobot(getIPAddress())) {
+      System.out.println("[SimpleServer] Robot Heartbeat: " + getIPAddress()
+          + ".");
+      isRobot = true;
+    }
+    else {
+      System.out.println("[SimpleServer] IP Connection from " + getIPAddress()
+          + "!");
+    }
+
+    if (server.isIPBanned(getIPAddress())) {
+      System.out.println("[SimpleServer] IP " + getIPAddress() + " is banned!");
+      kick("Banned IP!");
+    }
+    server.requestTracker.addRequest(getIPAddress());
+
+    try {
+      intsocket = new Socket("localhost", server.options.getInt("internalPort"));
+    }
+    catch (Exception e) {
+      e.printStackTrace();
+      if (server.options.getBoolean("exitOnFailure")) {
+        server.stop();
+      }
+      else {
+        server.restart();
+      }
+    }
+
+    try {
+      serverToClient = new StreamTunnel(intsocket.getInputStream(),
+                                        extsocket.getOutputStream(), true, this);
+      clientToServer = new StreamTunnel(extsocket.getInputStream(),
+                                        intsocket.getOutputStream(), false,
+                                        this);
+    }
+    catch (IOException e) {
+      e.printStackTrace();
+      cleanup();
+    }
+
+    if (isRobot) {
+      server.addRobotPort(intsocket.getLocalPort());
+    }
+
+    watchdog = new Watchdog();
+    watchdog.start();
+  }
+
   public double distanceTo(Player player) {
     return Math.sqrt(Math.pow(x - player.x, 2) + Math.pow(x - player.y, 2)
         + Math.pow(x - player.z, 2));
-  }
-
-  public boolean hasExternalConnection() {
-    return extsocket != null;
-  }
-
-  public boolean hasInternalConnection() {
-    return intsocket != null;
   }
 
   public void updateLocation(double x, double y, double z, double stance) {
@@ -100,12 +144,20 @@ public class Player {
       return false;
     }
     this.name = name;
-    updateGroup(name);
+    updateGroup();
 
     watchdog.setName("PlayerWatchdog-" + name);
     server.connectionLog("player", extsocket, name);
     server.playerList.addPlayer(this);
     return true;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public boolean hasMessages() {
+    return !messages.isEmpty();
   }
 
   public void addMessage(String msg) {
@@ -132,20 +184,12 @@ public class Player {
     isKicked = b;
   }
 
-  public boolean isMuted() {
-    return server.mutelist.isMuted(name);
-  }
-
   public String getKickMsg() {
     return kickMsg;
   }
 
-  public boolean hasMessages() {
-    return !messages.isEmpty();
-  }
-
-  public String getName() {
-    return name;
+  public boolean isMuted() {
+    return server.mutelist.isMuted(name);
   }
 
   public boolean parseCommand(String message) {
@@ -180,21 +224,10 @@ public class Player {
     return groupObject;
   }
 
-  private void updateGroup(String name) {
+  public void updateGroup() {
     int nameGroup = server.members.getGroup(name);
     int ipGroup = server.ipMembers.getGroup(this);
     int defaultGroup = server.options.getInt("defaultGroup");
-    if ((nameGroup == -1 || ipGroup == -1 && defaultGroup != -1)
-        || (nameGroup == -1 && ipGroup == -1 && defaultGroup == -1)) {
-      group = -1;
-      if (server.groups.groupExists(group)) {
-        groupObject = server.groups.getGroup(group);
-      }
-      else {
-        groupObject = null;
-      }
-      return;
-    }
 
     if (ipGroup >= nameGroup) {
       group = ipGroup;
@@ -203,16 +236,16 @@ public class Player {
       group = nameGroup;
     }
 
+    if (nameGroup == -1 || ipGroup == -1 && defaultGroup != -1) {
+      group = -1;
+    }
+
     if (server.groups.groupExists(group)) {
       groupObject = server.groups.getGroup(group);
     }
     else {
-      group = 0;
+      groupObject = null;
     }
-  }
-
-  public void updateGroup() {
-    updateGroup(name);
   }
 
   public boolean isAdmin() {
@@ -226,68 +259,12 @@ public class Player {
     return extsocket.getInetAddress().getHostAddress();
   }
 
-  public Player(Socket inc, Server parent) {
-    server = parent;
-    extsocket = inc;
-    if (parent.isRobot(extsocket.getInetAddress().getHostAddress())) {
-      System.out.println("[SimpleServer] Robot Heartbeat: "
-          + extsocket.getInetAddress().getHostAddress() + ".");
-      isRobot = true;
-    }
-    if (!isRobot) {
-      System.out.println("[SimpleServer] IP Connection from "
-          + extsocket.getInetAddress().getHostAddress() + "!");
-    }
-    parent.requestTracker.addRequest(extsocket.getInetAddress()
-                                              .getHostAddress());
-    if (parent.isIPBanned(extsocket.getInetAddress().getHostAddress())) {
-      System.out.println("[SimpleServer] IP "
-          + extsocket.getInetAddress().getHostAddress() + " is banned!");
-      kick("Banned IP!");
-    }
-    try {
-      intsocket = new Socket("localhost", parent.options.getInt("internalPort"));
-    }
-    catch (Exception e) {
-      e.printStackTrace();
-      if (parent.options.getBoolean("exitOnFailure")) {
-        server.stop();
-      }
-      else {
-        parent.restart();
-      }
-    }
-
-    try {
-      serverToClient = new StreamTunnel(intsocket.getInputStream(),
-                                        extsocket.getOutputStream(), true, this);
-      clientToServer = new StreamTunnel(extsocket.getInputStream(),
-                                        intsocket.getOutputStream(), false,
-                                        this);
-    }
-    catch (IOException e) {
-      e.printStackTrace();
-      cleanup();
-    }
-
-    if (isRobot) {
-      parent.addRobotPort(intsocket.getLocalPort());
-    }
-
-    watchdog = new Watchdog();
-    watchdog.start();
-  }
-
-  public boolean isClosed() {
-    return closed;
-  }
-
   public void close() {
     serverToClient.stop();
     clientToServer.stop();
   }
 
-  public void cleanup() {
+  private void cleanup() {
     if (!closed) {
       closed = true;
       serverToClient.stop();

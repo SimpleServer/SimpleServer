@@ -212,6 +212,13 @@ public class Server {
     banKick(name, "Banned!");
   }
 
+  public void kick(String name, String reason) {
+    Player player = playerList.findPlayer(name);
+    if (player != null) {
+      player.kick(reason);
+    }
+  }
+
   public void loadResources() {
     for (Resource resource : resources) {
       resource.load();
@@ -222,10 +229,6 @@ public class Server {
     for (Resource resource : resources) {
       resource.save();
     }
-  }
-
-  public void forceBackup() {
-    autoBackup.forceBackup();
   }
 
   public String findName(String prefix) {
@@ -243,13 +246,6 @@ public class Server {
 
   public Player findPlayerExact(String exact) {
     return playerList.findPlayerExact(exact);
-  }
-
-  public void kick(String name, String reason) {
-    Player player = playerList.findPlayer(name);
-    if (player != null) {
-      player.kick(reason);
-    }
   }
 
   public void updateGroup(String name) {
@@ -324,6 +320,10 @@ public class Server {
 
   public void setSaving(boolean save) {
     this.save = save;
+  }
+
+  public void forceBackup() {
+    autoBackup.forceBackup();
   }
 
   private void kickAllPlayers() {

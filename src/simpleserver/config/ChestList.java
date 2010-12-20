@@ -23,18 +23,17 @@ package simpleserver.config;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Semaphore;
 
 public class ChestList extends AsciiConfig {
-  static class CoordinateMap {
-    private class X {
-      ConcurrentHashMap<Integer, Y> x = new ConcurrentHashMap<Integer, Y>();
+  private static class CoordinateMap {
+    private static class X {
+      private ConcurrentHashMap<Integer, Y> x = new ConcurrentHashMap<Integer, Y>();
 
-      public Y get(int x) {
+      private Y get(int x) {
         return this.x.get(x);
       }
 
-      public boolean put(Chest c) {
+      private boolean put(Chest c) {
         if (x.containsKey(c.x)) {
           return x.get(c.x).put(c);
         }
@@ -45,19 +44,7 @@ public class ChestList extends AsciiConfig {
         }
       }
 
-      public Chest remove(int xC, int yC, int zC) {
-        if (!x.containsKey(xC)) {
-          return null;
-        }
-        Chest c = x.get(xC).remove(yC, zC);
-        Y yObj = x.get(xC);
-        if (yObj.y.keySet().size() == 0) {
-          x.remove(xC);
-        }
-        return c;
-      }
-
-      public boolean remove(Chest c) {
+      private boolean remove(Chest c) {
         if (!x.containsKey(c.x)) {
           return false;
         }
@@ -71,14 +58,14 @@ public class ChestList extends AsciiConfig {
       }
     }
 
-    private class Y {
-      ConcurrentHashMap<Integer, Z> y = new ConcurrentHashMap<Integer, Z>();
+    private static class Y {
+      private ConcurrentHashMap<Integer, Z> y = new ConcurrentHashMap<Integer, Z>();
 
-      public Z get(int y) {
+      private Z get(int y) {
         return this.y.get(y);
       }
 
-      public boolean put(Chest c) {
+      private boolean put(Chest c) {
         if (y.containsKey(c.y)) {
           return y.get(c.y).put(c);
         }
@@ -89,19 +76,7 @@ public class ChestList extends AsciiConfig {
         }
       }
 
-      public Chest remove(int yC, int zC) {
-        if (!y.containsKey(yC)) {
-          return null;
-        }
-        Chest c = y.get(yC).remove(zC);
-        Z zObj = y.get(yC);
-        if (zObj.z.keySet().size() == 0) {
-          y.remove(yC);
-        }
-        return c;
-      }
-
-      public boolean remove(Chest c) {
+      private boolean remove(Chest c) {
         if (!y.containsKey(c.y)) {
           return false;
         }
@@ -115,14 +90,14 @@ public class ChestList extends AsciiConfig {
       }
     }
 
-    private class Z {
-      ConcurrentHashMap<Integer, Chest> z = new ConcurrentHashMap<Integer, Chest>();
+    private static class Z {
+      private ConcurrentHashMap<Integer, Chest> z = new ConcurrentHashMap<Integer, Chest>();
 
-      public Chest get(int z) {
+      private Chest get(int z) {
         return this.z.get(z);
       }
 
-      public boolean put(Chest c) {
+      private boolean put(Chest c) {
         if (z.containsKey(c.z)) {
           return false;
         }
@@ -132,16 +107,7 @@ public class ChestList extends AsciiConfig {
         }
       }
 
-      public Chest remove(int zC) {
-        if (!z.containsKey(zC)) {
-          return null;
-        }
-        Chest c = z.get(zC);
-        z.remove(zC);
-        return c;
-      }
-
-      public boolean remove(Chest c) {
+      private boolean remove(Chest c) {
         if (!z.containsKey(c.z)) {
           return false;
         }
@@ -153,11 +119,10 @@ public class ChestList extends AsciiConfig {
       }
     }
 
-    X map = new X();
-    ConcurrentHashMap<String, Chest> names = new ConcurrentHashMap<String, Chest>();
-    Semaphore mapLock = new Semaphore(1);
+    private X map = new X();
+    private ConcurrentHashMap<String, Chest> names = new ConcurrentHashMap<String, Chest>();
 
-    public boolean findLock(int x, int y, int z) {
+    private boolean findLock(int x, int y, int z) {
       try {
         Chest c = map.get(x).get(y).get(z);
         if (c == null) {
@@ -171,23 +136,14 @@ public class ChestList extends AsciiConfig {
       return false;
     }
 
-    public boolean findLock(String name) {
+    private boolean findLock(String name) {
       if (names.containsKey(name.toLowerCase())) {
         return true;
       }
       return false;
     }
 
-    public Chest getLock(int x, int y, int z) {
-      try {
-        return map.get(x).get(y).get(z);
-      }
-      catch (Exception e) {
-      }
-      return null;
-    }
-
-    public Chest getLock(String name) {
+    private Chest getLock(String name) {
       try {
         return names.get(name.toLowerCase());
       }
@@ -197,7 +153,7 @@ public class ChestList extends AsciiConfig {
       return null;
     }
 
-    public void removeLock(String name) {
+    private void removeLock(String name) {
       Chest c;
       if (!names.containsKey(name)) {
         return;
@@ -207,60 +163,32 @@ public class ChestList extends AsciiConfig {
       map.remove(c);
     }
 
-    public void removeLock(int x, int y, int z) {
-      Chest c = map.remove(x, y, z);
-      if (c != null) {
-        names.remove(c.name.toLowerCase());
-      }
-    }
-
-    public boolean addLock(Chest c) {
+    private boolean addLock(Chest c) {
       names.put(c.name, c);
       return map.put(c);
     }
 
-    public LinkedList<Chest> flatArray2() {
+    private LinkedList<Chest> flatArray2() {
       LinkedList<Chest> chestList = new LinkedList<Chest>();
       Collection<Chest> chests = names.values();
       chestList.addAll(chests);
       return chestList;
     }
 
-    public LinkedList<Chest> flatArray() {
-      LinkedList<Chest> chestList = new LinkedList<Chest>();
-      Collection<Y> xVals = map.x.values();
-      for (Y i : xVals) {
-        Collection<Z> yVals = i.y.values();
-        for (Z j : yVals) {
-          Collection<Chest> chestVals = j.z.values();
-          chestList.addAll(chestVals);
-        }
-      }
-      return chestList;
-    }
-
-    public void clear() {
+    private void clear() {
       map = new X();
       names = new ConcurrentHashMap<String, Chest>();
     }
   }
 
-  class Chest {
-    String name;
-    boolean isGroup;
-    int x;
-    int y;
-    int z;
+  private static class Chest {
+    private String name;
+    private boolean isGroup;
+    private int x;
+    private int y;
+    private int z;
 
-    public Chest(String name, int x, int y, int z) {
-      this.name = name;
-      this.x = x;
-      this.y = y;
-      this.z = z;
-      isGroup = false;
-    }
-
-    public Chest(String name, int x, int y, int z, boolean isGroup) {
+    private Chest(String name, int x, int y, int z, boolean isGroup) {
       this.name = name;
       this.x = x;
       this.y = y;

@@ -58,14 +58,6 @@ public class IPMemberList extends PropertiesConfig {
     return options.getInt("defaultGroup");
   }
 
-  public void setGroup(Player player, int group) {
-    String ip = player.getIPAddress();
-    members.put(ip, group);
-    setProperty(ip, Integer.toString(group));
-
-    save();
-  }
-
   @Override
   public void load() {
     super.load();
