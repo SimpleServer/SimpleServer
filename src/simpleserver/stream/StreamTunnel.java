@@ -247,7 +247,8 @@ public class StreamTunnel {
         break;
       case 0x08: // Update Health
         write(packetId);
-        copyNBytes(1);
+        //copyNBytes(1);
+        copyNBytes(2); // Beta Update
         break;
       case 0x09: // Respawn
         write(packetId);
@@ -391,7 +392,7 @@ public class StreamTunnel {
         break;
       case 0x10: // Holding Change
         write(packetId);
-        copyNBytes(6);
+        copyNBytes(2);
         break;
       case 0x11: // Add To Inventory
         write(packetId);
@@ -513,6 +514,73 @@ public class StreamTunnel {
         int recordCount = in.readInt();
         write(recordCount);
         copyNBytes(recordCount * 3);
+        break;
+      case 0x64: // Beta Update
+        write(packetId);
+        write(in.readByte());
+        write(in.readByte());
+        String str64 = in.readUTF(); // Don't know what this packet is
+        write(str64);
+        write(in.readByte());
+        break;
+      case 0x65: // Beta Update
+        write(packetId);
+        copyNBytes(1);
+        break;
+      case 0x66: // Beta Update
+        write(packetId);
+        write(in.readByte());
+        write(in.readShort());
+        write(in.readByte());
+        write(in.readShort());
+        short val66 = in.readShort();
+        write(val66);
+        if (val66!=-1) {
+          write(in.readByte());
+          write(in.readByte());
+        }
+        break;
+      case 0x67: // Beta Update
+        write(packetId);
+        write(in.readByte());
+        write(in.readShort());
+        short val67 = in.readShort();
+        write(val67);
+        if (val67!=-1) {
+          write(in.readByte());
+          write(in.readByte());
+        }
+        break;
+      case 0x68: // Beta Update
+          write(packetId);
+          write(in.readByte());
+          short val68 = in.readShort();
+          write(val68);
+          for (int loop68=0;loop68<val68;loop68++) {
+            short val68_2 = in.readShort();
+            write(val68_2);
+            if (val68_2!=-1)
+              write(in.readByte());
+              write(in.readShort());
+          }
+          break;
+      case 0x69: // Beta Update
+        write(packetId);
+        copyNBytes(5);
+        break;
+      case 0x6a: // Beta Update
+        write(packetId);
+        copyNBytes(4);
+        break;
+      case (byte) 0x82: // Beta Update
+        write(packetId);
+        write(in.readInt());
+        write(in.readShort());
+        write(in.readInt());
+        write(in.readUTF());
+        write(in.readUTF());
+        write(in.readUTF());
+        write(in.readUTF());
         break;
       case (byte) 0xff: // Disconnect/Kick
         write(packetId);
