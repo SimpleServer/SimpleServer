@@ -24,10 +24,10 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSortedSet;
 
 public class Group {
-  private String groupName;
-  private boolean showTitle;
-  private boolean isAdmin;
-  private String color;
+  private final String groupName;
+  private final boolean showTitle;
+  private final boolean isAdmin;
+  private final String color;
 
   public Group(String groupName, boolean showTitle, boolean isAdmin,
                String color) {

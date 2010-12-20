@@ -23,7 +23,7 @@ package simpleserver.options;
 import java.util.Properties;
 
 public class MinecraftOptions extends AbstractOptions {
-  private Options simpleServerOptions;
+  private final Options simpleServerOptions;
 
   public MinecraftOptions(Options options) {
     super("server.properties");

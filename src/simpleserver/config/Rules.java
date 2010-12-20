@@ -21,7 +21,7 @@
 package simpleserver.config;
 
 public class Rules extends AsciiConfig {
-  String rules;
+  private String rules;
 
   public Rules() {
     super("rules.txt");

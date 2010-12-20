@@ -30,7 +30,7 @@ import simpleserver.Player;
 import com.google.common.collect.ImmutableSet;
 
 public class BlockList extends PropertiesConfig {
-  private ConcurrentMap<Integer, ImmutableSet<Integer>> blocks;
+  private final ConcurrentMap<Integer, ImmutableSet<Integer>> blocks;
 
   public BlockList() {
     super("block-list.txt");

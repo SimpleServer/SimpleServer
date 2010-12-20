@@ -31,7 +31,7 @@ public class SystemInputQueue {
   private final BufferedReader input;
   private final Reader reader;
 
-  private boolean run = true;
+  private volatile boolean run = true;
 
   public SystemInputQueue() {
     queue = new LinkedBlockingQueue<String>();

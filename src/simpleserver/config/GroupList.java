@@ -27,7 +27,7 @@ import java.util.concurrent.ConcurrentMap;
 import simpleserver.Group;
 
 public class GroupList extends PropertiesConfig {
-  private ConcurrentMap<Integer, Group> groups;
+  private final ConcurrentMap<Integer, Group> groups;
 
   public GroupList() {
     super("group-list.txt");

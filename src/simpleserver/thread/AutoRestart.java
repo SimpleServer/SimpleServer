@@ -28,8 +28,8 @@ public class AutoRestart {
   private final Server server;
   private final Restarter restarter;
 
-  private boolean run = true;
   private long lastRestart;
+  private volatile boolean run = true;
 
   public AutoRestart(Server server) {
     this.server = server;

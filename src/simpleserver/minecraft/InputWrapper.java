@@ -26,12 +26,12 @@ import java.io.OutputStream;
 import simpleserver.thread.SystemInputQueue;
 
 public class InputWrapper implements Wrapper {
-  private SystemInputQueue in;
-  private OutputStream out;
-  private MessageHandler messageHandler;
+  private final SystemInputQueue in;
+  private final OutputStream out;
+  private final MessageHandler messageHandler;
+  private final Wrapper wrapper;
 
-  private Thread wrapper;
-  private boolean run = true;
+  private volatile boolean run = true;
 
   public InputWrapper(SystemInputQueue in, OutputStream out,
                       MessageHandler messageHandler) {
@@ -39,7 +39,7 @@ public class InputWrapper implements Wrapper {
     this.out = out;
     this.messageHandler = messageHandler;
 
-    wrapper = new WrapperThread();
+    wrapper = new Wrapper();
     wrapper.start();
     wrapper.setName("MinecraftInputWrapper");
   }
@@ -57,7 +57,7 @@ public class InputWrapper implements Wrapper {
     wrapper.join();
   }
 
-  private final class WrapperThread extends Thread {
+  private final class Wrapper extends Thread {
     @Override
     public void run() {
       try {

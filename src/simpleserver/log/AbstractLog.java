@@ -34,7 +34,7 @@ public class AbstractLog {
   private FileOutputStream stream;
   private Logger logger;
 
-  private boolean run = true;
+  private volatile boolean run = true;
 
   protected AbstractLog(String name) {
     this.name = name;

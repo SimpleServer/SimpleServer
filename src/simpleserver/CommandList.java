@@ -32,10 +32,10 @@ import simpleserver.command.ServerCommand;
 import simpleserver.options.Options;
 
 public class CommandList {
-  private Map<String, PlayerCommand> playerCommands;
-  private Map<String, ServerCommand> serverCommands;
-  private Map<String, String> aliases;
-  private Options options;
+  private final Map<String, PlayerCommand> playerCommands;
+  private final Map<String, ServerCommand> serverCommands;
+  private final Map<String, String> aliases;
+  private final Options options;
 
   public CommandList(Options options) {
     this.options = options;

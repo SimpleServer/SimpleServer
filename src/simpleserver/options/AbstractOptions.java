@@ -34,7 +34,8 @@ import simpleserver.Resource;
 public abstract class AbstractOptions implements Resource {
   private static final String resourceLocation = "defaults";
 
-  protected String filename;
+  protected final String filename;
+
   protected Properties defaultOptions;
   protected Properties options;
 

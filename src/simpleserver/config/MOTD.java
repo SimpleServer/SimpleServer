@@ -21,7 +21,7 @@
 package simpleserver.config;
 
 public class MOTD extends AsciiConfig {
-  String motd;
+  private String motd;
 
   public MOTD() {
     super("motd.txt");

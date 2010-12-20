@@ -33,7 +33,7 @@ public class RequestTracker {
   private final Map<String, Integer> requests;
   private final Tracker tracker;
 
-  private boolean run = true;
+  private volatile boolean run = true;
 
   public RequestTracker(Server server) {
     this.server = server;

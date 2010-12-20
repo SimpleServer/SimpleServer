@@ -32,7 +32,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 
 public class KitList extends PropertiesConfig {
-  private Server server;
+  private final Server server;
 
   private static final class Kit {
     public final ImmutableSet<Integer> groups;

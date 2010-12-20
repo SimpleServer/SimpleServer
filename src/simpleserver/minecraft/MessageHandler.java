@@ -24,7 +24,7 @@ import simpleserver.Server;
 import simpleserver.command.ServerCommand;
 
 public class MessageHandler {
-  private Server server;
+  private final Server server;
 
   public MessageHandler(Server server) {
     this.server = server;

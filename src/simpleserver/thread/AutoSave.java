@@ -28,9 +28,9 @@ public class AutoSave {
   private final Server server;
   private final Saver saver;
 
-  private boolean run = true;
-  private boolean forceSave = false;
   private long lastSave;
+  private volatile boolean run = true;
+  private volatile boolean forceSave = false;
 
   public AutoSave(Server server) {
     this.server = server;

@@ -32,8 +32,8 @@ public class AutoRun {
   private final String command;
   private final Runner runner;
 
-  private boolean run = true;
   private long lastRun;
+  private volatile boolean run = true;
 
   public AutoRun(Server server, String command) {
     this.server = server;

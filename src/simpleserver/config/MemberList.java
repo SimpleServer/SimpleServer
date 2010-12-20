@@ -27,8 +27,8 @@ import java.util.concurrent.ConcurrentMap;
 import simpleserver.Server;
 
 public class MemberList extends PropertiesConfig {
-  private Server server;
-  private ConcurrentMap<String, Integer> members;
+  private final Server server;
+  private final ConcurrentMap<String, Integer> members;
 
   public MemberList(Server server) {
     super("member-list.txt");

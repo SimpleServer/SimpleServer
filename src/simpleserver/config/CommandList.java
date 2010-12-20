@@ -31,7 +31,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSortedSet;
 
 public class CommandList extends PropertiesConfig {
-  private ConcurrentMap<String, ImmutableSet<Integer>> commands;
+  private final ConcurrentMap<String, ImmutableSet<Integer>> commands;
 
   public CommandList() {
     super("command-list.txt");

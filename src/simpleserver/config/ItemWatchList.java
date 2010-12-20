@@ -40,7 +40,7 @@ public class ItemWatchList extends PropertiesConfig {
     }
   }
 
-  private ConcurrentMap<Integer, Options> items;
+  private final ConcurrentMap<Integer, Options> items;
 
   public ItemWatchList() {
     super("item-watch-list.txt");

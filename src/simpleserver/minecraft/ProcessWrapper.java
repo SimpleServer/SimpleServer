@@ -21,17 +21,17 @@
 package simpleserver.minecraft;
 
 public class ProcessWrapper implements Wrapper {
-  private Process process;
-  private MessageHandler messageHandler;
+  private final Process process;
+  private final MessageHandler messageHandler;
+  private final Wrapper wrapper;
 
-  private Thread wrapper;
-  private boolean run = true;
+  private volatile boolean run = true;
 
   public ProcessWrapper(Process process, MessageHandler messageHandler) {
     this.process = process;
     this.messageHandler = messageHandler;
 
-    wrapper = new WrapperThread();
+    wrapper = new Wrapper();
     wrapper.start();
     wrapper.setName("MinecraftProcessWrapper");
   }
@@ -45,7 +45,7 @@ public class ProcessWrapper implements Wrapper {
     wrapper.join();
   }
 
-  private final class WrapperThread extends Thread {
+  private final class Wrapper extends Thread {
     @Override
     public void run() {
       try {

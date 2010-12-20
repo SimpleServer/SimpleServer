@@ -25,18 +25,18 @@ import java.util.NoSuchElementException;
 import java.util.Scanner;
 
 public class OutputWrapper implements Wrapper {
-  private Scanner scanner;
-  private MessageHandler messageHandler;
+  private final Scanner scanner;
+  private final MessageHandler messageHandler;
+  private final Wrapper wrapper;
 
-  private Thread wrapper;
-  private boolean run = true;
+  private volatile boolean run = true;
 
   public OutputWrapper(InputStream in, MessageHandler messageHandler,
                        String type) {
     scanner = new Scanner(in);
     this.messageHandler = messageHandler;
 
-    wrapper = new WrapperThread();
+    wrapper = new Wrapper();
     wrapper.start();
     wrapper.setName("MinecraftOutputWrapper-" + type);
   }
@@ -50,7 +50,7 @@ public class OutputWrapper implements Wrapper {
     wrapper.join();
   }
 
-  private final class WrapperThread extends Thread {
+  private final class Wrapper extends Thread {
     @Override
     public void run() {
       try {

@@ -60,9 +60,10 @@ public class StreamTunnel {
   private StreamDumper outputDumper;
 
   private int motionCounter = 0;
-  private boolean run = true;
   private boolean inGame = false;
-  private long lastRead;
+
+  private volatile long lastRead;
+  private volatile boolean run = true;
 
   public StreamTunnel(InputStream in, OutputStream out, boolean isServerTunnel,
                       Player player) {

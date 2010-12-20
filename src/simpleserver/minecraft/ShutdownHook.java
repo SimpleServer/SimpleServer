@@ -21,8 +21,8 @@
 package simpleserver.minecraft;
 
 public class ShutdownHook implements Wrapper {
-  private MinecraftWrapper minecraft;
-  private Hook hook;
+  private final MinecraftWrapper minecraft;
+  private final Hook hook;
 
   public ShutdownHook(MinecraftWrapper minecraft) {
     this.minecraft = minecraft;

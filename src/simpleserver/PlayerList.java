@@ -20,18 +20,19 @@
  ******************************************************************************/
 package simpleserver;
 
+import java.util.Collection;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 public class PlayerList {
-  private ConcurrentMap<String, Player> players;
+  private final ConcurrentMap<String, Player> players;
 
   public PlayerList() {
     players = new ConcurrentHashMap<String, Player>();
   }
 
-  public synchronized Player[] getArray() {
-    return players.values().toArray(new Player[0]);
+  public synchronized Collection<Player> getArray() {
+    return players.values();
   }
 
   public int size() {

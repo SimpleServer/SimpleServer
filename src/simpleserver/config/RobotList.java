@@ -24,13 +24,13 @@ import java.util.LinkedList;
 import java.util.concurrent.Semaphore;
 
 public class RobotList extends PropertiesConfig {
-  Semaphore robotLock = new Semaphore(1);
-  LinkedList<UnconfirmedRobot> potentialRobots = new LinkedList<UnconfirmedRobot>();
-  LinkedList<Integer> activeRobots = new LinkedList<Integer>();
+  private Semaphore robotLock = new Semaphore(1);
+  private LinkedList<UnconfirmedRobot> potentialRobots = new LinkedList<UnconfirmedRobot>();
+  private LinkedList<Integer> activeRobots = new LinkedList<Integer>();
 
-  static class UnconfirmedRobot {
-    String ipAddress;
-    int tries = 0;
+  private static final class UnconfirmedRobot {
+    private final String ipAddress;
+    private int tries = 0;
 
     public UnconfirmedRobot(String ipAddress) {
       this.ipAddress = ipAddress;
@@ -83,7 +83,7 @@ public class RobotList extends PropertiesConfig {
     return getProperty(ip) != null;
   }
 
-  public boolean isPotentialRobot(String ip) {
+  private boolean isPotentialRobot(String ip) {
     for (UnconfirmedRobot i : potentialRobots) {
       if (ip.equals(i.ipAddress)) {
         return true;

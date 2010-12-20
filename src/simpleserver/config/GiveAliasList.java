@@ -25,7 +25,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 public class GiveAliasList extends PropertiesConfig {
-  private Map<String, Integer> aliases;
+  private final Map<String, Integer> aliases;
 
   public GiveAliasList() {
     super("give-alias-list.txt");

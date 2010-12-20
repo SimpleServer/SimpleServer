@@ -40,15 +40,17 @@ public class AutoBackup {
   private static final File tempDirectory = new File("tmp");
 
   private final Server server;
+  private final byte[] copyBuffer;
   private final Archiver archiver;
 
-  private boolean run = true;
-  private boolean forceBackup = false;
-  private byte[] copyBuffer = new byte[8192];
+  private volatile boolean run = true;
+  private volatile boolean forceBackup = false;
 
   public AutoBackup(Server server) {
     this.server = server;
     purgeOldBackups();
+
+    copyBuffer = new byte[8192];
 
     archiver = new Archiver();
     archiver.start();

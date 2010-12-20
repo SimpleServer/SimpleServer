@@ -29,8 +29,8 @@ import simpleserver.Player;
 import simpleserver.options.Options;
 
 public class IPMemberList extends PropertiesConfig {
-  private Options options;
-  private ConcurrentMap<String, Integer> members;
+  private final Options options;
+  private final ConcurrentMap<String, Integer> members;
 
   public IPMemberList(Options options) {
     super("ip-member-list.txt");
