@@ -603,6 +603,7 @@ public class StreamTunnel {
         write(in.readUTF());
         write(in.readUTF());
         write(in.readUTF());
+        write(in.readUTF());
         break;
       case (byte) 0xff: // Disconnect/Kick
         write(packetId);
