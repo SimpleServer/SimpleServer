@@ -58,9 +58,10 @@ public class SystemInputQueue {
   private final class Reader extends Thread {
     @Override
     public void run() {
+      StringBuilder builder = new StringBuilder();
       while (run) {
         try {
-          StringBuffer buffer = new StringBuffer();
+          builder.setLength(0);
           while (input.ready()) {
             int character = input.read();
             if (character == -1) {
@@ -68,11 +69,11 @@ public class SystemInputQueue {
               break;
             }
             else if ((char) character != '\n') {
-              buffer.append((char) character);
+              builder.append((char) character);
             }
             else {
-              String line = buffer.toString();
-              buffer = new StringBuffer();
+              String line = builder.toString();
+              builder.setLength(0);
 
               if (line.endsWith("\r")) {
                 line = line.substring(0, line.length() - 1);
