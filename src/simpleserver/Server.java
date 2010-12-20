@@ -59,7 +59,7 @@ import simpleserver.thread.RequestTracker;
 import simpleserver.thread.SystemInputQueue;
 
 public class Server {
-  private static final String version = "RC 6.6.6_stable";
+  private static final String version = "RC 6.9.9_experimental";
   private static final String license = "SimpleServer -- Copyright (C) 2010 Charles Wagner Jr.";
   private static final String warranty = "This program is licensed under The MIT License.\nSee file LICENSE for details.";
 
@@ -414,7 +414,6 @@ public class Server {
     requestTracker.stop();
     c10t.stop();
     saveResources();
-
     while (playerList.size() > 0) {
       try {
         Thread.sleep(100);
@@ -422,7 +421,6 @@ public class Server {
       catch (InterruptedException e) {
       }
     }
-
     minecraft.stop();
     System.out.println("Server stopped successfully!");
     saveLock.release();

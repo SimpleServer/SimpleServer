@@ -23,6 +23,7 @@ package simpleserver;
 import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.reflections.Reflections;
 
@@ -90,7 +91,10 @@ public class CommandList {
   private <T extends Command> void loadCommands(Class<T> type,
                                                 Map<String, T> commands) {
     Reflections r = new Reflections("simpleserver");
-    for (Class<? extends T> commandType : r.getSubTypesOf(type)) {
+    
+    Set<Class<? extends T>> types = r.getSubTypesOf(type);
+    
+    for (Class<? extends T> commandType : types) {
       if (Modifier.isAbstract(commandType.getModifiers())) {
         continue;
       }
@@ -105,7 +109,7 @@ public class CommandList {
             + commandType.getName());
         continue;
       }
-
+      
       commands.put(command.getName(), command);
       for (String alias : command.getAliases()) {
         aliases.put(alias, command.getName());
