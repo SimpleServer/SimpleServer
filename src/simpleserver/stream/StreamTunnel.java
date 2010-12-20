@@ -537,7 +537,7 @@ public class StreamTunnel {
         write(packetId);
         write(in.readByte());
         write(in.readByte());
-        write(in.readInt());
+        write(in.readUTF());
         write(in.readByte());
         break;
       case 0x65:
