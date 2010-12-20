@@ -206,6 +206,12 @@ public class StreamTunnel {
         copyNBytes(8);
         break;
       case 0x05: // Player Inventory
+        write(packetId);
+        write(in.readInt());
+        write(in.readShort());
+        write(in.readShort());
+        break;
+      /*
         boolean guest = player.getGroupId() < 0;
         int inventoryType = in.readInt();
         short itemCount = in.readShort();
@@ -237,6 +243,7 @@ public class StreamTunnel {
           }
         }
         break;
+      */
       case 0x06: // Spawn Position
         write(packetId);
         copyNBytes(12);
@@ -247,7 +254,7 @@ public class StreamTunnel {
         break;
       case 0x08: // Update Health
         write(packetId);
-        copyNBytes(1);
+        copyNBytes(2);
         break;
       case 0x09: // Respawn
         write(packetId);
@@ -326,6 +333,19 @@ public class StreamTunnel {
         }
         break;
       case 0x0f: // Player Block Placement
+        write(packetId);
+        write(in.readInt());
+        write(in.readByte());
+        write(in.readInt());
+        write(in.readByte());
+        short dropItem = in.readShort();
+        write(dropItem);
+        if (dropItem != -1) {
+          write(in.readByte());
+          write(in.readByte());
+        }
+        break;
+      /*
         short blockId = in.readShort();
         if (!isServerTunnel && (player.getGroupId() < 0)
             || !server.blockFirewall.playerAllowed(player, blockId)) {
@@ -389,13 +409,10 @@ public class StreamTunnel {
           copyNBytes(10);
         }
         break;
+      */
       case 0x10: // Holding Change
         write(packetId);
-        copyNBytes(6);
-        break;
-      case 0x11: // Add To Inventory
-        write(packetId);
-        copyNBytes(5);
+        copyNBytes(2);
         break;
       case 0x12: // Animation
         write(packetId);
@@ -485,6 +502,7 @@ public class StreamTunnel {
         write(packetId);
         copyNBytes(11);
         break;
+      /*
       case 0x3b: // Complex Entities
         int x = in.readInt();
         short y = in.readShort();
@@ -507,12 +525,84 @@ public class StreamTunnel {
           copyNBytes(payloadSize);
         }
         break;
+      */
       case 0x3c: // Explosion
         write(packetId);
         copyNBytes(28);
         int recordCount = in.readInt();
         write(recordCount);
         copyNBytes(recordCount * 3);
+        break;
+      case 0x64:
+        write(packetId);
+        write(in.readByte());
+        write(in.readByte());
+        write(in.readInt());
+        write(in.readByte());
+        break;
+      case 0x65:
+        write(packetId);
+        write(in.readByte());
+        break;
+      case 0x66:  // Inventory Item Move
+        write(packetId);
+        write(in.readByte());
+        write(in.readShort());
+        write(in.readByte());
+        write(in.readShort());
+        short moveItem = in.readShort();
+        write(moveItem);
+        if (moveItem != -1) {
+          write(in.readByte());
+          write(in.readByte());
+        }
+        break;
+      case 0x67:  // Inventory Item Update
+        write(packetId);
+        write(in.readByte());
+        write(in.readShort());
+        short setItem = in.readShort();
+        write(setItem);
+        if (setItem != -1) {
+          write(in.readByte());
+          write(in.readByte());
+        }
+        break;
+      case 0x68:  // Inventory
+        write(packetId);
+        write(in.readByte());
+        short count = in.readShort();
+        write(count);
+        for (int c = 0; c < count; ++c) {
+          short item = in.readShort();
+          write(item);
+          
+          if (item != -1) {
+            write(in.readByte());
+            write(in.readShort());
+          }
+        }
+        break;
+      case 0x69:
+        write(packetId);
+        write(in.readByte());
+        write(in.readShort());
+        write(in.readShort());
+        break;
+      case 0x6a:
+        write(packetId);
+        write(in.readByte());
+        write(in.readShort());
+        write(in.readByte());
+        break;
+      case (byte) 0x82: // Update Sign
+        write(packetId);
+        write(in.readInt());
+        write(in.readShort());
+        write(in.readInt());
+        write(in.readUTF());
+        write(in.readUTF());
+        write(in.readUTF());
         break;
       case (byte) 0xff: // Disconnect/Kick
         write(packetId);
@@ -524,10 +614,17 @@ public class StreamTunnel {
         player.close();
         break;
       default:
-        flushAll();
-        throw new IOException("Unable to parse unknown " + streamType
-            + " packet " + Integer.toHexString(packetId) + " for player "
-            + player.getName());
+        if (EXPENSIVE_DEBUG_LOGGING) {
+          while (true) {
+            skipNBytes(1);
+            flushAll();
+          }
+        }
+        else {
+          throw new IOException("Unable to parse unknown " + streamType
+              + " packet 0x" + Integer.toHexString(packetId) + " for player "
+              + player.getName());
+        }
     }
     packetFinished();
   }
