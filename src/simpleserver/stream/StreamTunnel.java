@@ -285,6 +285,11 @@ public class StreamTunnel {
             byte face = in.readByte();
 
             if (!server.chests.hasLock(x, y, z) || player.isAdmin()) {
+              if (server.chests.hasLock(x, y, z)
+                  && status == BLOCK_DESTROYED_STATUS) {
+                server.chests.releaseLock(x, y, z);
+              }
+
               write(packetId);
               write(status);
               write(x);
@@ -337,6 +342,14 @@ public class StreamTunnel {
           byte y = in.readByte();
           int z = in.readInt();
           byte direction = in.readByte();
+
+          write(packetId);
+          write(blockId);
+          write(x);
+          write(y);
+          write(z);
+          write(direction);
+
           switch (direction) {
             case 0:
               y--;
@@ -361,22 +374,13 @@ public class StreamTunnel {
           if (server.chests.hasLock(x, y, z)) {
             player.addMessage("This block is locked already!");
           }
-          else if (server.chests.giveLock(player.getName().toLowerCase(), x, y,
-                                          z, false)) {
+          else if (server.chests.giveLock(player.getName(), x, y, z, false)) {
             player.addMessage("Your locked chest is created! Do not add another chest to it!");
           }
           else {
             player.addMessage("You already have a lock, or this block is locked already!");
-
           }
           player.setAttemptLock(false);
-
-          write(packetId);
-          write(blockId);
-          write(x);
-          write(y);
-          write(z);
-          write(direction);
         }
         else {
           write(packetId);
@@ -485,8 +489,8 @@ public class StreamTunnel {
         short y = in.readShort();
         int z = in.readInt();
         short payloadSize = in.readShort();
-        if (server.chests.hasLock(x, y, z) && !player.isAdmin()
-            && !server.chests.ownsLock(x, y, z, player.getName())) {
+        if (server.chests.hasLock(x, (byte) y, z) && !player.isAdmin()
+            && !server.chests.ownsLock(player.getName(), x, (byte) y, z)) {
           skipNBytes(payloadSize);
         }
         else if (player.getGroupId() < 0

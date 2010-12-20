@@ -20,263 +20,164 @@
  ******************************************************************************/
 package simpleserver.config;
 
-import java.util.Collection;
-import java.util.LinkedList;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 public class ChestList extends AsciiConfig {
-  private static class CoordinateMap {
-    private static class X {
-      private ConcurrentHashMap<Integer, Y> x = new ConcurrentHashMap<Integer, Y>();
-
-      private Y get(int x) {
-        return this.x.get(x);
-      }
-
-      private boolean put(Chest c) {
-        if (x.containsKey(c.x)) {
-          return x.get(c.x).put(c);
-        }
-        else {
-          Y newY = new Y();
-          x.put(c.x, newY);
-          return newY.put(c);
-        }
-      }
-
-      private boolean remove(Chest c) {
-        if (!x.containsKey(c.x)) {
-          return false;
-        }
-        if (x.get(c.x).remove(c)) {
-          x.remove(c.x);
-        }
-        if (x.keySet().size() == 0) {
-          return true;
-        }
-        return false;
-      }
-    }
-
-    private static class Y {
-      private ConcurrentHashMap<Integer, Z> y = new ConcurrentHashMap<Integer, Z>();
-
-      private Z get(int y) {
-        return this.y.get(y);
-      }
-
-      private boolean put(Chest c) {
-        if (y.containsKey(c.y)) {
-          return y.get(c.y).put(c);
-        }
-        else {
-          Z newZ = new Z();
-          y.put(c.y, newZ);
-          return newZ.put(c);
-        }
-      }
-
-      private boolean remove(Chest c) {
-        if (!y.containsKey(c.y)) {
-          return false;
-        }
-        if (y.get(c.y).remove(c)) {
-          y.remove(c.y);
-        }
-        if (y.keySet().size() == 0) {
-          return true;
-        }
-        return false;
-      }
-    }
-
-    private static class Z {
-      private ConcurrentHashMap<Integer, Chest> z = new ConcurrentHashMap<Integer, Chest>();
-
-      private Chest get(int z) {
-        return this.z.get(z);
-      }
-
-      private boolean put(Chest c) {
-        if (z.containsKey(c.z)) {
-          return false;
-        }
-        else {
-          z.put(c.z, c);
-          return true;
-        }
-      }
-
-      private boolean remove(Chest c) {
-        if (!z.containsKey(c.z)) {
-          return false;
-        }
-        z.remove(c.z);
-        if (z.keySet().size() == 0) {
-          return true;
-        }
-        return false;
-      }
-    }
-
-    private X map = new X();
-    private ConcurrentHashMap<String, Chest> names = new ConcurrentHashMap<String, Chest>();
-
-    private boolean findLock(int x, int y, int z) {
-      try {
-        Chest c = map.get(x).get(y).get(z);
-        if (c == null) {
-          return false;
-        }
-        return true;
-      }
-      catch (Exception e) {
-
-      }
-      return false;
-    }
-
-    private boolean findLock(String name) {
-      if (names.containsKey(name.toLowerCase())) {
-        return true;
-      }
-      return false;
-    }
-
-    private Chest getLock(String name) {
-      try {
-        return names.get(name.toLowerCase());
-      }
-      catch (Exception e) {
-        e.printStackTrace();
-      }
-      return null;
-    }
-
-    private void removeLock(String name) {
-      Chest c;
-      if (!names.containsKey(name)) {
-        return;
-      }
-      c = names.get(name);
-      names.remove(name);
-      map.remove(c);
-    }
-
-    private boolean addLock(Chest c) {
-      names.put(c.name, c);
-      return map.put(c);
-    }
-
-    private LinkedList<Chest> flatArray2() {
-      LinkedList<Chest> chestList = new LinkedList<Chest>();
-      Collection<Chest> chests = names.values();
-      chestList.addAll(chests);
-      return chestList;
-    }
-
-    private void clear() {
-      map = new X();
-      names = new ConcurrentHashMap<String, Chest>();
-    }
-  }
-
-  private static class Chest {
-    private String name;
-    private boolean isGroup;
-    private int x;
-    private int y;
-    private int z;
-
-    private Chest(String name, int x, int y, int z, boolean isGroup) {
-      this.name = name;
-      this.x = x;
-      this.y = y;
-      this.z = z;
-      this.isGroup = isGroup;
-    }
-  }
-
-  private CoordinateMap chests = new CoordinateMap();
+  private final ConcurrentMap<String, Chest> names;
+  private final ConcurrentMap<Coordinate, Chest> locations;
 
   public ChestList() {
     super("chest-list.txt");
+
+    names = new ConcurrentHashMap<String, Chest>();
+    locations = new ConcurrentHashMap<Coordinate, Chest>();
   }
 
-  public synchronized boolean giveLock(String name, int x, int y, int z,
+  public synchronized boolean giveLock(String name, int x, byte y, int z,
                                        boolean isGroupLock) {
-    if (hasLock(name)) {
+    Coordinate coordinate = new Coordinate(x, y, z);
+    if (names.containsKey(names) || locations.containsKey(coordinate)) {
       return false;
     }
-    if (hasLock(x, y, z)) {
-      return false;
-    }
-    name = name.toLowerCase().trim();
-    chests.addLock(new Chest(name, x, y, z, isGroupLock));
+    System.out.println("Set lock at " + x + " " + y + " " + z);
+
+    name = name.toLowerCase();
+    Chest chest = new Chest(name, coordinate, isGroupLock);
+    names.put(name, chest);
+    locations.put(coordinate, chest);
+
     save();
     return true;
   }
 
-  public boolean hasLock(int x, int y, int z) {
-    return chests.findLock(x, y, z);
-  }
-
-  public boolean ownsLock(int x, int y, int z, String name) {
-    if (!hasLock(name)) {
-      return false;
-    }
-    Chest c = chests.getLock(name);
-    if (c == null) {
-      return false;
-    }
-    if (c.x == x && c.y == y && c.z == z) {
-      return true;
-    }
-    return false;
-  }
-
   public boolean hasLock(String name) {
-    return chests.findLock(name.toLowerCase());
+    return names.get(name.toLowerCase()) != null;
+  }
+
+  public boolean hasLock(int x, byte y, int z) {
+    return locations.containsKey(new Coordinate(x, y, z));
+  }
+
+  public boolean ownsLock(String name, int x, byte y, int z) {
+    Coordinate coordinate = new Coordinate(x, y, z);
+    Chest chest = names.get(name.toLowerCase());
+    return (chest != null) && (chest.coordinate.equals(coordinate));
   }
 
   public synchronized void releaseLock(String name) {
-    chests.removeLock(name.toLowerCase());
+    Chest chest = names.remove(name.toLowerCase());
+    if (chest != null) {
+      locations.remove(chest.coordinate);
+    }
+
+    save();
+  }
+
+  public synchronized void releaseLock(int x, byte y, int z) {
+    Chest chest = locations.remove(new Coordinate(x, y, z));
+    if (chest != null) {
+      names.remove(chest.name);
+      System.out.println("Released lock at " + x + " " + y + " " + z);
+    }
+
+    save();
   }
 
   @Override
   public void load() {
-    chests.clear();
+    names.clear();
+    locations.clear();
 
     super.load();
   }
 
   @Override
   protected void loadLine(String line) {
+    line = line.trim();
     if (line.length() == 0) {
       return;
     }
 
     String[] tokens = line.split(",");
-    if (tokens.length > 0) {
+    if (tokens.length > 4) {
+      int x;
+      byte y;
+      int z;
       try {
-        chests.addLock(new Chest(tokens[0], Integer.valueOf(tokens[2]),
-                                 Integer.valueOf(tokens[3]),
-                                 Integer.valueOf(tokens[4]),
-                                 Boolean.valueOf(tokens[1])));
+        x = Integer.parseInt(tokens[2]);
+        y = Byte.parseByte(tokens[3]);
+        z = Integer.parseInt(tokens[4]);
       }
-      catch (Exception e) {
-        e.printStackTrace();
+      catch (NumberFormatException e) {
+        System.out.println("Skipping malformed chest metadata: " + line);
+        return;
       }
+
+      giveLock(tokens[0], x, y, z, Boolean.parseBoolean(tokens[1]));
     }
   }
 
   @Override
   protected String saveString() {
-    String line = "";
-    for (Chest i : chests.flatArray2()) {
-      line += i.name + "," + i.isGroup + "," + i.x + "," + i.y + "," + i.z;
-      line += "\n";
+    StringBuilder output = new StringBuilder();
+    for (Chest chest : names.values().toArray(new Chest[0])) {
+      output.append(chest.name);
+      output.append(",");
+      output.append(chest.isGroup);
+      output.append(",");
+      output.append(chest.coordinate.x);
+      output.append(",");
+      output.append(chest.coordinate.y);
+      output.append(",");
+      output.append(chest.coordinate.z);
+      output.append("\n");
     }
-    return line;
+    return output.toString();
+  }
+
+  private static final class Coordinate {
+    private final int x;
+    private final byte y;
+    private final int z;
+    private final int hashCode;
+
+    private Coordinate(int x, byte y, int z) {
+      this.x = x;
+      this.y = y;
+      this.z = z;
+
+      int code = 17;
+      code = 37 * code + x;
+      code = 37 * code + y;
+      code = 37 * code + z;
+      hashCode = code;
+    }
+
+    public boolean equals(Coordinate coordinate) {
+      return (coordinate.x == x) && (coordinate.y == y) && (coordinate.z == z);
+    }
+
+    @Override
+    public boolean equals(Object object) {
+      return (object instanceof Coordinate) && equals((Coordinate) object);
+    }
+
+    @Override
+    public int hashCode() {
+      return hashCode;
+    }
+  }
+
+  private static final class Chest {
+    private final String name;
+    private final Coordinate coordinate;
+    private final boolean isGroup;
+
+    private Chest(String name, Coordinate coordinate, boolean isGroup) {
+      this.name = name;
+      this.coordinate = coordinate;
+      this.isGroup = isGroup;
+    }
   }
 }
