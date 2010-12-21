@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.reflections.Reflections;
+import org.reflections.scanners.SubTypesScanner;
 
 import simpleserver.command.Command;
 import simpleserver.command.PlayerCommand;
@@ -50,7 +51,11 @@ public class CommandList {
 
   public PlayerCommand getPlayerCommand(String message) {
     if (message.startsWith(commandPrefix())) {
-      return playerCommands.get(extractName(message, 1));
+      PlayerCommand command = playerCommands.get(extractName(message, 1));
+      if (command == null) {
+        command = playerCommands.get(null);
+      }
+      return command;
     }
 
     return null;
@@ -90,8 +95,7 @@ public class CommandList {
 
   private <T extends Command> void loadCommands(Class<T> type,
                                                 Map<String, T> commands) {
-    Reflections r = new Reflections("simpleserver");
-
+    Reflections r = new Reflections("simpleserver", new SubTypesScanner());
     Set<Class<? extends T>> types = r.getSubTypesOf(type);
 
     for (Class<? extends T> commandType : types) {
