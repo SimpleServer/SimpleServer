@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project default="release" name="Create Runnable Jar for Project SimpleServer with Jar-in-Jar Loader">
+  <target name="release" depends="clean,create_release_jar" />
+
+  <target name="create_release_jar">
+    <jar destfile="SimpleServer.jar">
+      <manifest>
+        <attribute name="Main-Class" value="org.eclipse.jdt.internal.jarinjarloader.JarRsrcLoader"/>
+        <attribute name="Rsrc-Main-Class" value="simpleserver.Server"/>
+        <attribute name="Class-Path" value="."/>
+        <attribute name="Rsrc-Class-Path" value="./ guava-r07.jar reflections-0.9.5-RC2.jar slf4j-api-1.6.1.jar slf4j-nop-1.6.1.jar dom4j-1.6.jar javassist-3.8.0.GA.jar"/>
+      </manifest>
+
+      <zipfileset src="lib/jar-in-jar-loader.zip"/>
+      <fileset dir="bin"/>
+      <zipfileset dir="lib" includes="guava-r07.jar"/>
+      <zipfileset dir="lib" includes="reflections-0.9.5-RC2.jar"/>
+      <zipfileset dir="lib" includes="slf4j-api-1.6.1.jar"/>
+      <zipfileset dir="lib" includes="slf4j-nop-1.6.1.jar"/>
+      <zipfileset dir="lib" includes="dom4j-1.6.jar"/>
+      <zipfileset dir="lib" includes="javassist-3.8.0.GA.jar"/>
+    </jar>
+  </target>
+
+  <target name="clean">
+    <delete file="SimpleServer.jar"/>
+  </target>
+</project>

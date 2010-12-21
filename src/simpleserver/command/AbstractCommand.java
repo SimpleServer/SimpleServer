@@ -48,10 +48,10 @@ public abstract class AbstractCommand implements Command {
 
   protected String[] extractArguments(String message) {
     String[] parts = message.split("\\s+");
-    //return Arrays.copyOfRange(parts, 1, parts.length);
-    //JDK 1.5 Compatibility
-    String[] cpy = new String[parts.length-1];
-    System.arraycopy(parts, 1, cpy, 0, parts.length-1);
+    // return Arrays.copyOfRange(parts, 1, parts.length);
+    // JDK 1.5 Compatibility
+    String[] cpy = new String[parts.length - 1];
+    System.arraycopy(parts, 1, cpy, 0, parts.length - 1);
     return cpy;
   }
 

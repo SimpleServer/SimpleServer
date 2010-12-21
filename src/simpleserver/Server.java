@@ -36,7 +36,6 @@ import simpleserver.config.GiveAliasList;
 import simpleserver.config.GroupList;
 import simpleserver.config.IPBanList;
 import simpleserver.config.IPMemberList;
-import simpleserver.config.ItemWatchList;
 import simpleserver.config.KitList;
 import simpleserver.config.MOTD;
 import simpleserver.config.MemberList;
@@ -80,7 +79,6 @@ public class Server {
   private Rules rules;
   public IPMemberList ipMembers;
   public IPBanList ipBans;
-  public ItemWatchList itemWatch;
   public WhiteList whitelist;
   public MuteList mutelist;
   public GiveAliasList giveAliasList;
@@ -346,7 +344,6 @@ public class Server {
     resources.add(chests = new ChestList());
     resources.add(commands = new CommandList());
     resources.add(blockFirewall = new BlockList());
-    resources.add(itemWatch = new ItemWatchList());
     resources.add(groups = new GroupList());
     resources.add(members = new MemberList(this));
     resources.add(motd = new MOTD());

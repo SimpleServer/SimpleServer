@@ -91,9 +91,9 @@ public class CommandList {
   private <T extends Command> void loadCommands(Class<T> type,
                                                 Map<String, T> commands) {
     Reflections r = new Reflections("simpleserver");
-    
+
     Set<Class<? extends T>> types = r.getSubTypesOf(type);
-    
+
     for (Class<? extends T> commandType : types) {
       if (Modifier.isAbstract(commandType.getModifiers())) {
         continue;
@@ -109,7 +109,7 @@ public class CommandList {
             + commandType.getName());
         continue;
       }
-      
+
       commands.put(command.getName(), command);
       for (String alias : command.getAliases()) {
         aliases.put(alias, command.getName());

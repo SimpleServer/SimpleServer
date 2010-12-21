@@ -191,9 +191,7 @@ public class StreamTunnel {
             break;
           }
 
-          if (server.options.getBoolean("useSlashes")
-              && message.startsWith("/") || message.startsWith("!")
-              && player.parseCommand(message)) {
+          if (player.parseCommand(message)) {
             break;
           }
         }
@@ -211,39 +209,6 @@ public class StreamTunnel {
         write(in.readShort());
         write(in.readShort());
         break;
-      /*
-        boolean guest = player.getGroupId() < 0;
-        int inventoryType = in.readInt();
-        short itemCount = in.readShort();
-        if (!guest) {
-          write(packetId);
-          write(inventoryType);
-          write(itemCount);
-        }
-
-        for (int c = 0; c < itemCount; ++c) {
-          short itemId = in.readShort();
-          if (!guest) {
-            write(itemId);
-          }
-
-          if (itemId != -1) {
-            byte itemAmount = in.readByte();
-            short itemUses = in.readShort();
-            if (!guest) {
-              write(itemAmount);
-              write(itemUses);
-            }
-
-            if (!server.itemWatch.playerAllowed(player, itemId, itemAmount)) {
-              server.adminLog("ItemWatchList banned player:\t"
-                  + player.getName());
-              server.banKick(player.getName());
-            }
-          }
-        }
-        break;
-      */
       case 0x06: // Spawn Position
         write(packetId);
         copyNBytes(12);

@@ -34,7 +34,6 @@ public class MinecraftOptions extends AbstractOptions {
   @Override
   public void save() {
     load();
-    options = new Properties();
     options.setProperty("online-mode", simpleServerOptions.get("onlineMode"));
     options.setProperty("server-ip", "127.0.0.1");
     options.setProperty("server-port", simpleServerOptions.get("internalPort"));
