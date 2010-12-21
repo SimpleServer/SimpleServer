@@ -1,3 +1,7 @@
+== RC 6.9.9 ==
+* Huge internal refactoring. There is a lot of debug output right now.
+* Updated packets for Beta.
+
 == RC 6.6.6 ==
 * Initial Open Source release!
 * Changed ServerBackup.java to make backups worldedit compatible (hopefully).

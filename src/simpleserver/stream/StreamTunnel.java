@@ -298,16 +298,87 @@ public class StreamTunnel {
         }
         break;
       case 0x0f: // Player Block Placement
-        write(packetId);
-        write(in.readInt());
-        write(in.readByte());
-        write(in.readInt());
-        write(in.readByte());
+        int x = in.readInt();
+        byte y = in.readByte();
+        int z = in.readInt();
+        byte direction = in.readByte();
         short dropItem = in.readShort();
-        write(dropItem);
+        
         if (dropItem != -1) {
-          write(in.readByte());
-          write(in.readByte());
+          byte b = in.readByte();
+          byte c = in.readByte();
+          
+          if (!isServerTunnel && (player.getGroupId() < 0)
+              || !server.blockFirewall.playerAllowed(player, dropItem)) {
+            if (x != -1) {
+              server.runCommand("say",
+                                String.format(server.l.get("BAD_BLOCK"),
+                                              player.getName(),
+                                              Short.toString(dropItem)));
+            }
+          }
+          else if (!isServerTunnel && (dropItem == 54) && player.isAttemptLock()) {
+
+            write(packetId);
+           
+            write(x);
+            write(y);
+            write(z);
+            write(direction);
+            write(dropItem);
+            
+            switch (direction) {
+              case 0:
+                y--;
+                break;
+              case 1:
+                y++;
+                break;
+              case 2:
+                z--;
+                break;
+              case 3:
+                z++;
+                break;
+              case 4:
+                x--;
+                break;
+              case 5:
+                x++;
+                break;
+            }
+            // create chest entry
+            if (server.chests.hasLock(x, y, z)) {
+              player.addMessage("This block is locked already!");
+            }
+            else if (server.chests.giveLock(player.getName(), x, y, z, false)) {
+              player.addMessage("Your locked chest is created! Do not add another chest to it!");
+            }
+            else {
+              player.addMessage("You already have a lock, or this block is locked already!");
+            }
+            player.setAttemptLock(false);
+          }
+          else {
+            write(packetId);
+            
+            write(x);
+            write(y);
+            write(z);
+            write(direction);
+            write(dropItem);
+            write(b);
+            write(c);
+          }
+        }
+        else {
+          write(packetId);
+          
+          write(x);
+          write(y);
+          write(z);
+          write(direction);
+          write(dropItem);
         }
         break;
       /*
@@ -510,41 +581,81 @@ public class StreamTunnel {
         write(in.readByte());
         break;
       case 0x66: // Inventory Item Move
-        write(packetId);
-        write(in.readByte());
-        write(in.readShort());
-        write(in.readByte());
-        write(in.readShort());
-        short moveItem = in.readShort();
-        write(moveItem);
-        if (moveItem != -1) {
-          write(in.readByte());
-          write(in.readByte());
+        
+        byte typeFrom = in.readByte();
+        short slotFrom =in.readShort();
+        byte typeTo =in.readByte();
+        short slotTo =in.readShort();
+        if ( (typeFrom<0 && typeTo<0) || player.getGroupId()>=0) {
+          write(packetId);
+          write(typeFrom);
+          write(slotFrom);
+          write(typeTo);
+          write(slotTo);
+          short moveItem = in.readShort();
+          write(moveItem);
+          if (moveItem != -1) {
+            write(in.readByte());
+            write(in.readByte());
+          }
+        }
+        else {
+          short moveItem = in.readShort();
+          if (moveItem != -1) {
+            in.readByte();
+            in.readByte();
+          }
         }
         break;
       case 0x67: // Inventory Item Update
-        write(packetId);
-        write(in.readByte());
-        write(in.readShort());
-        short setItem = in.readShort();
-        write(setItem);
-        if (setItem != -1) {
-          write(in.readByte());
-          write(in.readByte());
+        byte type67 = in.readByte();
+        if (type67<0 || player.getGroupId()>=0) {
+          write(packetId);
+          short slot = in.readShort();
+          write(type67);
+          write(slot);
+          short setItem = in.readShort();
+          write(setItem);
+          if (setItem != -1) {
+            write(in.readByte());
+            write(in.readByte());
+          }
+        }
+        else {
+          in.readShort();
+          short setItem = in.readShort();
+          if (setItem != -1) {
+            in.readByte();
+            in.readByte();
+          }
         }
         break;
       case 0x68: // Inventory
-        write(packetId);
-        write(in.readByte());
-        short count = in.readShort();
-        write(count);
-        for (int c = 0; c < count; ++c) {
-          short item = in.readShort();
-          write(item);
-
-          if (item != -1) {
-            write(in.readByte());
-            write(in.readShort());
+        
+        byte type = in.readByte();
+        if (type<0 || player.getGroupId()>=0) {
+          write(packetId);
+          write(type);
+          short count = in.readShort();
+          write(count);
+          for (int c = 0; c < count; ++c) {
+            short item = in.readShort();
+            write(item);
+  
+            if (item != -1) {
+              write(in.readByte());
+              write(in.readShort());
+            }
+          }
+        }
+        else {
+          short count = in.readShort();
+          for (int c = 0; c < count; ++c) {
+            short item = in.readShort();
+            if (item != -1) {
+              in.readByte();
+              in.readShort();
+            }
           }
         }
         break;
