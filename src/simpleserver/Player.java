@@ -41,7 +41,7 @@ public class Player {
   private String kickMsg = null;
   private double x, y, z;
   private int group = 0;
-  private int entityId =0;
+  private int entityId = 0;
   private Group groupObject = null;
   private boolean isRobot = false;
 
@@ -269,7 +269,7 @@ public class Player {
   private void cleanup() {
     if (!closed) {
       closed = true;
-      entityId=0;
+      entityId = 0;
       serverToClient.stop();
       clientToServer.stop();
 
@@ -381,14 +381,12 @@ public class Player {
     }
   }
 
-
   public boolean godModeEnabled() {
     return godMode;
   }
 
-
   public void toggleGodMode() {
-    godMode = !godMode;    
+    godMode = !godMode;
   }
 
   /**
@@ -402,6 +400,6 @@ public class Player {
    * @param readInt
    */
   public void setEntityId(int readInt) {
-      entityId=readInt;
+    entityId = readInt;
   }
 }

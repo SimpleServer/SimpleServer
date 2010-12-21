@@ -223,7 +223,7 @@ public class StreamTunnel {
         int user = in.readInt();
         int target = in.readInt();
         Player targetPlayer = server.playerList.findPlayer(target);
-        if (targetPlayer!=null) {
+        if (targetPlayer != null) {
           if (targetPlayer.godModeEnabled()) {
             in.readBoolean();
             break;
@@ -320,11 +320,11 @@ public class StreamTunnel {
         int z = in.readInt();
         byte direction = in.readByte();
         short dropItem = in.readShort();
-        
+
         if (dropItem != -1) {
           byte b = in.readByte();
           byte c = in.readByte();
-          
+
           if (!isServerTunnel && (player.getGroupId() < 0)
               || !server.blockFirewall.playerAllowed(player, dropItem)) {
             if (x != -1) {
@@ -334,16 +334,17 @@ public class StreamTunnel {
                                               Short.toString(dropItem)));
             }
           }
-          else if (!isServerTunnel && (dropItem == 54) && player.isAttemptLock()) {
+          else if (!isServerTunnel && (dropItem == 54)
+              && player.isAttemptLock()) {
 
             write(packetId);
-           
+
             write(x);
             write(y);
             write(z);
             write(direction);
             write(dropItem);
-            
+
             switch (direction) {
               case 0:
                 y--;
@@ -378,7 +379,7 @@ public class StreamTunnel {
           }
           else {
             write(packetId);
-            
+
             write(x);
             write(y);
             write(z);
@@ -390,7 +391,7 @@ public class StreamTunnel {
         }
         else {
           write(packetId);
-          
+
           write(x);
           write(y);
           write(z);
@@ -533,12 +534,12 @@ public class StreamTunnel {
         write(in.readByte());
         break;
       case 0x66: // Inventory Item Move
-        
+
         byte typeFrom = in.readByte();
-        short slotFrom =in.readShort();
-        byte typeTo =in.readByte();
-        short slotTo =in.readShort();
-        if ( (typeFrom<0 && typeTo<0) || player.getGroupId()>=0) {
+        short slotFrom = in.readShort();
+        byte typeTo = in.readByte();
+        short slotTo = in.readShort();
+        if ((typeFrom < 0 && typeTo < 0) || player.getGroupId() >= 0) {
           write(packetId);
           write(typeFrom);
           write(slotFrom);
@@ -561,7 +562,7 @@ public class StreamTunnel {
         break;
       case 0x67: // Inventory Item Update
         byte type67 = in.readByte();
-        if (type67<0 || player.getGroupId()>=0) {
+        if (type67 < 0 || player.getGroupId() >= 0) {
           write(packetId);
           short slot = in.readShort();
           write(type67);
@@ -583,9 +584,9 @@ public class StreamTunnel {
         }
         break;
       case 0x68: // Inventory
-        
+
         byte type = in.readByte();
-        if (type<0 || player.getGroupId()>=0) {
+        if (type < 0 || player.getGroupId() >= 0) {
           write(packetId);
           write(type);
           short count = in.readShort();
@@ -593,7 +594,7 @@ public class StreamTunnel {
           for (int c = 0; c < count; ++c) {
             short item = in.readShort();
             write(item);
-  
+
             if (item != -1) {
               write(in.readByte());
               write(in.readShort());
