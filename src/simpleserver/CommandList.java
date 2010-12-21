@@ -21,6 +21,7 @@
 package simpleserver;
 
 import java.lang.reflect.Modifier;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -65,9 +66,8 @@ public class CommandList {
     return serverCommands.get(extractName(message, 0));
   }
 
-  public PlayerCommand[] getPlayerCommands() {
-    return playerCommands.values()
-                         .toArray(new PlayerCommand[playerCommands.size()]);
+  public Collection<PlayerCommand> getPlayerCommands() {
+    return playerCommands.values();
   }
 
   public String commandPrefix() {

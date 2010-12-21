@@ -35,10 +35,10 @@ public class InvalidCommand extends AbstractCommand implements PlayerCommand,
   }
 
   public void execute(Player player, String message) {
-    player.addMessage("\302\247cNo such command " + message);
+    player.addMessage("cNo such command " + message);
   }
 
   public void execute(Server server, String message) {
-    System.out.println("\302\247cNo such command " + message);
+    System.out.println("No such command " + message);
   }
 }
