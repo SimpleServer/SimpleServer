@@ -191,9 +191,7 @@ public class StreamTunnel {
             break;
           }
 
-          if (server.options.getBoolean("useSlashes")
-              && message.startsWith("/") || message.startsWith("!")
-              && player.parseCommand(message)) {
+          if (player.parseCommand(message)) {
             break;
           }
         }
