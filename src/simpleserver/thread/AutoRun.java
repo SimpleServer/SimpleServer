@@ -122,8 +122,9 @@ public class AutoRun {
             }
 
             if (exitCode < 0) {
-              System.out.println("[SimpleServer] c10t Failed! Exited with code "
-                  + exitCode + "!");
+              System.out
+                        .println("[SimpleServer] c10t Failed! Exited with code "
+                            + exitCode + "!");
               server.runCommand("say", "Mapping Failed!");
             }
             else {

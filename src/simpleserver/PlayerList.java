@@ -41,12 +41,13 @@ public class PlayerList {
 
   public Player findPlayer(int entityId) {
     for (Player p : players.values()) {
-      if (p.getEntityId()==entityId)
+      if (p.getEntityId() == entityId) {
         return p;
+      }
     }
     return null;
   }
-  
+
   public Player findPlayer(String prefix) {
     prefix = prefix.toLowerCase();
     for (String name : players.keySet()) {

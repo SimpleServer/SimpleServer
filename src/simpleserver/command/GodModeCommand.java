@@ -22,8 +22,7 @@ package simpleserver.command;
 
 import simpleserver.Player;
 
-public class GodModeCommand extends AbstractCommand implements
-    PlayerCommand {
+public class GodModeCommand extends AbstractCommand implements PlayerCommand {
   public GodModeCommand() {
     super("iddqd");
   }

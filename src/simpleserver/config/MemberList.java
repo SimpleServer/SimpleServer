@@ -67,7 +67,8 @@ public class MemberList extends PropertiesConfig {
         group = Integer.parseInt(entry.getValue().toString());
       }
       catch (NumberFormatException e) {
-        System.out.println("Skipping bad member list entry " + entry.getValue());
+        System.out
+                  .println("Skipping bad member list entry " + entry.getValue());
         continue;
       }
 

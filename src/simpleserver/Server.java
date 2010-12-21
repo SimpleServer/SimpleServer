@@ -391,7 +391,8 @@ public class Server {
     save = false;
 
     if (!saveLock.tryAcquire()) {
-      System.out.println("[SimpleServer] Server is currently Backing Up/Saving...");
+      System.out
+                .println("[SimpleServer] Server is currently Backing Up/Saving...");
       while (true) {
         try {
           saveLock.acquire();

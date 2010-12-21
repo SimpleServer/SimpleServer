@@ -60,7 +60,8 @@ public class Options extends AbstractOptions {
     }
 
     if (getInt("internalPort") == getInt("port")) {
-      System.out.println("OH NO! Your 'internalPort' and 'port' properties are the same! Edit simpleserver.properties and change them to different values. 'port' is recommended to be 25565, the default port of minecraft, and will be the port you actually connect to.");
+      System.out
+                .println("OH NO! Your 'internalPort' and 'port' properties are the same! Edit simpleserver.properties and change them to different values. 'port' is recommended to be 25565, the default port of minecraft, and will be the port you actually connect to.");
       System.out.println("Press enter to continue...");
       Scanner in = new Scanner(System.in);
       in.nextLine();
@@ -72,7 +73,8 @@ public class Options extends AbstractOptions {
   protected void missingFile() {
     super.missingFile();
 
-    System.out.println("Properties file not found! Created simpleserver.properties! Adjust values and then start the server again!");
+    System.out
+              .println("Properties file not found! Created simpleserver.properties! Adjust values and then start the server again!");
     System.out.println("Press enter to continue...");
     Scanner in = new Scanner(System.in);
     in.nextLine();
@@ -101,8 +103,10 @@ public class Options extends AbstractOptions {
     }
     save();
 
-    System.out.println("The Properties file format has changed! Command ranks are now set in command-list.txt!");
-    System.out.println("Your previous settings for commands have been saved, and cleared from simpleserver.properties!");
+    System.out
+              .println("The Properties file format has changed! Command ranks are now set in command-list.txt!");
+    System.out
+              .println("Your previous settings for commands have been saved, and cleared from simpleserver.properties!");
     System.out.println("Press enter to continue...");
     Scanner in = new Scanner(System.in);
     in.nextLine();

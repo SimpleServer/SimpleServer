@@ -31,7 +31,8 @@ public class WarpHereCommand extends OnlinePlayerArgCommand {
   protected void executeWithTarget(Player player, String message, Player target) {
     target.teleportTo(player);
 
-    player.getServer().adminLog("Admin " + player.getName() + " teleported:\t "
+    player.getServer().adminLog(
+                                "Admin " + player.getName() + " teleported:\t "
                                     + target.getName() + "\tto\t"
                                     + player.getName());
   }
