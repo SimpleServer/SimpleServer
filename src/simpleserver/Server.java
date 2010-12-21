@@ -1,6 +1,4 @@
 /*******************************************************************************
- * Open Source Initiative OSI - The MIT License:Licensing
- * The MIT License
  * Copyright (c) 2010 SimpleServer authors (see CONTRIBUTORS)
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -59,7 +57,7 @@ import simpleserver.thread.SystemInputQueue;
 
 public class Server {
   private static final String version = "RC 6.9.9_stable";
-  private static final String license = "SimpleServer -- Copyright (C) 2010 Charles Wagner Jr.";
+  private static final String license = "SimpleServer -- Copyright (C) 2010 SimpleServer authors (see CONTRIBUTORS)";
   private static final String warranty = "This program is licensed under The MIT License.\nSee file LICENSE for details.";
 
   private final Listener listener;

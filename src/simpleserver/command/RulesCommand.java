@@ -1,6 +1,4 @@
 /*******************************************************************************
- * Open Source Initiative OSI - The MIT License:Licensing
- * The MIT License
  * Copyright (c) 2010 SimpleServer authors (see CONTRIBUTORS)
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
