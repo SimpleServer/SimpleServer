@@ -33,7 +33,7 @@ public class KitCommand extends AbstractCommand implements PlayerCommand {
       player.getServer().kits.giveKit(player, arguments[0]);
     }
     else {
-      player.addMessage("\302\247cNo kit specified.");
+      player.addMessage("\u00a7cNo kit specified.");
     }
   }
 }

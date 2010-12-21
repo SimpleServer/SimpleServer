@@ -33,11 +33,11 @@ public class GivePlayerCommand extends GiveCommand {
     if (arguments.length > 0) {
       target = player.getServer().findPlayer(arguments[0]);
       if (target == null) {
-        player.addMessage("\302\247cPlayer not online (" + arguments[0] + ")");
+        player.addMessage("\u00a7cPlayer not online (" + arguments[0] + ")");
       }
     }
     else {
-      player.addMessage("\302\247cNo player or item specified!");
+      player.addMessage("\u00a7cNo player or item specified!");
     }
 
     return target;

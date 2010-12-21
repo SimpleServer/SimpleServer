@@ -32,7 +32,7 @@ public class SetGroupCommand extends PlayerArgCommand {
   protected void executeWithTarget(Player player, String message, String target) {
     Server server = player.getServer();
     if (player.getGroupId() <= server.members.getGroup(target)) {
-      player.addMessage("\302\247cYou cannot set the group of this user!");
+      player.addMessage("\u00a7cYou cannot set the group of this user!");
       return;
     }
 
@@ -43,12 +43,12 @@ public class SetGroupCommand extends PlayerArgCommand {
         group = Integer.parseInt(arguments[1]);
       }
       catch (NumberFormatException e) {
-        player.addMessage("\302\247cGroup must be a number!");
+        player.addMessage("\u00a7cGroup must be a number!");
         return;
       }
 
       if (group >= player.getGroupId()) {
-        player.addMessage("\302\247cYou cannot promote a user to a higher group!");
+        player.addMessage("\u00a7cYou cannot promote a user to a higher group!");
       }
       else {
         server.members.setGroup(target, group);

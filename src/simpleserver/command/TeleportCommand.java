@@ -36,7 +36,7 @@ public class TeleportCommand extends OnlinePlayerArgCommand {
     if (arguments.length > 1) {
       Player target2 = server.findPlayer(arguments[1]);
       if (target2 == null) {
-        player.addMessage("\302\247cPlayer not online (" + arguments[1] + ")");
+        player.addMessage("\u00a7cPlayer not online (" + arguments[1] + ")");
       }
       else {
         target1.teleportTo(target2);
@@ -48,12 +48,12 @@ public class TeleportCommand extends OnlinePlayerArgCommand {
       }
     }
     else {
-      player.addMessage("\302\247cMust specify two players.");
+      player.addMessage("\u00a7cMust specify two players.");
     }
   }
 
   @Override
   protected void noTargetSpecified(Player player, String message) {
-    player.addMessage("\302\247cNo players specified.");
+    player.addMessage("\u00a7cNo players specified.");
   }
 }

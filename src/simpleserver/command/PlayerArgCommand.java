@@ -48,6 +48,6 @@ public abstract class PlayerArgCommand extends AbstractCommand implements
                                             String target);
 
   protected void noTargetSpecified(Player player, String message) {
-    player.addMessage("\302\247cNo player specified.");
+    player.addMessage("\u00a7cNo player specified.");
   }
 }

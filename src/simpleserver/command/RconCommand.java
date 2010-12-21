@@ -34,7 +34,7 @@ public class RconCommand extends AbstractCommand implements PlayerCommand {
       player.getServer().runCommand(arguments[0], commandArguments);
     }
     else {
-      player.addMessage("\302\247cNo rcon command specified.");
+      player.addMessage("\u00a7cNo rcon command specified.");
     }
   }
 }

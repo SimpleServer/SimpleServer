@@ -50,7 +50,7 @@ public class BanIPCommand extends AbstractCommand implements PlayerCommand {
       }
     }
     else {
-      player.addMessage("\302\247cNo player or IP specified.");
+      player.addMessage("\u00a7cNo player or IP specified.");
     }
   }
 }

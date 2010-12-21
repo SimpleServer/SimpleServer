@@ -203,7 +203,7 @@ public class Player {
     }
 
     if (command.getName() != null && !commandAllowed(command.getName())) {
-      addMessage("\302\247cInsufficient permission.");
+      addMessage("\u00a7cInsufficient permission.");
       return true;
     }
 
@@ -304,12 +304,12 @@ public class Player {
       item = Integer.parseInt(rawItem);
 
       if (item < 0) {
-        addMessage("\302\247cItem ID must be positive!");
+        addMessage("\u00a7cItem ID must be positive!");
         success = false;
       }
     }
     catch (NumberFormatException e) {
-      addMessage("\302\247cItem ID must be a number!");
+      addMessage("\u00a7cItem ID must be a number!");
       success = false;
     }
 
@@ -319,18 +319,18 @@ public class Player {
         amount = Integer.parseInt(rawAmount);
 
         if ((amount < 1) || (amount > 1000)) {
-          addMessage("\302\247cAmount must be within 1-1000!");
+          addMessage("\u00a7cAmount must be within 1-1000!");
           success = false;
         }
       }
       catch (NumberFormatException e) {
-        addMessage("\302\247cAmount must be a number!");
+        addMessage("\u00a7cAmount must be a number!");
         success = false;
       }
     }
 
     if (!success) {
-      addMessage("\302\247cUnable to give " + rawItem);
+      addMessage("\u00a7cUnable to give " + rawItem);
       return false;
     }
 

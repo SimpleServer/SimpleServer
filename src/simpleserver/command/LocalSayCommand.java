@@ -36,7 +36,7 @@ public class LocalSayCommand extends AbstractCommand implements PlayerCommand {
     String chat = extractArgument(message);
     int numPlayers = player.getServer().localChat(player, chat);
     if (numPlayers <= 0) {
-      player.addMessage("\302\247cNobody is around to hear you.");
+      player.addMessage("\u00a7cNobody is around to hear you.");
     }
   }
 }

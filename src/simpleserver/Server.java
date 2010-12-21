@@ -254,7 +254,7 @@ public class Server {
   }
 
   public int localChat(Player player, String msg) {
-    String chat = "\302\2477" + player.getName() + " says: " + msg;
+    String chat = "\u00a77" + player.getName() + " says: " + msg;
     int localPlayers = 0;
     for (Player friend : playerList.getArray()) {
       int radius = options.getInt("localChatRadius");

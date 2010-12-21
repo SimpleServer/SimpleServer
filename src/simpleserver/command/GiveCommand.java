@@ -62,7 +62,7 @@ public class GiveCommand extends AbstractCommand implements PlayerCommand {
                                       + amount + ")");
     }
     else {
-      player.addMessage("\302\247cNo item or amount specified!");
+      player.addMessage("\u00a7cNo item or amount specified!");
     }
   }
 

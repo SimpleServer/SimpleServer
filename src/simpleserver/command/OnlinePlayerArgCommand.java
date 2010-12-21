@@ -34,7 +34,7 @@ public abstract class OnlinePlayerArgCommand extends AbstractCommand implements
     if (arguments.length > 0) {
       Player target = player.getServer().findPlayer(arguments[0]);
       if (target == null) {
-        player.addMessage("\302\247cPlayer not online (" + arguments[0] + ")");
+        player.addMessage("\u00a7cPlayer not online (" + arguments[0] + ")");
       }
       else {
         executeWithTarget(player, message, target);
@@ -49,6 +49,6 @@ public abstract class OnlinePlayerArgCommand extends AbstractCommand implements
                                             Player target);
 
   protected void noTargetSpecified(Player player, String message) {
-    player.addMessage("\302\247cNo player specified.");
+    player.addMessage("\u00a7cNo player specified.");
   }
 }

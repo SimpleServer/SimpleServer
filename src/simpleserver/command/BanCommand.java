@@ -44,6 +44,6 @@ public class BanCommand extends PlayerArgCommand {
 
   @Override
   protected void noTargetSpecified(Player player, String message) {
-    player.addMessage("\302\247cNo player or reason specified.");
+    player.addMessage("\u00a7cNo player or reason specified.");
   }
 }
