@@ -137,7 +137,13 @@ public class StreamTunnel {
         break;
       case 0x01: // Login Request/Response
         write(packetId);
-        write(in.readInt());
+        if (isServerTunnel) {
+          player.setEntityId(in.readInt());
+          write(player.getEntityId());
+        }
+        else {
+          write(in.readInt());
+        }
         write(in.readUTF());
         write(in.readUTF());
         write(in.readLong());
@@ -214,8 +220,19 @@ public class StreamTunnel {
         copyNBytes(12);
         break;
       case 0x07: // Use Entity?
+        int user = in.readInt();
+        int target = in.readInt();
+        Player targetPlayer = server.playerList.findPlayer(target);
+        if (targetPlayer!=null) {
+          if (targetPlayer.godModeEnabled()) {
+            in.readBoolean();
+            break;
+          }
+        }
         write(packetId);
-        copyNBytes(9);
+        write(user);
+        write(target);
+        write(in.readBoolean());
         break;
       case 0x08: // Update Health
         write(packetId);
@@ -381,71 +398,6 @@ public class StreamTunnel {
           write(dropItem);
         }
         break;
-      /*
-        short blockId = in.readShort();
-        if (!isServerTunnel && (player.getGroupId() < 0)
-            || !server.blockFirewall.playerAllowed(player, blockId)) {
-          int x = in.readInt();
-          skipNBytes(6);
-          if (x != -1) {
-            server.runCommand("say",
-                              String.format(server.l.get("BAD_BLOCK"),
-                                            player.getName(),
-                                            Short.toString(blockId)));
-          }
-        }
-        else if (!isServerTunnel && (blockId == 54) && player.isAttemptLock()) {
-          int x = in.readInt();
-          byte y = in.readByte();
-          int z = in.readInt();
-          byte direction = in.readByte();
-
-          write(packetId);
-          write(blockId);
-          write(x);
-          write(y);
-          write(z);
-          write(direction);
-
-          switch (direction) {
-            case 0:
-              y--;
-              break;
-            case 1:
-              y++;
-              break;
-            case 2:
-              z--;
-              break;
-            case 3:
-              z++;
-              break;
-            case 4:
-              x--;
-              break;
-            case 5:
-              x++;
-              break;
-          }
-          // create chest entry
-          if (server.chests.hasLock(x, y, z)) {
-            player.addMessage("This block is locked already!");
-          }
-          else if (server.chests.giveLock(player.getName(), x, y, z, false)) {
-            player.addMessage("Your locked chest is created! Do not add another chest to it!");
-          }
-          else {
-            player.addMessage("You already have a lock, or this block is locked already!");
-          }
-          player.setAttemptLock(false);
-        }
-        else {
-          write(packetId);
-          write(blockId);
-          copyNBytes(10);
-        }
-        break;
-      */
       case 0x10: // Holding Change
         write(packetId);
         copyNBytes(2);
@@ -756,7 +708,6 @@ public class StreamTunnel {
     out.writeUTF(s);
   }
 
-  @SuppressWarnings("unused")
   private void write(boolean b) throws IOException {
     out.writeBoolean(b);
   }

@@ -39,6 +39,14 @@ public class PlayerList {
     return players.size();
   }
 
+  public Player findPlayer(int entityId) {
+    for (Player p : players.values()) {
+      if (p.getEntityId()==entityId)
+        return p;
+    }
+    return null;
+  }
+  
   public Player findPlayer(String prefix) {
     prefix = prefix.toLowerCase();
     for (String name : players.keySet()) {

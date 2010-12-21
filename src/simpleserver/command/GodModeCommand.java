@@ -22,19 +22,19 @@ package simpleserver.command;
 
 import simpleserver.Player;
 
-public class InstantDestroyCommand extends AbstractCommand implements
+public class GodModeCommand extends AbstractCommand implements
     PlayerCommand {
-  public InstantDestroyCommand() {
-    super("idbehold");
+  public GodModeCommand() {
+    super("iddqd");
   }
 
   public void execute(Player player, String message) {
-    player.toggleInstantDestroy();
-    if (player.instantDestroyEnabled()) {
-      player.addMessage("Destroy Enabled!");
+    player.toggleGodMode();
+    if (player.godModeEnabled()) {
+      player.addMessage("God-Mode Enabled!");
     }
     else {
-      player.addMessage("Destroy Disabled!");
+      player.addMessage("God-Mode Disabled!");
     }
   }
 }
