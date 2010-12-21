@@ -309,7 +309,7 @@ public class Player {
       }
     }
     catch (NumberFormatException e) {
-      addMessage("\u00a7cItem ID must be a number!");
+      addMessage("\u00a7cItem ID must map to a number!");
       success = false;
     }
 
@@ -338,7 +338,9 @@ public class Player {
     for (int c = 0; c < amount / 64; ++c) {
       server.runCommand("give", baseCommand + 64);
     }
-    server.runCommand("give", baseCommand + amount % 64);
+    if (amount % 64 != 0) {
+      server.runCommand("give", baseCommand + amount % 64);
+    }
 
     return true;
   }
