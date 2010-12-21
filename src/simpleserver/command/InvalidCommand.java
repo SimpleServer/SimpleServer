@@ -35,7 +35,7 @@ public class InvalidCommand extends AbstractCommand implements PlayerCommand,
   }
 
   public void execute(Player player, String message) {
-    player.addMessage("cNo such command " + message);
+    player.addMessage("\u00a7cNo such command " + message);
   }
 
   public void execute(Server server, String message) {
