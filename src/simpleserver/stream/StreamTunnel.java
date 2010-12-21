@@ -660,14 +660,12 @@ public class StreamTunnel {
         }
         break;
       case 0x69:
-        System.out.println(packetId);
         write(packetId);
         write(in.readByte());
         write(in.readShort());
         write(in.readShort());
         break;
       case 0x6a:
-        System.out.println(packetId);
         write(packetId);
         write(in.readByte());
         write(in.readShort());
