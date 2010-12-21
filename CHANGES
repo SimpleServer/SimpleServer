@@ -1,6 +1,7 @@
 == RC 6.9.9 ==
 * Huge internal refactoring. There is a lot of debug output right now.
 * Updated packets for Beta.
+* Added alias list for the !give and !giveplayer commands (thanks teraquendya!)
 
 == RC 6.6.6 ==
 * Initial Open Source release!
