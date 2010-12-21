@@ -56,10 +56,10 @@ public class MuteList extends PropertiesConfig {
     List<String> names = new LinkedList<String>();
     Set<Object> rawNames = keySet();
 
-    //for (Object name : rawNames) {
-    for (Iterator<Object> itr = rawNames.iterator();itr.hasNext();) {
+    // for (Object name : rawNames) {
+    for (Iterator<Object> itr = rawNames.iterator(); itr.hasNext();) {
       Object name = itr.next();
-      //rawNames.remove(name);
+      // rawNames.remove(name);
       names.add(((String) name).toLowerCase());
       itr.remove();
     }

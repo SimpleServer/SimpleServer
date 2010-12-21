@@ -48,7 +48,7 @@ public class RconServer {
 
   public void stop() {
     run = false;
-    if (socket!=null) {
+    if (socket != null) {
       try {
         socket.close();
       }
