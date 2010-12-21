@@ -40,7 +40,6 @@ public class ChestList extends AsciiConfig {
     if (names.containsKey(names) || locations.containsKey(coordinate)) {
       return false;
     }
-    System.out.println("Set lock at " + x + " " + y + " " + z);
 
     name = name.toLowerCase();
     Chest chest = new Chest(name, coordinate, isGroupLock);
@@ -78,7 +77,6 @@ public class ChestList extends AsciiConfig {
     Chest chest = locations.remove(new Coordinate(x, y, z));
     if (chest != null) {
       names.remove(chest.name);
-      System.out.println("Released lock at " + x + " " + y + " " + z);
     }
 
     save();
