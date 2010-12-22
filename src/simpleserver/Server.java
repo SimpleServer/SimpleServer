@@ -131,7 +131,7 @@ public class Server {
     try {
       socket.close();
     }
-    catch (IOException e) {
+    catch (Exception e) {
     }
   }
 
@@ -461,7 +461,7 @@ public class Server {
         }
 
         try {
-          while (true) {
+          while (run) {
             Socket client;
             try {
               client = socket.accept();

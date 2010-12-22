@@ -103,6 +103,30 @@ public class Player {
     watchdog.start();
   }
 
+  public boolean setName(String name) {
+    name = name.trim();
+    if (name.length() == 0 || this.name != null) {
+      kick("Invalid Name!");
+      return false;
+    }
+    if (server.options.getBoolean("useWhitelist")
+        && !server.whitelist.isWhitelisted(name)) {
+      kick("You are not whitelisted!");
+      return false;
+    }
+    this.name = name;
+    updateGroup();
+
+    watchdog.setName("PlayerWatchdog-" + name);
+    server.connectionLog("player", extsocket, name);
+    server.playerList.addPlayer(this);
+    return true;
+  }
+
+  public String getName() {
+    return name;
+  }
+
   public double distanceTo(Player player) {
     return Math.sqrt(Math.pow(x - player.x, 2) + Math.pow(x - player.y, 2)
         + Math.pow(x - player.z, 2));
@@ -132,30 +156,6 @@ public class Player {
 
   public Server getServer() {
     return server;
-  }
-
-  public boolean setName(String name) {
-    name = name.trim();
-    if (name.length() == 0 || this.name != null) {
-      kick("Invalid Name!");
-      return false;
-    }
-    if (server.options.getBoolean("useWhitelist")
-        && !server.whitelist.isWhitelisted(name)) {
-      kick("You are not whitelisted!");
-      return false;
-    }
-    this.name = name;
-    updateGroup();
-
-    watchdog.setName("PlayerWatchdog-" + name);
-    server.connectionLog("player", extsocket, name);
-    server.playerList.addPlayer(this);
-    return true;
-  }
-
-  public String getName() {
-    return name;
   }
 
   public boolean hasMessages() {
@@ -194,6 +194,45 @@ public class Player {
     return server.mutelist.isMuted(name);
   }
 
+  public boolean isRobot() {
+    return isRobot;
+  }
+
+  public boolean godModeEnabled() {
+    return godMode;
+  }
+
+  public void toggleGodMode() {
+    godMode = !godMode;
+  }
+
+  public int getEntityId() {
+    return entityId;
+  }
+
+  public void setEntityId(int readInt) {
+    entityId = readInt;
+  }
+
+  public int getGroupId() {
+    return group;
+  }
+
+  public Group getGroup() {
+    return groupObject;
+  }
+
+  public boolean isAdmin() {
+    if (groupObject != null) {
+      return groupObject.isAdmin();
+    }
+    return false;
+  }
+
+  public String getIPAddress() {
+    return extsocket.getInetAddress().getHostAddress();
+  }
+
   public boolean parseCommand(String message) {
     if (closed) {
       return true;
@@ -218,85 +257,15 @@ public class Player {
     return server.commands.playerAllowed(command, this);
   }
 
-  public int getGroupId() {
-    return group;
+  public void teleportTo(Player target) {
+    server.runCommand("tp", getName() + " " + target.getName());
   }
 
-  public Group getGroup() {
-    return groupObject;
-  }
-
-  public void updateGroup() {
-    int nameGroup = server.members.getGroup(name);
-    int ipGroup = server.ipMembers.getGroup(this);
-    int defaultGroup = server.options.getInt("defaultGroup");
-
-    if (ipGroup >= nameGroup) {
-      group = ipGroup;
+  public void sendMOTD() {
+    String[] lines = server.getMOTD().split("\\r?\\n");
+    for (int i = 0; i < lines.length; i++) {
+      addMessage(lines[i]);
     }
-    else {
-      group = nameGroup;
-    }
-
-    if (nameGroup == -1 || ipGroup == -1 && defaultGroup != -1) {
-      group = -1;
-    }
-
-    if (server.groups.groupExists(group)) {
-      groupObject = server.groups.getGroup(group);
-    }
-    else {
-      groupObject = null;
-    }
-  }
-
-  public boolean isAdmin() {
-    if (groupObject != null) {
-      return groupObject.isAdmin();
-    }
-    return false;
-  }
-
-  public String getIPAddress() {
-    return extsocket.getInetAddress().getHostAddress();
-  }
-
-  public void close() {
-    serverToClient.stop();
-    clientToServer.stop();
-  }
-
-  private void cleanup() {
-    if (!closed) {
-      closed = true;
-      entityId = 0;
-      serverToClient.stop();
-      clientToServer.stop();
-
-      if (name != null) {
-        server.playerList.removePlayer(this);
-      }
-
-      try {
-        extsocket.close();
-      }
-      catch (IOException e) {
-      }
-      try {
-        intsocket.close();
-      }
-      catch (IOException e) {
-      }
-
-      if (!isRobot) {
-        System.out.println("[SimpleServer] Socket Closed: "
-            + extsocket.getInetAddress().getHostAddress());
-      }
-    }
-  }
-
-  public boolean isRobot() {
-    return isRobot;
   }
 
   public boolean give(String rawItem, String rawAmount) {
@@ -348,14 +317,61 @@ public class Player {
     return true;
   }
 
-  public void teleportTo(Player target) {
-    server.runCommand("tp", getName() + " " + target.getName());
+  public void updateGroup() {
+    int nameGroup = server.members.getGroup(name);
+    int ipGroup = server.ipMembers.getGroup(this);
+    int defaultGroup = server.options.getInt("defaultGroup");
+
+    if (ipGroup >= nameGroup) {
+      group = ipGroup;
+    }
+    else {
+      group = nameGroup;
+    }
+
+    if (nameGroup == -1 || ipGroup == -1 && defaultGroup != -1) {
+      group = -1;
+    }
+
+    if (server.groups.groupExists(group)) {
+      groupObject = server.groups.getGroup(group);
+    }
+    else {
+      groupObject = null;
+    }
   }
 
-  public void sendMOTD() {
-    String[] lines = server.getMOTD().split("\\r?\\n");
-    for (int i = 0; i < lines.length; i++) {
-      addMessage(lines[i]);
+  public void close() {
+    serverToClient.stop();
+    clientToServer.stop();
+  }
+
+  private void cleanup() {
+    if (!closed) {
+      closed = true;
+      entityId = 0;
+      serverToClient.stop();
+      clientToServer.stop();
+
+      if (name != null) {
+        server.playerList.removePlayer(this);
+      }
+
+      try {
+        extsocket.close();
+      }
+      catch (IOException e) {
+      }
+      try {
+        intsocket.close();
+      }
+      catch (IOException e) {
+      }
+
+      if (!isRobot) {
+        System.out.println("[SimpleServer] Socket Closed: "
+            + extsocket.getInetAddress().getHostAddress());
+      }
     }
   }
 
@@ -379,27 +395,5 @@ public class Player {
 
       cleanup();
     }
-  }
-
-  public boolean godModeEnabled() {
-    return godMode;
-  }
-
-  public void toggleGodMode() {
-    godMode = !godMode;
-  }
-
-  /**
-   * @return
-   */
-  public int getEntityId() {
-    return entityId;
-  }
-
-  /**
-   * @param readInt
-   */
-  public void setEntityId(int readInt) {
-    entityId = readInt;
   }
 }

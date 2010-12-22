@@ -11,9 +11,11 @@ Installation:
 1) Download minecraft_server.jar from minecraft.net
 2) Unzip all files into the same directory as minecraft_server.jar
 3) Run launch.bat or launch.sh to start the server for the first time
-4) Press "Enter" at the console (which is informing you that you've started the server for the first time!)
+4) Press "Enter" at the console (which is informing you that you've started
+   the server for the first time!)
 5) Open simpleserver.properties and adjust the values as needed
-6) You can now connect to the server using your IP Address (www.whatismyip.com) and the port indicated in simpleserver.properties!
+6) You can now connect to the server using your IP Address (www.whatismyip.com)
+   and the port indicated in simpleserver.properties!
 
 Groups:
   Groups can be added in group-list.txt.
@@ -32,65 +34,66 @@ Group Notation:
       1-3 means the same thing.
       1-3,5 means 1,2,3, and 5.
 
-
 Guest Mode/Destroy Protection:
-  Setting defaultGroup=-1 in simpleserver.properties, or setting someone's group to -1 will enable "Guest Mode"
-  Guests are not be able to place blocks, destroy blocks, remove items from chests, or drop items.
+  Setting defaultGroup=-1 in simpleserver.properties, or setting someone's
+  group to -1 will enable "Guest Mode".  Guests are not be able to place
+  blocks, destroy blocks, remove items from chests, or drop items.
 
 Locked Chests:
-  A player can say !lock to begin the process to lock a chest. They can then place a single chest block,
-  and it is "locked." Locked chest's contents cannot be viewed or changed by other players unless they
-  belong to a group marked with isAdmin=true in group-list.txt.
-  A player can release their lock by saying !unlock, and the chest will be available to other players.
+  A player can say !lock to begin the process to lock a chest. They can then
+  place a single chest block, and it is "locked." Locked chest's contents
+  cannot be viewed or changed by other players unless they belong to a group
+  marked with isAdmin=true in group-list.txt.  A player can release their lock
+  by saying !unlock, and the chest will be available to other players.
 
 Local Chat:
-  Players can chat with other players in the area by saying !local message or !l message.
-  The radius can be changed in simpleserver.properties.
-  Note: Radius is somewhat misleading. To save a few CPU cycles, a cube is used instead of a sphere.
+  Players can chat with other players in the area by saying !local message or
+  !l message.  The radius can be changed in simpleserver.properties.
 
 Commands:
   Command permissions can be set per group in command-list.txt.
   Setting a command to 0 means that it can be used by any player.
 
-
-
-
 Console Commands:
 Say help in the console for all of the standard minecraft server commands.
 Added are:
-  !save -- Save all resource files (motd.txt, rules.txt, etc)
-  !reload -- Reload all resource files
-  !backup -- Force a backup
+  backup -- Force a backup
+  reload -- Reload all resource files
+  restart -- Restart the server
+  save -- Save all resource files (motd.txt, rules.txt, etc)
+
 Player Commands:
-  say !commands in game
-  Commands are based on rank
-  !motd
-  !rules
-  !lock
-  !unlock
-  !iddqd
-  !local
-  !kits
-  !kit KIT_NAME
-  !banip IPAddress
-  !unbanip IPAddress
-  !ban NAME REASON
-  !unban NAME
-  !kick NAME REASON
-  !setrank PLAYER RANK
-  !giveplayer PLAYER ID# AMT
-  !give ID# AMT
-  !whitelist NAME
-  !unwhitelist NAME
-  !help
-  !commands
-  !who
-  !list
-  !listips
-  !give ID# AMT
+Commands are based on rank.  Say !help in game for a list of currently
+accessible commands.
   !backup
-  !restart
-  !reload
-  !save
+  !banip IPAddress
+  !ban NAME REASON
+  !give ID# AMT
+  !giveplayer PLAYER ID# AMT
+  !help
+  !idbehold
+  !iddqd
+  !kick NAME REASON
+  !kit KIT_NAME
+  !kits
+  !listips
+  !local
+  !lock
+  !motd
   !mute
+  !rcon
+  !reload
+  !restart
+  !rules
+  !save
+  !setrank PLAYER RANK
+  !tp PLAYER1 PLAYER2
+  !unbanip IPAddress
+  !unban NAME
+  !unlock
   !unmute
+  !unwhitelist NAME
+  !warpmeto PLAYER
+  !warptome PLAYER
+  !whitelist NAME
+  !who
