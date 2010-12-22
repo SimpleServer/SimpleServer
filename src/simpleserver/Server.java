@@ -131,7 +131,7 @@ public class Server {
     try {
       socket.close();
     }
-    catch (IOException e) {
+    catch (Exception e) {
     }
   }
 

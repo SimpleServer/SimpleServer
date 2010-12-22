@@ -68,6 +68,9 @@ public class MinecraftWrapper {
 
     active = true;
     wrappers = new LinkedList<Wrapper>();
+    wrappers.add(new ShutdownHook(this));
+    wrappers.add(new ProcessWrapper(minecraft, messageHandler));
+
     wrappers.add(new OutputWrapper(minecraft.getInputStream(), messageHandler,
                                    "stdout"));
     wrappers.add(new OutputWrapper(minecraft.getErrorStream(), messageHandler,
@@ -76,8 +79,6 @@ public class MinecraftWrapper {
     inputWrapper = new InputWrapper(systemInput, minecraft.getOutputStream(),
                                     messageHandler);
     wrappers.add(inputWrapper);
-    wrappers.add(new ProcessWrapper(minecraft, messageHandler));
-    wrappers.add(new ShutdownHook(this));
   }
 
   public void stop() {
