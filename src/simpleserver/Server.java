@@ -460,7 +460,7 @@ public class Server {
         }
 
         try {
-          while (true) {
+          while (run) {
             Socket client;
             try {
               client = socket.accept();
