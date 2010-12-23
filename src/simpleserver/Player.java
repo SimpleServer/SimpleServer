@@ -47,7 +47,7 @@ public class Player {
 
   private StreamTunnel serverToClient;
   private StreamTunnel clientToServer;
-  private final Watchdog watchdog;
+  private Watchdog watchdog;
 
   private Queue<String> messages = new ConcurrentLinkedQueue<String>();
 
@@ -66,7 +66,9 @@ public class Player {
 
     if (server.isIPBanned(getIPAddress())) {
       System.out.println("[SimpleServer] IP " + getIPAddress() + " is banned!");
-      kick("Banned IP!");
+
+      cleanup();
+      return;
     }
     server.requestTracker.addRequest(getIPAddress());
 
@@ -81,6 +83,9 @@ public class Player {
       else {
         server.restart();
       }
+
+      cleanup();
+      return;
     }
 
     try {
@@ -93,6 +98,7 @@ public class Player {
     catch (IOException e) {
       e.printStackTrace();
       cleanup();
+      return;
     }
 
     if (isRobot) {
@@ -345,8 +351,14 @@ public class Player {
     if (!closed) {
       closed = true;
       entityId = 0;
-      serverToClient.stop();
-      clientToServer.stop();
+
+      if (serverToClient != null) {
+        serverToClient.stop();
+      }
+
+      if (clientToServer != null) {
+        clientToServer.stop();
+      }
 
       if (name != null) {
         server.playerList.removePlayer(this);
