@@ -322,8 +322,8 @@ public class StreamTunnel {
         short dropItem = in.readShort();
 
         if (dropItem != -1) {
-          byte b = in.readByte();
-          byte c = in.readByte();
+          byte count = in.readByte();
+          byte uses = in.readByte();
 
           if (!isServerTunnel && (player.getGroupId() < 0)
               || !server.blockFirewall.playerAllowed(player, dropItem)) {
@@ -344,6 +344,8 @@ public class StreamTunnel {
             write(z);
             write(direction);
             write(dropItem);
+            write(count);
+            write(uses);
 
             switch (direction) {
               case 0:
@@ -385,8 +387,8 @@ public class StreamTunnel {
             write(z);
             write(direction);
             write(dropItem);
-            write(b);
-            write(c);
+            write(count);
+            write(uses);
           }
         }
         else {
