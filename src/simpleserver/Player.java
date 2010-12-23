@@ -359,7 +359,7 @@ public class Player {
     if (clientToServer != null) {
       clientToServer.stop();
     }
-    
+
     if (name != null) {
       server.playerList.removePlayer(this);
       name = null;
