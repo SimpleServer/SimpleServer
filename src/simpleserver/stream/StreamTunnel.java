@@ -334,6 +334,7 @@ public class StreamTunnel {
         }
         else if (server.chests.hasLock(x, y, z) && !player.isAdmin()
             && !server.chests.ownsLock(player.getName(), x, y, z)) {
+          server.runCommand("say", "\u00a7cThis chest is locked!");
           writePacket = false;
         }
         else if ((player.getGroupId() < 0)
