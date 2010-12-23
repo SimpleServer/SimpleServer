@@ -117,11 +117,18 @@ public class Player {
       kick("Invalid Name!");
       return false;
     }
+
     if (server.options.getBoolean("useWhitelist")
         && !server.whitelist.isWhitelisted(name)) {
       kick("You are not whitelisted!");
       return false;
     }
+
+    if (server.playerList.findPlayerExact(name) != null) {
+      kick("Player already in server!");
+      return false;
+    }
+
     this.name = name;
     updateGroup();
 
@@ -345,8 +352,18 @@ public class Player {
   }
 
   public void close() {
-    serverToClient.stop();
-    clientToServer.stop();
+    if (serverToClient != null) {
+      serverToClient.stop();
+    }
+
+    if (clientToServer != null) {
+      clientToServer.stop();
+    }
+    
+    if (name != null) {
+      server.playerList.removePlayer(this);
+      name = null;
+    }
   }
 
   private void cleanup() {
@@ -354,17 +371,7 @@ public class Player {
       closed = true;
       entityId = 0;
 
-      if (serverToClient != null) {
-        serverToClient.stop();
-      }
-
-      if (clientToServer != null) {
-        clientToServer.stop();
-      }
-
-      if (name != null) {
-        server.playerList.removePlayer(this);
-      }
+      close();
 
       try {
         extsocket.close();

@@ -783,7 +783,7 @@ public class StreamTunnel {
             if (run) {
               e.printStackTrace();
               System.out.println(streamType + " error handling traffic for "
-                  + player.getName());
+                  + player.getIPAddress());
             }
             break;
           }
