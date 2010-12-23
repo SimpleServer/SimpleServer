@@ -319,26 +319,21 @@ public class Player {
 
   public void updateGroup() {
     int nameGroup = server.members.getGroup(name);
-    int ipGroup = server.ipMembers.getGroup(this);
-    int defaultGroup = server.options.getInt("defaultGroup");
+    int ipGroup = server.ipMembers.getGroup(getIPAddress());
 
-    if (ipGroup >= nameGroup) {
+    if (ipGroup > nameGroup) {
       group = ipGroup;
     }
     else {
       group = nameGroup;
     }
 
-    if (nameGroup == -1 || ipGroup == -1 && defaultGroup != -1) {
+    if ((nameGroup == -1) || (ipGroup == -1)
+        && (server.options.getInt("defaultGroup") != -1)) {
       group = -1;
     }
 
-    if (server.groups.groupExists(group)) {
-      groupObject = server.groups.getGroup(group);
-    }
-    else {
-      groupObject = null;
-    }
+    groupObject = server.groups.getGroup(group);
   }
 
   public void close() {

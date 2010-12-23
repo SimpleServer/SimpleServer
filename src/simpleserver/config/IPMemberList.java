@@ -25,7 +25,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.regex.Pattern;
 
-import simpleserver.Player;
 import simpleserver.options.Options;
 
 public class IPMemberList extends PropertiesConfig {
@@ -39,10 +38,9 @@ public class IPMemberList extends PropertiesConfig {
     members = new ConcurrentHashMap<String, Integer>();
   }
 
-  public int getGroup(Player player) {
+  public int getGroup(String ipAddress) {
     String network = "";
-    String ip = player.getIPAddress();
-    String[] octets = ip.split("\\.");
+    String[] octets = ipAddress.split("\\.");
 
     for (String octet : octets) {
       network += octet;
