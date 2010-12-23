@@ -65,8 +65,7 @@ public class Group {
   public static ImmutableSet<Integer> parseGroups(String idString,
                                                   String delimiter) {
     String[] segments = idString.split(delimiter);
-    ImmutableSortedSet.Builder<Integer> groups = ImmutableSortedSet
-                                                                   .naturalOrder();
+    ImmutableSortedSet.Builder<Integer> groups = ImmutableSortedSet.naturalOrder();
     for (String segment : segments) {
       if (segment.matches("^\\s*$")) {
         continue;

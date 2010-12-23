@@ -29,15 +29,12 @@ public class LockCommand extends AbstractCommand implements PlayerCommand {
 
   public void execute(Player player, String message) {
     if (!player.getServer().chests.hasLock(player.getName())) {
-      player
-            .addMessage("Create a single box chest, and it will be locked to your username!");
-      player
-            .addMessage("You only get ONE locked chest! Release the lock by saying !unlock");
+      player.addMessage("Create a single box chest, and it will be locked to your username!");
+      player.addMessage("You only get ONE locked chest! Release the lock by saying !unlock");
       player.setAttemptLock(true);
     }
     else {
-      player
-            .addMessage("You already have a lock! Release the lock by saying !unlock");
+      player.addMessage("You already have a lock! Release the lock by saying !unlock");
     }
   }
 }

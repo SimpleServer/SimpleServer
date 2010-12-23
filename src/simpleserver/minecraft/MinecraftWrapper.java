@@ -62,8 +62,7 @@ public class MinecraftWrapper {
     }
     catch (IOException e) {
       e.printStackTrace();
-      System.out
-                .println("[SimpleServer] FATAL ERROR: Could not start minecraft_server.jar!");
+      System.out.println("[SimpleServer] FATAL ERROR: Could not start minecraft_server.jar!");
       System.exit(-1);
     }
 

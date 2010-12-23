@@ -127,8 +127,7 @@ public abstract class AbstractOptions implements Resource {
 
   protected void loadDefaults() {
     defaultOptions = new Properties();
-    InputStream stream = getClass().getResourceAsStream(
-                                                        resourceLocation + "/"
+    InputStream stream = getClass().getResourceAsStream(resourceLocation + "/"
                                                             + filename);
     try {
       try {

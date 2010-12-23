@@ -93,8 +93,7 @@ public abstract class AbstractConfig implements Resource {
   }
 
   private InputStream getHeaderResourceStream() {
-    return getClass().getResourceAsStream(
-                                          resourceLocation + "/" + filename
+    return getClass().getResourceAsStream(resourceLocation + "/" + filename
                                               + "-header");
   }
 

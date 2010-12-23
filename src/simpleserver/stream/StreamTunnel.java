@@ -40,14 +40,12 @@ import simpleserver.Player;
 import simpleserver.Server;
 
 public class StreamTunnel {
-  private static final boolean EXPENSIVE_DEBUG_LOGGING = Boolean
-                                                                .getBoolean("EXPENSIVE_DEBUG_LOGGING");
+  private static final boolean EXPENSIVE_DEBUG_LOGGING = Boolean.getBoolean("EXPENSIVE_DEBUG_LOGGING");
   private static final int IDLE_TIME = 30000;
   private static final int BUFFER_SIZE = 1024;
   private static final int DESTROY_HITS = 14;
   private static final byte BLOCK_DESTROYED_STATUS = 3;
-  private static final Pattern MESSAGE_PATTERN = Pattern
-                                                        .compile("^<([^>]+)> (.*)$");
+  private static final Pattern MESSAGE_PATTERN = Pattern.compile("^<([^>]+)> (.*)$");
 
   private final boolean isServerTunnel;
   private final String streamType;
@@ -186,8 +184,7 @@ public class StreamTunnel {
                     + messageMatcher.group(2);
               }
               catch (IllegalFormatException e) {
-                System.out
-                          .println("[SimpleServer] There is an error in your msgFormat/msgTitleFormat settings!");
+                System.out.println("[SimpleServer] There is an error in your msgFormat/msgTitleFormat settings!");
               }
             }
           }
@@ -196,8 +193,7 @@ public class StreamTunnel {
         if (!isServerTunnel) {
           if (player.isMuted() && !message.startsWith("/")
               && !message.startsWith("!")) {
-            player
-                  .addMessage("You are muted! You may not send messages to all players.");
+            player.addMessage("You are muted! You may not send messages to all players.");
             break;
           }
 
@@ -332,9 +328,10 @@ public class StreamTunnel {
           if (!isServerTunnel && (player.getGroupId() < 0)
               || !server.blockFirewall.playerAllowed(player, dropItem)) {
             if (x != -1) {
-              server.runCommand("say", String.format(server.l.get("BAD_BLOCK"),
-                                                     player.getName(),
-                                                     Short.toString(dropItem)));
+              server.runCommand("say",
+                                String.format(server.l.get("BAD_BLOCK"),
+                                              player.getName(),
+                                              Short.toString(dropItem)));
             }
           }
           else if (!isServerTunnel && (dropItem == 54)
@@ -373,12 +370,10 @@ public class StreamTunnel {
               player.addMessage("This block is locked already!");
             }
             else if (server.chests.giveLock(player.getName(), x, y, z, false)) {
-              player
-                    .addMessage("Your locked chest is created! Do not add another chest to it!");
+              player.addMessage("Your locked chest is created! Do not add another chest to it!");
             }
             else {
-              player
-                    .addMessage("You already have a lock, or this block is locked already!");
+              player.addMessage("You already have a lock, or this block is locked already!");
             }
             player.setAttemptLock(false);
           }
