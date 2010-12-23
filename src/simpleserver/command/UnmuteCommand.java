@@ -25,7 +25,7 @@ import simpleserver.Server;
 
 public class UnmuteCommand extends PlayerArgCommand {
   public UnmuteCommand() {
-    super("unmute");
+    super("unmute PLAYER", "Allow the named player to use normal chat again");
   }
 
   @Override

@@ -26,7 +26,7 @@ import simpleserver.Server;
 public class InvalidCommand extends AbstractCommand implements PlayerCommand,
     ServerCommand {
   public InvalidCommand() {
-    super(null);
+    super(null, "\u00a7cNo such command!");
   }
 
   @Override

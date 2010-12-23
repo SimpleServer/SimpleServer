@@ -24,7 +24,7 @@ import simpleserver.Player;
 
 public class KickCommand extends OnlinePlayerArgCommand {
   public KickCommand() {
-    super("kick");
+    super("kick PLAYER [REASON]", "Kick the named player from the server");
   }
 
   @Override

@@ -24,11 +24,11 @@ import simpleserver.Player;
 
 public class MOTDCommand extends AbstractCommand implements PlayerCommand {
   public MOTDCommand() {
-    super("motd");
+    super("motd", "Display the message of the day");
   }
 
   public void execute(Player player, String message) {
-    if (player.getServer().getMOTD().length() > 0) {
+    if (player.getServer().getMOTD().trim().length() > 0) {
       player.sendMOTD();
     }
     else {

@@ -78,7 +78,7 @@ public class KitList extends PropertiesConfig {
 
   public void listKits(Player player) {
     StringBuilder kitList = new StringBuilder();
-    kitList.append("Allowed kits: ");
+    kitList.append("\u00a77Allowed kits: \u00a7f");
     for (String name : kits.keySet()) {
       Kit kit = kits.get(name);
       if (Group.isMember(kit.groups, player)) {

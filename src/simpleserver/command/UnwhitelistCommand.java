@@ -24,7 +24,7 @@ import simpleserver.Player;
 
 public class UnwhitelistCommand extends PlayerArgCommand {
   public UnwhitelistCommand() {
-    super("unwhitelist");
+    super("unwhitelist PLAYER", "Remove player from server access list");
   }
 
   @Override
@@ -33,6 +33,6 @@ public class UnwhitelistCommand extends PlayerArgCommand {
 
     player.getServer().adminLog("User " + player.getName()
                                     + " unwhitelisted player:\t " + name);
-    player.addMessage("Player " + name + " was un-whitelisted!");
+    player.addMessage("\u00a77Player " + name + " was un-whitelisted!");
   }
 }

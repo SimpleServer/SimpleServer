@@ -24,7 +24,7 @@ import simpleserver.Player;
 
 public class WarpToCommand extends OnlinePlayerArgCommand {
   public WarpToCommand() {
-    super("warpmeto");
+    super("warpmeto PLAYER", "Teleport to the named player");
   }
 
   @Override

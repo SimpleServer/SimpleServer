@@ -26,11 +26,11 @@ import simpleserver.Server;
 public class IPListCommand extends AbstractCommand implements PlayerCommand,
     ServerCommand {
   public IPListCommand() {
-    super("listips");
+    super("listips", "Display the name and IP of each connected player");
   }
 
   public void execute(Player player, String message) {
-    player.addMessage("IP Addresses:");
+    player.addMessage("\u00a77IP Addresses:");
     for (Player friend : player.getServer().playerList.getArray()) {
       player.addMessage(friend.getName() + " " + friend.getIPAddress());
     }

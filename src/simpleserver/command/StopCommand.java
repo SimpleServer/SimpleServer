@@ -24,7 +24,7 @@ import simpleserver.Server;
 
 public class StopCommand extends AbstractCommand implements ServerCommand {
   public StopCommand() {
-    super("stop");
+    super("stop", "Shutdown the entire server");
   }
 
   @Override

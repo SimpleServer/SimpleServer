@@ -21,9 +21,22 @@
 package simpleserver.command;
 
 public abstract class AbstractCommand implements Command {
-  private String name;
+  private final String name;
+  private final String helpText;
 
-  protected AbstractCommand(String name) {
+  protected AbstractCommand(String name, String helpText) {
+    if (name != null) {
+      this.helpText = name + "\u00a7f : " + helpText;
+
+      int splitIndex = name.indexOf(" ");
+      if (splitIndex != -1) {
+        name = name.substring(0, splitIndex);
+      }
+    }
+    else {
+      this.helpText = helpText;
+    }
+
     this.name = name;
   }
 
@@ -33,6 +46,15 @@ public abstract class AbstractCommand implements Command {
 
   public String[] getAliases() {
     return new String[] {};
+  }
+
+  public String getHelpText(String prefix) {
+    if (name != null) {
+      return "\u00a72" + prefix + helpText;
+    }
+    else {
+      return helpText;
+    }
   }
 
   /**

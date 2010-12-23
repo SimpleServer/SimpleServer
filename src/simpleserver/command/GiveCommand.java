@@ -26,11 +26,11 @@ public class GiveCommand extends AbstractCommand implements PlayerCommand {
   private int offset;
 
   public GiveCommand() {
-    this("give", 0);
+    this("give ITEM [AMOUNT]", "Spawn items for yourself", 0);
   }
 
-  protected GiveCommand(String name, int offset) {
-    super(name);
+  protected GiveCommand(String name, String helpText, int offset) {
+    super(name, helpText);
 
     this.offset = offset;
   }

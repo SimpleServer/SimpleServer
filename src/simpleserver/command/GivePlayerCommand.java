@@ -24,7 +24,8 @@ import simpleserver.Player;
 
 public class GivePlayerCommand extends GiveCommand {
   public GivePlayerCommand() {
-    super("giveplayer", 1);
+    super("giveplayer PLAYER ITEM [AMOUNT]", "Spawn items for another player",
+          1);
   }
 
   @Override

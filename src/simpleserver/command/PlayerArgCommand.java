@@ -24,8 +24,9 @@ import simpleserver.Player;
 
 public abstract class PlayerArgCommand extends AbstractCommand implements
     PlayerCommand {
-  protected PlayerArgCommand(String name) {
-    super(name);
+  protected PlayerArgCommand(String name, String helpText) {
+    super(name, helpText
+        + " (case-insensitive, name prefix works for online players)");
   }
 
   public void execute(Player player, String message) {

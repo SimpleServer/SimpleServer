@@ -24,7 +24,8 @@ import simpleserver.Player;
 
 public class UnlockCommand extends AbstractCommand implements PlayerCommand {
   public UnlockCommand() {
-    super("unlock");
+    super("unlock",
+          "Unlock your locked chest (if you have one) for others to access");
   }
 
   @Override
@@ -34,6 +35,6 @@ public class UnlockCommand extends AbstractCommand implements PlayerCommand {
 
   public void execute(Player player, String message) {
     player.getServer().chests.releaseLock(player.getName().toLowerCase());
-    player.addMessage("Your lock has been released!");
+    player.addMessage("\u00a77Your lock has been released!");
   }
 }

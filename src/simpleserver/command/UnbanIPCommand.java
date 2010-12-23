@@ -24,7 +24,7 @@ import simpleserver.Player;
 
 public class UnbanIPCommand extends AbstractCommand implements PlayerCommand {
   public UnbanIPCommand() {
-    super("unbanip");
+    super("unbanip IPADDRESS", "Remove the IP address from the ban list");
   }
 
   public void execute(Player player, String message) {
@@ -35,7 +35,8 @@ public class UnbanIPCommand extends AbstractCommand implements PlayerCommand {
 
       player.getServer().adminLog("User " + player.getName()
                                       + " unbanned ip:\t " + arguments[0]);
-      player.addMessage("IP Address " + arguments[0] + " has been unbanned!");
+      player.addMessage("\u00a77IP Address " + arguments[0]
+          + " has been unbanned!");
     }
     else {
       player.addMessage("\u00a7cNo IP specified.");

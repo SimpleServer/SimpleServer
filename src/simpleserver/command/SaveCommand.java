@@ -26,7 +26,7 @@ import simpleserver.Server;
 public class SaveCommand extends AbstractCommand implements PlayerCommand,
     ServerCommand {
   public SaveCommand() {
-    super("save");
+    super("save", "Store configuration to disk and force a map save");
   }
 
   @Override
@@ -37,7 +37,7 @@ public class SaveCommand extends AbstractCommand implements PlayerCommand,
   public void execute(Player player, String message) {
     player.getServer().saveResources();
     player.getServer().runCommand("save-all", null);
-    player.addMessage("Resources Saved!");
+    player.addMessage("\u00a77Resources Saved!");
   }
 
   public void execute(Server server, String message) {

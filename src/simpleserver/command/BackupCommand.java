@@ -26,11 +26,11 @@ import simpleserver.Server;
 public class BackupCommand extends AbstractCommand implements PlayerCommand,
     ServerCommand {
   public BackupCommand() {
-    super("backup");
+    super("backup", "Backup the map");
   }
 
   public void execute(Player player, String message) {
-    player.addMessage("Forcing backup!");
+    player.addMessage("\u00a77Forcing backup!");
     player.getServer().forceBackup();
   }
 

@@ -25,7 +25,7 @@ import simpleserver.Server;
 
 public class BanIPCommand extends AbstractCommand implements PlayerCommand {
   public BanIPCommand() {
-    super("banip");
+    super("banip IPADDRESS", "Kick and ban players with this IP");
   }
 
   public void execute(Player player, String message) {
@@ -36,7 +36,8 @@ public class BanIPCommand extends AbstractCommand implements PlayerCommand {
       Player p = player.getServer().findPlayer(arguments[0]);
       if (p == null) {
         server.ipBans.addBan(arguments[0]);
-        player.addMessage("IP Address " + arguments[0] + " has been banned!");
+        player.addMessage("\u00a77IP Address " + arguments[0]
+            + " has been banned!");
         server.adminLog("User " + player.getName() + " banned ip:\t "
             + arguments[0]);
       }
