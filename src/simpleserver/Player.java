@@ -21,6 +21,7 @@
 package simpleserver;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.Socket;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -73,7 +74,8 @@ public class Player {
     server.requestTracker.addRequest(getIPAddress());
 
     try {
-      intsocket = new Socket("localhost", server.options.getInt("internalPort"));
+      intsocket = new Socket(InetAddress.getByName(null),
+                             server.options.getInt("internalPort"));
     }
     catch (Exception e) {
       e.printStackTrace();
