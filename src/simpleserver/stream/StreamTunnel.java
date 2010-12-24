@@ -776,7 +776,7 @@ public class StreamTunnel {
             flushAll();
           }
           catch (IOException e) {
-            if (run) {
+            if (run && !player.isRobot()) {
               e.printStackTrace();
               System.out.println(streamType + " error handling traffic for "
                   + player.getIPAddress());
