@@ -3,6 +3,7 @@ ban=3,4
 banip=3,4
 give=2-4
 giveplayer=3,4
+gps=2-4
 help=-1
 home=-1
 iddqd=3,4

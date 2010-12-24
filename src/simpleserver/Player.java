@@ -248,6 +248,18 @@ public class Player {
     return extsocket.getInetAddress().getHostAddress();
   }
 
+  public double getX() {
+    return x;
+  }
+
+  public double getY() {
+    return y;
+  }
+
+  public double getZ() {
+    return z;
+  }
+
   public boolean parseCommand(String message) {
     if (closed) {
       return true;

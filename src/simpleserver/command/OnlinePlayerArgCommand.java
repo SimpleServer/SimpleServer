@@ -24,8 +24,17 @@ import simpleserver.Player;
 
 public abstract class OnlinePlayerArgCommand extends AbstractCommand implements
     PlayerCommand {
+  private final boolean playerOptional;
+
   protected OnlinePlayerArgCommand(String name, String helpText) {
+    this(name, helpText, false);
+  }
+
+  protected OnlinePlayerArgCommand(String name, String helpText,
+                                   boolean playerOptional) {
     super(name, helpText + " (case-insensitive, name prefix works)");
+
+    this.playerOptional = playerOptional;
   }
 
   public void execute(Player player, String message) {
@@ -41,7 +50,12 @@ public abstract class OnlinePlayerArgCommand extends AbstractCommand implements
       }
     }
     else {
-      noTargetSpecified(player, message);
+      if (playerOptional) {
+        executeWithTarget(player, message, null);
+      }
+      else {
+        noTargetSpecified(player, message);
+      }
     }
   }
 

@@ -7,6 +7,7 @@
 * Fixed !local
 * Added !tell to talk directly with another player
 * Added !time to get the real-world time on the server
+* Added !gps command to get player coordinates
 * Other bugfixes
 
 == RC 6.9.9 ==
