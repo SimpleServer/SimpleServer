@@ -4,6 +4,9 @@
 * Added command help information (eg. !help help)
 * Merged kit and kits commands
 * Changed tp to teleport (both will work but command-list will need an update)
+* Fixed !local
+* Added !tell to talk directly with another player
+* Added !time to get the real-world time on the server
 * Other bugfixes
 
 == RC 6.9.9 ==
