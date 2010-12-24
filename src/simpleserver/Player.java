@@ -143,8 +143,8 @@ public class Player {
   }
 
   public double distanceTo(Player player) {
-    return Math.sqrt(Math.pow(x - player.x, 2) + Math.pow(x - player.y, 2)
-        + Math.pow(x - player.z, 2));
+    return Math.sqrt(Math.pow(x - player.x, 2) + Math.pow(y - player.y, 2)
+        + Math.pow(z - player.z, 2));
   }
 
   public void updateLocation(double x, double y, double z, double stance) {
@@ -359,7 +359,7 @@ public class Player {
     if (clientToServer != null) {
       clientToServer.stop();
     }
-    
+
     if (name != null) {
       server.playerList.removePlayer(this);
       name = null;

@@ -20,25 +20,18 @@
  */
 package simpleserver.command;
 
+import java.util.Date;
+
 import simpleserver.Player;
-import simpleserver.Server;
 
-public class InvalidCommand extends AbstractCommand implements PlayerCommand,
-    ServerCommand {
-  public InvalidCommand() {
-    super(null, "\u00a7cNo such command!");
-  }
+public class TimeCommand extends AbstractCommand implements PlayerCommand {
 
-  @Override
-  public boolean isHidden() {
-    return true;
+  public TimeCommand() {
+    super("time", "Display the real-world time of the server");
   }
 
   public void execute(Player player, String message) {
-    player.addMessage("\u00a7cNo such command " + message);
-  }
-
-  public void execute(Server server, String message) {
-    System.out.println("No such command " + message);
+    player.addMessage(String.format("\u00a77Server time:\u00a7f %tc",
+                                    new Date()));
   }
 }

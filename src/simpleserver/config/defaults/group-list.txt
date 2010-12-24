@@ -1,6 +1,6 @@
 -1=Guest,true,false,f
 0=Player,false,false,f
-1=Trusted,false,false,1
-2=Mod,true,true,1
+1=Trusted,false,false,9
+2=Mod,true,true,9
 3=Admin,true,true,2
 4=Owner,true,true,3

@@ -24,7 +24,7 @@ import simpleserver.Player;
 
 public class UnbanCommand extends PlayerArgCommand {
   public UnbanCommand() {
-    super("unban");
+    super("unban PLAYER", "Remove the named player from the ban list");
   }
 
   @Override
@@ -33,6 +33,6 @@ public class UnbanCommand extends PlayerArgCommand {
 
     player.getServer().adminLog("User " + player.getName()
                                     + " unbanned player:\t " + name);
-    player.addMessage("Unbanning " + name + "!");
+    player.addMessage("\u00a77Unbanned " + name + "!");
   }
 }

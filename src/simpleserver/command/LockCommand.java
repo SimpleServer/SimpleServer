@@ -24,17 +24,18 @@ import simpleserver.Player;
 
 public class LockCommand extends AbstractCommand implements PlayerCommand {
   public LockCommand() {
-    super("lock");
+    super("lock", "Prepare to create your locked chest");
   }
 
   public void execute(Player player, String message) {
     if (!player.getServer().chests.hasLock(player.getName())) {
-      player.addMessage("Create a single box chest, and it will be locked to your username!");
-      player.addMessage("You only get ONE locked chest! Release the lock by saying !unlock");
+      player.addMessage("\u00a77Create a chest, and it will be locked to you.");
+      player.addMessage("\u00a77You only get ONE SINGLE-WIDE locked chest!");
+      player.addMessage("\u00a77Release the lock by saying !unlock");
       player.setAttemptLock(true);
     }
     else {
-      player.addMessage("You already have a lock! Release the lock by saying !unlock");
+      player.addMessage("\u00a7cYou already have a lock! Say !unlock to release.");
     }
   }
 }

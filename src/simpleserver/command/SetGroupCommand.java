@@ -25,7 +25,7 @@ import simpleserver.Server;
 
 public class SetGroupCommand extends PlayerArgCommand {
   public SetGroupCommand() {
-    super("setgroup");
+    super("setgroup PLAYER GROUP", "Set the group ID of the named player");
   }
 
   @Override
@@ -52,8 +52,8 @@ public class SetGroupCommand extends PlayerArgCommand {
       }
       else {
         server.members.setGroup(target, group);
-        player.addMessage("Player " + target + "'s group was set to " + group
-            + "!");
+        player.addMessage("\u00a77Player " + target + "'s group was set to "
+            + group + "!");
         server.adminLog("User " + player.getName() + " set player's group:\t "
             + target + "\t(" + group + ")");
       }

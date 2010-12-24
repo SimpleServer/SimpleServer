@@ -26,7 +26,7 @@ import simpleserver.Server;
 public class PlayerListCommand extends AbstractCommand implements
     PlayerCommand, ServerCommand {
   public PlayerListCommand() {
-    super("who");
+    super("who", "Display online players names");
   }
 
   @Override
@@ -43,7 +43,8 @@ public class PlayerListCommand extends AbstractCommand implements
   }
 
   private String getList(Server server) {
-    String list = "Connected Players (" + server.numPlayers() + "): ";
+    String list = "\u00a77Connected Players (" + server.numPlayers()
+        + "):\u00a7f ";
     for (Player friend : server.playerList.getArray()) {
       list += friend.getName() + ", ";
     }

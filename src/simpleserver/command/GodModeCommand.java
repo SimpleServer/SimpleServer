@@ -24,16 +24,16 @@ import simpleserver.Player;
 
 public class GodModeCommand extends AbstractCommand implements PlayerCommand {
   public GodModeCommand() {
-    super("iddqd");
+    super("iddqd", "Make yourself invulnerable to other players attacks");
   }
 
   public void execute(Player player, String message) {
     player.toggleGodMode();
     if (player.godModeEnabled()) {
-      player.addMessage("God-Mode Enabled!");
+      player.addMessage("\u00a77God-Mode Enabled!");
     }
     else {
-      player.addMessage("God-Mode Disabled!");
+      player.addMessage("\u00a77God-Mode Disabled!");
     }
   }
 }

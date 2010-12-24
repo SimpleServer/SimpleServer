@@ -25,13 +25,16 @@ import simpleserver.Server;
 
 public class BanCommand extends PlayerArgCommand {
   public BanCommand() {
-    super("ban");
+    super("ban PLAYER [REASON]", "Kick and ban the named player");
   }
 
   @Override
   protected void executeWithTarget(Player player, String message, String target) {
-    String reason = extractArgument(message, 1);
     Server server = player.getServer();
+    String reason = extractArgument(message, 1);
+    if (reason == null) {
+      reason = "Banned by admin.";
+    }
 
     server.runCommand("ban", target);
     server.kick(target, reason);

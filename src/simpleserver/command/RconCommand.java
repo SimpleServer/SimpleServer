@@ -24,7 +24,8 @@ import simpleserver.Player;
 
 public class RconCommand extends AbstractCommand implements PlayerCommand {
   public RconCommand() {
-    super("rcon");
+    super("rcon COMMAND ARGUMENTS...",
+          "Execute a command on the server console");
   }
 
   public void execute(Player player, String message) {

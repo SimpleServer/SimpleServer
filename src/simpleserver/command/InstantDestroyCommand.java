@@ -25,16 +25,16 @@ import simpleserver.Player;
 public class InstantDestroyCommand extends AbstractCommand implements
     PlayerCommand {
   public InstantDestroyCommand() {
-    super("idbehold");
+    super("idbehold", "Make tools work instantly for yourself");
   }
 
   public void execute(Player player, String message) {
     player.toggleInstantDestroy();
     if (player.instantDestroyEnabled()) {
-      player.addMessage("Destroy Enabled!");
+      player.addMessage("\u00a77Instant destroy Enabled!");
     }
     else {
-      player.addMessage("Destroy Disabled!");
+      player.addMessage("\u00a77Instant destroy Disabled!");
     }
   }
 }

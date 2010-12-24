@@ -22,12 +22,34 @@ package simpleserver.command;
 
 import simpleserver.Player;
 
-public class KitListCommand extends AbstractCommand implements PlayerCommand {
-  public KitListCommand() {
-    super("kits");
+public class TellCommand extends OnlinePlayerArgCommand implements
+    PlayerCommand {
+
+  public TellCommand() {
+    super("tell PLAYER MESSAGE...", "Send a message to the named player");
   }
 
-  public void execute(Player player, String message) {
-    player.getServer().kits.listKits(player);
+  @Override
+  public String[] getAliases() {
+    return new String[] { "t" };
+  }
+
+  @Override
+  protected void executeWithTarget(Player player, String message, Player target) {
+    String chat = extractArgument(message, 1);
+    if (chat != null) {
+      String formattedChat = "\u00a77" + player.getName() + " -> "
+          + target.getName() + ":\u00a7f " + chat;
+      player.addMessage(formattedChat);
+      target.addMessage(formattedChat);
+    }
+    else {
+      player.addMessage("\u00a7cPlease supply a message.");
+    }
+  }
+
+  @Override
+  protected void noTargetSpecified(Player player, String message) {
+    player.addMessage("\u00a7cNo player or message specified.");
   }
 }

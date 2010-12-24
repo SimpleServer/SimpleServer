@@ -24,16 +24,22 @@ import simpleserver.Player;
 
 public class KitCommand extends AbstractCommand implements PlayerCommand {
   public KitCommand() {
-    super("kit");
+    super("kit [KIT]", "Display all kits or give yourself the named kit");
+  }
+
+  @Override
+  public String[] getAliases() {
+    return new String[] { "kits" };
   }
 
   public void execute(Player player, String message) {
     String[] arguments = extractArguments(message);
-    if (arguments.length >= 1) {
+
+    if (arguments.length > 0) {
       player.getServer().kits.giveKit(player, arguments[0]);
     }
     else {
-      player.addMessage("\u00a7cNo kit specified.");
+      player.getServer().kits.listKits(player);
     }
   }
 }

@@ -26,7 +26,7 @@ import simpleserver.Server;
 public class ReloadCommand extends AbstractCommand implements PlayerCommand,
     ServerCommand {
   public ReloadCommand() {
-    super("reload");
+    super("reload", "Reread the configuration files from disk");
   }
 
   @Override
@@ -36,7 +36,7 @@ public class ReloadCommand extends AbstractCommand implements PlayerCommand,
 
   public void execute(Player player, String message) {
     player.getServer().loadResources();
-    player.addMessage("Resources Reloaded!");
+    player.addMessage("\u00a77Resources Reloaded!");
   }
 
   public void execute(Server server, String message) {

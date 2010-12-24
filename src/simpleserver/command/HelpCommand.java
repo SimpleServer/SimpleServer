@@ -25,7 +25,7 @@ import simpleserver.Player;
 
 public class HelpCommand extends AbstractCommand implements PlayerCommand {
   public HelpCommand() {
-    super("help");
+    super("help [COMMAND]", "List commands or get help for one command");
   }
 
   @Override
@@ -39,22 +39,46 @@ public class HelpCommand extends AbstractCommand implements PlayerCommand {
   }
 
   public void execute(Player player, String message) {
-    StringBuffer line = new StringBuffer();
-    line.append("Available Commands: ");
+    String[] arguments = extractArguments(message);
 
     CommandList commandList = player.getServer().getCommandList();
-    String prefix = commandList.commandPrefix();
+    if (arguments.length > 0) {
+      String prefix = commandList.commandPrefix();
+      String commandName = arguments[0];
+      if (!commandName.startsWith(prefix)) {
+        commandName = prefix + commandName;
+      }
+      PlayerCommand command = commandList.getPlayerCommand(commandName);
+      player.addMessage(command.getHelpText(prefix));
 
-    for (PlayerCommand command : commandList.getPlayerCommands()) {
-      if (command.isHidden() || !player.commandAllowed(command.getName())) {
-        continue;
+      String[] aliases = command.getAliases();
+      if (aliases.length > 0) {
+        StringBuffer line = new StringBuffer();
+        line.append("\u00a77Aliases:\u00a7f ");
+        for (String alias : aliases) {
+          line.append(commandList.commandPrefix());
+          line.append(alias);
+          line.append(" ");
+        }
+        player.addMessage(line.toString());
+      }
+    }
+    else {
+      StringBuffer line = new StringBuffer();
+      line.append("\u00a77Available Commands:\u00a7f ");
+
+      String prefix = commandList.commandPrefix();
+      for (PlayerCommand command : commandList.getPlayerCommands()) {
+        if (command.isHidden() || !player.commandAllowed(command.getName())) {
+          continue;
+        }
+
+        line.append(prefix);
+        line.append(command.getName());
+        line.append(" ");
       }
 
-      line.append(prefix);
-      line.append(command.getName());
-      line.append(" ");
+      player.addMessage(line.toString());
     }
-
-    player.addMessage(line.toString());
   }
 }

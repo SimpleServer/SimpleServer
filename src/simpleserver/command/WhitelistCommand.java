@@ -24,7 +24,7 @@ import simpleserver.Player;
 
 public class WhitelistCommand extends PlayerArgCommand {
   public WhitelistCommand() {
-    super("whitelist");
+    super("whitelist PLAYER", "Add player to server access list");
   }
 
   @Override
@@ -33,6 +33,6 @@ public class WhitelistCommand extends PlayerArgCommand {
 
     player.getServer().adminLog("User " + player.getName()
                                     + " whitelisted player:\t " + name);
-    player.addMessage("Player " + name + " was whitelisted!");
+    player.addMessage("\u00a77Player " + name + " was whitelisted!");
   }
 }

@@ -25,7 +25,12 @@ import simpleserver.Server;
 
 public class TeleportCommand extends OnlinePlayerArgCommand {
   public TeleportCommand() {
-    super("tp");
+    super("teleport PLAYER1 PLAYER2", "Teleport the first player to the second");
+  }
+
+  @Override
+  public String[] getAliases() {
+    return new String[] { "tp" };
   }
 
   @Override
@@ -41,7 +46,7 @@ public class TeleportCommand extends OnlinePlayerArgCommand {
       else {
         target1.teleportTo(target2);
 
-        player.addMessage("Teleported " + target1.getName() + " to "
+        player.addMessage("\u00a77Teleported " + target1.getName() + " to "
             + target2.getName() + "!");
         server.adminLog("User " + player.getName() + " teleported:\t "
             + target1.getName() + "\tto\t" + target2.getName());

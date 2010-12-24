@@ -24,14 +24,19 @@ import simpleserver.Player;
 
 public class RulesCommand extends AbstractCommand implements PlayerCommand {
   public RulesCommand() {
-    super("rules");
+    super("rules", "Display the server rules");
   }
 
   public void execute(Player player, String message) {
     String rules = player.getServer().getRules();
-    String[] lines = rules.split("\\r?\\n");
-    for (int i = 0; i < lines.length; i++) {
-      player.addMessage(lines[i]);
+    if (rules.trim().length() > 0) {
+      String[] lines = rules.split("\\r?\\n");
+      for (int i = 0; i < lines.length; i++) {
+        player.addMessage(lines[i]);
+      }
+    }
+    else {
+      player.addMessage("\u00a7cRules is empty. Edit simpleserver/rules.txt");
     }
   }
 }

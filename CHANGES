@@ -1,7 +1,19 @@
+* Changed iddqd to idbehold and added new iddqd that provides pvp protection
+* Fixed chest locking bugs
+* Removed item watchlist (inventory is server-side now)
+* Added command help information (eg. !help help)
+* Merged kit and kits commands
+* Changed tp to teleport (both will work but command-list will need an update)
+* Fixed !local
+* Added !tell to talk directly with another player
+* Added !time to get the real-world time on the server
+* Other bugfixes
+
 == RC 6.9.9 ==
 * Huge internal refactoring. There is a lot of debug output right now.
 * Updated packets for Beta.
 * Added alias list for the !give and !giveplayer commands (thanks teraquendya!)
+* Added connection log
 
 == RC 6.6.6 ==
 * Initial Open Source release!

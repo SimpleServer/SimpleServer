@@ -24,7 +24,7 @@ import simpleserver.Player;
 
 public class LocalSayCommand extends AbstractCommand implements PlayerCommand {
   public LocalSayCommand() {
-    super("local");
+    super("local MESSAGE", "Send a chat message to nearby players");
   }
 
   @Override
@@ -34,9 +34,14 @@ public class LocalSayCommand extends AbstractCommand implements PlayerCommand {
 
   public void execute(Player player, String message) {
     String chat = extractArgument(message);
-    int numPlayers = player.getServer().localChat(player, chat);
-    if (numPlayers <= 0) {
-      player.addMessage("\u00a7cNobody is around to hear you.");
+    if (chat != null) {
+      int numPlayers = player.getServer().localChat(player, chat);
+      if (numPlayers <= 0) {
+        player.addMessage("\u00a7cNobody is around to hear you.");
+      }
+    }
+    else {
+      player.addMessage("\u00a7cPlease supply a message.");
     }
   }
 }

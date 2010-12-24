@@ -315,88 +315,86 @@ public class StreamTunnel {
         }
         break;
       case 0x0f: // Player Block Placement
-        int x = in.readInt();
-        byte y = in.readByte();
-        int z = in.readInt();
-        byte direction = in.readByte();
-        short dropItem = in.readShort();
+        final int x = in.readInt();
+        final byte y = in.readByte();
+        final int z = in.readInt();
+        final byte direction = in.readByte();
+        final short dropItem = in.readShort();
 
+        byte itemCount = 0;
+        byte uses = 0;
         if (dropItem != -1) {
-          byte b = in.readByte();
-          byte c = in.readByte();
+          itemCount = in.readByte();
+          uses = in.readByte();
+        }
 
-          if (!isServerTunnel && (player.getGroupId() < 0)
-              || !server.blockFirewall.playerAllowed(player, dropItem)) {
-            if (x != -1) {
-              server.runCommand("say",
-                                String.format(server.l.get("BAD_BLOCK"),
-                                              player.getName(),
-                                              Short.toString(dropItem)));
-            }
+        boolean writePacket = true;
+        if (isServerTunnel) {
+          // continue
+        }
+        else if (server.chests.hasLock(x, y, z) && !player.isAdmin()
+            && !server.chests.ownsLock(player.getName(), x, y, z)) {
+          player.addMessage("\u00a7cThis chest is locked!");
+          writePacket = false;
+        }
+        else if ((player.getGroupId() < 0)
+            || !server.blockFirewall.playerAllowed(player, dropItem)) {
+          String badBlock = String.format(server.l.get("BAD_BLOCK"),
+                                          player.getName(),
+                                          Short.toString(dropItem));
+          server.runCommand("say", badBlock);
+          writePacket = false;
+        }
+        else if ((dropItem == 54) && player.isAttemptLock()) {
+          int xPosition = x;
+          byte yPosition = y;
+          int zPosition = z;
+          switch (direction) {
+            case 0:
+              --yPosition;
+              break;
+            case 1:
+              ++yPosition;
+              break;
+            case 2:
+              --zPosition;
+              break;
+            case 3:
+              ++zPosition;
+              break;
+            case 4:
+              --xPosition;
+              break;
+            case 5:
+              ++xPosition;
+              break;
           }
-          else if (!isServerTunnel && (dropItem == 54)
-              && player.isAttemptLock()) {
 
-            write(packetId);
-
-            write(x);
-            write(y);
-            write(z);
-            write(direction);
-            write(dropItem);
-
-            switch (direction) {
-              case 0:
-                y--;
-                break;
-              case 1:
-                y++;
-                break;
-              case 2:
-                z--;
-                break;
-              case 3:
-                z++;
-                break;
-              case 4:
-                x--;
-                break;
-              case 5:
-                x++;
-                break;
-            }
-            // create chest entry
-            if (server.chests.hasLock(x, y, z)) {
-              player.addMessage("This block is locked already!");
-            }
-            else if (server.chests.giveLock(player.getName(), x, y, z, false)) {
-              player.addMessage("Your locked chest is created! Do not add another chest to it!");
-            }
-            else {
-              player.addMessage("You already have a lock, or this block is locked already!");
-            }
-            player.setAttemptLock(false);
+          if (server.chests.hasLock(xPosition, yPosition, zPosition)) {
+            player.addMessage("This block is locked already!");
+          }
+          else if (server.chests.giveLock(player.getName(), xPosition,
+                                          yPosition, zPosition, false)) {
+            player.addMessage("Your locked chest is created! Do not add another chest to it!");
           }
           else {
-            write(packetId);
-
-            write(x);
-            write(y);
-            write(z);
-            write(direction);
-            write(dropItem);
-            write(b);
-            write(c);
+            player.addMessage("You already have a lock, or this block is locked already!");
           }
+          player.setAttemptLock(false);
         }
-        else {
-          write(packetId);
 
+        if (writePacket) {
+          write(packetId);
           write(x);
           write(y);
           write(z);
           write(direction);
           write(dropItem);
+
+          if (dropItem != -1) {
+            write(itemCount);
+            write(uses);
+          }
         }
         break;
       case 0x10: // Holding Change
@@ -534,7 +532,6 @@ public class StreamTunnel {
         write(in.readByte());
         break;
       case 0x66: // Inventory Item Move
-
         byte typeFrom = in.readByte();
         short slotFrom = in.readShort();
         byte typeTo = in.readByte();
@@ -584,7 +581,6 @@ public class StreamTunnel {
         }
         break;
       case 0x68: // Inventory
-
         byte type = in.readByte();
         if (type < 0 || player.getGroupId() >= 0) {
           write(packetId);
