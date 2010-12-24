@@ -29,6 +29,7 @@ public class TellCommand extends OnlinePlayerArgCommand implements
     super("tell PLAYER MESSAGE...", "Send a message to the named player");
   }
 
+  @Override
   public String[] getAliases() {
     return new String[] { "t" };
   }

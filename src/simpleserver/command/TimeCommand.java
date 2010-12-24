@@ -29,8 +29,9 @@ public class TimeCommand extends AbstractCommand implements PlayerCommand {
   public TimeCommand() {
     super("time", "Display the real-world time of the server");
   }
-  
+
   public void execute(Player player, String message) {
-    player.addMessage(String.format("\u00a77Server time:\u00a7f %tc", new Date()));
+    player.addMessage(String.format("\u00a77Server time:\u00a7f %tc",
+                                    new Date()));
   }
 }
