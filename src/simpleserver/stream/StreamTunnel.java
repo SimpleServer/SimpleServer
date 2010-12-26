@@ -193,7 +193,7 @@ public class StreamTunnel {
         if (!isServerTunnel) {
           if (player.isMuted() && !message.startsWith("/")
               && !message.startsWith("!")) {
-            player.addMessage("You are muted! You may not send messages to all players.");
+            player.addMessage("\u00a7cYou are muted! You may not send messages to all players.");
             break;
           }
 
@@ -371,19 +371,19 @@ public class StreamTunnel {
           }
 
           if (server.chests.hasAdjacentLock(xPosition, yPosition, zPosition)) {
-            player.addMessage("The adjacent chest is locked!");
+            player.addMessage("\u00a7cThe adjacent chest is locked!");
             writePacket = false;
           }
           else if (player.isAttemptLock()) {
             if (server.chests.hasLock(xPosition, yPosition, zPosition)) {
-              player.addMessage("This block is locked already!");
+              player.addMessage("\u00a7cThis block is locked already!");
             }
             else if (server.chests.giveLock(player.getName(), xPosition,
                                             yPosition, zPosition, false)) {
-              player.addMessage("Your locked chest is created! Do not add another chest to it!");
+              player.addMessage("\u00a77Your locked chest is created! Do not add another chest to it!");
             }
             else {
-              player.addMessage("You already have a lock, or this block is locked already!");
+              player.addMessage("\u00a7cYou already have a lock, or this block is locked already!");
             }
             player.setAttemptLock(false);
           }
@@ -495,30 +495,6 @@ public class StreamTunnel {
         write(packetId);
         copyNBytes(11);
         break;
-      /*
-      case 0x3b: // Complex Entities
-        int x = in.readInt();
-        short y = in.readShort();
-        int z = in.readInt();
-        short payloadSize = in.readShort();
-        if (server.chests.hasLock(x, (byte) y, z) && !player.isAdmin()
-            && !server.chests.ownsLock(player.getName(), x, (byte) y, z)) {
-          skipNBytes(payloadSize);
-        }
-        else if (player.getGroupId() < 0
-            && !server.options.getBoolean("guestsCanViewComplex")) {
-          skipNBytes(payloadSize);
-        }
-        else {
-          write(packetId);
-          write(x);
-          write(y);
-          write(z);
-          write(payloadSize);
-          copyNBytes(payloadSize);
-        }
-        break;
-      */
       case 0x3c: // Explosion
         write(packetId);
         copyNBytes(28);
