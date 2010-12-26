@@ -58,6 +58,13 @@ public class ChestList extends AsciiConfig {
     return locations.containsKey(new Coordinate(x, y, z));
   }
 
+  public boolean hasAdjacentLock(int x, byte y, int z) {
+    return locations.containsKey(new Coordinate(x + 1, y, z))
+        || locations.containsKey(new Coordinate(x - 1, y, z))
+        || locations.containsKey(new Coordinate(x, y, z + 1))
+        || locations.containsKey(new Coordinate(x, y, z - 1));
+  }
+
   public boolean ownsLock(String name, int x, byte y, int z) {
     Coordinate coordinate = new Coordinate(x, y, z);
     Chest chest = names.get(name.toLowerCase());

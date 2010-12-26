@@ -345,7 +345,7 @@ public class StreamTunnel {
           server.runCommand("say", badBlock);
           writePacket = false;
         }
-        else if ((dropItem == 54) && player.isAttemptLock()) {
+        else if (dropItem == 54) {
           int xPosition = x;
           byte yPosition = y;
           int zPosition = z;
@@ -370,17 +370,23 @@ public class StreamTunnel {
               break;
           }
 
-          if (server.chests.hasLock(xPosition, yPosition, zPosition)) {
-            player.addMessage("This block is locked already!");
+          if (server.chests.hasAdjacentLock(xPosition, yPosition, zPosition)) {
+            player.addMessage("The adjacent chest is locked!");
+            writePacket = false;
           }
-          else if (server.chests.giveLock(player.getName(), xPosition,
-                                          yPosition, zPosition, false)) {
-            player.addMessage("Your locked chest is created! Do not add another chest to it!");
+          else if (player.isAttemptLock()) {
+            if (server.chests.hasLock(xPosition, yPosition, zPosition)) {
+              player.addMessage("This block is locked already!");
+            }
+            else if (server.chests.giveLock(player.getName(), xPosition,
+                                            yPosition, zPosition, false)) {
+              player.addMessage("Your locked chest is created! Do not add another chest to it!");
+            }
+            else {
+              player.addMessage("You already have a lock, or this block is locked already!");
+            }
+            player.setAttemptLock(false);
           }
-          else {
-            player.addMessage("You already have a lock, or this block is locked already!");
-          }
-          player.setAttemptLock(false);
         }
 
         if (writePacket) {

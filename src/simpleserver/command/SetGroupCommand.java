@@ -48,7 +48,7 @@ public class SetGroupCommand extends PlayerArgCommand {
       }
 
       if (group >= player.getGroupId()) {
-        player.addMessage("\u00a7cYou cannot promote a user to a higher group!");
+        player.addMessage("\u00a7cYou cannot promote to your group or higher!");
       }
       else {
         server.members.setGroup(target, group);
