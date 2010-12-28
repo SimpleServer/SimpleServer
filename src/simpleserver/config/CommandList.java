@@ -20,6 +20,8 @@
  */
 package simpleserver.config;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -32,27 +34,50 @@ import com.google.common.collect.ImmutableSortedSet;
 
 public class CommandList extends PropertiesConfig {
   private final ConcurrentMap<String, ImmutableSet<Integer>> commands;
+  private final ConcurrentMap<String, String> aliases;
 
   public CommandList() {
-    super("command-list.txt");
+    super("command-list.txt", true);
 
     commands = new ConcurrentHashMap<String, ImmutableSet<Integer>>();
+    aliases = new ConcurrentHashMap<String, String>();
+  }
 
-    loadDefaults();
+  public String[] getAliases(String command) {
+    command = command.toLowerCase();
+
+    List<String> names = new LinkedList<String>();
+    for (Entry<String, String> alias : aliases.entrySet()) {
+      if (alias.getValue().equals(command)) {
+        names.add(alias.getKey());
+      }
+    }
+
+    return names.toArray(new String[names.size()]);
+  }
+
+  public String lookupCommand(String name) {
+    name = name.toLowerCase();
+
+    String alias = aliases.get(name);
+    if (alias != null) {
+      name = alias;
+    }
+    else if (!commands.containsKey(name)) {
+      name = null;
+    }
+
+    return name;
   }
 
   public boolean playerAllowed(String command, Player player) {
     ImmutableSet<Integer> groups = commands.get(command);
-    if (groups != null) {
-      return Group.isMember(groups, player);
-    }
-
-    return false;
+    return (groups != null) && Group.isMember(groups, player);
   }
 
   public void setGroup(String command, int group) {
     commands.put(command, ImmutableSortedSet.of(group));
-    setProperty(command, Integer.toString(group));
+    properties.setProperty(command, Integer.toString(group));
   }
 
   @Override
@@ -60,9 +85,27 @@ public class CommandList extends PropertiesConfig {
     super.load();
 
     commands.clear();
-    for (Entry<Object, Object> entry : entrySet()) {
-      commands.put(entry.getKey().toString(),
-                   Group.parseGroups(entry.getValue().toString()));
+    aliases.clear();
+    for (Entry<Object, Object> entry : properties.entrySet()) {
+      String command = entry.getKey().toString().toLowerCase();
+      String[] options = entry.getValue().toString().split(";");
+
+      String groups;
+      if (options.length == 1) {
+        groups = options[0];
+      }
+      else if (options.length == 2) {
+        for (String alias : options[0].split(",")) {
+          aliases.put(alias, command);
+        }
+        groups = options[1];
+      }
+      else {
+        System.out.println("Skipping bad command entry: " + command);
+        continue;
+      }
+
+      commands.put(command, Group.parseGroups(groups));
     }
   }
 }

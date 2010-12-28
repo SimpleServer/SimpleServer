@@ -20,10 +20,8 @@
  */
 package simpleserver.config;
 
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 import java.util.regex.Pattern;
 
 public class IPBanList extends PropertiesConfig {
@@ -32,13 +30,13 @@ public class IPBanList extends PropertiesConfig {
   }
 
   public void addBan(String ipAddress) {
-    setProperty(ipAddress, "");
+    properties.setProperty(ipAddress, "");
 
     save();
   }
 
   public boolean removeBan(String ipAddress) {
-    if (removeProperty(ipAddress) != null) {
+    if (properties.remove(ipAddress) != null) {
       save();
 
       return true;
@@ -54,7 +52,7 @@ public class IPBanList extends PropertiesConfig {
     for (String octet : octets) {
       network += octet;
 
-      if (getProperty(network) != null) {
+      if (properties.getProperty(network) != null) {
         return true;
       }
 
@@ -70,18 +68,14 @@ public class IPBanList extends PropertiesConfig {
 
     Pattern trailingDot = Pattern.compile("\\.$");
     List<String> networks = new LinkedList<String>();
-    Set<Object> addresses = keySet();
 
-    // for (Object address : addresses) {
-    for (Iterator<Object> itr = addresses.iterator(); itr.hasNext();) {
-      Object address = itr.next();
-      // addresses.remove(address);
+    for (Object address : properties.keySet()) {
       networks.add(trailingDot.matcher((String) address).replaceFirst(""));
-      itr.remove();
     }
 
+    properties.clear();
     for (String network : networks) {
-      setProperty(network, "");
+      properties.setProperty(network, "");
     }
   }
 }

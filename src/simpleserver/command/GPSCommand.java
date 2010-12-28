@@ -38,8 +38,9 @@ public class GPSCommand extends OnlinePlayerArgCommand {
       name = target.getName() + "'s";
     }
 
-    player.addMessage("\u00a77" + name + " Latitude: \u00a7f" + (int) target.getX()
-        + "\u00a77 Longitude: \u00a7f" + (int) target.getZ() + "\u00a77 Altitude: \u00a7f"
+    player.addMessage("\u00a77" + name + " Latitude: \u00a7f"
+        + (int) target.getX() + "\u00a77 Longitude: \u00a7f"
+        + (int) target.getZ() + "\u00a77 Altitude: \u00a7f"
         + (int) target.getY());
   }
 }

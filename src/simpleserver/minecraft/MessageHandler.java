@@ -21,6 +21,7 @@
 package simpleserver.minecraft;
 
 import simpleserver.Server;
+import simpleserver.command.InvalidCommand;
 import simpleserver.command.ServerCommand;
 
 public class MessageHandler {
@@ -83,8 +84,8 @@ public class MessageHandler {
   }
 
   public boolean parseCommand(String line) {
-    ServerCommand command = server.getCommandList().getServerCommand(line);
-    if (command != null) {
+    ServerCommand command = server.getCommandParser().getServerCommand(line);
+    if ((command != null) && (command.getClass() != InvalidCommand.class)) {
       command.execute(server, line);
       return !command.passThrough();
     }

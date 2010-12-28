@@ -80,7 +80,7 @@ public class RobotList extends PropertiesConfig {
   }
 
   public boolean isRobot(String ip) {
-    return getProperty(ip) != null;
+    return properties.getProperty(ip) != null;
   }
 
   private boolean isPotentialRobot(String ip) {
@@ -102,7 +102,7 @@ public class RobotList extends PropertiesConfig {
           if (ip.equals(i.ipAddress)) {
             i.tries++;
             if (i.tries > 30) {
-              setProperty(ip, "");
+              properties.setProperty(ip, "");
               potentialRobots.remove(i);
               save();
             }

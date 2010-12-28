@@ -32,20 +32,21 @@ import org.reflections.scanners.SubTypesScanner;
 import simpleserver.command.Command;
 import simpleserver.command.PlayerCommand;
 import simpleserver.command.ServerCommand;
+import simpleserver.config.CommandList;
 import simpleserver.options.Options;
 
-public class CommandList {
+public class CommandParser {
   private final Map<String, PlayerCommand> playerCommands;
   private final Map<String, ServerCommand> serverCommands;
-  private final Map<String, String> aliases;
   private final Options options;
+  private final CommandList commandList;
 
-  public CommandList(Options options) {
+  public CommandParser(Options options, CommandList commandList) {
     this.options = options;
+    this.commandList = commandList;
 
     playerCommands = new HashMap<String, PlayerCommand>();
     serverCommands = new HashMap<String, ServerCommand>();
-    aliases = new HashMap<String, String>();
     loadCommands(PlayerCommand.class, playerCommands);
     loadCommands(ServerCommand.class, serverCommands);
   }
@@ -54,8 +55,10 @@ public class CommandList {
     if (message.startsWith(commandPrefix())) {
       PlayerCommand command = playerCommands.get(extractName(message, 1));
       if (command == null) {
+        System.out.println("Illegal command configuration for: " + message);
         command = playerCommands.get(null);
       }
+
       return command;
     }
 
@@ -86,11 +89,7 @@ public class CommandList {
     }
 
     String name = message.substring(offset, splitIndex).toLowerCase();
-    String alias = aliases.get(name);
-    if (alias != null) {
-      name = alias;
-    }
-    return name;
+    return commandList.lookupCommand(name);
   }
 
   private <T extends Command> void loadCommands(Class<T> type,
@@ -115,9 +114,6 @@ public class CommandList {
       }
 
       commands.put(command.getName(), command);
-      for (String alias : command.getAliases()) {
-        aliases.put(alias, command.getName());
-      }
     }
   }
 }

@@ -30,11 +30,6 @@ public class TellCommand extends OnlinePlayerArgCommand implements
   }
 
   @Override
-  public String[] getAliases() {
-    return new String[] { "t" };
-  }
-
-  @Override
   protected void executeWithTarget(Player player, String message, Player target) {
     String chat = extractArgument(message, 1);
     if (chat != null) {

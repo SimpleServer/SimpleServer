@@ -20,17 +20,12 @@
  */
 package simpleserver.command;
 
-import simpleserver.CommandList;
+import simpleserver.CommandParser;
 import simpleserver.Player;
 
 public class HelpCommand extends AbstractCommand implements PlayerCommand {
   public HelpCommand() {
     super("help [COMMAND]", "List commands or get help for one command");
-  }
-
-  @Override
-  public String[] getAliases() {
-    return new String[] { "", "commands" };
   }
 
   @Override
@@ -41,22 +36,22 @@ public class HelpCommand extends AbstractCommand implements PlayerCommand {
   public void execute(Player player, String message) {
     String[] arguments = extractArguments(message);
 
-    CommandList commandList = player.getServer().getCommandList();
+    CommandParser commandParser = player.getServer().getCommandParser();
     if (arguments.length > 0) {
-      String prefix = commandList.commandPrefix();
+      String prefix = commandParser.commandPrefix();
       String commandName = arguments[0];
       if (!commandName.startsWith(prefix)) {
         commandName = prefix + commandName;
       }
-      PlayerCommand command = commandList.getPlayerCommand(commandName);
+      PlayerCommand command = commandParser.getPlayerCommand(commandName);
       player.addMessage(command.getHelpText(prefix));
 
-      String[] aliases = command.getAliases();
+      String[] aliases = player.getServer().commands.getAliases(command.getName());
       if (aliases.length > 0) {
         StringBuffer line = new StringBuffer();
         line.append("\u00a77Aliases:\u00a7f ");
         for (String alias : aliases) {
-          line.append(commandList.commandPrefix());
+          line.append(commandParser.commandPrefix());
           line.append(alias);
           line.append(" ");
         }
@@ -67,8 +62,8 @@ public class HelpCommand extends AbstractCommand implements PlayerCommand {
       StringBuffer line = new StringBuffer();
       line.append("\u00a77Available Commands:\u00a7f ");
 
-      String prefix = commandList.commandPrefix();
-      for (PlayerCommand command : commandList.getPlayerCommands()) {
+      String prefix = commandParser.commandPrefix();
+      for (PlayerCommand command : commandParser.getPlayerCommands()) {
         if (command.isHidden() || !player.commandAllowed(command.getName())) {
           continue;
         }

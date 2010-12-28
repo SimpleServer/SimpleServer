@@ -27,11 +27,6 @@ public class LocalSayCommand extends AbstractCommand implements PlayerCommand {
     super("local MESSAGE", "Send a chat message to nearby players");
   }
 
-  @Override
-  public String[] getAliases() {
-    return new String[] { "l" };
-  }
-
   public void execute(Player player, String message) {
     String chat = extractArgument(message);
     if (chat != null) {

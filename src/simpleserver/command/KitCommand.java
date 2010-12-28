@@ -27,16 +27,13 @@ public class KitCommand extends AbstractCommand implements PlayerCommand {
     super("kit [KIT]", "Display all kits or give yourself the named kit");
   }
 
-  @Override
-  public String[] getAliases() {
-    return new String[] { "kits" };
-  }
-
   public void execute(Player player, String message) {
     String[] arguments = extractArguments(message);
 
     if (arguments.length > 0) {
-      player.getServer().kits.giveKit(player, arguments[0]);
+      if (!player.getServer().kits.giveKit(player, arguments[0])) {
+        player.addMessage("\u00a7cInvalid kit name.");
+      }
     }
     else {
       player.getServer().kits.listKits(player);

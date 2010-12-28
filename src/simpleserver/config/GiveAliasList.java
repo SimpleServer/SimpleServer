@@ -42,7 +42,7 @@ public class GiveAliasList extends PropertiesConfig {
     super.load();
 
     aliases.clear();
-    for (Entry<Object, Object> alias : entrySet()) {
+    for (Entry<Object, Object> alias : properties.entrySet()) {
       Integer id;
       try {
         id = Integer.valueOf((String) alias.getValue());

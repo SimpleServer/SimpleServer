@@ -29,11 +29,6 @@ public class TeleportCommand extends OnlinePlayerArgCommand {
   }
 
   @Override
-  public String[] getAliases() {
-    return new String[] { "tp" };
-  }
-
-  @Override
   protected void executeWithTarget(Player player, String message, Player target1) {
     String[] arguments = extractArguments(message);
     Server server = player.getServer();

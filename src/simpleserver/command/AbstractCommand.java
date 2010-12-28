@@ -44,10 +44,6 @@ public abstract class AbstractCommand implements Command {
     return name;
   }
 
-  public String[] getAliases() {
-    return new String[] {};
-  }
-
   public String getHelpText(String prefix) {
     if (name != null) {
       return "\u00a72" + prefix + helpText;
@@ -70,11 +66,12 @@ public abstract class AbstractCommand implements Command {
 
   protected String[] extractArguments(String message) {
     String[] parts = message.split("\\s+");
-    // return Arrays.copyOfRange(parts, 1, parts.length);
+
     // JDK 1.5 Compatibility
-    String[] cpy = new String[parts.length - 1];
-    System.arraycopy(parts, 1, cpy, 0, parts.length - 1);
-    return cpy;
+    String[] copy = new String[parts.length - 1];
+    System.arraycopy(parts, 1, copy, 0, parts.length - 1);
+
+    return copy;
   }
 
   protected String extractArgument(String message, int startOffset) {

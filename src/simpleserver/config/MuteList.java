@@ -20,10 +20,8 @@
  */
 package simpleserver.config;
 
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 public class MuteList extends PropertiesConfig {
   public MuteList() {
@@ -31,17 +29,17 @@ public class MuteList extends PropertiesConfig {
   }
 
   public boolean isMuted(String name) {
-    return getProperty(name.toLowerCase()) != null;
+    return properties.getProperty(name.toLowerCase()) != null;
   }
 
   public void addName(String name) {
-    if (setProperty(name.toLowerCase(), "") == null) {
+    if (properties.setProperty(name.toLowerCase(), "") == null) {
       save();
     }
   }
 
   public boolean removeName(String name) {
-    if (removeProperty(name.toLowerCase()) != null) {
+    if (properties.remove(name.toLowerCase()) != null) {
       save();
       return true;
     }
@@ -54,18 +52,13 @@ public class MuteList extends PropertiesConfig {
     super.load();
 
     List<String> names = new LinkedList<String>();
-    Set<Object> rawNames = keySet();
-
-    // for (Object name : rawNames) {
-    for (Iterator<Object> itr = rawNames.iterator(); itr.hasNext();) {
-      Object name = itr.next();
-      // rawNames.remove(name);
+    for (Object name : properties.keySet()) {
       names.add(((String) name).toLowerCase());
-      itr.remove();
     }
 
+    properties.clear();
     for (String name : names) {
-      setProperty(name, "");
+      properties.setProperty(name, "");
     }
   }
 }

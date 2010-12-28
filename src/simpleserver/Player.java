@@ -90,6 +90,7 @@ public class Player {
       return;
     }
 
+    watchdog = new Watchdog();
     try {
       serverToClient = new StreamTunnel(intsocket.getInputStream(),
                                         extsocket.getOutputStream(), true, this);
@@ -106,8 +107,6 @@ public class Player {
     if (isRobot) {
       server.addRobotPort(intsocket.getLocalPort());
     }
-
-    watchdog = new Watchdog();
     watchdog.start();
   }
 
@@ -265,7 +264,7 @@ public class Player {
       return true;
     }
 
-    PlayerCommand command = server.getCommandList().getPlayerCommand(message);
+    PlayerCommand command = server.getCommandParser().getPlayerCommand(message);
     if (command == null) {
       return false;
     }

@@ -63,8 +63,8 @@ public class KitList extends PropertiesConfig {
     kits = new ConcurrentHashMap<String, Kit>();
   }
 
-  public void giveKit(Player player, String kitName) {
-    Kit kit = kits.get(kitName);
+  public boolean giveKit(Player player, String kitName) {
+    Kit kit = kits.get(kitName.toLowerCase());
     if ((kit != null) && (Group.isMember(kit.groups, player))) {
       for (Kit.Entry entry : kit.items) {
         String baseCommand = player.getName() + " " + entry.item;
@@ -73,7 +73,9 @@ public class KitList extends PropertiesConfig {
         }
         server.runCommand("give", baseCommand + " " + entry.amount % 64);
       }
+      return true;
     }
+    return false;
   }
 
   public void listKits(Player player) {
@@ -95,7 +97,7 @@ public class KitList extends PropertiesConfig {
     super.load();
 
     kits.clear();
-    for (Entry<Object, Object> entry : entrySet()) {
+    for (Entry<Object, Object> entry : properties.entrySet()) {
       String[] options = entry.getValue().toString().split(",");
       if (options.length < 2) {
         System.out.println("Skipping bad kit list entry " + entry.getValue());
@@ -125,7 +127,7 @@ public class KitList extends PropertiesConfig {
       }
 
       Kit kit = new Kit(Group.parseGroups(options[0], ";"), items.build());
-      kits.put(entry.getKey().toString(), kit);
+      kits.put(entry.getKey().toString().toLowerCase(), kit);
     }
   }
 }

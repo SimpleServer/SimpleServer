@@ -33,11 +33,9 @@ public class BlockList extends PropertiesConfig {
   private final ConcurrentMap<Integer, ImmutableSet<Integer>> blocks;
 
   public BlockList() {
-    super("block-list.txt");
+    super("block-list.txt", true);
 
     blocks = new ConcurrentHashMap<Integer, ImmutableSet<Integer>>();
-
-    loadDefaults();
   }
 
   public boolean contains(int blockID) {
@@ -57,7 +55,7 @@ public class BlockList extends PropertiesConfig {
     super.load();
 
     blocks.clear();
-    for (Entry<Object, Object> entry : entrySet()) {
+    for (Entry<Object, Object> entry : properties.entrySet()) {
       Integer block;
       try {
         block = Integer.parseInt(entry.getKey().toString());

@@ -86,7 +86,7 @@ public class Server {
 
   private List<Resource> resources;
   public PlayerList playerList;
-  private simpleserver.CommandList commandList;
+  private CommandParser commandParser;
 
   private AdminLog adminLog;
   private ErrorLog errorLog;
@@ -284,8 +284,8 @@ public class Server {
     }
   }
 
-  public simpleserver.CommandList getCommandList() {
-    return commandList;
+  public CommandParser getCommandParser() {
+    return commandParser;
   }
 
   public void runCommand(String command, String arguments) {
@@ -359,7 +359,7 @@ public class Server {
     errorLog = new ErrorLog();
     connectionLog = new ConnectionLog();
 
-    commandList = new simpleserver.CommandList(options);
+    commandParser = new CommandParser(options, commands);
   }
 
   private void cleanup() {

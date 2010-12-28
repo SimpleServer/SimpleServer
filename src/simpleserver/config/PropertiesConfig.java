@@ -26,21 +26,35 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Map.Entry;
 import java.util.Properties;
-import java.util.Set;
 
 public abstract class PropertiesConfig extends AbstractConfig {
-  private Properties properties;
+  private boolean layered;
+  private Properties defaultProperties;
+
+  protected Properties properties;
 
   protected PropertiesConfig(String filename) {
+    this(filename, false);
+  }
+
+  protected PropertiesConfig(String filename, boolean layered) {
     super(filename);
+    this.layered = layered;
 
     properties = new Properties();
+    loadDefaults();
   }
 
   @Override
   public void load() {
+    if (layered) {
+      properties = (Properties) defaultProperties.clone();
+    }
+    else {
+      properties = new Properties();
+    }
+
     try {
       InputStream stream = new FileInputStream(getFile());
       try {
@@ -52,7 +66,7 @@ public abstract class PropertiesConfig extends AbstractConfig {
     }
     catch (FileNotFoundException e) {
       System.out.println(getFilename() + " is missing.  Loading defaults.");
-      loadDefaults();
+      properties = (Properties) defaultProperties.clone();
       save();
     }
     catch (IOException e) {
@@ -78,32 +92,12 @@ public abstract class PropertiesConfig extends AbstractConfig {
     }
   }
 
-  protected String getProperty(String key) {
-    return properties.getProperty(key);
-  }
-
-  protected String setProperty(String key, String value) {
-    return (String) properties.setProperty(key, value);
-  }
-
-  protected String removeProperty(String key) {
-    return (String) properties.remove(key);
-  }
-
-  protected Set<Entry<Object, Object>> entrySet() {
-    return properties.entrySet();
-  }
-
-  protected Set<Object> keySet() {
-    return properties.keySet();
-  }
-
-  protected void loadDefaults() {
+  private void loadDefaults() {
     InputStream stream = getResourceStream();
-    properties = new Properties();
+    defaultProperties = new Properties();
     try {
       try {
-        properties.load(stream);
+        defaultProperties.load(stream);
       }
       finally {
         stream.close();

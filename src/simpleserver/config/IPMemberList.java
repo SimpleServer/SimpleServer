@@ -62,7 +62,7 @@ public class IPMemberList extends PropertiesConfig {
 
     members.clear();
     Pattern trailingDot = Pattern.compile("\\.$");
-    for (Entry<Object, Object> entry : entrySet()) {
+    for (Entry<Object, Object> entry : properties.entrySet()) {
       Integer group;
       try {
         group = Integer.parseInt(entry.getValue().toString());

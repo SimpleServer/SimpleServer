@@ -48,7 +48,7 @@ public class GroupList extends PropertiesConfig {
     super.load();
 
     groups.clear();
-    for (Entry<Object, Object> entry : entrySet()) {
+    for (Entry<Object, Object> entry : properties.entrySet()) {
       Integer group;
       try {
         group = Integer.parseInt(entry.getKey().toString());

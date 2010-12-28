@@ -28,11 +28,6 @@ public class UnlockCommand extends AbstractCommand implements PlayerCommand {
           "Unlock your locked chest (if you have one) for others to access");
   }
 
-  @Override
-  public String[] getAliases() {
-    return new String[] { "releaselock" };
-  }
-
   public void execute(Player player, String message) {
     player.getServer().chests.releaseLock(player.getName().toLowerCase());
     player.addMessage("\u00a77Your lock has been released!");

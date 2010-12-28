@@ -50,7 +50,7 @@ public class MemberList extends PropertiesConfig {
       return;
     }
     members.put(name.toLowerCase(), group);
-    setProperty(name.toLowerCase(), Integer.toString(group));
+    properties.setProperty(name.toLowerCase(), Integer.toString(group));
 
     server.updateGroup(name);
     save();
@@ -61,7 +61,7 @@ public class MemberList extends PropertiesConfig {
     super.load();
 
     members.clear();
-    for (Entry<Object, Object> entry : entrySet()) {
+    for (Entry<Object, Object> entry : properties.entrySet()) {
       Integer group;
       try {
         group = Integer.parseInt(entry.getValue().toString());
@@ -72,6 +72,11 @@ public class MemberList extends PropertiesConfig {
       }
 
       members.put(entry.getKey().toString().toLowerCase(), group);
+    }
+
+    properties.clear();
+    for (Entry<String, Integer> entry : members.entrySet()) {
+      properties.setProperty(entry.getKey(), entry.getValue().toString());
     }
   }
 }

@@ -20,9 +20,11 @@
  */
 package simpleserver.command;
 
+import simpleserver.Player;
 import simpleserver.Server;
 
-public class StopCommand extends AbstractCommand implements ServerCommand {
+public class StopCommand extends AbstractCommand implements PlayerCommand,
+    ServerCommand {
   public StopCommand() {
     super("stop", "Shutdown the entire server");
   }
@@ -30,6 +32,10 @@ public class StopCommand extends AbstractCommand implements ServerCommand {
   @Override
   public boolean passThrough() {
     return true;
+  }
+
+  public void execute(Player player, String message) {
+    player.getServer().stop();
   }
 
   public void execute(Server server, String message) {
