@@ -31,18 +31,19 @@ import simpleserver.config.CommandList;
 import simpleserver.options.Options;
 
 public class Main {
-  private static final String version;
   private static final String license = "SimpleServer -- Copyright (C) 2010 SimpleServer authors (see CONTRIBUTORS)";
   private static final String warranty = "This program is licensed under The MIT License.\nSee file LICENSE for details.";
+  private static final String baseVersion = "7.0-dev";
+  private static final String version;
 
   static {
-    String baseVersion = "RC 7.0.0-dev";
-    InputStream input = Server.class.getResourceAsStream("VERSION");
+    String extendedVersion = baseVersion;
+    InputStream input = Main.class.getResourceAsStream("VERSION");
     if (input != null) {
       BufferedReader reader = new BufferedReader(new InputStreamReader(input));
       try {
         try {
-          baseVersion += "-" + reader.readLine();
+          extendedVersion += "-" + reader.readLine();
         }
         finally {
           reader.close();
@@ -54,7 +55,7 @@ public class Main {
       }
     }
 
-    version = baseVersion;
+    version = extendedVersion;
   }
   
   public static void main(String[] args) {

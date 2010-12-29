@@ -1,0 +1,13 @@
+ List of commands, their aliases and the groups that can use them, one per
+ line.  Commands not listed here will be assigned default values.  To hide a
+ command, set its group to a non-existent group ID.
+ Format: Command=Aliases;GroupIDs
+
+ Aliases are comma separated with no white-space (eg. tp,tele,warp).
+
+ Group IDs Notation:
+ 0     - Any group is allowed, except guests (-1).
+ X,Y,Z - Groups X, Y, and Z are allowed.
+ X-Y   - All between X and Y (inclusive) are allowed.
+
+ Example: tell=t;0 means anyone except guests can use the the tell or t command

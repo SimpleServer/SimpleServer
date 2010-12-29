@@ -1,0 +1,10 @@
+ List of IPs to ban, one per line.
+
+ IPAddress can be specified as 1, 2, 3 or all 4 octets.  For instance
+ 10.0.0.128 defines a single IP and 10.0.0 will include every IP in the class C
+ network 10.0.0.0/24.
+
+ Please note that most residential internet connections are assigned dynamic IP
+ addresses.  Some dynamic addresses change daily while others remain the same
+ for months.  Proceed with caution if you are adding residential IP addresses
+ to this file.

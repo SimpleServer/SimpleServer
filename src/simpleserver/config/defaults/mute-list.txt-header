@@ -1,2 +1,1 @@
- list of muted players
- case insensitive
+ List of players muted from global chat, one per line (case-insensitive).

@@ -1,2 +1,13 @@
- Kit format:
- NAME:Group1;Group2;Group3, ItemId1:Amount1, ItemId2:Amount2, ... ... , ItemIdN:AmountN
+ List of kits your members can use, one per line.  There are currently no
+ limits on kit usage other than the groups restriction.
+ Format: Name=GroupIDs, ItemId1:Amount1, ItemId2:Amount2, etc.
+
+ Group IDs Notation:
+ 0     - Any group is allowed, except guests (-1).
+ X;Y;Z - Groups X, Y, and Z are allowed.
+ X-Y   - All between X and Y (inclusive) are allowed.
+
+ Item IDs are listed here: http://www.minecraftwiki.net/wiki/Data_values
+
+ Example: music=1-3;5,84:1,2256:2,2257:2 defines a music kit for groups 1, 2,
+ 3, and 5 that includes a jukebox and two of each record.

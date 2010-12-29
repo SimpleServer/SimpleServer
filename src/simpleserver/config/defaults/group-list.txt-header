@@ -1,4 +1,14 @@
- Group -1 is defined as guest
- Group 0 is defined as normal player
- Format:
-  GID=Name,showTitle,isAdmin,colorCode
+ List of groups you can place your members in, one per line.
+ Format: GroupID=GroupName,showTitle,isAdmin,colorCode
+
+ Group ID:
+ -1 - This group is always treated as guests
+ 0  - This group is for normal players
+ Any other group 1 or greater can be added.
+
+ The showTitle and isAdmin settings can be either true or false.  The colorCode
+ can be any single digit 0-9 or single letter a-f.  If showTitle is enabled,
+ the group name will displayed in chat messages for members of that group.  If
+ isAdmin is enabled, the groups members will be unaffected by chest locks.
+
+ Example: 5=Super-User,true,true,4
