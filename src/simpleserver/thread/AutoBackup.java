@@ -138,7 +138,7 @@ public class AutoBackup {
     try {
       ZipOutputStream out = new ZipOutputStream(new BufferedOutputStream(fout));
       try {
-        zipRecursively(source, out, source.getPath().length() + 1);
+        zipRecursively(source, out);
       }
       finally {
         out.close();
@@ -150,15 +150,27 @@ public class AutoBackup {
     System.out.println("[SimpleServer] Backup saved: " + backup.getPath());
   }
 
+  private void zipRecursively(File source, ZipOutputStream out)
+      throws IOException {
+    for (File file : source.listFiles()) {
+      zipRecursively(file, out, source.getPath().length() + 1);
+    }
+  }
+
   private void zipRecursively(File source, ZipOutputStream out, int prefixLength)
       throws IOException {
+    String name = source.getPath().substring(prefixLength);
     if (source.isDirectory()) {
+      ZipEntry entry = new ZipEntry(name + "/");
+      out.putNextEntry(entry);
+      out.closeEntry();
+
       for (File file : source.listFiles()) {
         zipRecursively(file, out, prefixLength);
       }
     }
     else {
-      ZipEntry entry = new ZipEntry(source.getPath().substring(prefixLength));
+      ZipEntry entry = new ZipEntry(name);
       out.putNextEntry(entry);
 
       FileInputStream in = new FileInputStream(source);
@@ -172,7 +184,6 @@ public class AutoBackup {
       finally {
         in.close();
       }
-
       out.closeEntry();
     }
   }

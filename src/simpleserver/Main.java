@@ -57,7 +57,7 @@ public class Main {
 
     version = extendedVersion;
   }
-  
+
   public static void main(String[] args) {
     System.out.println(license);
     System.out.println(warranty);
