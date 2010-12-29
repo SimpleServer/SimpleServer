@@ -19,7 +19,7 @@
   <target name="create-release-jar" depends="set-version">
     <jar destfile="SimpleServer.jar">
       <manifest>
-        <attribute name="Main-Class" value="simpleserver.Server"/>
+        <attribute name="Main-Class" value="simpleserver.Main"/>
         <attribute name="Class-Path" value="."/>
       </manifest>
 

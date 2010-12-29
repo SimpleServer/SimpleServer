@@ -20,10 +20,7 @@
  */
 package simpleserver;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -61,32 +58,6 @@ import simpleserver.thread.RequestTracker;
 import simpleserver.thread.SystemInputQueue;
 
 public class Server {
-  private static final String version;
-  private static final String license = "SimpleServer -- Copyright (C) 2010 SimpleServer authors (see CONTRIBUTORS)";
-  private static final String warranty = "This program is licensed under The MIT License.\nSee file LICENSE for details.";
-
-  static {
-    String baseVersion = "RC 7.0.0-dev";
-    InputStream input = Server.class.getResourceAsStream("VERSION");
-    if (input != null) {
-      BufferedReader reader = new BufferedReader(new InputStreamReader(input));
-      try {
-        try {
-          baseVersion += "-" + reader.readLine();
-        }
-        finally {
-          reader.close();
-        }
-      }
-      catch (IOException e) {
-        e.printStackTrace();
-        System.out.println("Warning, jar may be corrupted!");
-      }
-    }
-
-    version = baseVersion;
-  }
-
   private final Listener listener;
 
   private ServerSocket socket;
@@ -132,14 +103,7 @@ public class Server {
 
   public Semaphore saveLock = new Semaphore(1);
 
-  public static void main(String[] args) {
-    System.out.println(license);
-    System.out.println(warranty);
-    System.out.println(">> Starting SimpleServer " + version);
-    new Server();
-  }
-
-  private Server() {
+  public Server() {
     listener = new Listener();
     listener.start();
     listener.setName("SimpleServerListener");
