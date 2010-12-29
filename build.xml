@@ -1,8 +1,22 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <project default="release" name="Create Runnable Jar for Project SimpleServer with Jar-in-Jar Loader">
-  <target name="release" depends="clean,create_release_jar" />
+  <property name="version-file" value="bin/simpleserver/VERSION" />
 
-  <target name="create_release_jar">
+  <target name="set-version">
+    <exec executable="script/update-version.sh" osfamily="unix">
+      <arg file="${version-file}" />
+    </exec>
+
+    <exec executable="cmd" osfamily="winnt">
+      <arg value="/c" />
+      <arg file="script/update-version.bat" />
+      <arg file="${version-file}" />
+    </exec>
+  </target>
+
+  <target name="release" depends="clean, create-release-jar" />
+
+  <target name="create-release-jar" depends="set-version">
     <jar destfile="SimpleServer.jar">
       <manifest>
         <attribute name="Main-Class" value="simpleserver.Server"/>
@@ -21,5 +35,6 @@
 
   <target name="clean">
     <delete file="SimpleServer.jar"/>
+    <delete file="${version-file}"/>
   </target>
 </project>
