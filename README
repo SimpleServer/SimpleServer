@@ -27,6 +27,7 @@ Features (See CHANGES for updates):
  * Message translation support (language.properties)
  * Locked chests.  Each player can say !lock and place a single locked chest.
    Other non-admins cannot access or destroy the chest.
+ * Automatically makes space for members with higher group IDs.
  * Local chat.  Say !l MESSAGE... to send a message to nearby players
  * Customizable message formats.
  * Compatible with SMP API, hey0 and other server mods.

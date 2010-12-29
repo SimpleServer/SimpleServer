@@ -10,6 +10,9 @@
  * Added !time to get the real-world time on the server
  * Added !gps command to get player coordinates
  * Command aliases are defined in command-list.txt now
+ * Added "reserved slot" type functionality.  When someone joins a full server,
+   if there is a player of a lower group on the server, the player with the
+   lowest group and the least time connected is kicked to make room.
  * Other bugfixes
 
 == RC 6.9.9 ==

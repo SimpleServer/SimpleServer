@@ -30,9 +30,15 @@ import simpleserver.command.PlayerCommand;
 import simpleserver.stream.StreamTunnel;
 
 public class Player {
+  private final long connected;
+  private final Socket extsocket;
+  private final Server server;
+
   private Socket intsocket;
-  private Socket extsocket;
-  private Server server;
+  private StreamTunnel serverToClient;
+  private StreamTunnel clientToServer;
+  private Watchdog watchdog;
+
   private String name = null;
   private boolean closed = false;
   private boolean isKicked = false;
@@ -46,13 +52,10 @@ public class Player {
   private Group groupObject = null;
   private boolean isRobot = false;
 
-  private StreamTunnel serverToClient;
-  private StreamTunnel clientToServer;
-  private Watchdog watchdog;
-
   private Queue<String> messages = new ConcurrentLinkedQueue<String>();
 
   public Player(Socket inc, Server parent) {
+    connected = System.currentTimeMillis();
     server = parent;
     extsocket = inc;
     if (server.isRobot(getIPAddress())) {
@@ -144,6 +147,10 @@ public class Player {
   public double distanceTo(Player player) {
     return Math.sqrt(Math.pow(x - player.x, 2) + Math.pow(y - player.y, 2)
         + Math.pow(z - player.z, 2));
+  }
+
+  public long getConnectedAt() {
+    return connected;
   }
 
   public void updateLocation(double x, double y, double z, double stance) {

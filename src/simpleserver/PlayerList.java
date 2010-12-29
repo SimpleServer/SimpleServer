@@ -20,19 +20,22 @@
  */
 package simpleserver;
 
-import java.util.Collection;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import simpleserver.options.Options;
+
 public class PlayerList {
+  private final Options options;
   private final ConcurrentMap<String, Player> players;
 
-  public PlayerList() {
+  public PlayerList(Options options) {
+    this.options = options;
     players = new ConcurrentHashMap<String, Player>();
   }
 
-  public synchronized Collection<Player> getArray() {
-    return players.values();
+  public synchronized Player[] getArray() {
+    return players.values().toArray(new Player[players.size()]);
   }
 
   public int size() {
@@ -67,6 +70,27 @@ public class PlayerList {
   }
 
   public synchronized void addPlayer(Player player) {
-    players.put(player.getName().toLowerCase(), player);
+    if (players.size() < options.getInt("maxPlayers")) {
+      players.put(player.getName().toLowerCase(), player);
+    }
+    else {
+      Player playerToKick = null;
+      for (Player friend : players.values()) {
+        if (!((friend.getGroupId() >= player.getGroupId()) || (playerToKick != null)
+            && (friend.getConnectedAt() < playerToKick.getConnectedAt())
+            && (friend.getGroupId() > playerToKick.getGroupId()))) {
+          playerToKick = friend;
+        }
+      }
+
+      if (playerToKick == null) {
+        player.kick("Sorry, server is full!");
+      }
+      else {
+        playerToKick.kick("Sorry, making space for more senior member.");
+        players.remove(playerToKick.getName().toLowerCase());
+        players.put(player.getName().toLowerCase(), player);
+      }
+    }
   }
 }

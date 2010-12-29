@@ -362,7 +362,7 @@ public class Server {
     restart = false;
 
     loadResources();
-    playerList = new PlayerList();
+    playerList = new PlayerList(options);
     requestTracker = new RequestTracker(this);
 
     minecraft = new MinecraftWrapper(this, options, systemInput);

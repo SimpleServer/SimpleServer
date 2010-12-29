@@ -37,7 +37,7 @@ public class MinecraftOptions extends AbstractOptions {
     options.setProperty("online-mode", simpleServerOptions.get("onlineMode"));
     options.setProperty("server-ip", "127.0.0.1");
     options.setProperty("server-port", simpleServerOptions.get("internalPort"));
-    options.setProperty("max-players", simpleServerOptions.get("maxPlayers"));
+    options.setProperty("max-players", Integer.toString(Integer.MAX_VALUE));
     options.setProperty("level-name", simpleServerOptions.get("levelName"));
 
     super.save();
