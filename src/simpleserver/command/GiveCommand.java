@@ -45,7 +45,7 @@ public class GiveCommand extends AbstractCommand implements PlayerCommand {
 
     if (arguments.length > offset) {
       String item = arguments[offset];
-      Integer id = player.getServer().giveAliasList.getId(item);
+      Integer id = player.getServer().giveAliasList.getItemId(item);
       if (id != null) {
         item = id.toString();
       }

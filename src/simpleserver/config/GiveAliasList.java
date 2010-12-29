@@ -25,6 +25,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 public class GiveAliasList extends PropertiesConfig {
+  private static final String[] suffixes = new String[] { "s", "block",
+      "blocks", "ore", "ores", "es" };
+
   private final Map<String, Integer> aliases;
 
   public GiveAliasList() {
@@ -33,8 +36,22 @@ public class GiveAliasList extends PropertiesConfig {
     aliases = new HashMap<String, Integer>();
   }
 
-  public Integer getId(String itemAlias) {
-    return aliases.get(itemAlias);
+  public Integer getItemId(String itemAlias) {
+    itemAlias = itemAlias.toLowerCase();
+    Integer itemId = aliases.get(itemAlias);
+
+    for (String suffix : suffixes) {
+      if (itemId != null) {
+        break;
+      }
+
+      if (itemAlias.endsWith(suffix)) {
+        int prefixLength = itemAlias.length() - suffix.length();
+        itemId = aliases.get(itemAlias.substring(0, prefixLength));
+      }
+    }
+
+    return itemId;
   }
 
   @Override
