@@ -52,7 +52,7 @@ public class MinecraftWrapper {
     this.systemInput = systemInput;
   }
 
-  public void start() {
+  public void start() throws InterruptedException {
     minecraftOptions.save();
     Runtime runtime = Runtime.getRuntime();
     String command = getCommand();
@@ -79,6 +79,8 @@ public class MinecraftWrapper {
     inputWrapper = new InputWrapper(systemInput, minecraft.getOutputStream(),
                                     messageHandler);
     wrappers.add(inputWrapper);
+
+    messageHandler.waitUntilLoaded();
   }
 
   public void stop() {

@@ -122,6 +122,8 @@ public class Server {
     }
     catch (Exception e) {
     }
+
+    listener.interrupt();
   }
 
   public void addRobot(Player p) {
@@ -366,7 +368,13 @@ public class Server {
     requestTracker = new RequestTracker(this);
 
     minecraft = new MinecraftWrapper(this, options, systemInput);
-    minecraft.start();
+    try {
+      minecraft.start();
+    }
+    catch (InterruptedException e) {
+      // Severe error happened while starting up.
+      // Already on track to stop/restart.
+    }
 
     rconServer = new RconServer(this);
     autoBackup = new AutoBackup(this);

@@ -27,8 +27,16 @@ import simpleserver.command.ServerCommand;
 public class MessageHandler {
   private final Server server;
 
+  private boolean loaded = false;
+
   public MessageHandler(Server server) {
     this.server = server;
+  }
+
+  public synchronized void waitUntilLoaded() throws InterruptedException {
+    if (!loaded) {
+      wait();
+    }
   }
 
   public void handleError(Exception exception) {
@@ -70,12 +78,17 @@ public class MessageHandler {
       }
     }
 
-    if (line.contains("[INFO] CONSOLE: Save complete.")) {
+    if (line.contains("[INFO] Done! ")) {
+      synchronized (this) {
+        loaded = true;
+        notifyAll();
+      }
+    }
+    else if (line.contains("[INFO] CONSOLE: Save complete.")) {
       server.setSaving(false);
       server.runCommand("say", server.l.get("SAVE_COMPLETE"));
     }
-
-    if (line.contains("[SEVERE] Unexpected exception")) {
+    else if (line.contains("[SEVERE] Unexpected exception")) {
       handleError(new Exception(line));
     }
 
