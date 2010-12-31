@@ -29,7 +29,7 @@ public class HelpCommand extends AbstractCommand implements PlayerCommand {
   }
 
   @Override
-  public boolean passThrough() {
+  public boolean shouldPassThroughToSMPAPI() {
     return true;
   }
 

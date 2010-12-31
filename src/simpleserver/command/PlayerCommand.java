@@ -25,5 +25,7 @@ import simpleserver.Player;
 public interface PlayerCommand extends Command {
   public String getHelpText(String prefix);
 
+  public boolean shouldPassThroughToSMPAPI();
+
   public void execute(Player player, String message);
 }

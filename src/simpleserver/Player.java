@@ -282,7 +282,7 @@ public class Player {
     }
 
     command.execute(this, message);
-    return !(command.passThrough() && server.options.getBoolean("useSMPAPI"))
+    return !(command.shouldPassThroughToSMPAPI() && server.options.getBoolean("useSMPAPI"))
         || message.startsWith("/");
   }
 

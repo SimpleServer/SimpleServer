@@ -30,7 +30,7 @@ public class StopCommand extends AbstractCommand implements PlayerCommand,
   }
 
   @Override
-  public boolean passThrough() {
+  public boolean shouldPassThroughToConsole() {
     return true;
   }
 

@@ -23,7 +23,5 @@ package simpleserver.command;
 public interface Command {
   public String getName();
 
-  public boolean passThrough();
-
   public boolean isHidden();
 }

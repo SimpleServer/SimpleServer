@@ -53,10 +53,11 @@ public abstract class AbstractCommand implements Command {
     }
   }
 
-  /**
-   * @return true if command should be passed-through to SMP API also
-   */
-  public boolean passThrough() {
+  public boolean shouldPassThroughToSMPAPI() {
+    return false;
+  }
+
+  public boolean shouldPassThroughToConsole() {
     return false;
   }
 
