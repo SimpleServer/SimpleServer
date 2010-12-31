@@ -408,13 +408,8 @@ public class Server {
     requestTracker.stop();
     c10t.stop();
     saveResources();
-    while (playerList.size() > 0) {
-      try {
-        Thread.sleep(100);
-      }
-      catch (InterruptedException e) {
-      }
-    }
+
+    playerList.waitUntilEmpty();
     minecraft.stop();
     System.out.println("Server stopped successfully!");
     saveLock.release();

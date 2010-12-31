@@ -42,6 +42,16 @@ public class PlayerList {
     return players.size();
   }
 
+  public synchronized void waitUntilEmpty() {
+    while (players.size() > 0) {
+      try {
+        wait();
+      }
+      catch (InterruptedException e) {
+      }
+    }
+  }
+
   public Player findPlayer(int entityId) {
     for (Player p : players.values()) {
       if (p.getEntityId() == entityId) {
@@ -67,6 +77,7 @@ public class PlayerList {
 
   public synchronized void removePlayer(Player player) {
     players.remove(player.getName().toLowerCase());
+    notifyAll();
   }
 
   public synchronized void addPlayer(Player player) {
