@@ -59,7 +59,6 @@ public class StreamTunnel {
   private StreamDumper inputDumper;
   private StreamDumper outputDumper;
 
-  private short activeSlot = 0;
   private int motionCounter = 0;
   private boolean inGame = false;
 
@@ -391,25 +390,6 @@ public class StreamTunnel {
         }
 
         if (writePacket) {
-          if (dropItem == -1) {
-            write((byte) 0x66);
-            write((byte) 0x00);
-            write((short) (activeSlot + 36));
-            write((byte) 0);
-            write((short) -1);
-            write((short) -1);
-            
-            write((byte) 0x66);
-            write((byte) 0x00);
-            write((short) -999);
-            write((byte) 0);
-            write((short) -2);
-            write((short) -1);
-
-            write((byte) 0x65);
-            write((byte) 0);
-          }
-
           write(packetId);
           write(x);
           write(y);
@@ -421,7 +401,7 @@ public class StreamTunnel {
             write(itemCount);
             write(uses);
           }
-        }/*
+        }
         else {
           // Drop the item in hand. This keeps the client state in-sync with the
           // server. This generally prevents empty-hand clicks by the client
@@ -432,13 +412,11 @@ public class StreamTunnel {
           write(y);
           write(z);
           write(direction);
-        }*/
+        }
         break;
       case 0x10: // Holding Change
-        activeSlot = in.readShort();
-
         write(packetId);
-        write(activeSlot);
+        copyNBytes(2);
         break;
       case 0x12: // Animation
         write(packetId);
