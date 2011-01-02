@@ -343,17 +343,6 @@ public class StreamTunnel {
                                           player.getName(),
                                           Short.toString(dropItem));
           server.runCommand("say", badBlock);
-
-          // Drop the item in hand. This keeps the client state in-sync with the
-          // server.  This generally prevents empty-hand clicks by the client
-          // from placing blocks the server thinks the client has in hand.
-          write((byte) 0x0e);
-          write((byte) 0x04);
-          write(x);
-          write(y);
-          write(z);
-          write(direction);
-
           writePacket = false;
         }
         else if (dropItem == 54) {
@@ -412,6 +401,17 @@ public class StreamTunnel {
             write(itemCount);
             write(uses);
           }
+        }
+        else {
+          // Drop the item in hand. This keeps the client state in-sync with the
+          // server. This generally prevents empty-hand clicks by the client
+          // from placing blocks the server thinks the client has in hand.
+          write((byte) 0x0e);
+          write((byte) 0x04);
+          write(x);
+          write(y);
+          write(z);
+          write(direction);
         }
         break;
       case 0x10: // Holding Change
