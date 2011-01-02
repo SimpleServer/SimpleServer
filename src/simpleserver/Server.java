@@ -321,8 +321,8 @@ public class Server {
       message = "Server restarting!";
     }
 
-    for (Player p : playerList.getArray()) {
-      p.kick(message);
+    for (Player player : playerList.getArray()) {
+      player.kick(message);
     }
   }
 
