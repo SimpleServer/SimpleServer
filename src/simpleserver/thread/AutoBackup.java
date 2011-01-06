@@ -27,7 +27,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Calendar;
+import java.util.Date;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -36,8 +36,9 @@ import simpleserver.Server;
 public class AutoBackup {
   private static final long MILLISECONDS_PER_MINUTE = 1000 * 60;
   private static final long MILLISECONDS_PER_HOUR = MILLISECONDS_PER_MINUTE * 60;
-  private static final File backupDirectory = new File("backups");
-  private static final File tempDirectory = new File("tmp");
+  private static final String NAME_FORMAT = "%tF-%1$tH-%1$tM";
+  private static final File BACKUP_DIRECTORY = new File("backups");
+  private static final File TEMP_DIRECTORY = new File("tmp");
 
   private final Server server;
   private final byte[] copyBuffer;
@@ -80,7 +81,7 @@ public class AutoBackup {
       zipBackup(copy);
     }
     finally {
-      deleteRecursively(tempDirectory);
+      deleteRecursively(TEMP_DIRECTORY);
     }
     purgeOldBackups();
     server.runCommand("say", server.l.get("BACKUP_COMPLETE"));
@@ -95,10 +96,10 @@ public class AutoBackup {
   }
 
   private long lastBackupAge() {
-    backupDirectory.mkdir();
+    BACKUP_DIRECTORY.mkdir();
 
     long newest = 0;
-    for (File file : backupDirectory.listFiles()) {
+    for (File file : BACKUP_DIRECTORY.listFiles()) {
       long modified = file.lastModified();
       if (modified > newest) {
         newest = modified;
@@ -108,10 +109,10 @@ public class AutoBackup {
   }
 
   private void purgeOldBackups() {
-    backupDirectory.mkdir();
+    BACKUP_DIRECTORY.mkdir();
     long maxAge = MILLISECONDS_PER_HOUR
         * server.options.getInt("keepBackupHours");
-    for (File file : backupDirectory.listFiles()) {
+    for (File file : BACKUP_DIRECTORY.listFiles()) {
       if (System.currentTimeMillis() - file.lastModified() > maxAge) {
         deleteRecursively(file);
       }
@@ -119,21 +120,16 @@ public class AutoBackup {
   }
 
   private File makeTemporaryCopy() throws IOException {
-    tempDirectory.mkdir();
-    Calendar date = Calendar.getInstance();
-    File backup = new File(tempDirectory, date.get(Calendar.YEAR) + "-"
-        + (date.get(Calendar.MONTH) + 1) + "-" + date.get(Calendar.DATE) + "-"
-        + date.get(Calendar.HOUR_OF_DAY) + "_" + date.get(Calendar.MINUTE));
+    TEMP_DIRECTORY.mkdir();
+    File backup = new File(TEMP_DIRECTORY, String.format(NAME_FORMAT,
+                                                         new Date()));
     copyRecursively(new File(server.options.get("levelName")), backup);
     return backup;
   }
 
   private void zipBackup(File source) throws IOException {
-    Calendar date = Calendar.getInstance();
-    File backup = new File(backupDirectory, date.get(Calendar.YEAR) + "-"
-        + (date.get(Calendar.MONTH) + 1) + "-" + date.get(Calendar.DATE) + "-"
-        + date.get(Calendar.HOUR_OF_DAY) + "_" + date.get(Calendar.MINUTE)
-        + ".zip");
+    File backup = new File(BACKUP_DIRECTORY,
+                           String.format(NAME_FORMAT + ".zip", new Date()));
     FileOutputStream fout = new FileOutputStream(backup);
     try {
       ZipOutputStream out = new ZipOutputStream(new BufferedOutputStream(fout));
