@@ -46,6 +46,7 @@ public class StreamTunnel {
   private static final int DESTROY_HITS = 14;
   private static final byte BLOCK_DESTROYED_STATUS = 3;
   private static final Pattern MESSAGE_PATTERN = Pattern.compile("^<([^>]+)> (.*)$");
+  private static final Pattern COLOR_PATTERN = Pattern.compile("\u00a7[0-9a-f]");
 
   private final boolean isServerTunnel;
   private final String streamType;
@@ -161,7 +162,10 @@ public class StreamTunnel {
       case 0x03: // Chat Message
         String message = in.readUTF();
         if (isServerTunnel && server.options.getBoolean("useMsgFormats")) {
-          Matcher messageMatcher = MESSAGE_PATTERN.matcher(message);
+          Matcher colorMatcher = COLOR_PATTERN.matcher(message);
+          String cleanMessage = colorMatcher.replaceAll("");
+
+          Matcher messageMatcher = MESSAGE_PATTERN.matcher(cleanMessage);
           if (messageMatcher.find()) {
             Player friend = server.findPlayerExact(messageMatcher.group(1));
 
