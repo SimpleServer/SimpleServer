@@ -43,7 +43,11 @@ public class OutputWrapper implements Wrapper {
 
   public void stop() {
     run = false;
-    scanner.close();
+    //This caused the SimpleServer listener to throw an exception and fail sometimes.
+    try {
+      scanner.close();
+    }
+    catch (Exception e) { }
   }
 
   public void join() throws InterruptedException {
