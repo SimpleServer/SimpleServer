@@ -327,10 +327,10 @@ public class StreamTunnel {
         final short dropItem = in.readShort();
 
         byte itemCount = 0;
-        byte uses = 0;
+        short uses = 0;
         if (dropItem != -1) {
           itemCount = in.readByte();
-          uses = in.readByte();
+          uses = in.readShort();
         }
 
         boolean writePacket = true;
@@ -576,14 +576,14 @@ public class StreamTunnel {
           write(moveItem);
           if (moveItem != -1) {
             write(in.readByte());
-            write(in.readByte());
+            write(in.readShort());
           }
         }
         else {
           short moveItem = in.readShort();
           if (moveItem != -1) {
             in.readByte();
-            in.readByte();
+            in.readShort();
           }
         }
         break;
