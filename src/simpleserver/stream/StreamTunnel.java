@@ -451,7 +451,15 @@ public class StreamTunnel {
         break;
       case 0x18: // Mob Spawn
         write(packetId);
-        copyNBytes(19);
+        write(in.readInt());
+        write(in.readByte());
+        write(in.readInt());
+        write(in.readInt());
+        write(in.readInt());
+        write(in.readByte());
+        write(in.readByte());
+
+        copyUnknownBlob();
         break;
       case 0x19: // ???
         write(packetId);
@@ -497,6 +505,12 @@ public class StreamTunnel {
       case 0x27: // Attach Entity?
         write(packetId);
         copyNBytes(8);
+        break;
+      case 0x28: // ???
+        write(packetId);
+        write(in.readInt());
+
+        copyUnknownBlob();
         break;
       case 0x32: // Pre-Chunk
         write(packetId);
@@ -687,6 +701,40 @@ public class StreamTunnel {
     }
   }
 
+  private void copyUnknownBlob() throws IOException {
+    byte unknown = in.readByte();
+    write(unknown);
+
+    while (unknown != 0x7f) {
+      int type = (unknown & 0xE0) >> 5;
+
+      switch (type) {
+        case 0:
+          write(in.readByte());
+          break;
+        case 1:
+          write(in.readShort());
+          break;
+        case 2:
+          write(in.readInt());
+          break;
+        case 3:
+          write(in.readFloat());
+          break;
+        case 4:
+          write(in.readUTF());
+          break;
+        case 5:
+          write(in.readShort());
+          write(in.readByte());
+          write(in.readShort());
+      }
+
+      unknown = in.readByte();
+      write(unknown);
+    }
+  }
+
   private void write(byte b) throws IOException {
     out.writeByte(b);
   }
@@ -703,7 +751,6 @@ public class StreamTunnel {
     out.writeLong(l);
   }
 
-  @SuppressWarnings("unused")
   private void write(float f) throws IOException {
     out.writeFloat(f);
   }
