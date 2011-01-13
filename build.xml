@@ -35,11 +35,13 @@
 
   <target name="create-release-zip" depends="create-release-jar">
     <zip destfile="SimpleServer.zip">
-      <zipfileset file="SimpleServer.jar"/>
       <zipfileset file="CHANGES"/>
-      <zipfileset file="README"/>
       <zipfileset file="CONTRIBUTORS"/>
       <zipfileset file="LICENSE"/>
+      <zipfileset file="README"/>
+      <zipfileset file="launch.bat"/>
+      <zipfileset file="launch.sh"/>
+      <zipfileset file="SimpleServer.jar"/>
     </zip>
   </target>
 
