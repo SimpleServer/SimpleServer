@@ -218,6 +218,7 @@ public class StreamTunnel {
         write(in.readInt());
         write(in.readShort());
         write(in.readShort());
+        write(in.readShort());
         break;
       case 0x06: // Spawn Position
         write(packetId);
@@ -434,11 +435,11 @@ public class StreamTunnel {
         break;
       case 0x15: // Pickup spawn
         if (player.getGroupId() < 0) {
-          skipNBytes(22);
+          skipNBytes(24);
           break;
         }
         write(packetId);
-        copyNBytes(22);
+        copyNBytes(24);
         break;
       case 0x16: // Collect Item
         write(packetId);
@@ -451,6 +452,15 @@ public class StreamTunnel {
       case 0x18: // Mob Spawn
         write(packetId);
         copyNBytes(19);
+        break;
+      case 0x19: // ???
+        write(packetId);
+        write(in.readInt());
+        write(in.readUTF());
+        write(in.readInt());
+        write(in.readInt());
+        write(in.readInt());
+        write(in.readInt());
         break;
       case 0x1c: // Entity Velocity?
         write(packetId);
@@ -510,6 +520,10 @@ public class StreamTunnel {
         write(packetId);
         copyNBytes(11);
         break;
+      case 0x36: // ???
+        write(packetId);
+        copyNBytes(12);
+        break;
       case 0x3c: // Explosion
         write(packetId);
         copyNBytes(28);
@@ -565,7 +579,7 @@ public class StreamTunnel {
           write(setItem);
           if (setItem != -1) {
             write(in.readByte());
-            write(in.readByte());
+            write(in.readShort());
           }
         }
         else {
@@ -573,7 +587,7 @@ public class StreamTunnel {
           short setItem = in.readShort();
           if (setItem != -1) {
             in.readByte();
-            in.readByte();
+            in.readShort();
           }
         }
         break;
