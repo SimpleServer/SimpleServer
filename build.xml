@@ -14,7 +14,7 @@
     </exec>
   </target>
 
-  <target name="release" depends="clean, create-release-jar" />
+  <target name="release" depends="clean, create-release-zip" />
 
   <target name="create-release-jar" depends="set-version">
     <jar destfile="SimpleServer.jar">
@@ -33,8 +33,19 @@
     </jar>
   </target>
 
+  <target name="create-release-zip" depends="create-release-jar">
+    <zip destfile="SimpleServer.zip">
+      <zipfileset file="SimpleServer.jar"/>
+      <zipfileset file="CHANGES"/>
+      <zipfileset file="README"/>
+      <zipfileset file="CONTRIBUTORS"/>
+      <zipfileset file="LICENSE"/>
+    </zip>
+  </target>
+
   <target name="clean">
     <delete file="SimpleServer.jar"/>
+    <delete file="SimpleServer.zip"/>
     <delete file="${version-file}"/>
   </target>
 </project>
