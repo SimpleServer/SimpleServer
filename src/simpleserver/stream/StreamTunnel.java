@@ -427,6 +427,11 @@ public class StreamTunnel {
         write(packetId);
         copyNBytes(5);
         break;
+      case 0x13: // ???
+        write(packetId);
+        write(in.readInt());
+        write(in.readByte());
+        break;
       case 0x14: // Named Entity Spawn
         write(packetId);
         write(in.readInt());
