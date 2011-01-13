@@ -1,2 +1,2 @@
 
-git log -n1 --format=%h > "%1"
+git log -n1 --format=%%h > "%1"
