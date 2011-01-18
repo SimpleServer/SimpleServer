@@ -1,4 +1,9 @@
 == 7.1 (in-development) ==
+ * Workaround 5 second timer in minecraft_server.jar by cycling through the
+   entire 127.0.0.0/8 address space.  If you are running Windows XP SP2, you
+   may need to install this patch from Microsoft.
+   http://support.microsoft.com/kb/884020
+ * Fix mod integration when useSlashes=true
 
 == 7.0 ==
  * Updated to work with version 1.2
