@@ -286,8 +286,8 @@ public class Player {
     }
 
     command.execute(this, message);
-    return !(command.shouldPassThroughToSMPAPI() && server.options.getBoolean("useSMPAPI"))
-        || message.startsWith("/");
+    return !(command.shouldPassThroughToSMPAPI()
+        && server.options.getBoolean("useSMPAPI") || message.startsWith("/"));
   }
 
   public boolean commandAllowed(String command) {
