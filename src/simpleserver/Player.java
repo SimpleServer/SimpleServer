@@ -82,8 +82,7 @@ public class Player {
       InetAddress localAddress = InetAddress.getByName(addressFactory.getNextAddress());
       intsocket = new Socket(InetAddress.getByName(null),
                              server.options.getInt("internalPort"),
-                             localAddress,
-                             server.options.getInt("internalPort"));
+                             localAddress, 0);
     }
     catch (Exception e) {
       e.printStackTrace();
