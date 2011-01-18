@@ -30,6 +30,8 @@ import simpleserver.command.PlayerCommand;
 import simpleserver.stream.StreamTunnel;
 
 public class Player {
+  private static final LocalAddressFactory addressFactory = new LocalAddressFactory();
+
   private final long connected;
   private final Socket extsocket;
   private final Server server;
@@ -77,7 +79,10 @@ public class Player {
     server.requestTracker.addRequest(getIPAddress());
 
     try {
+      InetAddress localAddress = InetAddress.getByName(addressFactory.getNextAddress());
       intsocket = new Socket(InetAddress.getByName(null),
+                             server.options.getInt("internalPort"),
+                             localAddress,
                              server.options.getInt("internalPort"));
     }
     catch (Exception e) {
@@ -394,12 +399,12 @@ public class Player {
       try {
         extsocket.close();
       }
-      catch (IOException e) {
+      catch (Exception e) {
       }
       try {
         intsocket.close();
       }
-      catch (IOException e) {
+      catch (Exception e) {
       }
 
       if (!isRobot) {
@@ -428,6 +433,33 @@ public class Player {
       }
 
       cleanup();
+    }
+  }
+
+  private static final class LocalAddressFactory {
+    private static final int[] octets = { 0, 0, 1 };
+
+    private synchronized String getNextAddress() {
+      if (octets[2] >= 255) {
+        if (octets[1] >= 255) {
+          if (octets[0] >= 255) {
+            octets[0] = 0;
+          }
+          else {
+            ++octets[0];
+          }
+          octets[1] = 0;
+        }
+        else {
+          ++octets[1];
+        }
+        octets[2] = 2;
+      }
+      else {
+        ++octets[2];
+      }
+
+      return "127." + octets[0] + "." + octets[1] + "." + octets[2];
     }
   }
 }
