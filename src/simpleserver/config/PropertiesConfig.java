@@ -28,6 +28,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Properties;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public abstract class PropertiesConfig extends AbstractConfig {
   private boolean layered;
@@ -112,22 +114,9 @@ public abstract class PropertiesConfig extends AbstractConfig {
 
   @Override
   protected String getHeader() {
-    String comments = super.getHeader();
+    Pattern linePattern = Pattern.compile("^", Pattern.MULTILINE);
+    Matcher lineMatcher = linePattern.matcher(super.getHeader()); 
 
-    boolean propertiesFormatsComments;
-    try {
-      Properties.class.getDeclaredMethod("writeComments", BufferedWriter.class,
-                                         String.class);
-      propertiesFormatsComments = true;
-    }
-    catch (NoSuchMethodException e) {
-      propertiesFormatsComments = false;
-    }
-
-    if (!propertiesFormatsComments) {
-      comments = comments.replaceAll("^", "#").substring(1);
-    }
-
-    return comments;
+    return lineMatcher.replaceAll("#").substring(1);
   }
 }
