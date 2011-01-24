@@ -20,7 +20,6 @@
  */
 package simpleserver.config;
 
-import java.io.BufferedWriter;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -115,7 +114,7 @@ public abstract class PropertiesConfig extends AbstractConfig {
   @Override
   protected String getHeader() {
     Pattern linePattern = Pattern.compile("^", Pattern.MULTILINE);
-    Matcher lineMatcher = linePattern.matcher(super.getHeader()); 
+    Matcher lineMatcher = linePattern.matcher(super.getHeader());
 
     return lineMatcher.replaceAll("#").substring(1);
   }
