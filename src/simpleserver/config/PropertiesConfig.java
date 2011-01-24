@@ -20,6 +20,7 @@
  */
 package simpleserver.config;
 
+import java.io.BufferedWriter;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -107,5 +108,26 @@ public abstract class PropertiesConfig extends AbstractConfig {
       e.printStackTrace();
       System.out.println("Failed to load defaults for " + getFilename());
     }
+  }
+
+  @Override
+  protected String getHeader() {
+    String comments = super.getHeader();
+
+    boolean propertiesFormatsComments;
+    try {
+      Properties.class.getDeclaredMethod("writeComments", BufferedWriter.class,
+                                         String.class);
+      propertiesFormatsComments = true;
+    }
+    catch (NoSuchMethodException e) {
+      propertiesFormatsComments = false;
+    }
+
+    if (!propertiesFormatsComments) {
+      comments = comments.replaceAll("^", "#").substring(1);
+    }
+
+    return comments;
   }
 }
