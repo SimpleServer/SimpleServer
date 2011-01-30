@@ -55,11 +55,11 @@ public class GiveCommand extends AbstractCommand implements PlayerCommand {
         amount = arguments[offset + 1];
       }
 
-      target.give(item, amount);
       player.getServer().adminLog("User " + player.getName()
-                                      + " used giveplayer:\t "
+                                      + " used giveplayer:\t"
                                       + target.getName() + "\t" + item + "\t("
                                       + amount + ")");
+      target.give(item, amount);
     }
     else {
       player.addMessage("\u00a7cNo item or amount specified!");

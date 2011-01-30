@@ -44,6 +44,10 @@ public class CommandList extends PropertiesConfig {
   }
 
   public String[] getAliases(String command) {
+    if (command == null) {
+      return new String[] {};
+    }
+
     command = command.toLowerCase();
 
     List<String> names = new LinkedList<String>();
