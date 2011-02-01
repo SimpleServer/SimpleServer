@@ -72,11 +72,7 @@ public class Options extends AbstractOptions {
   protected void missingFile() {
     super.missingFile();
 
-    System.out.println("Properties file not found! Created simpleserver.properties! Adjust values and then start the server again!");
-    System.out.println("Press enter to continue...");
-    Scanner in = new Scanner(System.in);
-    in.nextLine();
-    System.exit(0);
+    System.out.println("Properties file not found. Created simpleserver.properties!");
   }
 
   private void conversion() {
