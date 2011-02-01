@@ -451,6 +451,11 @@ public class Server {
           break;
         }
 
+        System.out.println("[SimpleServer] Wrapper listening on "
+            + socket.getInetAddress().getHostAddress() + ":"
+            + socket.getLocalPort() + " (connect here)");
+        System.out.println("[SimpleServer] Note: 0.0.0.0 means all IP addresses; you want this.");
+
         try {
           while (run) {
             Socket client;

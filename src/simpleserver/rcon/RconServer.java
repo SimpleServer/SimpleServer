@@ -21,8 +21,10 @@
 package simpleserver.rcon;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.UnknownHostException;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -63,16 +65,36 @@ public class RconServer {
   private class Listener extends Thread {
     @Override
     public void run() {
+      String ip = server.options.get("ipAddress");
       int port = server.options.getInt("rconPort");
+
+      InetAddress address;
+      if (ip.equals("0.0.0.0")) {
+        address = null;
+      }
+      else {
+        try {
+          address = InetAddress.getByName(ip);
+        }
+        catch (UnknownHostException e) {
+          e.printStackTrace();
+          System.out.println("Invalid listening address " + ip);
+          return;
+        }
+      }
+
       try {
-        socket = new ServerSocket(port);
+        socket = new ServerSocket(port, 0, address);
       }
       catch (IOException e) {
         System.out.println("Could not listen on port " + port
             + "!\nIs it already in use? RCON is not available!");
         return;
       }
-      System.out.println("Opened RCON on port: " + port + "!");
+
+      System.out.println("[SimpleServer] RCON listening on "
+          + socket.getInetAddress().getHostAddress() + ":"
+          + socket.getLocalPort());
 
       try {
         while (run) {
