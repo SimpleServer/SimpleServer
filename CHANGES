@@ -3,7 +3,10 @@
    entire 127.0.0.0/8 address space.  If you are running Windows XP SP2, you
    may need to install this patch from Microsoft.
    http://support.microsoft.com/kb/884020
+   The workaround will not work correctly on OSX, but the wrapper will
+   function as before.
  * Fix mod integration when useSlashes=true
+ * Other bug fixes
 
 == 7.0 ==
  * Updated to work with version 1.2
