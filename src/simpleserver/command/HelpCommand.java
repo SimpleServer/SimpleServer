@@ -74,6 +74,8 @@ public class HelpCommand extends AbstractCommand implements PlayerCommand {
       }
 
       player.addMessage(line.toString());
+      player.addMessage("\u00a77Say " + prefix
+          + "help command for details of a specific command.");
     }
   }
 }
