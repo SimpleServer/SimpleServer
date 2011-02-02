@@ -42,7 +42,7 @@ public class MessageHandler {
   public void handleError(Exception exception) {
     if (!server.isRestarting() && !server.isStopping()) {
       if (exception != null) {
-        exception.printStackTrace();
+        System.out.println("[SimpleServer] " + exception);
       }
 
       String baseError = "[SimpleServer] Minecraft process stopped unexpectedly!";

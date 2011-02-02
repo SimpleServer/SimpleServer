@@ -440,8 +440,8 @@ public class Server {
             address = InetAddress.getByName(ip);
           }
           catch (UnknownHostException e) {
-            e.printStackTrace();
-            System.out.println("Invalid listening address " + ip);
+            System.out.println("[SimpleServer] " + e);
+            System.out.println("[SimpleServer] Invalid listening address " + ip);
             break;
           }
         }
@@ -450,8 +450,8 @@ public class Server {
           socket = new ServerSocket(port, 0, address);
         }
         catch (IOException e) {
-          e.printStackTrace();
-          System.out.println("Could not listen on port " + port
+          System.out.println("[SimpleServer] " + e);
+          System.out.println("[SimpleServer] Could not listen on port " + port
               + "!\nIs it already in use? Exiting application...");
           break;
         }
@@ -469,8 +469,9 @@ public class Server {
             }
             catch (IOException e) {
               if (run && !restart) {
-                e.printStackTrace();
-                System.out.println("Accept failed on port " + port + "!");
+                System.out.println("[SimpleServer] " + e);
+                System.out.println("[SimpleServer] Accept failed on port "
+                    + port + "!");
               }
               break;
             }

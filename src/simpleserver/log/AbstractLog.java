@@ -44,8 +44,9 @@ public class AbstractLog {
       stream = new FileOutputStream(getLogFile(), true);
     }
     catch (FileNotFoundException e) {
-      e.printStackTrace();
-      System.out.println("Unable to open " + name + " log for writing!");
+      System.out.println("[SimpleServer] " + e);
+      System.out.println("[SimpleServer] Unable to open " + name
+          + " log for writing!");
       return;
     }
 
@@ -90,8 +91,9 @@ public class AbstractLog {
             stream.flush();
           }
           catch (IOException e) {
-            e.printStackTrace();
-            System.out.println("Writing to " + name + " log failed!");
+            System.out.println("[SimpleServer] " + e);
+            System.out.println("[SimpleServer] Writing to " + name
+                + " log failed!");
             break;
           }
         }

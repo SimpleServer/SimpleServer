@@ -72,8 +72,8 @@ public abstract class PropertiesConfig extends AbstractConfig {
       save();
     }
     catch (IOException e) {
-      e.printStackTrace();
-      System.out.println("Failed to load " + getFilename());
+      System.out.println("[SimpleServer] " + e);
+      System.out.println("[SimpleServer] Failed to load " + getFilename());
     }
   }
 
@@ -89,8 +89,8 @@ public abstract class PropertiesConfig extends AbstractConfig {
       }
     }
     catch (IOException e) {
-      e.printStackTrace();
-      System.out.println("Failed to save " + getFilename());
+      System.out.println("[SimpleServer] " + e);
+      System.out.println("[SimpleServer] Failed to save " + getFilename());
     }
   }
 
@@ -106,8 +106,9 @@ public abstract class PropertiesConfig extends AbstractConfig {
       }
     }
     catch (IOException e) {
-      e.printStackTrace();
-      System.out.println("Failed to load defaults for " + getFilename());
+      System.out.println("[SimpleServer] " + e);
+      System.out.println("[SimpleServer] Failed to load defaults for "
+          + getFilename());
     }
   }
 

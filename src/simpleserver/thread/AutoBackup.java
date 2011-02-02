@@ -258,8 +258,8 @@ public class AutoBackup {
           }
           catch (IOException e) {
             server.errorLog(e, "Server Backup Failure");
-            e.printStackTrace();
-            System.out.println("[WARNING] Automated Server Backup Failure!");
+            System.out.println("[SimpleServer] " + e);
+            System.out.println("[SimpleServer] Automated Server Backup Failure!");
           }
           server.saveLock.release();
         }

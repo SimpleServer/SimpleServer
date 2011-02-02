@@ -840,9 +840,9 @@ public class StreamTunnel {
           }
           catch (IOException e) {
             if (run && !player.isRobot()) {
-              e.printStackTrace();
-              System.out.println(streamType + " error handling traffic for "
-                  + player.getIPAddress());
+              System.out.println("[SimpleServer] " + e);
+              System.out.println("[SimpleServer] " + streamType
+                  + " error handling traffic for " + player.getIPAddress());
             }
             break;
           }

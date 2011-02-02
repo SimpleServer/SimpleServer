@@ -94,8 +94,8 @@ public abstract class AbstractOptions implements Resource {
       missingFile();
     }
     catch (IOException e) {
-      e.printStackTrace();
-      System.out.println("Could not read " + filename);
+      System.out.println("[SimpleServer] " + e);
+      System.out.println("[SimpleServer] Could not read " + filename);
     }
   }
 
@@ -112,8 +112,8 @@ public abstract class AbstractOptions implements Resource {
       }
     }
     catch (IOException e) {
-      e.printStackTrace();
-      System.out.println("Could not write " + filename);
+      System.out.println("[SimpleServer] " + e);
+      System.out.println("[SimpleServer] Could not write " + filename);
     }
   }
 
@@ -138,8 +138,8 @@ public abstract class AbstractOptions implements Resource {
       }
     }
     catch (IOException e) {
-      e.printStackTrace();
-      System.out.println("Could not read default " + filename);
+      System.out.println("[SimpleServer] " + e);
+      System.out.println("[SimpleServer] Could not read default " + filename);
     }
 
     options = (Properties) defaultOptions.clone();

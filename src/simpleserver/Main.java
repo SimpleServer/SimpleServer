@@ -50,8 +50,8 @@ public class Main {
         }
       }
       catch (IOException e) {
-        e.printStackTrace();
-        System.out.println("Warning, jar may be corrupted!");
+        System.out.println("[SimpleServer] " + e);
+        System.out.println("[SimpleServer] Warning, jar may be corrupted!");
       }
     }
 

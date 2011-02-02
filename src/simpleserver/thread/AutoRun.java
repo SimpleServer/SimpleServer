@@ -99,7 +99,7 @@ public class AutoRun {
             }
             catch (IOException e) {
               server.runCommand("say", "Mapping Failed!");
-              e.printStackTrace();
+              System.out.println("[SimpleServer] " + e);
               System.out.println("[SimpleServer] Cron Failed! Bad Command!");
               server.errorLog(e, "AutoRun Failure");
               continue;
