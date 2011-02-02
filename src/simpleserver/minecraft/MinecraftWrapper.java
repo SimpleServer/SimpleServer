@@ -20,9 +20,16 @@
  */
 package simpleserver.minecraft;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.zip.ZipFile;
 
 import simpleserver.Server;
 import simpleserver.options.MinecraftOptions;
@@ -30,6 +37,7 @@ import simpleserver.options.Options;
 import simpleserver.thread.SystemInputQueue;
 
 public class MinecraftWrapper {
+  private static final String DOWNLOAD_URL = "http://www.minecraft.net/download/minecraft_server.jar";
   private static final String COMMAND_FORMAT = "java %s -Xmx%sM -Xms%sM -jar %s nogui";
   private static final String SERVER_JAR = "minecraft_server.jar";
   private static final int MINIMUM_MEMORY = 1024;
@@ -52,6 +60,76 @@ public class MinecraftWrapper {
     this.systemInput = systemInput;
   }
 
+  public boolean prepareServerJar() {
+    if (verifyMinecraftJar()) {
+      return true;
+    }
+
+    System.out.println("[SimpleServer] Downloading " + SERVER_JAR
+        + ".  Please wait!");
+
+    URL downloadUrl;
+    try {
+      downloadUrl = new URL(DOWNLOAD_URL);
+    }
+    catch (MalformedURLException e) {
+      System.out.println("[SimpleServer] " + e);
+      System.out.println("[SimpleServer] Unable to download " + SERVER_JAR
+          + "!");
+      return false;
+    }
+
+    InputStream downloadStream;
+    try {
+      downloadStream = downloadUrl.openStream();
+    }
+    catch (IOException e) {
+      System.out.println("[SimpleServer] " + e);
+      System.out.println("[SimpleServer] Unable to download " + SERVER_JAR
+          + "!");
+      return false;
+    }
+
+    OutputStream outputFile;
+    try {
+      outputFile = new FileOutputStream(SERVER_JAR);
+    }
+    catch (FileNotFoundException e) {
+      System.out.println("[SimpleServer] " + e);
+      System.out.println("[SimpleServer] Unable to save " + SERVER_JAR + "!");
+      return false;
+    }
+
+    int bufferSize = 4096;
+    byte[] buffer = new byte[bufferSize];
+    int bytesRead;
+
+    try {
+      try {
+        while ((bytesRead = downloadStream.read(buffer)) != -1) {
+          outputFile.write(buffer, 0, bytesRead);
+        }
+      }
+      finally {
+        downloadStream.close();
+        outputFile.close();
+      }
+    }
+    catch (IOException e) {
+      System.out.println("[SimpleServer] " + e);
+      System.out.println("[SimpleServer] Unable to save " + SERVER_JAR + "!");
+      return false;
+    }
+
+    if (verifyMinecraftJar()) {
+      return true;
+    }
+    else {
+      System.out.println("[SimpleServer] " + SERVER_JAR + " is corrupt!");
+      return false;
+    }
+  }
+
   public void start() throws InterruptedException {
     minecraftOptions.save();
     Runtime runtime = Runtime.getRuntime();
@@ -61,7 +139,7 @@ public class MinecraftWrapper {
       minecraft = runtime.exec(command);
     }
     catch (IOException e) {
-      e.printStackTrace();
+      System.out.println("[SimpleServer] " + e);
       System.out.println("[SimpleServer] FATAL ERROR: Could not start minecraft_server.jar!");
       System.exit(-1);
     }
@@ -115,12 +193,32 @@ public class MinecraftWrapper {
       minimumMemory = options.getInt("memory");
     }
 
-    String serverJar = SERVER_JAR;
+    return String.format(COMMAND_FORMAT, options.get("javaArguments"),
+                         options.get("memory"), minimumMemory, getServerJar());
+  }
+
+  private String getServerJar() {
     if (options.contains("alternateJarFile")) {
-      serverJar = options.get("alternateJarFile");
+      return options.get("alternateJarFile");
     }
 
-    return String.format(COMMAND_FORMAT, options.get("javaArguments"),
-                         options.get("memory"), minimumMemory, serverJar);
+    return SERVER_JAR;
+  }
+
+  private boolean verifyMinecraftJar() {
+    if (getServerJar() != SERVER_JAR) {
+      return true;
+    }
+
+    boolean valid = false;
+    try {
+      ZipFile jar = new ZipFile(SERVER_JAR);
+      valid = jar.size() > 200;
+      jar.close();
+    }
+    catch (IOException e) {
+    }
+
+    return valid;
   }
 }

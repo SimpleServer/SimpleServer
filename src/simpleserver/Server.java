@@ -368,6 +368,11 @@ public class Server {
     requestTracker = new RequestTracker(this);
 
     minecraft = new MinecraftWrapper(this, options, systemInput);
+    if (!minecraft.prepareServerJar()) {
+      System.out.println("Please download minecraft_server.jar to the folder with SimpleServer.jar.");
+      System.exit(1);
+    }
+
     try {
       minecraft.start();
     }
