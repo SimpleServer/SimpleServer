@@ -8,5 +8,8 @@
 	<classpathentry kind="lib" path="lib/slf4j-nop-1.6.1.jar"/>
 	<classpathentry kind="lib" path="lib/dom4j-1.6.jar"/>
 	<classpathentry kind="lib" path="lib/javassist-3.8.0.GA.jar"/>
+	<classpathentry kind="lib" path="lib/httpclient-4.1.jar"/>
+	<classpathentry kind="lib" path="lib/httpcore-4.1.jar"/>
+	<classpathentry kind="lib" path="lib/commons-logging-1.1.1.jar" sourcepath="lib/commons-logging-1.1.1-sources.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

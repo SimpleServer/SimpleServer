@@ -23,13 +23,18 @@ package simpleserver.minecraft;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.io.UnsupportedEncodingException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.zip.ZipFile;
+
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.ResponseHandler;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.BasicResponseHandler;
+import org.apache.http.impl.client.DefaultHttpClient;
 
 import simpleserver.Server;
 import simpleserver.options.MinecraftOptions;
@@ -68,26 +73,26 @@ public class MinecraftWrapper {
     System.out.println("[SimpleServer] Downloading " + SERVER_JAR
         + ".  Please wait!");
 
-    URL downloadUrl;
+    HttpClient httpclient = new DefaultHttpClient();
+    String responseBody;
     try {
-      downloadUrl = new URL(DOWNLOAD_URL);
-    }
-    catch (MalformedURLException e) {
-      System.out.println("[SimpleServer] " + e);
-      System.out.println("[SimpleServer] Unable to download " + SERVER_JAR
-          + "!");
-      return false;
-    }
+      HttpGet httpget = new HttpGet(DOWNLOAD_URL);
+      ResponseHandler<String> responseHandler = new BasicResponseHandler();
 
-    InputStream downloadStream;
-    try {
-      downloadStream = downloadUrl.openStream();
+      try {
+        responseBody = httpclient.execute(httpget, responseHandler);
+      }
+      catch (ClientProtocolException e) {
+        autodownloadError(e, "download");
+        return false;
+      }
+      catch (IOException e) {
+        autodownloadError(e, "download");
+        return false;
+      }
     }
-    catch (IOException e) {
-      System.out.println("[SimpleServer] " + e);
-      System.out.println("[SimpleServer] Unable to download " + SERVER_JAR
-          + "!");
-      return false;
+    finally {
+      httpclient.getConnectionManager().shutdown();
     }
 
     OutputStream outputFile;
@@ -95,29 +100,19 @@ public class MinecraftWrapper {
       outputFile = new FileOutputStream(SERVER_JAR);
     }
     catch (FileNotFoundException e) {
-      System.out.println("[SimpleServer] " + e);
-      System.out.println("[SimpleServer] Unable to save " + SERVER_JAR + "!");
+      autodownloadError(e, "save");
       return false;
     }
 
-    int bufferSize = 4096;
-    byte[] buffer = new byte[bufferSize];
-    int bytesRead;
-
     try {
-      try {
-        while ((bytesRead = downloadStream.read(buffer)) != -1) {
-          outputFile.write(buffer, 0, bytesRead);
-        }
-      }
-      finally {
-        downloadStream.close();
-        outputFile.close();
-      }
+      outputFile.write(responseBody.getBytes("ISO-8859-1"));
+    }
+    catch (UnsupportedEncodingException e) {
+      autodownloadError(e, "save");
+      return false;
     }
     catch (IOException e) {
-      System.out.println("[SimpleServer] " + e);
-      System.out.println("[SimpleServer] Unable to save " + SERVER_JAR + "!");
+      autodownloadError(e, "save");
       return false;
     }
 
@@ -220,5 +215,11 @@ public class MinecraftWrapper {
     }
 
     return valid;
+  }
+
+  private void autodownloadError(Exception e, String stepName) {
+    System.out.println("[SimpleServer] " + e);
+    System.out.println("[SimpleServer] Unable to " + stepName + " "
+        + SERVER_JAR + "!");
   }
 }

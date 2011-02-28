@@ -24,12 +24,15 @@
       </manifest>
 
       <fileset dir="bin"/>
+      <zipfileset excludes="META-INF/**" src="lib/commons-logging-1.1.1.jar"/>
+      <zipfileset excludes="META-INF/**" src="lib/dom4j-1.6.jar"/>
       <zipfileset excludes="META-INF/**" src="lib/guava-r07.jar"/>
+      <zipfileset excludes="META-INF/**" src="lib/httpclient-4.1.jar"/>
+      <zipfileset excludes="META-INF/**" src="lib/httpcore-4.1.jar"/>
+      <zipfileset excludes="META-INF/**" src="lib/javassist-3.8.0.GA.jar"/>
       <zipfileset excludes="META-INF/**" src="lib/reflections-0.9.5-RC2.jar"/>
       <zipfileset excludes="META-INF/**" src="lib/slf4j-api-1.6.1.jar"/>
       <zipfileset excludes="META-INF/**" src="lib/slf4j-nop-1.6.1.jar"/>
-      <zipfileset excludes="META-INF/**" src="lib/dom4j-1.6.jar"/>
-      <zipfileset excludes="META-INF/**" src="lib/javassist-3.8.0.GA.jar"/>
     </jar>
   </target>
 
