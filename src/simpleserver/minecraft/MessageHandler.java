@@ -78,7 +78,7 @@ public class MessageHandler {
       }
     }
 
-    if (line.contains("[INFO] Done! ")) {
+    if (line.contains("[INFO] Done (")) {
       synchronized (this) {
         loaded = true;
         notifyAll();
