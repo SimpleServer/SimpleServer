@@ -369,7 +369,7 @@ public class Server {
 
     minecraft = new MinecraftWrapper(this, options, systemInput);
     if (!minecraft.prepareServerJar()) {
-      System.out.println("Please download minecraft_server.jar to the folder with SimpleServer.jar.");
+      System.out.println("[SimpleServer] Please download minecraft_server.jar to the folder with SimpleServer.jar.");
       System.exit(1);
     }
 
@@ -389,7 +389,7 @@ public class Server {
   }
 
   private void shutdown() {
-    System.out.println("Stopping Server...");
+    System.out.println("[SimpleServer] Stopping Server...");
     save = false;
 
     if (!saveLock.tryAcquire()) {
@@ -416,7 +416,7 @@ public class Server {
 
     playerList.waitUntilEmpty();
     minecraft.stop();
-    System.out.println("Server stopped successfully!");
+    System.out.println("[SimpleServer] Server stopped successfully!");
     saveLock.release();
   }
 
