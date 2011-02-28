@@ -423,6 +423,10 @@ public class StreamTunnel {
         write(packetId);
         copyNBytes(2);
         break;
+      case 0x11: // Use Bed
+        write(packetId);
+        copyNBytes(14);
+        break;
       case 0x12: // Animation
         write(packetId);
         copyNBytes(5);
@@ -466,7 +470,7 @@ public class StreamTunnel {
 
         copyUnknownBlob();
         break;
-      case 0x19: // ???
+      case 0x19: // Painting
         write(packetId);
         write(in.readInt());
         write(in.readUTF());
@@ -475,19 +479,23 @@ public class StreamTunnel {
         write(in.readInt());
         write(in.readInt());
         break;
+      case 0x1b: // ???
+        write(packetId);
+        copyNBytes(18);
+        break;
       case 0x1c: // Entity Velocity?
         write(packetId);
         copyNBytes(10);
         break;
-      case 0x1D: // Destroy Entity
+      case 0x1d: // Destroy Entity
         write(packetId);
         copyNBytes(4);
         break;
-      case 0x1E: // Entity
+      case 0x1e: // Entity
         write(packetId);
         copyNBytes(4);
         break;
-      case 0x1F: // Entity Relative Move
+      case 0x1f: // Entity Relative Move
         write(packetId);
         copyNBytes(7);
         break;
@@ -511,7 +519,7 @@ public class StreamTunnel {
         write(packetId);
         copyNBytes(8);
         break;
-      case 0x28: // ???
+      case 0x28: // Entity Metadata
         write(packetId);
         write(in.readInt());
 
