@@ -459,7 +459,10 @@ public class Server {
         System.out.println("[SimpleServer] Wrapper listening on "
             + socket.getInetAddress().getHostAddress() + ":"
             + socket.getLocalPort() + " (connect here)");
-        System.out.println("[SimpleServer] Note: 0.0.0.0 means all IP addresses; you want this.");
+        if (socket.getInetAddress().getHostAddress().equals("0.0.0.0")) {
+          System.out.println("[SimpleServer] Note: 0.0.0.0 means all"
+              + " IP addresses; you want this.");
+        }
 
         try {
           while (run) {
