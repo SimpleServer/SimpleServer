@@ -31,9 +31,9 @@ import simpleserver.config.CommandList;
 import simpleserver.options.Options;
 
 public class Main {
-  private static final String license = "SimpleServer -- Copyright (C) 2010 SimpleServer authors (see CONTRIBUTORS)";
+  private static final String license = "SimpleServer -- Copyright (C) 2011 SimpleServer authors (see CONTRIBUTORS)";
   private static final String warranty = "This program is licensed under The MIT License.\nSee file LICENSE for details.";
-  private static final String baseVersion = "7.1-dev";
+  private static final String baseVersion = "7.2-dev";
   private static final String version;
 
   static {

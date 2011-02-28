@@ -1,6 +1,6 @@
-Simple Server 7.1-dev
+Simple Server 7.2-dev
 An open source simple server tunnel for minecraft beta multiplayer servers.
-Copyright (c) 2010 SimpleServer authors (see CONTRIBUTORS)
+Copyright (c) 2011 SimpleServer authors (see CONTRIBUTORS)
 See LICENSE for details.
 
 Wiki: http://www.devfluid.com/simpleserver
@@ -8,13 +8,8 @@ Forum thread: http://www.minecraftforum.net/viewtopic.php?f=1012&t=27756
 Source: https://github.com/spiegalpwns/SimpleServer
 
 Installation:
-1) Download minecraft_server.jar from minecraft.net
-2) Unzip all files into the same directory as minecraft_server.jar
-3) Run launch.bat or launch.sh to start the server for the first time
-4) Press "Enter" at the console (which is informing you that you've started
-   the server for the first time!)
-5) Open simpleserver.properties and adjust the values as needed
-6) You can now connect to the server using your IP Address (www.whatismyip.com)
+1) Run launch.bat or launch.sh to start the server for the first time
+2) You can now connect to the server using your IP Address (www.whatismyip.com)
    and the port indicated in simpleserver.properties!
 
 Features (See CHANGES for updates):
