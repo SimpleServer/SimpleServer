@@ -31,8 +31,8 @@ public class RulesCommand extends AbstractCommand implements PlayerCommand {
     String rules = player.getServer().getRules();
     if (rules.trim().length() > 0) {
       String[] lines = rules.split("\\r?\\n");
-      for (int i = 0; i < lines.length; i++) {
-        player.addMessage(lines[i]);
+      for (String line : lines) {
+        player.addMessage(line);
       }
     }
     else {

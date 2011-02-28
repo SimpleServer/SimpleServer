@@ -68,10 +68,10 @@ public class MessageHandler {
 
     Integer[] ports = server.getRobotPorts();
     if (ports != null) {
-      for (int i = 0; i < ports.length; i++) {
-        if (ports[i] != null) {
-          if (line.contains(ports[i].toString())) {
-            server.removeRobotPort(ports[i]);
+      for (Integer port : ports) {
+        if (port != null) {
+          if (line.contains(port.toString())) {
+            server.removeRobotPort(port);
             return;
           }
         }
