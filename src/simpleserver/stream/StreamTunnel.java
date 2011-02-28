@@ -43,8 +43,7 @@ public class StreamTunnel {
   private static final boolean EXPENSIVE_DEBUG_LOGGING = Boolean.getBoolean("EXPENSIVE_DEBUG_LOGGING");
   private static final int IDLE_TIME = 30000;
   private static final int BUFFER_SIZE = 1024;
-  private static final int DESTROY_HITS = 14;
-  private static final byte BLOCK_DESTROYED_STATUS = 3;
+  private static final byte BLOCK_DESTROYED_STATUS = 2;
   private static final Pattern MESSAGE_PATTERN = Pattern.compile("^<([^>]+)> (.*)$");
   private static final Pattern COLOR_PATTERN = Pattern.compile("\u00a7[0-9a-f]");
 
@@ -293,16 +292,6 @@ public class StreamTunnel {
               write(face);
 
               if (player.instantDestroyEnabled()) {
-                for (int c = 1; c < DESTROY_HITS; ++c) {
-                  packetFinished();
-                  write(packetId);
-                  write(status);
-                  write(x);
-                  write(y);
-                  write(z);
-                  write(face);
-                }
-
                 packetFinished();
                 write(packetId);
                 write(BLOCK_DESTROYED_STATUS);
