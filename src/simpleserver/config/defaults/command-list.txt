@@ -11,6 +11,7 @@ kick=2-4
 kit=kits;0
 listips=2-4
 local=l;-1
+localtoggle=-1
 lock=0
 motd=-1
 mute=2-4
