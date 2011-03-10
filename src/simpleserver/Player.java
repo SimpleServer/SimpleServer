@@ -55,6 +55,7 @@ public class Player {
   private int entityId = 0;
   private Group groupObject = null;
   private boolean isRobot = false;
+  private boolean localChat = false;
 
   private Queue<String> messages = new ConcurrentLinkedQueue<String>();
 
@@ -270,6 +271,14 @@ public class Player {
 
   public double getZ() {
     return z;
+  }
+  
+  public void setLocalChat(boolean mode) {
+    localChat = mode;
+  }
+  
+  public boolean localChat() {
+    return localChat;
   }
 
   public boolean parseCommand(String message) {

@@ -38,6 +38,7 @@ import java.util.regex.Pattern;
 import simpleserver.Group;
 import simpleserver.Player;
 import simpleserver.Server;
+import simpleserver.command.LocalSayCommand;
 
 public class StreamTunnel {
   private static final boolean EXPENSIVE_DEBUG_LOGGING = Boolean.getBoolean("EXPENSIVE_DEBUG_LOGGING");
@@ -46,6 +47,7 @@ public class StreamTunnel {
   private static final byte BLOCK_DESTROYED_STATUS = 2;
   private static final Pattern MESSAGE_PATTERN = Pattern.compile("^<([^>]+)> (.*)$");
   private static final Pattern COLOR_PATTERN = Pattern.compile("\u00a7[0-9a-f]");
+  private static final LocalSayCommand localSay = new LocalSayCommand();
 
   private final boolean isServerTunnel;
   private final String streamType;
@@ -161,6 +163,12 @@ public class StreamTunnel {
       case 0x03: // Chat Message
         String message = in.readUTF();
         if (isServerTunnel && server.options.getBoolean("useMsgFormats")) {
+          
+          if(player.localChat()) {
+            localSay.execute(player, message);
+            break;
+          }
+          
           Matcher colorMatcher = COLOR_PATTERN.matcher(message);
           String cleanMessage = colorMatcher.replaceAll("");
 
