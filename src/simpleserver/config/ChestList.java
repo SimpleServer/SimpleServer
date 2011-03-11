@@ -23,75 +23,92 @@ package simpleserver.config;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import simpleserver.Player;
+
 public class ChestList extends AsciiConfig {
-  private final ConcurrentMap<String, Chest> names;
   private final ConcurrentMap<Coordinate, Chest> locations;
 
   public ChestList() {
     super("chest-list.txt");
 
-    names = new ConcurrentHashMap<String, Chest>();
     locations = new ConcurrentHashMap<Coordinate, Chest>();
   }
 
-  public synchronized boolean giveLock(String name, int x, byte y, int z,
-                                       boolean isGroupLock) {
+  private boolean giveLock(String player, int x, byte y, int z,
+                        boolean isGroupLock) {
     Coordinate coordinate = new Coordinate(x, y, z);
-    if (names.containsKey(names) || locations.containsKey(coordinate)) {
+    if (locations.containsKey(coordinate)) {
       return false;
     }
 
-    name = name.toLowerCase();
-    Chest chest = new Chest(name, coordinate, isGroupLock);
-    names.put(name, chest);
+    Chest chest = new Chest(player, coordinate, isGroupLock);
     locations.put(coordinate, chest);
 
     save();
     return true;
   }
 
+  public synchronized boolean giveLock(Player player, int x, byte y, int z,
+                                       boolean isGroupLock) {
+    return giveLock(player.getName(), x, y, z, isGroupLock);
+  }
+  
+  public void addOpenChest(int x, byte y, int z) {
+    giveLock("-", x, y, z, false);
+  }
+
   public boolean hasLock(String name) {
-    return names.get(name.toLowerCase()) != null;
+    return false;
   }
 
   public boolean hasLock(int x, byte y, int z) {
-    return locations.containsKey(new Coordinate(x, y, z));
+    if(locations.containsKey(new Coordinate(x, y, z))) {
+      return !locations.get(new Coordinate(x, y, z)).isOpen();
+    }
+    return false;
   }
 
-  public boolean hasAdjacentLock(int x, byte y, int z) {
-    return locations.containsKey(new Coordinate(x + 1, y, z))
-        || locations.containsKey(new Coordinate(x - 1, y, z))
-        || locations.containsKey(new Coordinate(x, y, z + 1))
-        || locations.containsKey(new Coordinate(x, y, z - 1));
+  public Chest adjacentChest(int x, byte y, int z) {
+    Chest chest = chestAt(new Coordinate(x + 1, y, z));
+    if(chest == null)
+      chest = chestAt(new Coordinate(x - 1, y, z));
+    if(chest == null)
+      chest = chestAt(new Coordinate(x, y, z + 1));
+    if(chest == null)
+      chest = chestAt(new Coordinate(x, y, z - 1));
+    return chest;
+  }
+  
+  private Chest chestAt(Coordinate coord) {
+    if(locations.containsKey(coord)) {
+      return locations.get(coord);
+    }
+    return null;
   }
 
-  public boolean ownsLock(String name, int x, byte y, int z) {
+  public boolean ownsLock(Player player, int x, byte y, int z) {
     Coordinate coordinate = new Coordinate(x, y, z);
-    Chest chest = names.get(name.toLowerCase());
-    return (chest != null) && (chest.coordinate.equals(coordinate));
+    Chest chest = locations.get(coordinate);
+    return (chest != null) && (chest.owner == player.getName() || chest.isOpen());
   }
 
-  public synchronized void releaseLock(String name) {
-    Chest chest = names.remove(name.toLowerCase());
-    if (chest != null) {
-      locations.remove(chest.coordinate);
+  public synchronized void releaseLock(Player player) {
+    for(Chest chest : locations.values()) {
+      if(chest.owner.equals(player.getName()))
+        chest.unlock();
     }
 
     save();
   }
 
   public synchronized void releaseLock(int x, byte y, int z) {
-    Chest chest = locations.remove(new Coordinate(x, y, z));
-    if (chest != null) {
-      names.remove(chest.name);
-    }
+    locations.remove(new Coordinate(x, y, z));
 
     save();
   }
 
   @Override
   public void load() {
-    names.clear();
     locations.clear();
 
     super.load();
@@ -118,7 +135,7 @@ public class ChestList extends AsciiConfig {
         System.out.println("Skipping malformed chest metadata: " + line);
         return;
       }
-
+      
       giveLock(tokens[0], x, y, z, Boolean.parseBoolean(tokens[1]));
     }
   }
@@ -126,8 +143,8 @@ public class ChestList extends AsciiConfig {
   @Override
   protected String saveString() {
     StringBuilder output = new StringBuilder();
-    for (Chest chest : names.values().toArray(new Chest[0])) {
-      output.append(chest.name);
+    for (Chest chest : locations.values().toArray(new Chest[0])) {
+      output.append(chest.owner);
       output.append(",");
       output.append(chest.isGroup);
       output.append(",");
@@ -141,7 +158,7 @@ public class ChestList extends AsciiConfig {
     return output.toString();
   }
 
-  private static final class Coordinate {
+  public static final class Coordinate {
     private final int x;
     private final byte y;
     private final int z;
@@ -174,15 +191,33 @@ public class ChestList extends AsciiConfig {
     }
   }
 
-  private static final class Chest {
-    private final String name;
+  public static final class Chest {
+    private String owner;
     private final Coordinate coordinate;
     private final boolean isGroup;
 
-    private Chest(String name, Coordinate coordinate, boolean isGroup) {
-      this.name = name;
+    private Chest(String player, Coordinate coordinate, boolean isGroup) {
+      this.owner = player;
       this.coordinate = coordinate;
       this.isGroup = isGroup;
     }
+    
+    public void unlock() {
+      owner = "-";
+      
+    }
+
+    public boolean isOpen() {
+      return owner.equals("-");
+    }
+
+    public String owner() {
+      return owner;
+    }
+
+    public void lock(Player player) {
+      this.owner = player.getName();
+    }
   }
+
 }

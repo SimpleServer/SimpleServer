@@ -58,6 +58,7 @@ import simpleserver.thread.RequestTracker;
 import simpleserver.thread.SystemInputQueue;
 
 public class Server {
+  
   private final Listener listener;
 
   private ServerSocket socket;

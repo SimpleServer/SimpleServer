@@ -39,6 +39,7 @@ import simpleserver.Group;
 import simpleserver.Player;
 import simpleserver.Server;
 import simpleserver.command.LocalSayCommand;
+import simpleserver.config.ChestList.Chest;
 
 public class StreamTunnel {
   private static final boolean EXPENSIVE_DEBUG_LOGGING = Boolean.getBoolean("EXPENSIVE_DEBUG_LOGGING");
@@ -164,11 +165,6 @@ public class StreamTunnel {
         String message = in.readUTF();
         if (isServerTunnel && server.options.getBoolean("useMsgFormats")) {
           
-          if(player.localChat()) {
-            localSay.execute(player, message);
-            break;
-          }
-          
           Matcher colorMatcher = COLOR_PATTERN.matcher(message);
           String cleanMessage = colorMatcher.replaceAll("");
 
@@ -209,6 +205,11 @@ public class StreamTunnel {
           }
 
           if (player.parseCommand(message)) {
+            break;
+          }
+          
+          if(player.localChat() && !message.startsWith("/") && !message.startsWith("!")) {
+            localSay.execute(player, "l " + message);
             break;
           }
         }
@@ -285,7 +286,6 @@ public class StreamTunnel {
             byte y = in.readByte();
             int z = in.readInt();
             byte face = in.readByte();
-
             if (!server.chests.hasLock(x, y, z) || player.isAdmin()) {
               if (server.chests.hasLock(x, y, z)
                   && status == BLOCK_DESTROYED_STATUS) {
@@ -322,7 +322,6 @@ public class StreamTunnel {
         final int z = in.readInt();
         final byte direction = in.readByte();
         final short dropItem = in.readShort();
-
         byte itemCount = 0;
         short uses = 0;
         if (dropItem != -1) {
@@ -335,7 +334,7 @@ public class StreamTunnel {
           // continue
         }
         else if (server.chests.hasLock(x, y, z) && !player.isAdmin()
-            && !server.chests.ownsLock(player.getName(), x, y, z)) {
+            && !server.chests.ownsLock(player, x, y, z)) {
           player.addMessage("\u00a7cThis chest is locked!");
           writePacket = false;
         }
@@ -372,22 +371,30 @@ public class StreamTunnel {
               break;
           }
 
-          if (server.chests.hasAdjacentLock(xPosition, yPosition, zPosition)) {
+          Chest adjacentChest = server.chests.adjacentChest(xPosition, yPosition, zPosition);
+          
+          if (adjacentChest != null && !adjacentChest.isOpen() && adjacentChest.owner() != player.getName()) {
             player.addMessage("\u00a7cThe adjacent chest is locked!");
             writePacket = false;
           }
-          else if (player.isAttemptLock()) {
+          else if (player.isAttemptLock() || (adjacentChest != null && !adjacentChest.isOpen())) {
             if (server.chests.hasLock(xPosition, yPosition, zPosition)) {
               player.addMessage("\u00a7cThis block is locked already!");
             }
-            else if (server.chests.giveLock(player.getName(), xPosition,
+            else if (server.chests.giveLock(player, xPosition,
                                             yPosition, zPosition, false)) {
-              player.addMessage("\u00a77Your locked chest is created! Do not add another chest to it!");
+              if(adjacentChest != null) {
+                adjacentChest.lock(player);
+                server.chests.save(); 
+              }
+              player.addMessage("\u00a77Your locked chest is created!");
             }
             else {
-              player.addMessage("\u00a7cYou already have a lock, or this block is locked already!");
+              player.addMessage("\u00a7cThis block is locked already!");
             }
             player.setAttemptLock(false);
+          } else {
+            server.chests.addOpenChest(xPosition, yPosition, zPosition);
           }
         }
 

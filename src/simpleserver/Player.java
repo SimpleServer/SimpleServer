@@ -56,7 +56,7 @@ public class Player {
   private Group groupObject = null;
   private boolean isRobot = false;
   private boolean localChat = false;
-
+  
   private Queue<String> messages = new ConcurrentLinkedQueue<String>();
 
   public Player(Socket inc, Server parent) {
@@ -298,7 +298,7 @@ public class Player {
 
     command.execute(this, message);
     return !(command.shouldPassThroughToSMPAPI()
-        && server.options.getBoolean("useSMPAPI") || message.startsWith("/"));
+        && server.options.getBoolean("useSMPAPI"));
   }
 
   public boolean commandAllowed(String command) {
