@@ -89,7 +89,7 @@ public class ChestList extends AsciiConfig {
   public boolean ownsLock(Player player, int x, byte y, int z) {
     Coordinate coordinate = new Coordinate(x, y, z);
     Chest chest = locations.get(coordinate);
-    return (chest != null) && (chest.owner == player.getName() || chest.isOpen());
+    return (chest != null) && (chest.owner.toLowerCase().equals(player.getName().toLowerCase()) || chest.isOpen());
   }
 
   public synchronized void releaseLock(Player player) {
