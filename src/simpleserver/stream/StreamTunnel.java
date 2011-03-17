@@ -154,7 +154,6 @@ public class StreamTunnel {
         break;
       case 0x02: // Handshake
         String name = in.readUTF();
-
         if (isServerTunnel || player.setName(name)) {
           tunneler.setName(streamType + "-" + player.getName());
           write(packetId);
@@ -308,6 +307,10 @@ public class StreamTunnel {
                 write(z);
                 write(face);
               }
+              
+              if(status == BLOCK_DESTROYED_STATUS) {
+                player.destroyedBlock();
+              }
             }
           }
         }
@@ -328,15 +331,17 @@ public class StreamTunnel {
           itemCount = in.readByte();
           uses = in.readShort();
         }
-
+        
         boolean writePacket = true;
         if (isServerTunnel) {
           // continue
         }
-        else if (server.chests.hasLock(x, y, z) && !player.isAdmin()
+        else if (server.chests.hasLock(x, y, z)
             && !server.chests.ownsLock(player, x, y, z)) {
           player.addMessage("\u00a7cThis chest is locked!");
-          writePacket = false;
+          if(!player.isAdmin()) {
+            writePacket = false;
+          }
         }
         else if ((player.getGroupId() < 0)
             || !server.blockFirewall.playerAllowed(player, dropItem)) {
@@ -409,9 +414,14 @@ public class StreamTunnel {
           if (dropItem != -1) {
             write(itemCount);
             write(uses);
+            
+            if(dropItem <= 94 && direction >= 0) {
+              player.placedBlock();
+            }
           }
+          
         }
-        else {
+        else if(dropItem != 54) {
           // Drop the item in hand. This keeps the client state in-sync with the
           // server. This generally prevents empty-hand clicks by the client
           // from placing blocks the server thinks the client has in hand.

@@ -29,6 +29,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Semaphore;
 
+import simpleserver.command.DayCommand;
 import simpleserver.config.BlockList;
 import simpleserver.config.ChestList;
 import simpleserver.config.CommandList;
@@ -42,6 +43,7 @@ import simpleserver.config.MemberList;
 import simpleserver.config.MuteList;
 import simpleserver.config.RobotList;
 import simpleserver.config.Rules;
+import simpleserver.config.Stats;
 import simpleserver.config.WhiteList;
 import simpleserver.log.AdminLog;
 import simpleserver.log.ConnectionLog;
@@ -80,6 +82,7 @@ public class Server {
   public MuteList mutelist;
   public GiveAliasList giveAliasList;
   public CommandList commands;
+  public Stats stats;
 
   private List<Resource> resources;
   public PlayerList playerList;
@@ -345,6 +348,7 @@ public class Server {
     resources.add(whitelist = new WhiteList());
     resources.add(mutelist = new MuteList());
     resources.add(giveAliasList = new GiveAliasList());
+    resources.add(stats = new Stats());
 
     systemInput = new SystemInputQueue();
     adminLog = new AdminLog();
@@ -359,6 +363,7 @@ public class Server {
     adminLog.stop();
     errorLog.stop();
     connectionLog.stop();
+    ((DayCommand)commandParser.getPlayerCommand(commandParser.commandPrefix() + "day")).unfreeze();
   }
 
   private void startup() {

@@ -56,6 +56,8 @@ public class Player {
   private Group groupObject = null;
   private boolean isRobot = false;
   private boolean localChat = false;
+  private int blocksPlaced = 0;
+  private int blocksDestroyed = 0;
   
   private Queue<String> messages = new ConcurrentLinkedQueue<String>();
 
@@ -384,6 +386,29 @@ public class Player {
     groupObject = server.groups.getGroup(group);
   }
 
+  public void placedBlock() {
+    blocksPlaced += 1;
+  }
+  
+  public void destroyedBlock() {
+    blocksDestroyed += 1;
+  }
+  
+  public Integer[] stats() {
+    Integer[] stats = new Integer[4];
+    
+    stats[0] = (int)(System.currentTimeMillis() - connected)/1000/60;
+    stats[1] = server.stats.getMinutes(this) + stats[0];
+    stats[2] = server.stats.addPlacedBlocks(this, blocksPlaced);
+    stats[3] = server.stats.addDestroyedBlocks(this, blocksDestroyed);
+    
+    blocksPlaced = 0;
+    blocksDestroyed = 0;
+    server.stats.save();
+    
+    return stats;
+  }
+  
   public void close() {
     if (serverToClient != null) {
       serverToClient.stop();
@@ -394,6 +419,11 @@ public class Player {
     }
 
     if (name != null) {
+      server.stats.addOnlineMinutes(this, (int)(System.currentTimeMillis() - connected)/1000/60);
+      server.stats.addDestroyedBlocks(this, blocksDestroyed);
+      server.stats.addPlacedBlocks(this, blocksPlaced);
+      server.stats.save();
+      
       server.playerList.removePlayer(this);
       name = null;
     }
@@ -403,6 +433,7 @@ public class Player {
     if (!closed) {
       closed = true;
       entityId = 0;
+      
 
       close();
 

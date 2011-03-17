@@ -1,6 +1,7 @@
 backup=3,4
 ban=3,4
 banip=3,4
+day=3,4
 give=2-4
 giveplayer=3,4
 gps=2-4
@@ -15,6 +16,7 @@ localtoggle=-1
 lock=0
 motd=-1
 mute=2-4
+mystats=0
 rcon=4
 reload=3,4
 restart=3,4
