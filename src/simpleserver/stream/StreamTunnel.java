@@ -166,7 +166,9 @@ public class StreamTunnel {
           
           Matcher colorMatcher = COLOR_PATTERN.matcher(message);
           String cleanMessage = colorMatcher.replaceAll("");
-
+          
+          
+          
           Matcher messageMatcher = MESSAGE_PATTERN.matcher(cleanMessage);
           if (messageMatcher.find()) {
             Player friend = server.findPlayerExact(messageMatcher.group(1));
@@ -197,6 +199,7 @@ public class StreamTunnel {
         }
 
         if (!isServerTunnel) {
+          
           if (player.isMuted() && !message.startsWith("/")
               && !message.startsWith("!")) {
             player.addMessage("\u00a7cYou are muted! You may not send messages to all players.");
@@ -258,6 +261,12 @@ public class StreamTunnel {
         copyNBytes(1);
         if (!inGame && !isServerTunnel) {
           player.sendMOTD();
+            
+          if(server.options.getBoolean("showListOnConnect")){
+            //display player list if enabled in config
+            player.parseCommand(server.getCommandParser().commandPrefix() + "who");
+          }
+          
           inGame = true;
         }
         break;
