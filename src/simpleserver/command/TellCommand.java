@@ -37,6 +37,8 @@ public class TellCommand extends OnlinePlayerArgCommand implements
           + target.getName() + ":\u00a7f " + chat;
       player.addMessage(formattedChat);
       target.addMessage(formattedChat);
+      
+      target.setReply(player);
     }
     else {
       player.addMessage("\u00a7cPlease supply a message.");
