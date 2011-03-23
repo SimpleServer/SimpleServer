@@ -37,7 +37,9 @@ import simpleserver.options.Options;
 
 public class CommandParser {
   private final Map<String, PlayerCommand> playerCommands;
+  private final Map<Class, PlayerCommand> playerCommandClasses;
   private final Map<String, ServerCommand> serverCommands;
+  private final Map<Class, ServerCommand> serverCommandClasses;
   private final Options options;
   private final CommandList commandList;
 
@@ -46,11 +48,20 @@ public class CommandParser {
     this.commandList = commandList;
 
     playerCommands = new HashMap<String, PlayerCommand>();
+    playerCommandClasses = new HashMap<Class, PlayerCommand>();
     serverCommands = new HashMap<String, ServerCommand>();
-    loadCommands(PlayerCommand.class, playerCommands);
-    loadCommands(ServerCommand.class, serverCommands);
+    serverCommandClasses = new HashMap<Class, ServerCommand>();
+    loadCommands(PlayerCommand.class, playerCommands, playerCommandClasses);
+    loadCommands(ServerCommand.class, serverCommands, serverCommandClasses);
   }
-
+  
+  public PlayerCommand getPlayerCommand(Class<? extends PlayerCommand> c) {
+    if(playerCommandClasses.containsKey(c))
+      return playerCommandClasses.get(c);
+    else
+      return null;
+  }
+  
   public PlayerCommand getPlayerCommand(String message) {
     if (message.startsWith(commandPrefix())) {
       PlayerCommand command = playerCommands.get(extractName(message, 1));
@@ -67,6 +78,13 @@ public class CommandParser {
 
   public ServerCommand getServerCommand(String message) {
     return serverCommands.get(extractName(message, 0));
+  }
+  
+  public ServerCommand getServerCommand(Class<? extends ServerCommand> c) {
+    if(serverCommandClasses.containsKey(c))
+      return serverCommandClasses.get(c);
+    else
+      return null;
   }
 
   public Collection<PlayerCommand> getPlayerCommands() {
@@ -92,8 +110,7 @@ public class CommandParser {
     return commandList.lookupCommand(name);
   }
 
-  private <T extends Command> void loadCommands(Class<T> type,
-                                                Map<String, T> commands) {
+  private <T extends Command> void loadCommands(Class<T> type, Map<String, T> commands, Map<Class, T> commandClasses) {
     Reflections r = new Reflections("simpleserver", new SubTypesScanner());
     Set<Class<? extends T>> types = r.getSubTypesOf(type);
 
@@ -114,6 +131,7 @@ public class CommandParser {
       }
 
       commands.put(command.getName(), command);
+      commandClasses.put(command.getClass(), command);
     }
   }
 }

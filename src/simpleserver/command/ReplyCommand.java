@@ -35,7 +35,7 @@ public class ReplyCommand extends AbstractCommand implements PlayerCommand {
     message = extractArgument(message);
     
     if (target != null && target.getName() != null){
-      player.parseCommand(player.getServer().getCommandParser().commandPrefix() + "tell " + target.getName() + " " + message);
+      player.getServer().getCommandParser().getPlayerCommand(TellCommand.class).execute(player, "tell " + target.getName() + " " + message);
     } else{
       player.addMessage("\u00a7cNobody sent you a message yet.");
     }

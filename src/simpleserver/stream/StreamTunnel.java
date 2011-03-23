@@ -39,6 +39,7 @@ import simpleserver.Group;
 import simpleserver.Player;
 import simpleserver.Server;
 import simpleserver.command.LocalSayCommand;
+import simpleserver.command.PlayerListCommand;
 import simpleserver.config.ChestList.Chest;
 
 public class StreamTunnel {
@@ -48,7 +49,6 @@ public class StreamTunnel {
   private static final byte BLOCK_DESTROYED_STATUS = 2;
   private static final Pattern MESSAGE_PATTERN = Pattern.compile("^<([^>]+)> (.*)$");
   private static final Pattern COLOR_PATTERN = Pattern.compile("\u00a7[0-9a-f]");
-  private static final LocalSayCommand localSay = new LocalSayCommand();
 
   private final boolean isServerTunnel;
   private final String streamType;
@@ -211,7 +211,7 @@ public class StreamTunnel {
           }
           
           if(player.localChat() && !message.startsWith("/") && !message.startsWith("!")) {
-            localSay.execute(player, "l " + message);
+            server.getCommandParser().getPlayerCommand(LocalSayCommand.class).execute(player, "l " + message);
             break;
           }
         }
@@ -264,7 +264,7 @@ public class StreamTunnel {
             
           if(server.options.getBoolean("showListOnConnect")){
             //display player list if enabled in config
-            player.parseCommand(server.getCommandParser().commandPrefix() + "who");
+            player.getServer().getCommandParser().getPlayerCommand(PlayerListCommand.class).execute(player, "");
           }
           
           inGame = true;
