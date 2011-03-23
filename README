@@ -51,6 +51,7 @@ accessible commands.
   !backup -- Backup the map
   !banip IPADDRESS -- Kick and ban players with this IP
   !ban PLAYER [REASON] -- Kick and ban the named player
+  !day [freeze|unfreeze] -- Set time to 0 or freeze/unfreeze on day
   !give ITEM [AMOUNT] -- Spawn items for yourself
   !giveplayer PLAYER ITEM [AMOUNT] -- Spawn items for another player
   !gps [PLAYER] -- Display block coordinates of named player or yourself
@@ -61,11 +62,14 @@ accessible commands.
   !kit [KIT] -- Display all kits or give yourself the named kit
   !listips -- Display the name and IP of each connected player
   !local MESSAGE -- Send a chat message to nearby players
+  !localtoggle -- toggle localchat mode
   !lock -- Prepare to create your locked chest
   !motd -- Display the message of the day
   !mute PLAYER -- Block the named player from normal chat
+  !mystats -- Show own statistics
   !rcon COMMAND ARGUMENTS... -- Execute a command on the server console
   !reload -- Reread the configuration files from disk
+  !reply MESSAGE -- Send message to the player who last sent you one
   !restart -- Stop the minecraft server and start it again
   !rules -- Display the server rules
   !save -- Store configuration to disk and force a map save
