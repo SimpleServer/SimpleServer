@@ -58,6 +58,7 @@ public class Player {
   private boolean localChat = false;
   private int blocksPlaced = 0;
   private int blocksDestroyed = 0;
+  private Player reply = null;
   
   private Queue<String> messages = new ConcurrentLinkedQueue<String>();
 
@@ -407,6 +408,16 @@ public class Player {
     server.stats.save();
     
     return stats;
+  }
+  
+  public void setReply(Player answer){
+    // set Player to reply with !reply command
+    reply = answer;
+  }
+  
+  public Player getReply(){
+    // what if null?
+    return reply;
   }
   
   public void close() {
