@@ -416,7 +416,6 @@ public class Player {
   }
   
   public Player getReply(){
-    // what if null?
     return reply;
   }
   
