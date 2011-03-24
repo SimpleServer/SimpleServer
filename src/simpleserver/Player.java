@@ -303,6 +303,14 @@ public class Player {
     return !(command.shouldPassThroughToSMPAPI()
         && server.options.getBoolean("useSMPAPI"));
   }
+  
+  public void execute(Class<? extends PlayerCommand> c) {
+    execute(c, "");
+  }
+
+  public void execute(Class<? extends PlayerCommand> c, String arguments) {
+    server.getCommandParser().getPlayerCommand(c).execute(this, "a " + arguments);
+  }
 
   public boolean commandAllowed(String command) {
     return server.commands.playerAllowed(command, this);

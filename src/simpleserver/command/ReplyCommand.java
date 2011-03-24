@@ -29,13 +29,12 @@ public class ReplyCommand extends AbstractCommand implements PlayerCommand {
   }
   
   public void execute(Player player, String message) {
-    // TODO Auto-generated method stub
     Player target = player.getReply();
     
     message = extractArgument(message);
     
     if (target != null && target.getName() != null){
-      player.getServer().getCommandParser().getPlayerCommand(TellCommand.class).execute(player, "tell " + target.getName() + " " + message);
+      player.execute(TellCommand.class, target.getName() + " " + message);
     } else{
       player.addMessage("\u00a7cNobody sent you a message yet.");
     }

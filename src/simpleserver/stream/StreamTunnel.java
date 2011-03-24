@@ -211,7 +211,7 @@ public class StreamTunnel {
           }
           
           if(player.localChat() && !message.startsWith("/") && !message.startsWith("!")) {
-            server.getCommandParser().getPlayerCommand(LocalSayCommand.class).execute(player, "l " + message);
+            player.execute(LocalSayCommand.class, message);
             break;
           }
         }
@@ -264,7 +264,7 @@ public class StreamTunnel {
             
           if(server.options.getBoolean("showListOnConnect")){
             //display player list if enabled in config
-            player.getServer().getCommandParser().getPlayerCommand(PlayerListCommand.class).execute(player, "");
+            player.execute(PlayerListCommand.class);
           }
           
           inGame = true;
