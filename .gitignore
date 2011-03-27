@@ -19,3 +19,5 @@
 /SimpleServer.jar
 /SimpleServer.zip
 /.settings/
+*.orig
+*~

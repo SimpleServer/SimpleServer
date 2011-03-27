@@ -46,13 +46,16 @@ public class DayCommand extends AbstractCommand implements PlayerCommand {
       String argument = arguments[0];
       if(argument.equals("freeze")) {
         freeze();
+        player.addMessage("\u00a77Time frozen");
       } else if(argument.equals("unfreeze")) {
         unfreeze();
+        player.addMessage("\u00a77Time unfrozen");
       } else {
         player.addMessage("\u00a7cOnly arguments freeze and unfreeze are allowed!");
       }
     }
     else {
+      player.addMessage("\u00a77Time set to sunrise");
       day();
     }
   }
