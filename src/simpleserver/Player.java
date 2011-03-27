@@ -46,7 +46,7 @@ public class Player {
   private String name = null;
   private boolean closed = false;
   private boolean isKicked = false;
-  private boolean attemptLock = false;
+  private Action attemptedAction;
   private boolean instantDestroy = false;
   private boolean godMode = false;
   private String kickMsg = null;
@@ -61,6 +61,12 @@ public class Player {
   private Player reply = null;
   
   private Queue<String> messages = new ConcurrentLinkedQueue<String>();
+
+  private Coordinate chestPlaced;
+
+  private Coordinate chestOpened;
+
+  private String nextChestName;
 
   public Player(Socket inc, Server parent) {
     connected = System.currentTimeMillis();
@@ -170,11 +176,11 @@ public class Player {
   }
 
   public boolean isAttemptLock() {
-    return attemptLock;
+    return attemptedAction == Action.Lock;
   }
 
-  public void setAttemptLock(boolean state) {
-    attemptLock = state;
+  public void setAttemptedAction(Action action) {
+    attemptedAction = action;
   }
 
   public boolean instantDestroyEnabled() {
@@ -561,4 +567,37 @@ public class Player {
       return canCycle;
     }
   }
+
+  public void placingChest(Coordinate coord) {
+      chestPlaced = coord;
+  }
+
+  public boolean placedChest(int x, byte y, int z) {
+    return chestPlaced != null && chestPlaced.equals(new Coordinate(x,y,z));
+  }
+
+  public void openingChest(int x, byte y, int z) {
+    chestOpened = new Coordinate(x,y,z);
+  }
+
+  public Coordinate openedChest() {
+    return chestOpened;
+  }
+
+  public void setChestName(String name) {
+    nextChestName = name;
+  }
+
+  public String nextChestName() {
+    return nextChestName;
+  }
+
+  public enum Action {
+    Lock, Unlock, Rename;
+  }
+
+  public boolean isAttemptingUnlock() {
+    return attemptedAction == Action.Unlock;
+  }
+  
 }

@@ -18,36 +18,37 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package simpleserver.command;
+package simpleserver;
 
-import java.util.List;
+public class Coordinate {
+  public final int x;
+  public final byte y;
+  public final int z;
+  private final int hashCode;
 
-import simpleserver.Player;
-import simpleserver.Player.Action;
-import simpleserver.config.ChestList.Chest;
+  public Coordinate(int x, byte y, int z) {
+    this.x = x;
+    this.y = y;
+    this.z = z;
 
-public class UnlockCommand extends AbstractCommand implements PlayerCommand {
-  public UnlockCommand() {
-    super("unlock [name]",
-          "Unlocks locked chests");
+    int code = 17;
+    code = 37 * code + x;
+    code = 37 * code + y;
+    code = 37 * code + z;
+    hashCode = code;
   }
 
-  public void execute(Player player, String message) {
-    String name = extractArgument(message);
-    if(name == null) {
-      player.setAttemptedAction(Action.Unlock);
-      player.addMessage("\u00a77The next chest you open will get unlocked.");
-    } else {
-      List<Chest> chests = player.getServer().chests.getChestsByName(name);
-      for(Chest chest : chests) {
-        chest.unlock();
-      }
-      player.getServer().chests.save();
-      if(chests.size() > 1) {
-        player.addMessage("\u00a77" + chests.size() + " chests have been unlocked!");
-      } else {
-        player.addMessage("\u00a77The chest has been unlocked!");
-      }
-    }
+  public boolean equals(Coordinate coordinate) {
+    return (coordinate.x == x) && (coordinate.y == y) && (coordinate.z == z);
+  }
+
+  @Override
+  public boolean equals(Object object) {
+    return (object instanceof Coordinate) && equals((Coordinate) object);
+  }
+
+  @Override
+  public int hashCode() {
+    return hashCode;
   }
 }

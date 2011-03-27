@@ -363,7 +363,7 @@ public class Server {
     adminLog.stop();
     errorLog.stop();
     connectionLog.stop();
-    ((DayCommand)commandParser.getPlayerCommand(commandParser.commandPrefix() + "day")).unfreeze();
+    ((DayCommand) commandParser.getPlayerCommand(DayCommand.class)).unfreeze();
   }
 
   private void startup() {
