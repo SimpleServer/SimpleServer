@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project default="release" name="Create Runnable Jar for Project SimpleServer with Jar-in-Jar Loader">
+  <property name="version-file" value="bin/simpleserver/VERSION" />
+  
+  <path id="project-classpath">
+    <fileset dir="./lib" includes="*.jar" />
+  </path>
+
+  <target name="copy-non-java-files">
+    <copy todir="bin" includeemptydirs="false">
+      <fileset dir="src" excludes="**/*.java" />
+    </copy>
+  </target>
+
+  <target name="compile" depends="copy-non-java-files">
+    <mkdir dir="bin" />
+	<javac srcdir="src" destdir="bin" classpathref="project-classpath" />
+  </target>
+
+  <target name="set-version">
+    <exec executable="script/update-version.sh" osfamily="unix">
+      <arg file="${version-file}" />
+    </exec>
+
+    <exec executable="cmd" osfamily="winnt">
+      <arg value="/c" />
+      <arg file="script/update-version.bat" />
+      <arg file="${version-file}" />
+    </exec>
+  </target>
+
+  <target name="release" depends="clean, create-release-zip" />
+
+  <target name="create-release-jar" depends="set-version,compile">
+    <jar destfile="SimpleServer.jar">
+      <manifest>
+        <attribute name="Main-Class" value="simpleserver.Main"/>
+        <attribute name="Class-Path" value="."/>
+      </manifest>
+
+      <fileset dir="bin"/>
+      <zipfileset excludes="META-INF/**" src="lib/commons-logging-1.1.1.jar"/>
+      <zipfileset excludes="META-INF/**" src="lib/dom4j-1.6.jar"/>
+      <zipfileset excludes="META-INF/**" src="lib/guava-r07.jar"/>
+      <zipfileset excludes="META-INF/**" src="lib/httpclient-4.1.jar"/>
+      <zipfileset excludes="META-INF/**" src="lib/httpcore-4.1.jar"/>
+      <zipfileset excludes="META-INF/**" src="lib/javassist-3.8.0.GA.jar"/>
+      <zipfileset excludes="META-INF/**" src="lib/reflections-0.9.5-RC2.jar"/>
+      <zipfileset excludes="META-INF/**" src="lib/slf4j-api-1.6.1.jar"/>
+      <zipfileset excludes="META-INF/**" src="lib/slf4j-nop-1.6.1.jar"/>
+    </jar>
+  </target>
+
+  <target name="create-release-zip" depends="create-release-jar">
+    <zip destfile="SimpleServer.zip">
+      <zipfileset file="CHANGES"/>
+      <zipfileset file="CONTRIBUTORS"/>
+      <zipfileset file="LICENSE"/>
+      <zipfileset file="README"/>
+      <zipfileset file="launch.bat"/>
+      <zipfileset file="launch.sh"/>
+      <zipfileset file="SimpleServer.jar"/>
+    </zip>
+  </target>
+
+  <target name="clean">
+    <delete file="SimpleServer.jar"/>
+    <delete file="SimpleServer.zip"/>
+    <delete file="${version-file}"/>
+	<delete dir="bin" />
+  </target>
+</project>
