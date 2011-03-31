@@ -580,6 +580,10 @@ public class StreamTunnel {
         write(recordCount);
         copyNBytes(recordCount * 3);
         break;
+      case 0x46: // Invalid Bed
+        write(packetId);
+        copyNBytes(1);
+        break;
       case 0x64:
         byte id = in.readByte();
         byte invtype = in.readByte();
