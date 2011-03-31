@@ -212,3 +212,6 @@ fish=349
 cookedfish=350
 goldrecord=2256
 greenrecord=2257
+cookie=357
+bed=355
+repeater=356
