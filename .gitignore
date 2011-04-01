@@ -21,3 +21,7 @@
 /.settings/
 *.orig
 *~
+*.BASE.*
+*.BACKUP.*
+*.LOCAL.*
+
