@@ -29,7 +29,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Semaphore;
 
-import simpleserver.command.DayCommand;
+import simpleserver.command.TimeCommand;
 import simpleserver.config.BlockList;
 import simpleserver.config.ChestList;
 import simpleserver.config.CommandList;
@@ -363,7 +363,7 @@ public class Server {
     adminLog.stop();
     errorLog.stop();
     connectionLog.stop();
-    ((DayCommand) commandParser.getPlayerCommand(DayCommand.class)).unfreeze();
+    ((TimeCommand) commandParser.getPlayerCommand(TimeCommand.class)).unfreeze();
   }
 
   private void startup() {

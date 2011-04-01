@@ -4,7 +4,8 @@
  * Attempt !idbehold fix (Thanks andrewdski)
  * Extended chest support
  * Added !localtoggle for quick local conversations
- * Added !day to control time
+ * Added !time to control time, old !time is !servertime now
+ * Added custom server authentication (enableCustomAuth) and !setpassword command
  * Other bug fixes
 
 == 7.1 ==

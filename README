@@ -51,7 +51,7 @@ accessible commands.
   !backup -- Backup the map
   !banip IPADDRESS -- Kick and ban players with this IP
   !ban PLAYER [REASON] -- Kick and ban the named player
-  !day [freeze|unfreeze] -- Set time to 0 or freeze/unfreeze on day
+  !time [0-23999 or day|night] [freeze|unfreeze] -- Set or freeze arbitrary time of day
   !give ITEM [AMOUNT] -- Spawn items for yourself
   !giveplayer PLAYER ITEM [AMOUNT] -- Spawn items for another player
   !gps [PLAYER] -- Display block coordinates of named player or yourself
@@ -77,7 +77,7 @@ accessible commands.
   !stop -- Shutdown the entire server
   !teleport PLAYER1 PLAYER2 -- Teleport the first player to the second
   !tell PLAYER MESSAGE... -- Send a message to the named player
-  !time -- Display the real-world time of the server
+  !servertime -- Display the real-world time of the server
   !unbanip IPADDRESS -- Remove the IP address from the ban list
   !unban PLAYER -- Remove the named player from the ban list
   !unlock -- Unlock your locked chest (if you have one) for others to access

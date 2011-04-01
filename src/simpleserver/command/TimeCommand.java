@@ -20,18 +20,109 @@
  */
 package simpleserver.command;
 
-import java.util.Date;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import simpleserver.Player;
+import simpleserver.Server;
 
 public class TimeCommand extends AbstractCommand implements PlayerCommand {
+  private static final int DELAY = 8*60*1000;
+  private static final int DAY = 2000;
+  private static final int NIGHT = 14000;
+  
+  private boolean frozen = false;
+  private Player player;
+  private Server server;
+  private Timer timer;
 
   public TimeCommand() {
-    super("time", "Display the real-world time of the server");
+    super("time [number or day/night] [freeze|unfreeze]",
+          "Set or freeze time");
   }
 
   public void execute(Player player, String message) {
-    player.addMessage(String.format("\u00a77Server time:\u00a7f %tc",
-                                    new Date()));
+    server = player.getServer();
+	this.player = player;
+    
+    String[] arguments = extractArguments(message);
+
+	if (arguments.length == 0) {
+	  setTime(0);
+	  player.addMessage("\u00a77Time set to sunrise.");
+	} else if (arguments.length >= 1) {
+      String argument = arguments[0];
+	  int time = 0;
+      if(argument.equals("day"))
+		  time = DAY;
+	  else if (argument.equals("night"))
+		  time = NIGHT;
+	  else {
+		try {
+	  	  time = Integer.parseInt(argument);
+		} catch(NumberFormatException e) {
+          player.addMessage("\u00a7cInvalid argument!");
+		  return;
+		}
+		if (time < 0 || time > 23999) {
+          player.addMessage("\u00a7cTime must be either a value in the range 0-23999 or day/night!");
+		  return;
+		}
+      }
+	  
+	  if (arguments.length < 2) //Prevents double calling (from freeze)
+		setTime(time);
+
+	  if (arguments.length >= 2) {
+	    argument = arguments[1];
+		
+		if (argument.equals("freeze")) {
+		  freeze(time);
+		} else if (argument.equals("unfreeze")) {
+		  unfreeze();
+		} else {
+          player.addMessage("\u00a7cOptional 2nd argument must be freeze or unfreeze!");
+		}
+	  }
+	}
+  }
+  
+  private void setTime(int time) {
+	  server.runCommand("time", "set "+time);
+  }
+
+  public void unfreeze() {
+    if(timer != null) {
+      timer.cancel();
+      frozen = false;
+
+      player.addMessage("\u00a77Time unfrozen");
+    }
+  }
+  
+  private void freeze(int time) {
+    if(!frozen) {
+      frozen = true;
+      timer = new Timer();
+      timer.schedule(new TimeFreezer(this, time), 0, DELAY);
+
+	  player.addMessage("\u00a77Time frozen");
+    }
+  }
+  
+  private class TimeFreezer extends TimerTask {
+ 
+    private TimeCommand parent;
+	private int freezetime;
+
+    public TimeFreezer(TimeCommand parent, int time) {
+      this.parent = parent;
+	  this.freezetime = time;
+    }
+    
+    @Override
+    public void run() {
+      parent.setTime(freezetime);
+    }
   }
 }
