@@ -61,6 +61,7 @@ public class Player {
   private Player reply = null;
   
   private Queue<String> messages = new ConcurrentLinkedQueue<String>();
+  private Queue<PlayerVisitRequest> visitreqs = new ConcurrentLinkedQueue<PlayerVisitRequest>();
 
   private Coordinate chestPlaced;
 
@@ -205,6 +206,20 @@ public class Player {
 
   public String getMessage() {
     return messages.remove();
+  }
+
+  public void addVisitRequest(Player source) {
+	  visitreqs.add(new PlayerVisitRequest(source));
+  }
+
+  public void handleVisitRequests() {
+    while(visitreqs.size() > 0) {
+	  PlayerVisitRequest req = visitreqs.remove();
+      if (System.currentTimeMillis() < req.timestamp+10000 && server.findPlayerExact(req.source.getName())!=null) {
+	  	req.source.addMessage("\u00a77Request accepted!");
+		req.source.teleportTo(this);
+	  }
+	}
   }
 
   public void kick(String reason) {
@@ -477,6 +492,16 @@ public class Player {
             + extsocket.getInetAddress().getHostAddress());
       }
     }
+  }
+
+  private class PlayerVisitRequest {
+  	public Player source;
+	public long timestamp;
+
+	public PlayerVisitRequest(Player source) {
+		timestamp = System.currentTimeMillis();
+		this.source = source;
+	}
   }
 
   private final class Watchdog extends Thread {
