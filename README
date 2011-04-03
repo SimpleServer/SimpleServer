@@ -66,6 +66,7 @@ accessible commands.
   !motd -- Display the message of the day
   !mute PLAYER -- Block the named player from normal chat
   !mystats -- Show own statistics
+  !ok -- Response to the !visit command to allow a teleport
   !rcon COMMAND ARGUMENTS... -- Execute a command on the server console
   !reload -- Reread the configuration files from disk
   !reply MESSAGE -- Send message to the player who last sent you one
@@ -83,6 +84,7 @@ accessible commands.
   !unlock -- Unlock your locked chest (if you have one) for others to access
   !unmute PLAYER -- Allow the named player to use normal chat again
   !unwhitelist PLAYER -- Remove player from server access list
+  !visit PLAYER -- Ask a player for permission to be teleported to him
   !warpmeto PLAYER -- Teleport to the named player
   !warptome PLAYER -- Teleport the named player to you
   !whitelist PLAYER -- Add player to server access list
