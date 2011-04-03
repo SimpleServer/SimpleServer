@@ -59,6 +59,7 @@ public class Player {
   private int blocksPlaced = 0;
   private int blocksDestroyed = 0;
   private Player reply = null;
+  private String lastCommand = "";
   
   private Queue<String> messages = new ConcurrentLinkedQueue<String>();
   private Queue<PlayerVisitRequest> visitreqs = new ConcurrentLinkedQueue<PlayerVisitRequest>();
@@ -310,6 +311,10 @@ public class Player {
       return true;
     }
 
+	//Repeat last command
+	if (message.equals("!!"))
+		message = lastCommand;
+
     PlayerCommand command = server.getCommandParser().getPlayerCommand(message);
     if (command == null) {
       return false;
@@ -321,6 +326,8 @@ public class Player {
     }
 
     command.execute(this, message);
+	lastCommand = message;
+
     return !(command.shouldPassThroughToSMPAPI()
         && server.options.getBoolean("useSMPAPI"));
   }
