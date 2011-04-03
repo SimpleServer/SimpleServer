@@ -14,7 +14,10 @@
 
   <target name="compile" depends="copy-non-java-files">
     <mkdir dir="bin" />
-	<javac srcdir="src" destdir="bin" classpathref="project-classpath" />
+	<javac srcdir="src" destdir="bin" debug="yes">
+		<classpath refid="project-classpath" />
+		<compilerarg value="-Xlint:unchecked"/> 
+	</javac>
   </target>
 
   <target name="set-version">
@@ -29,7 +32,7 @@
     </exec>
   </target>
 
-  <target name="release" depends="clean, create-release-zip" />
+  <target name="release" depends="cleanrelease, create-release-zip" />
 
   <target name="create-release-jar" depends="set-version,compile">
     <jar destfile="SimpleServer.jar">
@@ -59,14 +62,19 @@
       <zipfileset file="README"/>
       <zipfileset file="launch.bat"/>
       <zipfileset file="launch.sh"/>
-      <zipfileset file="SimpleServer.jar"/>
+	  <zipfileset file="SimpleServer.jar"/>
     </zip>
   </target>
 
-  <target name="clean">
+  <target name="cleanrelease">
     <delete file="SimpleServer.jar"/>
     <delete file="SimpleServer.zip"/>
     <delete file="${version-file}"/>
+  </target>
+
+  <target name="cleanbuild">
 	<delete dir="bin" />
   </target>
+  
+  <target name="clean" depends="cleanbuild,cleanrelease" />
 </project>
