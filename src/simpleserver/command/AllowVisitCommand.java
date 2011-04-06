@@ -29,6 +29,10 @@ public class AllowVisitCommand extends AbstractCommand implements PlayerCommand 
   }
 
   @Override
+  public boolean isHidden() {
+    return true;
+  }
+  
   public void execute(Player player, String message) {
     player.handleVisitRequests();
   }

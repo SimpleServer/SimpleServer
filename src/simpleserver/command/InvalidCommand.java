@@ -33,9 +33,15 @@ public class InvalidCommand extends AbstractCommand implements PlayerCommand,
   public boolean isHidden() {
     return true;
   }
+  
+  public boolean shouldPassThroughToSMPAPI() {
+    return true;
+  }
+
 
   public void execute(Player player, String message) {
-    player.addMessage("\u00a7cNo such command " + message);
+    if(!player.getServer().options.getBoolean("useSMPAPI"))
+      player.addMessage("\u00a7cNo such command " + message);
   }
 
   public void execute(Server server, String message) {

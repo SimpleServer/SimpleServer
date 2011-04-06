@@ -27,68 +27,81 @@ import simpleserver.Player;
 import simpleserver.Server;
 
 public class TimeCommand extends AbstractCommand implements PlayerCommand {
-  private static final int DELAY = 8*60*1000;
-  private static final int DAY = 2000;
-  private static final int NIGHT = 14000;
-  
+  private static final int DELAY_NIGHT = 7*60*1000;
+  private static final int DELAY_DAY = 10*60*1000;
+  private static final int DELAY = 5*1000;
+  private static final int DAY = 0;
+  private static final int NIGHT = 13800;
+
   private boolean frozen = false;
   private Player player;
   private Server server;
   private Timer timer;
 
   public TimeCommand() {
-    super("time [number or day/night] [freeze|unfreeze]",
-          "Set or freeze time");
+    super("time number|day|night [freeze|unfreeze]",
+    "Set or freeze time");
   }
 
   public void execute(Player player, String message) {
     server = player.getServer();
-	this.player = player;
-    
+    this.player = player;
+
     String[] arguments = extractArguments(message);
 
-	if (arguments.length == 0) {
-	  setTime(0);
-	  player.addMessage("\u00a77Time set to sunrise.");
-	} else if (arguments.length >= 1) {
+    if (arguments.length == 0) {
+      usage();
+    } else if (arguments.length >= 1) {
       String argument = arguments[0];
-	  int time = 0;
-      if(argument.equals("day"))
-		  time = DAY;
-	  else if (argument.equals("night"))
-		  time = NIGHT;
-	  else {
-		try {
-	  	  time = Integer.parseInt(argument);
-		} catch(NumberFormatException e) {
+      int time = 0;
+      if(argument.equals("day")) {
+        time = DAY;
+      } else if (argument.equals("night")) {
+        time = NIGHT;
+      } else if (argument.equals("set") || argument.equals("add")) {
+        player.addMessage("§cThis is not the standard time command.");
+        usage();
+        return;
+      } else if (argument.equals("unfreeze")) {
+        unfreeze();
+        return;
+      } else {
+        try {
+          time = Integer.parseInt(argument);
+        } catch(NumberFormatException e) {
           player.addMessage("\u00a7cInvalid argument!");
-		  return;
-		}
-		if (time < 0 || time > 23999) {
+          usage();
+          return;
+        }
+        if (time < 0 || time > 23999) {
           player.addMessage("\u00a7cTime must be either a value in the range 0-23999 or day/night!");
-		  return;
-		}
+          return;
+        }
       }
-	  
-	  if (arguments.length < 2) //Prevents double calling (from freeze)
-		setTime(time);
+      
+      unfreeze();
 
-	  if (arguments.length >= 2) {
-	    argument = arguments[1];
-		
-		if (argument.equals("freeze")) {
-		  freeze(time);
-		} else if (argument.equals("unfreeze")) {
-		  unfreeze();
-		} else {
-          player.addMessage("\u00a7cOptional 2nd argument must be freeze or unfreeze!");
-		}
-	  }
-	}
+      if (arguments.length < 2) //Prevents double calling (from freeze)
+        setTime(time);
+
+      if (arguments.length >= 2) {
+        argument = arguments[1];
+
+        if (argument.equals("freeze")) {
+          freeze(time);
+        } else {
+          player.addMessage("\u00a7cOptional 2nd argument must be freeze!");
+        }
+      }
+    }
+  }
+
+  private void usage() {
+    player.addMessage("§7Usage: !time [0-23999|night|day] [freeze|unfreeze]");
   }
   
   private void setTime(int time) {
-	  server.runCommand("time", "set "+time);
+    server.runCommand("time", "set "+time);
   }
 
   public void unfreeze() {
@@ -99,27 +112,33 @@ public class TimeCommand extends AbstractCommand implements PlayerCommand {
       player.addMessage("\u00a77Time unfrozen");
     }
   }
-  
+
   private void freeze(int time) {
     if(!frozen) {
       frozen = true;
       timer = new Timer();
-      timer.schedule(new TimeFreezer(this, time), 0, DELAY);
+      int delay = DELAY;
+      if(time == DAY) {
+        delay = DELAY_DAY;
+      } else if(time == NIGHT) {
+        delay = DELAY_NIGHT;
+      }
+      timer.schedule(new TimeFreezer(this, time), 0, delay);
 
-	  player.addMessage("\u00a77Time frozen");
+      player.addMessage("\u00a77Time frozen");
     }
   }
-  
+
   private class TimeFreezer extends TimerTask {
- 
+
     private TimeCommand parent;
-	private int freezetime;
+    private int freezetime;
 
     public TimeFreezer(TimeCommand parent, int time) {
       this.parent = parent;
-	  this.freezetime = time;
+      this.freezetime = time;
     }
-    
+
     @Override
     public void run() {
       parent.setTime(freezetime);
