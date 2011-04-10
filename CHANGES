@@ -7,6 +7,7 @@
  * Added !time to control time, old !time is !servertime now
  * Added custom server authentication (enableCustomAuth) and !setpassword command
  * Added command disabling
+ * Added useXincgc and overwriteArguments options
  * Fixed command redirection
  * Other bug fixes
 
