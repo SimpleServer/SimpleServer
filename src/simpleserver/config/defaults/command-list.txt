@@ -1,7 +1,6 @@
 backup=3,4
 ban=3,4
 banip=3,4
-time=3,4
 give=2-4
 giveplayer=3,4
 gps=2-4
@@ -28,6 +27,7 @@ setgroup=3,4
 stop=5
 teleport=tp;3,4
 tell=t;0
+time=3,4
 servertime=-1
 unban=3,4
 unbanip=3,4
