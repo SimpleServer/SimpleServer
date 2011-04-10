@@ -29,6 +29,7 @@ import java.util.Set;
 import org.reflections.Reflections;
 import org.reflections.scanners.SubTypesScanner;
 
+import simpleserver.command.AbstractCommand;
 import simpleserver.command.Command;
 import simpleserver.command.PlayerCommand;
 import simpleserver.command.ServerCommand;
@@ -122,6 +123,7 @@ public class CommandParser {
       T command;
       try {
         command = commandType.getConstructor().newInstance(new Object[] {});
+        ((AbstractCommand) command).setParser(this);
       }
       catch (Exception e) {
         e.printStackTrace();

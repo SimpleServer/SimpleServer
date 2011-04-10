@@ -33,7 +33,7 @@ public class VisitCommand extends OnlinePlayerArgCommand {
 	player.addMessage("\u00a77If nothing happens within 10 seconds, your request is denied.");
 
 	target.addMessage("\u00a7c"+player.getName()+" would like to visit you. If you agree,");
-	target.addMessage("\u00a7cissue the command !ok within 10 seconds.");
+	target.addMessage("\u00a7cissue the command " + commandPrefix() + "ok within 10 seconds.");
 
     target.addVisitRequest(player);
 

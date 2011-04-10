@@ -97,7 +97,7 @@ public class TimeCommand extends AbstractCommand implements PlayerCommand {
   }
 
   private void usage() {
-    player.addMessage("§7Usage: !time [0-23999|night|day] [freeze|unfreeze]");
+    player.addMessage("§7Usage: " + commandPrefix() + "time [0-23999|night|day] [freeze|unfreeze]");
   }
   
   private void setTime(int time) {

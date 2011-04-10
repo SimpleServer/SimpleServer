@@ -20,9 +20,13 @@
  */
 package simpleserver.command;
 
+import simpleserver.CommandParser;
+import simpleserver.Server;
+
 public abstract class AbstractCommand implements Command {
   private final String name;
   private final String helpText;
+  protected CommandParser parser;
 
   protected AbstractCommand(String name, String helpText) {
     if (name != null) {
@@ -90,5 +94,17 @@ public abstract class AbstractCommand implements Command {
 
   protected String extractArgument(String message) {
     return extractArgument(message, 0);
+  }
+  
+  protected String commandPrefix() {
+    if(parser != null) {
+      return parser.commandPrefix();
+    } else {
+      return "!";
+    }
+  }
+  
+  public void setParser(CommandParser parser) {
+    this.parser = parser;
   }
 }
