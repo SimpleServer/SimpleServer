@@ -43,7 +43,9 @@ import simpleserver.thread.SystemInputQueue;
 
 public class MinecraftWrapper {
   private static final String DOWNLOAD_URL = "http://www.minecraft.net/download/minecraft_server.jar";
-  private static final String COMMAND_FORMAT = "java %s -Xmx%sM -Xms%sM -jar %s nogui";
+  private static final String COMMAND_FORMAT = "java %s %s -jar %s nogui";
+  private static final String MEMORY_FORMAT = "-Xmx%sM -Xms%sM";
+  private static final String XINCGC_FORMAT = "-Xincgc -Xms%sM";
   private static final String SERVER_JAR = "minecraft_server.jar";
   private static final int MINIMUM_MEMORY = 1024;
 
@@ -187,9 +189,17 @@ public class MinecraftWrapper {
     if (options.getInt("memory") < minimumMemory) {
       minimumMemory = options.getInt("memory");
     }
+    
+    String memory;
+    if (options.getBoolean("overwriteArguments")) {
+      memory = "";
+    } else if (options.getBoolean("useXincgc")) {
+      memory = String.format(XINCGC_FORMAT, options.get("memory"));
+    } else {
+      memory = String.format(MEMORY_FORMAT, minimumMemory, options.get("memory"));
+    }
 
-    return String.format(COMMAND_FORMAT, options.get("javaArguments"),
-                         options.get("memory"), minimumMemory, getServerJar());
+    return String.format(COMMAND_FORMAT, options.get("javaArguments"), memory, getServerJar());
   }
 
   private String getServerJar() {
