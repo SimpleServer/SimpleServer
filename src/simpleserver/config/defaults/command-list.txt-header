@@ -9,5 +9,6 @@
  0     - Any group is allowed, except guests (-1).
  X,Y,Z - Groups X, Y, and Z are allowed.
  X-Y   - All between X and Y (inclusive) are allowed.
+ -     - Command is disabled
 
  Example: tell=t;0 means anyone except guests can use the the tell or t command
