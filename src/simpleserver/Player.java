@@ -311,9 +311,9 @@ public class Player {
       return true;
     }
 
-	//Repeat last command
-	if (message.equals("!!"))
-		message = lastCommand;
+    //Repeat last command
+    if (message.equals("!!"))
+      message = lastCommand;
 
     PlayerCommand command = server.getCommandParser().getPlayerCommand(message);
     if (command == null) {
@@ -326,7 +326,7 @@ public class Player {
     }
 
     command.execute(this, message);
-	lastCommand = message;
+    lastCommand = message;
 
     return !(command.shouldPassThroughToSMPAPI()
         && server.options.getBoolean("useSMPAPI"));
@@ -343,7 +343,7 @@ public class Player {
   public boolean commandAllowed(String command) {
     return server.commands.playerAllowed(command, this);
   }
-
+  
   public void teleportTo(Player target) {
     server.runCommand("tp", getName() + " " + target.getName());
   }

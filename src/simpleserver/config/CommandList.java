@@ -78,7 +78,7 @@ public class CommandList extends PropertiesConfig {
     ImmutableSet<Integer> groups = commands.get(command);
     return (groups != null) && Group.isMember(groups, player);
   }
-
+  
   public void setGroup(String command, int group) {
     commands.put(command, ImmutableSortedSet.of(group));
     properties.setProperty(command, Integer.toString(group));
@@ -108,8 +108,10 @@ public class CommandList extends PropertiesConfig {
         System.out.println("Skipping bad command entry: " + command);
         continue;
       }
-
-      commands.put(command, Group.parseGroups(groups));
+      
+      if(!groups.equals("-"))
+        commands.put(command, Group.parseGroups(groups));
     }
   }
+
 }
