@@ -6,6 +6,8 @@
  * Added !localtoggle for quick local conversations
  * Added !time to control time, old !time is !servertime now
  * Added custom server authentication (enableCustomAuth) and !setpassword command
+ * Added command disabling
+ * Fixed command redirection
  * Other bug fixes
 
 == 7.1 ==
