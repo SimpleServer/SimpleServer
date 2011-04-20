@@ -165,7 +165,6 @@ public class StreamTunnel {
         break;
       case 0x03: // Chat Message
         String message = readUTF16();
-        System.out.println(message);
         if (isServerTunnel && server.options.getBoolean("useMsgFormats")) {
           
           Matcher colorMatcher = COLOR_PATTERN.matcher(message);
@@ -727,7 +726,7 @@ public class StreamTunnel {
         write(readUTF16());
         write(readUTF16());
         break;
-      case (byte)0xc6:
+      case (byte)0xc8:
         write(packetId);
         copyNBytes(5);
         break;
@@ -758,27 +757,15 @@ public class StreamTunnel {
   
   private String readUTF16() throws IOException {
     short length = in.readShort();
-    byte[] bytes = new byte[2+length*2];
-    bytes[0] = (byte)((length>>8)&0xFF);
-    bytes[1] = (byte)(length&0xFF);
+    byte[] bytes = new byte[length*2+2];
     for(short i = 0; i < length*2; i++) {
       bytes[i+2] = in.readByte();
     }
-    try {
-      String result = new String(bytes, "UTF-16");
-      return result;
-    } catch(Exception e) {
-      return "FUUUUU"; 
-    }
+    bytes[0] = (byte)0xfffffffe;
+    bytes[1] = (byte)0xffffffff;
+    return new String(bytes, "UTF-16");
   }
 
-
-  private void print(byte[] bytes) {
-    for(int i=0; i<bytes.length; i++) {
-      System.out.print(Integer.toHexString(bytes[i]) + " ");
-    }
-    System.out.println();
-  }
 
   private void lockChest(Coordinate coords) {
     lockChest(coords.x, coords.y, coords.z);
@@ -884,7 +871,14 @@ public class StreamTunnel {
 
   private void write(String s) throws IOException {
     byte[] bytes = s.getBytes("UTF-16");
-    for(int i = 2; i < bytes.length; i++) {
+    if(s.length() == 0) {
+      write((byte)0x00);
+      write((byte)0x00);
+      return;
+    }
+    bytes[0] = (byte)((s.length()>>8)&0xFF);
+    bytes[1] = (byte) ((s.length()&0xFF));
+    for(int i = 0; i < bytes.length; i++) {
       write(bytes[i]);
     }
   }
@@ -922,10 +916,16 @@ public class StreamTunnel {
   }
 
   private void sendMessage(String message) throws IOException {
-    //write(0x03);
-    //write(message);
-    //packetFinished();
+    for(int i=0; i<message.length(); i=i+100) {
+      write(0x03);
+      int bound = i+100;
+      if(bound >= message.length())
+        bound = message.length() - 1;
+      write(message.substring(i, bound));
+      packetFinished();
+    }
   }
+  
 
   private void packetFinished() throws IOException {
     if (EXPENSIVE_DEBUG_LOGGING) {
@@ -968,7 +968,6 @@ public class StreamTunnel {
               System.out.println("[SimpleServer] " + e);
               System.out.println("[SimpleServer] " + streamType
                   + " error handling traffic for " + player.getIPAddress());
-              e.printStackTrace();
             }
             break;
           }

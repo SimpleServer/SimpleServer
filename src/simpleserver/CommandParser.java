@@ -64,7 +64,9 @@ public class CommandParser {
   }
   
   public PlayerCommand getPlayerCommand(String message) {
-    if (message.startsWith(commandPrefix())) {
+    System.out.println("Parsing: " + message + " " + message.length());
+    if (message.startsWith("/")){//commandPrefix())) {
+      System.out.println("It's a command!");
       PlayerCommand command = playerCommands.get(extractName(message, 1));
       if (command == null) {
         System.out.println("Illegal command configuration for: " + message);

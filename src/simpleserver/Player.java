@@ -97,18 +97,21 @@ public class Player {
       intsocket = new Socket(InetAddress.getByName(null),
                              server.options.getInt("internalPort"),
                              localAddress, 0);
-    }
-    catch (Exception e) {
-      e.printStackTrace();
-      if (server.options.getBoolean("exitOnFailure")) {
-        server.stop();
+    } catch (Exception e) { 
+      try {
+        intsocket = new Socket(InetAddress.getByName(null), server.options.getInt("internalPort"));
+      } catch (Exception E) {
+        e.printStackTrace();
+        if (server.options.getBoolean("exitOnFailure")) {
+          server.stop();
+        }
+        else {
+          server.restart();
+        }
+  
+        cleanup();
+        return;
       }
-      else {
-        server.restart();
-      }
-
-      cleanup();
-      return;
     }
 
     watchdog = new Watchdog();
