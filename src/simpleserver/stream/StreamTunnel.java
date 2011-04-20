@@ -151,13 +151,12 @@ public class StreamTunnel {
         else {
           write(in.readInt());
         }
-        write(in.readUTF());
-        write(in.readUTF());
+        write(readUTF16());
         write(in.readLong());
         write(in.readByte());
         break;
       case 0x02: // Handshake
-        String name = in.readUTF();
+        String name = readUTF16();
         if (isServerTunnel || player.setName(name)) {
           tunneler.setName(streamType + "-" + player.getName());
           write(packetId);
@@ -165,7 +164,8 @@ public class StreamTunnel {
         }
         break;
       case 0x03: // Chat Message
-        String message = in.readUTF();
+        String message = readUTF16();
+        System.out.println(message);
         if (isServerTunnel && server.options.getBoolean("useMsgFormats")) {
           
           Matcher colorMatcher = COLOR_PATTERN.matcher(message);
@@ -445,7 +445,7 @@ public class StreamTunnel {
       case 0x14: // Named Entity Spawn
         write(packetId);
         write(in.readInt());
-        write(in.readUTF());
+        write(readUTF16());
         copyNBytes(16);
         break;
       case 0x15: // Pickup spawn
@@ -479,7 +479,7 @@ public class StreamTunnel {
       case 0x19: // Painting
         write(packetId);
         write(in.readInt());
-        write(in.readUTF());
+        write(readUTF16());
         write(in.readInt());
         write(in.readInt());
         write(in.readInt());
@@ -584,6 +584,10 @@ public class StreamTunnel {
         write(packetId);
         copyNBytes(1);
         break;
+      case 0x47: // Weather
+        write(packetId);
+        copyNBytes(17);
+        break;
       case 0x64:
         byte id = in.readByte();
         byte invtype = in.readByte();
@@ -616,7 +620,7 @@ public class StreamTunnel {
         write(packetId);
         write(id);
         write(invtype);
-        write(typeString);
+        write8(typeString);
         write(in.readByte());
         break;
       case 0x65:
@@ -634,6 +638,7 @@ public class StreamTunnel {
           write(slotFrom);
           write(typeTo);
           write(slotTo);
+          write(in.readBoolean());
           short moveItem = in.readShort();
           write(moveItem);
           if (moveItem != -1) {
@@ -717,14 +722,18 @@ public class StreamTunnel {
         write(in.readInt());
         write(in.readShort());
         write(in.readInt());
-        write(in.readUTF());
-        write(in.readUTF());
-        write(in.readUTF());
-        write(in.readUTF());
+        write(readUTF16());
+        write(readUTF16());
+        write(readUTF16());
+        write(readUTF16());
+        break;
+      case (byte)0xc6:
+        write(packetId);
+        copyNBytes(5);
         break;
       case (byte) 0xff: // Disconnect/Kick
         write(packetId);
-        String reason = in.readUTF();
+        String reason = readUTF16();
         write(reason);
         if (reason.startsWith("Took too long")) {
           server.addRobot(player);
@@ -745,6 +754,30 @@ public class StreamTunnel {
         }
     }
     packetFinished();
+  }
+  
+  private String readUTF16() throws IOException {
+    short length = in.readShort();
+    byte[] bytes = new byte[2+length*2];
+    bytes[0] = (byte)((length>>8)&0xFF);
+    bytes[1] = (byte)(length&0xFF);
+    for(short i = 0; i < length*2; i++) {
+      bytes[i+2] = in.readByte();
+    }
+    try {
+      String result = new String(bytes, "UTF-16");
+      return result;
+    } catch(Exception e) {
+      return "FUUUUU"; 
+    }
+  }
+
+
+  private void print(byte[] bytes) {
+    for(int i=0; i<bytes.length; i++) {
+      System.out.print(Integer.toHexString(bytes[i]) + " ");
+    }
+    System.out.println();
   }
 
   private void lockChest(Coordinate coords) {
@@ -812,7 +845,7 @@ public class StreamTunnel {
           write(in.readFloat());
           break;
         case 4:
-          write(in.readUTF());
+          write(readUTF16());
           break;
         case 5:
           write(in.readShort());
@@ -850,6 +883,13 @@ public class StreamTunnel {
   }
 
   private void write(String s) throws IOException {
+    byte[] bytes = s.getBytes("UTF-16");
+    for(int i = 2; i < bytes.length; i++) {
+      write(bytes[i]);
+    }
+  }
+  
+  private void write8(String s) throws IOException {
     out.writeUTF(s);
   }
 
@@ -882,9 +922,9 @@ public class StreamTunnel {
   }
 
   private void sendMessage(String message) throws IOException {
-    write(0x03);
-    write(message);
-    packetFinished();
+    //write(0x03);
+    //write(message);
+    //packetFinished();
   }
 
   private void packetFinished() throws IOException {
@@ -928,6 +968,7 @@ public class StreamTunnel {
               System.out.println("[SimpleServer] " + e);
               System.out.println("[SimpleServer] " + streamType
                   + " error handling traffic for " + player.getIPAddress());
+              e.printStackTrace();
             }
             break;
           }
