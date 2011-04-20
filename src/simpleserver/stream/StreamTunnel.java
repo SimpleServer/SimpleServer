@@ -50,6 +50,7 @@ public class StreamTunnel {
   private static final byte BLOCK_DESTROYED_STATUS = 2;
   private static final Pattern MESSAGE_PATTERN = Pattern.compile("^<([^>]+)> (.*)$");
   private static final Pattern COLOR_PATTERN = Pattern.compile("\u00a7[0-9a-f]");
+  private static final int MAXIMUM_MESSAGE_SIZE = 60;
 
   private final boolean isServerTunnel;
   private final String streamType;
@@ -916,14 +917,30 @@ public class StreamTunnel {
   }
 
   private void sendMessage(String message) throws IOException {
-    for(int i=0; i<message.length(); i=i+100) {
-      write(0x03);
-      int bound = i+100;
-      if(bound >= message.length())
-        bound = message.length() - 1;
-      write(message.substring(i, bound));
-      packetFinished();
+    if(message.length() > MAXIMUM_MESSAGE_SIZE) {
+      int end = MAXIMUM_MESSAGE_SIZE-1;
+      while(end > 0 && message.charAt(end) != ' ') {
+        end--;
+      }
+      if(end == 0)
+        end = MAXIMUM_MESSAGE_SIZE;
+      else
+        end++;
+      sendMessagePacket(message.substring(0,end));
+      sendMessage(message.substring(end));
+    } else {
+      sendMessagePacket(message);
     }
+  }
+  
+  private void sendMessagePacket(String message) throws IOException {
+    if(message.length() > MAXIMUM_MESSAGE_SIZE) {
+      System.out.println("[SimpleServer] Invalid message size: " + message);
+      return;
+    }
+    write(0x03);
+    write(message);
+    packetFinished();
   }
   
 
