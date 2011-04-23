@@ -50,7 +50,8 @@ public class StreamTunnel {
   private static final byte BLOCK_DESTROYED_STATUS = 2;
   private static final Pattern MESSAGE_PATTERN = Pattern.compile("^<([^>]+)> (.*)$");
   private static final Pattern COLOR_PATTERN = Pattern.compile("\u00a7[0-9a-f]");
-  private static final int MAXIMUM_MESSAGE_SIZE = 60;
+  private static final int MESSAGE_SIZE = 60;
+  private static final int MAXIMUM_MESSAGE_SIZE = 119;
 
   private final boolean isServerTunnel;
   private final String streamType;
@@ -198,11 +199,12 @@ public class StreamTunnel {
               catch (IllegalFormatException e) {
                 System.out.println("[SimpleServer] There is an error in your msgFormat/msgTitleFormat settings!");
               }
+              
             }
           }
-        }
-
-        if (!isServerTunnel) {
+          
+          sendMessage(message);
+        } else if (!isServerTunnel) {
           
           if (player.isMuted() && !message.startsWith("/")
               && !message.startsWith("!")) {
@@ -218,10 +220,15 @@ public class StreamTunnel {
             player.execute(LocalSayCommand.class, message);
             break;
           }
+          
+          if(message.length() > MAXIMUM_MESSAGE_SIZE) {
+            message = message.substring(0, MAXIMUM_MESSAGE_SIZE);
+          }
+
+          write(packetId);
+          write(message);
         }
 
-        write(packetId);
-        write(message);
         break;
       case 0x04: // Time Update
         write(packetId);
@@ -917,13 +924,13 @@ public class StreamTunnel {
   }
 
   private void sendMessage(String message) throws IOException {
-    if(message.length() > MAXIMUM_MESSAGE_SIZE) {
-      int end = MAXIMUM_MESSAGE_SIZE-1;
+    if(message.length() > MESSAGE_SIZE) {
+      int end = MESSAGE_SIZE-1;
       while(end > 0 && message.charAt(end) != ' ') {
         end--;
       }
       if(end == 0)
-        end = MAXIMUM_MESSAGE_SIZE;
+        end = MESSAGE_SIZE;
       else
         end++;
       sendMessagePacket(message.substring(0,end));
@@ -934,7 +941,7 @@ public class StreamTunnel {
   }
   
   private void sendMessagePacket(String message) throws IOException {
-    if(message.length() > MAXIMUM_MESSAGE_SIZE) {
+    if(message.length() > MESSAGE_SIZE) {
       System.out.println("[SimpleServer] Invalid message size: " + message);
       return;
     }

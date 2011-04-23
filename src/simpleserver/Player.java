@@ -332,7 +332,8 @@ public class Player {
     lastCommand = message;
 
     return !(command.shouldPassThroughToSMPAPI()
-        && server.options.getBoolean("useSMPAPI"));
+        && server.options.getBoolean("useSMPAPI"))
+        && !server.options.getBoolean("forwardAllCommands");
   }
   
   public void execute(Class<? extends PlayerCommand> c) {
