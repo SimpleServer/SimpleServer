@@ -846,6 +846,11 @@ public class StreamTunnel {
           write(in.readShort());
           write(in.readByte());
           write(in.readShort());
+          break;
+        case 6:
+          write(in.readInt());
+          write(in.readInt());
+          write(in.readInt());
       }
 
       unknown = in.readByte();
