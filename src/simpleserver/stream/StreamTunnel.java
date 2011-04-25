@@ -734,7 +734,7 @@ public class StreamTunnel {
         write(readUTF16());
         write(readUTF16());
         break;
-      case (byte)0xc8:
+      case (byte)0xc8:  //weather
         write(packetId);
         copyNBytes(5);
         break;

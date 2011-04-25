@@ -75,6 +75,12 @@ public class Main {
           System.out.println(text.replaceAll("\u00a7[0-9a-f]", ""));
         }
       }
+    } else if (args.length > 0){
+      for(String x: args){
+        if(x.equals("--version")){
+          System.out.println(version);
+        }
+      }
     }
     else {
       new Server();
