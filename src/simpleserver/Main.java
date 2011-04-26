@@ -91,27 +91,6 @@ public class Main {
     System.out.println(warranty);
     System.out.println(">> Starting SimpleServer " + version);
 
-    if (Boolean.getBoolean("PRINT_COMMAND_HELP")) {
-      System.out.println("In-game Commands:");
-
-      Options options = new Options();
-      PermissionConfig permissions = new PermissionConfig(options);
-      CommandParser commandParser = new CommandParser(options, permissions);
-      for (PlayerCommand command : commandParser.getPlayerCommands()) {
-        if (command.getClass() != InvalidCommand.class) {
-          String text = command.getHelpText("  !");
-          System.out.println(text.replaceAll("\u00a7[0-9a-f]", ""));
-        }
-      }
-    } else if (args.length > 0){
-      for(String x: args){
-        if(x.equals("--version")){
-          System.out.println(version);
-        }
-      }
-    }
-    else {
-      new Server();
-    }
+    new Server();
   }
 }

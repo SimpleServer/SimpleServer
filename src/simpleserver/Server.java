@@ -343,7 +343,7 @@ public class Server {
     resources.add(giveAliasList = new GiveAliasList());
     resources.add(stats = new Stats());
 
-	resources.add(permissions = new PermissionConfig(options));
+    resources.add(permissions = new PermissionConfig(this));
 
     systemInput = new SystemInputQueue();
     adminLog = new AdminLog();

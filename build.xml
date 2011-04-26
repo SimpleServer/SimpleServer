@@ -44,22 +44,7 @@
     </jar>
   </target>
 
-  <target name="pack-converter-script">
-    <javac srcdir="conf2xml" destdir="conf2xml" debug="yes">
-      <compilerarg value="-Xlint"/> 
-    </javac>
-
-    <mkdir dir="release" />
-    <jar destfile="release/conf2xml.jar">
-      <manifest>
-        <attribute name="Main-Class" value="ConfToXml" />
-        <attribute name="Class-Path" value="." />
-      </manifest>
-      <fileset dir="conf2xml" />
-    </jar>
-  </target>
-
-  <target name="create-release-zip" depends="create-release-jar,pack-converter-script">
+  <target name="create-release-zip" depends="create-release-jar">
     <zip destfile="release/SimpleServer.zip">
       <zipfileset file="CHANGES"/>
       <zipfileset file="CONTRIBUTORS"/>
@@ -68,13 +53,12 @@
       <zipfileset file="launch.bat"/>
       <zipfileset file="launch.sh"/>
       <zipfileset file="release/SimpleServer.jar"/>
-      <zipfileset file="release/conf2xml.jar"/>
     </zip>
   </target>
 
   <target name="clean">
     <delete dir="release" />
-    <delete file="conf2xml/ConfToXml.class" />
     <delete file="${version-file}" />
+    <delete file="${build-version-file}" />
   </target>
 </project>

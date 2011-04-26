@@ -48,7 +48,9 @@ import org.xml.sax.*;
 import simpleserver.Group;
 import simpleserver.Player;
 import simpleserver.Coordinate;
-import simpleserver.options.Options;
+import simpleserver.Server;
+
+import simpleserver.config.ConfToXml;
 
 class DTDEntityResolver implements EntityResolver {
   PermissionConfig c;
@@ -88,15 +90,15 @@ class DTDErrorHandler implements ErrorHandler {
 }
 
 public class PermissionConfig extends AbstractConfig {
-  private final Options options;
+  private Server server = null;
 
   public boolean loadsuccess = true;
 
   private XMLConfiguration config;
 
-  public PermissionConfig(Options options) {
+  public PermissionConfig(Server server) {
     super("permissions.xml");
-    this.options = options;	
+    this.server = server;	
   }
 
   public InputStream getDTD() {
@@ -161,7 +163,7 @@ public class PermissionConfig extends AbstractConfig {
     group = config.getString("/members/ip[@address='"+ipAddress+"']/@group", "");
 
     if (group.equals(""))
-      return options.getInt("defaultGroup");
+      return server.options.getInt("defaultGroup");
 
     return Integer.valueOf(group);
   }
@@ -174,7 +176,7 @@ public class PermissionConfig extends AbstractConfig {
     group = config.getString("/members/player[@name='"+name+"']/@group", "");
 
     if (group.equals(""))
-      return options.getInt("defaultGroup");
+      return server.options.getInt("defaultGroup");
 
     return Integer.valueOf(group);
   }
@@ -616,8 +618,17 @@ public class PermissionConfig extends AbstractConfig {
 	  }
 
 	  catch (FileNotFoundException e) {
-      System.out.println(getFilename() + " is missing.  Loading defaults.");
-      loadDefaults();
+      if (new ConfToXml().convertFiles()) {
+        System.out.println("[INFORMATION] Configuration upgraded!\n"
+                + "\tIf everything works, please remove command-list.txt, block-list.txt,\n"
+                + "\tgroup-list.txt, member-list.txt and ip-member-list.txt!");
+        server.kits.load();
+        load();
+
+      } else {
+        System.out.println(getFilename() + " is missing.  Loading defaults.");
+        loadDefaults();
+      }
     }
 
 	  catch (ConfigurationException e) {
