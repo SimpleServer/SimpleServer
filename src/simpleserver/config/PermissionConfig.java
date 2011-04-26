@@ -1,0 +1,656 @@
+/*
+ * Copyright (c) 2010 SimpleServer authors (see CONTRIBUTORS)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
+package simpleserver.config;
+
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.NoSuchElementException;
+
+import org.apache.commons.configuration.*;
+import org.apache.commons.configuration.tree.xpath.*;
+import org.apache.commons.lang.exception.*;
+
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableSortedSet;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import org.xml.sax.*;
+
+import simpleserver.Group;
+import simpleserver.Player;
+import simpleserver.Coordinate;
+import simpleserver.options.Options;
+
+class DTDEntityResolver implements EntityResolver {
+  PermissionConfig c;
+
+  public DTDEntityResolver(PermissionConfig c) {
+    this.c = c;
+  }
+
+  public InputSource resolveEntity(String publicId, String systemId)
+  {
+     return new InputSource(c.getDTD());
+  }
+}
+
+class DTDErrorHandler implements ErrorHandler {
+  private final String prefix = "[ERROR][permissions.xml] ";
+  private PermissionConfig parent = null;
+
+  public DTDErrorHandler(PermissionConfig p) {
+    this.parent = p;
+  }
+  
+  private void printExceptionInfo(SAXParseException e) {
+    System.out.println(prefix + "L. "+e.getLineNumber()+": "+e.getMessage());
+    parent.loadsuccess = false;
+  }
+
+  public void warning(SAXParseException e) {
+      printExceptionInfo(e);
+  }
+  public void error(SAXParseException e) {
+      printExceptionInfo(e);
+  }
+  public void fatalError(SAXParseException e) {
+      printExceptionInfo(e);
+  }
+}
+
+public class PermissionConfig extends AbstractConfig {
+  private final Options options;
+
+  public boolean loadsuccess = true;
+
+  private XMLConfiguration config;
+
+  public PermissionConfig(Options options) {
+    super("permissions.xml");
+    this.options = options;	
+  }
+
+  public InputStream getDTD() {
+    return super.getClass().getResourceAsStream(resourceLocation + "/permissions.dtd");
+  }
+
+  private void initConf(boolean validate) {
+    config = new XMLConfiguration();
+
+    DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+    DocumentBuilder db = null;
+    try {
+      dbf.setValidating(validate);
+      db = dbf.newDocumentBuilder();
+    }
+    catch (ParserConfigurationException e) {}
+
+    if (db!=null) {
+      db.setEntityResolver(new DTDEntityResolver(this));
+      db.setErrorHandler(new DTDErrorHandler(this));
+
+      config.setDocumentBuilder(db);
+    }
+
+    config.setExpressionEngine(new XPathExpressionEngine());
+    config.setDelimiterParsingDisabled(true);
+  }
+
+  // replacement for GroupList.groupExists
+  public boolean groupExists(int id) {
+    List ids = config.getList("/groups/group/@id");
+    return ids.contains(String.valueOf(id));
+  }
+
+  // replacement for GroupList.getGroup
+  public Group getGroup(int id) {
+    if (!groupExists(id))
+      return null;
+
+    String pathpart = "/groups/group[@id='"+id+"']/@";
+    String name = config.getString(pathpart+"name", "");
+    String showtitle = config.getString(pathpart+"showTitle", "");
+    String isadmin = config.getString(pathpart+"ignoreChestlocks", "");
+    String color = config.getString(pathpart+"color", "");
+
+    /* set defaults for missing attributes */
+    if (name.equals(""))
+      name = "NamelessGroup";
+    if (color.equals(""))
+      color = "f";
+    if (showtitle.equals(""))
+      showtitle = "false";
+    if (isadmin.equals(""))
+      isadmin = "false";
+
+	  return new Group(name, Boolean.valueOf(showtitle), Boolean.valueOf(isadmin), color);
+  }
+
+  private int getIPGroup(String ipAddress) {
+    String group = "";
+
+    group = config.getString("/members/ip[@address='"+ipAddress+"']/@group", "");
+
+    if (group.equals(""))
+      return options.getInt("defaultGroup");
+
+    return Integer.valueOf(group);
+  }
+
+
+  public int getNameGroup(String name) {
+    name = name.toLowerCase();
+    String group = "";
+
+    group = config.getString("/members/player[@name='"+name+"']/@group", "");
+
+    if (group.equals(""))
+      return options.getInt("defaultGroup");
+
+    return Integer.valueOf(group);
+  }
+
+  // replacement for (IP)MemberList.getGroup and does the former work of Player.updateGroup
+  public int getPlayerGroup(Player player) {
+    return getPlayerGroup(player.getName(), player.getIPAddress());
+  }
+
+  private int getPlayerGroup(String name, String ip) {
+    int grp = 0;
+
+    int nameGroup = getNameGroup(name);
+    int ipGroup = getIPGroup(ip);
+
+    if (ipGroup > nameGroup)
+      grp = ipGroup;
+    else
+      grp = nameGroup;
+
+    return grp;
+  }
+
+  // replacement for MemberList.setGroup
+  public void setPlayerGroup(Player player, int group) {
+    setPlayerGroup(player.getName(), group);
+  }
+
+  public void setPlayerGroup(String name, int group) {
+    name = name.toLowerCase();
+    String val = config.getString("/members/player[@name='"+name+"']/@group","");
+    if (val.equals("")) {
+      config.addProperty("/members player@name", name);
+      config.addProperty("/members/player[@name='"+name+"'][1] @group", "");
+    }
+
+    config.setProperty("/members/player[@name='"+name+"']/@group", String.valueOf(group));
+  }
+
+  // replaces Group.isMember with nickname permissions
+  public boolean includesPlayer(String allowstr, Player player) {
+    if (allowstr==null || allowstr.equals(""))
+        return false;
+
+    String[] str = allowstr.split(";");
+    boolean isgrpmember = false;
+    if (!str[0].equals("") && !str[0].equals("-"))
+      isgrpmember = parseGroups(str[0]).contains(player.getGroupId());
+
+    if (str.length < 2) //no nickname list specified
+      return isgrpmember;
+
+    String[] nicks = str[1].split(",");
+    return isgrpmember || Arrays.asList(nicks).contains(player.getName().toLowerCase());
+  }
+
+  // moved from class Group, parses ranges and listings of groups
+  private ImmutableSet<Integer> parseGroups(String idString) {
+    String[] segments = idString.split(",");
+    ImmutableSortedSet.Builder<Integer> groups = ImmutableSortedSet.naturalOrder();
+    for (String segment : segments) {
+      if (segment.matches("^\\s*$")) {
+        continue;
+      }
+
+      try {
+        groups.add(Integer.valueOf(segment));
+        continue;
+      }
+      catch (NumberFormatException e) {
+      }
+
+      if (segment.indexOf('+')==segment.length()-1) {
+        int num = 0;
+        try {
+          num = Integer.valueOf(segment.split("\\+")[0]);
+        } catch(NumberFormatException e) {
+          System.out.println("Unable to parse group: " + segment);
+          continue;
+        }
+        List ids = config.getList("/groups/group/@id");
+        for (int j=0; j<ids.size(); j++) {
+          int n = Integer.valueOf(ids.get(j).toString());
+          if (n>=num) {
+            groups.add(n);
+          }
+        }
+        continue;
+      }
+
+      String[] range = segment.split("-");
+      if (range.length != 2) {
+        System.out.println("Unable to parse group: " + segment);
+        continue;
+      }
+
+      int low;
+      int high;
+      try {
+        low = Integer.valueOf(range[0]);
+        high = Integer.valueOf(range[1]);
+      }
+      catch (NumberFormatException e) {
+        System.out.println("Unable to parse group: " + segment);
+        continue;
+      }
+
+      if (low > high) {
+        System.out.println("Unable to parse group: " + segment);
+        continue;
+      }
+
+      for (int k = low; k <= high; ++k) {
+        groups.add(k);
+      }
+    }
+
+    return groups.build();
+  }
+
+  // replacement for BlockList.playerAllowed
+  // return: [place, destroy, use, take]
+  public boolean[] getPlayerBlockPermissions(Player player, Coordinate blockCoord, int bID) {
+    boolean[] perms = new boolean[4];
+
+    if (blockCoord == null)
+        blockCoord = coordinateFromPlayer(player);
+
+    ArrayList<String> attrs = new ArrayList<String>();
+    attrs.add("allowPlace");
+    attrs.add("allowDestroy");
+    attrs.add("allowUse");
+    attrs.add("allowTake");
+
+    String pathpart = "/permissions/blocks/block[@id='"+String.valueOf(bID)+"']/@";
+
+    //get global permissions
+    for (int i=0; i<attrs.size(); i++) {
+      String permstr = config.getString("/permissions/blocks/@"+attrs.get(i),"");
+      if (permstr.equals(""))
+        perms[i] = true;
+      else
+        perms[i] = includesPlayer(permstr, player);
+    }
+
+    //single block tag overrides the areawide allowPlace
+    String place_allow = config.getString(pathpart + "allow","");
+    if (!place_allow.equals(""))
+      perms[0] = includesPlayer(place_allow, player);
+    String place_disallow = config.getString(pathpart + "disallow","");
+    if (!place_disallow.equals(""))
+      perms[0] = !includesPlayer(place_disallow, player);
+
+    String xpath = getAreanodeForCoordinate(blockCoord);
+    String[] areas = getAllAreasFromAreaXPath(xpath);
+
+    for (int i=0; i<areas.length; i++) {
+      String areapath = "//area[@name='"+areas[i]+"']";
+
+      //get area wide permissions
+      for (int n=0; n<attrs.size(); n++) {
+        String permstr = config.getString(areapath + "/permissions/blocks/@"+attrs.get(n),"");
+        if (!permstr.equals(""))
+          perms[n] = includesPlayer(permstr, player);
+      }
+
+      //single block tag overrides the areawide allowPlace
+      place_allow = config.getString(areapath + pathpart + "allow","");
+      if (!place_allow.equals(""))
+        perms[0] = includesPlayer(place_allow, player);
+      place_disallow = config.getString(areapath + pathpart + "disallow","");
+      if (!place_disallow.equals(""))
+        perms[0] = !includesPlayer(place_disallow, player);
+    }
+
+    return perms;
+  }
+
+  // replacement for CommandList.playerAllowed 
+  public boolean playerCommandAllowed(String cmd, Player player) {
+    boolean allowed = false;
+    String pathpart = "/permissions/commands/command[@name='"+cmd+"']/@";
+
+	  String globalpermission = config.getString(pathpart + "allow", "");
+    if (!globalpermission.equals(""))
+      allowed = includesPlayer(globalpermission, player);
+
+    //get all parent areas and check them incrementally
+    String xpath = getAreanodeForCoordinate(coordinateFromPlayer(player));
+    String[] areas = getAllAreasFromAreaXPath(xpath);
+
+    for (int i=0; i<areas.length; i++) {
+      String path = "//area[@name='"+areas[i]+"']";
+      String areaallow = config.getString(path + pathpart + "allow", "");
+      String areadisallow = config.getString(path + pathpart + "disallow", "");
+
+      if (!areaallow.equals(""))
+          allowed = includesPlayer(areaallow, player);
+      if (!areadisallow.equals(""))
+          allowed = !includesPlayer(areadisallow, player);
+    }
+
+    return allowed;
+  }
+
+  // replacement for CommandList.getAliases
+  public String[] getCommandAliases(String name) {
+    String aliasstr = config.getString("/permissions/commands/command[@name='"+name+"']/@aliases", "");
+
+    if (aliasstr.equals(""))
+  	  return new String[] {};
+
+    return aliasstr.split(",");
+  }
+
+  // replacement for CommandList.lookupCommand
+  public String lookupCommand(String name) {
+    List cmds = config.getList("/permissions/commands/command/@name");
+
+    if (cmds.contains(name)) //normal command?
+      return name;
+
+    for(int i=0; i<cmds.size(); i++) { //alias?
+      String cmd = (String)cmds.get(i);
+      String[] aliases = getCommandAliases(cmd);
+
+      if (Arrays.asList(aliases).contains(name))
+        return cmd;
+    }
+
+	  return null;
+  }
+
+  // replacement for CommandList.setGroup
+  public void setCommandGroup(String cmd, int grp) {
+  	String val = config.getString("/permissions/commands/command[@name='"+cmd+"']/@allow");
+	  if (val == null) {
+		  config.addProperty("/permissions/commands/ command@name", cmd);
+		  config.addProperty("/permissions/commands/command[@name='"+cmd+"'][1] @allow", String.valueOf(grp));
+    }
+
+	  config.setProperty("/permissions/commands/command[@name='"+cmd+"']/@allow", String.valueOf(grp));
+  }
+
+  public static String joinStrings(String[] strs, String delim) {
+  	String ret = "";
+
+    if (strs == null || strs.length==0)
+      return "";
+
+    if (strs.length == 1)
+      return strs[0];
+
+    for(int i=0; i<(strs.length-1); i++)
+      ret += strs[i] + delim;
+    ret+=strs[strs.length-1];
+
+    return ret;
+  }
+
+  public String getCurrentArea(Player player) {
+	  return getAreanameForCoordinate(coordinateFromPlayer(player));
+  }
+
+  public Coordinate coordinateFromPlayer(Player player) {
+  	int x = (int) Math.round(player.getX());
+  	byte y = (byte) Math.round(player.getY());
+  	int z = (int) Math.round(player.getZ());
+
+	  return new Coordinate(x,y,z);
+  }
+
+  public String getAreanameForCoordinate(Coordinate coord) {
+  	String node = getAreanodeForCoordinate(coord);
+	  if (node.equals(""))
+		  return "";
+
+    return config.getString(node+"/@name");
+  }
+
+  // Returns full XPath to the area node -> contains also names of parent areas
+  private String getAreanodeForCoordinate(Coordinate coord) {
+  	String nodepath="";
+	
+    boolean found = false;
+    while(!found) {
+	    found = true;
+
+	    List areas = config.getList(nodepath+"/areas/area/@name");
+	    List starts = config.getList(nodepath+"/areas/area/@start");
+	    List ends = config.getList(nodepath+"/areas/area/@end");
+
+	    if (areas.size() == 0 || areas.size() != starts.size()
+              || areas.size() != ends.size()) {
+	      break;
+      }
+
+	    for(int i=0; i<areas.size(); i++) {
+	   	 if (areaContainsCoordinate(parseCoords(starts.get(i).toString()), 
+               parseCoords(ends.get(i).toString()), coord)) {
+			    nodepath += "/areas/area[@name='"+areas.get(i)+"']";
+			    found = false;
+			    break;
+	      }
+	    }
+	  }
+
+    return nodepath;
+  }
+
+  //input like: /areas/area[@name="outer"]/areas/area[@name="Inner"]
+  //output like: ["outer","inner"]
+  private String[] getAllAreasFromAreaXPath(String path) {
+    if (path.equals(""))
+        return new String[]{};
+
+    ArrayList<String> areas = new ArrayList<String>();
+
+    for(int i=0; i<path.length(); i++) {
+      int start=path.indexOf("'",i);
+      if (start == -1)
+          break;
+      int end=path.indexOf("'",start+1);
+
+      areas.add(path.substring(start+1,end));
+      i=end;
+    }
+
+    return areas.toArray(new String[areas.size()]);
+  }
+
+  private boolean areaContainsCoordinate(Coordinate start, Coordinate end, Coordinate coord) {
+    // swap coordinates if start > end
+    int t=0;
+    byte u=0;
+    if (start.x > end.x) {
+      t = start.x;
+	    start.x = end.x;
+      end.x = t;
+    }
+	  if (start.z > end.z) {
+		  t = start.z;
+	    start.z = end.z;
+		  end.z = t;
+    }
+	  if (start.y > end.y) {
+      u = start.y;
+	    start.y = end.y;
+	 	  end.y = u;
+    }
+
+    if (start.y == 0 || end.y == 0) {
+		  if (coord.x >= start.x && coord.z >= start.z
+          && coord.x <= end.x && coord.z <= end.z)
+			  return true;
+    } else if (coord.x >= start.x && coord.z >= start.z && coord.y >= start.y
+          && coord.x <= end.x && coord.z <= end.z && coord.y <= end.y) {
+        return true;
+    }
+
+    return false;
+  }
+
+  private Coordinate parseCoords(String c) {
+    if (c==null || c.length() == 0)
+      return null;
+
+    String[] coords = c.split(",");
+    if (coords.length < 2)
+	    return null;
+
+    Integer x = Integer.valueOf(coords[0]);
+    Integer z = Integer.valueOf(coords[1]);
+
+    byte y = 0;
+    if (coords.length == 3)
+      y = (byte)Integer.valueOf(coords[2]).intValue();
+
+    return new Coordinate(x,y,z);
+  }
+
+  public void createPlayerArea(Player player) {
+    String name = player.getName().toLowerCase();
+
+    if(playerHasArea(player))
+      return;
+
+    config.addProperty("/areas area@owner", name);
+    String path = "/areas/area[@owner='"+name+"']";
+
+    config.addProperty(path+"[1] @name", name+"s private area");
+    config.addProperty(path+"[1] @start", player.areastart.x+","+player.areastart.z);
+    config.addProperty(path+"[1] @end", player.areaend.x+","+player.areaend.z);
+
+    config.addProperty(path+"[1] permissions/blocks@allowPlace",";"+name);
+    config.addProperty(path+"[1]/permissions/blocks @allowDestroy",";"+name);
+    config.addProperty(path+"[1]/permissions/blocks @allowUse",";"+name);
+    config.addProperty(path+"[1]/permissions/blocks @allowTake",";"+name);
+  }
+
+  public void removePlayerArea(Player player) {
+    String name = player.getName().toLowerCase();
+    if(!playerHasArea(player))
+      return;
+
+    String path = "/areas/area[@owner='"+name+"']";
+    config.clearTree(path);
+
+    if (config.getList("/areas/area/@name").size() == 0)
+        config.addProperty("/ areas"," "); // add areas tag back
+  }
+
+  public boolean playerHasArea(Player player) {
+    String name = player.getName().toLowerCase();
+    return !config.getString("/areas/area[@owner='"+name+"']/@owner","").equals("");
+  }
+
+
+  @Override
+  protected void loadHeader() {
+	  //No header for XML config required
+  }
+
+  @Override
+  public void load() {
+	  try {
+      loadsuccess = true;
+      InputStream stream = new FileInputStream(getFile());
+      initConf(true);
+		  config.load(stream);
+
+      if (loadsuccess == false) {
+        System.out.println("Trying to load permissions.xml ignoring errors...");
+        stream = new FileInputStream(getFile());
+        initConf(false);
+		    config.load(stream);
+      }
+
+	  }
+
+	  catch (FileNotFoundException e) {
+      System.out.println(getFilename() + " is missing.  Loading defaults.");
+      loadDefaults();
+    }
+
+	  catch (ConfigurationException e) {
+      System.out.println("[SimpleServer] " + e);
+      System.out.println("[SimpleServer] Failed to load " + getFilename());
+	  }
+  }
+
+  public void loadDefaults() {
+    try {
+      initConf(true);
+      InputStream stream = getResourceStream();
+      config.load(stream);
+    }
+    catch(ConfigurationException ex) {
+      System.out.println("[SimpleServer] " + ex);
+      System.out.println("[SimpleServer] Failed to load defaults for " + getFilename());
+    }
+    save();
+  }
+
+  @Override
+  public void save() {
+    try {
+      OutputStream stream = new FileOutputStream(getFile());
+      config.save(stream);
+    }
+
+    catch (Exception e) {
+      System.out.println("[SimpleServer] " + e);
+      System.out.println("[SimpleServer] Failed to save " + getFilename());
+    }
+
+  }
+
+}

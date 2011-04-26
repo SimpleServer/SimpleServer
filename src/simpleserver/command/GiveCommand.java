@@ -21,6 +21,7 @@
 package simpleserver.command;
 
 import simpleserver.Player;
+import simpleserver.Server;
 
 public class GiveCommand extends AbstractCommand implements PlayerCommand {
   private int offset;
@@ -38,7 +39,7 @@ public class GiveCommand extends AbstractCommand implements PlayerCommand {
   public void execute(Player player, String message) {
     String[] arguments = extractArguments(message);
 
-    Player target = getTarget(player, arguments);
+    Player target = getTarget(player, player.getServer(), arguments);
     if (target == null) {
       return;
     }
@@ -66,7 +67,7 @@ public class GiveCommand extends AbstractCommand implements PlayerCommand {
     }
   }
 
-  protected Player getTarget(Player player, String[] arguments) {
+  protected Player getTarget(Player player, Server server, String[] arguments) {
     return player;
   }
 }

@@ -70,6 +70,10 @@ public class Player {
 
   private String nextChestName;
 
+  //temporary coordinate storage for !myarea command
+  public Coordinate areastart;
+  public Coordinate areaend;
+
   public Player(Socket inc, Server parent) {
     connected = System.currentTimeMillis();
     server = parent;
@@ -135,6 +139,7 @@ public class Player {
   }
 
   public boolean setName(String name) {
+
     name = name.trim();
     if (name.length() == 0 || this.name != null) {
       kick("Invalid Name!");
@@ -160,7 +165,7 @@ public class Player {
     server.playerList.addPlayer(this);
     return true;
   }
-
+   
   public String getName() {
     return name;
   }
@@ -209,7 +214,7 @@ public class Player {
   }
 
   public String getMessage() {
-    return messages.remove();
+	return messages.remove();
   }
 
   public void addVisitRequest(Player source) {
@@ -315,7 +320,7 @@ public class Player {
     }
 
     //Repeat last command
-    if (message.equals("!!"))
+    if (message.equals(server.getCommandParser().commandPrefix()+"!"))
       message = lastCommand;
 
     PlayerCommand command = server.getCommandParser().getPlayerCommand(message);
@@ -345,7 +350,7 @@ public class Player {
   }
 
   public boolean commandAllowed(String command) {
-    return server.commands.playerAllowed(command, this);
+    return server.permissions.playerCommandAllowed(command, this);
   }
   
   public void teleportTo(Player target) {
@@ -409,22 +414,9 @@ public class Player {
   }
 
   public void updateGroup() {
-    int nameGroup = server.members.getGroup(name);
-    int ipGroup = server.ipMembers.getGroup(getIPAddress());
+	group = server.permissions.getPlayerGroup(this);
 
-    if (ipGroup > nameGroup) {
-      group = ipGroup;
-    }
-    else {
-      group = nameGroup;
-    }
-
-    if ((nameGroup == -1) || (ipGroup == -1)
-        && (server.options.getInt("defaultGroup") != -1)) {
-      group = -1;
-    }
-
-    groupObject = server.groups.getGroup(group);
+    groupObject = server.permissions.getGroup(group);
   }
 
   public void placedBlock() {

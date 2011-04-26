@@ -45,7 +45,7 @@ public class HelpCommand extends AbstractCommand implements PlayerCommand {
       PlayerCommand command = parser.getPlayerCommand(commandName);
       player.addMessage(command.getHelpText(prefix));
 
-      String[] aliases = player.getServer().commands.getAliases(command.getName());
+      String[] aliases = player.getServer().permissions.getCommandAliases(command.getName());
       if (aliases.length > 0) {
         StringBuffer line = new StringBuffer();
         line.append("\u00a77Aliases:\u00a7f ");

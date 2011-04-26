@@ -28,18 +28,19 @@ import java.net.UnknownHostException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Semaphore;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.math.BigInteger;
+
+
+import simpleserver.config.PermissionConfig;
 
 import simpleserver.command.TimeCommand;
-import simpleserver.config.BlockList;
 import simpleserver.config.ChestList;
-import simpleserver.config.CommandList;
 import simpleserver.config.GiveAliasList;
-import simpleserver.config.GroupList;
 import simpleserver.config.IPBanList;
-import simpleserver.config.IPMemberList;
 import simpleserver.config.KitList;
 import simpleserver.config.MOTD;
-import simpleserver.config.MemberList;
 import simpleserver.config.MuteList;
 import simpleserver.config.RobotList;
 import simpleserver.config.Rules;
@@ -68,21 +69,18 @@ public class Server {
 
   public Language l;
   public Options options;
-  public BlockList blockFirewall;
-  public GroupList groups;
-  public MemberList members;
   private RobotList robots;
   private MOTD motd;
   public KitList kits;
   public ChestList chests;
   private Rules rules;
-  public IPMemberList ipMembers;
   public IPBanList ipBans;
   public WhiteList whitelist;
   public MuteList mutelist;
   public GiveAliasList giveAliasList;
-  public CommandList commands;
   public Stats stats;
+
+  public PermissionConfig permissions;
 
   private List<Resource> resources;
   public PlayerList playerList;
@@ -154,7 +152,7 @@ public class Server {
   }
 
   public boolean cmdAllowed(String cmd, Player p) {
-    return commands.playerAllowed(cmd, p);
+    return permissions.playerCommandAllowed(cmd, p);
   }
 
   public int numPlayers() {
@@ -335,12 +333,7 @@ public class Server {
     resources.add(l = new Language());
     resources.add(options = new Options());
     resources.add(robots = new RobotList());
-    resources.add(ipMembers = new IPMemberList(options));
     resources.add(chests = new ChestList());
-    resources.add(commands = new CommandList());
-    resources.add(blockFirewall = new BlockList());
-    resources.add(groups = new GroupList());
-    resources.add(members = new MemberList(this));
     resources.add(motd = new MOTD());
     resources.add(rules = new Rules());
     resources.add(kits = new KitList(this));
@@ -350,12 +343,14 @@ public class Server {
     resources.add(giveAliasList = new GiveAliasList());
     resources.add(stats = new Stats());
 
+	resources.add(permissions = new PermissionConfig(options));
+
     systemInput = new SystemInputQueue();
     adminLog = new AdminLog();
     errorLog = new ErrorLog();
     connectionLog = new ConnectionLog();
 
-    commandParser = new CommandParser(options, commands);
+    commandParser = new CommandParser(options, permissions);
   }
 
   private void cleanup() {

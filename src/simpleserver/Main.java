@@ -27,23 +27,42 @@ import java.io.InputStreamReader;
 
 import simpleserver.command.InvalidCommand;
 import simpleserver.command.PlayerCommand;
-import simpleserver.config.CommandList;
+import simpleserver.config.PermissionConfig;
 import simpleserver.options.Options;
 
 public class Main {
   private static final String license = "SimpleServer -- Copyright (C) 2011 SimpleServer authors (see CONTRIBUTORS)";
   private static final String warranty = "This program is licensed under The MIT License.\nSee file LICENSE for details.";
-  private static final String baseVersion = "7.2-dev";
+  private static final String baseVersion = "7.2";
+  private static final boolean isDev = true;
   private static final String version;
 
   static {
     String extendedVersion = baseVersion;
-    InputStream input = Main.class.getResourceAsStream("VERSION");
+    
+    String buildversion = getVersionString("BUILDVERSION");
+    if (!buildversion.equals(""))
+        extendedVersion += "."+buildversion;
+
+    if (isDev)
+        extendedVersion += "-dev";
+
+    String commitversion = getVersionString("VERSION");
+    if (!commitversion.equals(""))
+        extendedVersion += "-"+commitversion;
+    
+    version = extendedVersion;
+  }
+
+  private static String getVersionString(String file) {
+    InputStream input = Main.class.getResourceAsStream(file);
+    String retversion = "";
+
     if (input != null) {
       BufferedReader reader = new BufferedReader(new InputStreamReader(input));
       try {
         try {
-          extendedVersion += "-" + reader.readLine();
+           retversion = reader.readLine();
         }
         finally {
           reader.close();
@@ -55,10 +74,19 @@ public class Main {
       }
     }
 
-    version = extendedVersion;
+    return retversion;
   }
 
   public static void main(String[] args) {
+    if (args.length > 0) {
+      for(String x: args) {
+        if(x.equals("--version") || x.equals("-v")) {
+          System.out.println(version);
+          return;
+        }
+      }
+    }
+
     System.out.println(license);
     System.out.println(warranty);
     System.out.println(">> Starting SimpleServer " + version);
@@ -66,9 +94,9 @@ public class Main {
     if (Boolean.getBoolean("PRINT_COMMAND_HELP")) {
       System.out.println("In-game Commands:");
 
-      CommandList commands = new CommandList();
       Options options = new Options();
-      CommandParser commandParser = new CommandParser(options, commands);
+      PermissionConfig permissions = new PermissionConfig(options);
+      CommandParser commandParser = new CommandParser(options, permissions);
       for (PlayerCommand command : commandParser.getPlayerCommands()) {
         if (command.getClass() != InvalidCommand.class) {
           String text = command.getHelpText("  !");

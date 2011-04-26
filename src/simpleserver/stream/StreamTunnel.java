@@ -162,7 +162,7 @@ public class StreamTunnel {
         if (isServerTunnel || player.setName(name)) {
           tunneler.setName(streamType + "-" + player.getName());
           write(packetId);
-          write(name);
+		      write(name);
         }
         break;
       case 0x03: // Chat Message
@@ -296,41 +296,40 @@ public class StreamTunnel {
         break;
       case 0x0e: // Player Digging
         if (!isServerTunnel) {
-          if (player.getGroupId() < 0) {
-            skipNBytes(11);
-          }
-          else {
-            byte status = in.readByte();
-            x = in.readInt();
-            y = in.readByte();
-            z = in.readInt();
-            byte face = in.readByte();
-            if (!server.chests.isLocked(x, y, z) || player.isAdmin()) {
-              if (server.chests.isLocked(x, y, z)
-                  && status == BLOCK_DESTROYED_STATUS) {
-                server.chests.releaseLock(x, y, z);
-              }
+          byte status = in.readByte();
+          x = in.readInt();
+          y = in.readByte();
+          z = in.readInt();
+          byte face = in.readByte();
 
+          if (!server.permissions.getPlayerBlockPermissions(player, new Coordinate(x,y,z), 0)[1])
+            break;
+
+          if (!server.chests.isLocked(x, y, z) || player.isAdmin()) {
+            if (server.chests.isLocked(x, y, z)
+                && status == BLOCK_DESTROYED_STATUS) {
+              server.chests.releaseLock(x, y, z);
+            }
+
+            write(packetId);
+            write(status);
+            write(x);
+            write(y);
+            write(z);
+            write(face);
+
+            if (player.instantDestroyEnabled()) {
+              packetFinished();
               write(packetId);
-              write(status);
+              write(BLOCK_DESTROYED_STATUS);
               write(x);
               write(y);
               write(z);
               write(face);
-
-              if (player.instantDestroyEnabled()) {
-                packetFinished();
-                write(packetId);
-                write(BLOCK_DESTROYED_STATUS);
-                write(x);
-                write(y);
-                write(z);
-                write(face);
-              }
-              
-              if(status == BLOCK_DESTROYED_STATUS) {
-                player.destroyedBlock();
-              }
+            }
+             
+            if(status == BLOCK_DESTROYED_STATUS) {
+              player.destroyedBlock();
             }
           }
         }
@@ -354,9 +353,13 @@ public class StreamTunnel {
         
         boolean writePacket = true;
         boolean drop = false;
+
+        boolean[] perms = server.permissions.getPlayerBlockPermissions(
+                player, new Coordinate(x,y,z), dropItem); // permission: [detroy, place, use]
+        
         if (isServerTunnel || server.chests.isChest(x, y, z)) {
           // continue
-        } else if ((player.getGroupId() < 0) || !server.blockFirewall.playerAllowed(player, dropItem)) {
+        } else if ((dropItem!=-1 && !perms[0]) || (dropItem==-1 && !perms[2])) {
           String badBlock = String.format(server.l.get("BAD_BLOCK"), player.getName(), Short.toString(dropItem));
           server.runCommand("say", badBlock);
           writePacket = false;

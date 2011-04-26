@@ -1,0 +1,53 @@
+<!ELEMENT config ( groups, members, permissions, areas )>
+<!ELEMENT groups (group+)>
+<!ELEMENT group EMPTY>
+<!ELEMENT members ((player|ip)*)>
+<!ELEMENT player EMPTY>
+<!ELEMENT ip EMPTY>
+
+<!ELEMENT permissions ( commands?, blocks? )>
+<!ELEMENT commands (command+)>
+<!ELEMENT command EMPTY>
+<!ELEMENT blocks (block*)>
+<!ELEMENT block EMPTY>
+
+<!ELEMENT areas (area*)>
+<!ELEMENT area ( permissions?, areas? )>
+
+<!ATTLIST group
+  id NMTOKEN #REQUIRED
+  name CDATA #IMPLIED 
+  color NMTOKEN #IMPLIED
+  showTitle NMTOKEN #IMPLIED
+  ignoreChestlocks NMTOKEN #IMPLIED
+>
+<!ATTLIST player
+  name NMTOKEN #REQUIRED
+  group CDATA #REQUIRED
+>
+<!ATTLIST ip
+  address NMTOKEN #REQUIRED
+  group CDATA #REQUIRED
+>
+<!ATTLIST command
+  name NMTOKEN #REQUIRED
+  aliases CDATA #IMPLIED
+  allow CDATA #IMPLIED
+  disallow CDATA #IMPLIED
+>
+<!ATTLIST blocks
+  allowPlace CDATA #IMPLIED
+  allowDestroy CDATA #IMPLIED
+  allowUse CDATA #IMPLIED
+  allowTake CDATA #IMPLIED
+>
+<!ATTLIST block
+  id NMTOKEN #REQUIRED
+  allow CDATA #IMPLIED
+>
+<!ATTLIST area
+  name CDATA #REQUIRED
+  start CDATA #REQUIRED
+  end CDATA #REQUIRED
+  owner NMTOKEN #IMPLIED
+>

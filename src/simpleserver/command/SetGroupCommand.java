@@ -31,7 +31,7 @@ public class SetGroupCommand extends PlayerArgCommand {
   @Override
   protected void executeWithTarget(Player player, String message, String target) {
     Server server = player.getServer();
-    if (player.getGroupId() <= server.members.getGroup(target)) {
+    if ( player.getGroupId() <= server.permissions.getNameGroup(target) ) {
       player.addMessage("\u00a7cYou cannot set the group of this user!");
       return;
     }
@@ -51,7 +51,7 @@ public class SetGroupCommand extends PlayerArgCommand {
         player.addMessage("\u00a7cYou cannot promote to your group or higher!");
       }
       else {
-        server.members.setGroup(target, group);
+        server.permissions.setPlayerGroup(target, group);
         player.addMessage("\u00a77Player " + target + "'s group was set to "
             + group + "!");
         server.adminLog("User " + player.getName() + " set player's group:\t "

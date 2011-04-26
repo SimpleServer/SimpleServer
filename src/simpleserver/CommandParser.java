@@ -33,7 +33,7 @@ import simpleserver.command.AbstractCommand;
 import simpleserver.command.Command;
 import simpleserver.command.PlayerCommand;
 import simpleserver.command.ServerCommand;
-import simpleserver.config.CommandList;
+import simpleserver.config.PermissionConfig;
 import simpleserver.options.Options;
 
 public class CommandParser {
@@ -42,11 +42,11 @@ public class CommandParser {
   private final Map<String, ServerCommand> serverCommands;
   private final Map<Class, ServerCommand> serverCommandClasses;
   private final Options options;
-  private final CommandList commandList;
+  private final PermissionConfig permissions;
 
-  public CommandParser(Options options, CommandList commandList) {
+  public CommandParser(Options options, PermissionConfig permissions) {
     this.options = options;
-    this.commandList = commandList;
+    this.permissions = permissions;
 
     playerCommands = new HashMap<String, PlayerCommand>();
     playerCommandClasses = new HashMap<Class, PlayerCommand>();
@@ -108,7 +108,7 @@ public class CommandParser {
     }
 
     String name = message.substring(offset, splitIndex).toLowerCase();
-    return commandList.lookupCommand(name);
+    return permissions.lookupCommand(name);
   }
 
   private <T extends Command> void loadCommands(Class<T> type, Map<String, T> commands, Map<Class, T> commandClasses) {

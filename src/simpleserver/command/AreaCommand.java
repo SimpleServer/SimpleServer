@@ -18,37 +18,20 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package simpleserver;
+package simpleserver.command;
 
-public class Coordinate {
-  public int x;
-  public byte y;
-  public int z;
-  private final int hashCode;
+import simpleserver.Player;
+import simpleserver.config.PermissionConfig;
 
-  public Coordinate(int x, byte y, int z) {
-    this.x = x;
-    this.y = y;
-    this.z = z;
-
-    int code = 17;
-    code = 37 * code + x;
-    code = 37 * code + y;
-    code = 37 * code + z;
-    hashCode = code;
+public class AreaCommand extends AbstractCommand implements PlayerCommand {
+  public AreaCommand() {
+    super("area", "Show the name of current area");
   }
 
-  public boolean equals(Coordinate coordinate) {
-    return (coordinate.x == x) && (coordinate.y == y) && (coordinate.z == z);
-  }
+  public void execute(Player player, String message) {
+    PermissionConfig perm = perm = player.getServer().permissions;
 
-  @Override
-  public boolean equals(Object object) {
-    return (object instanceof Coordinate) && equals((Coordinate) object);
-  }
-
-  @Override
-  public int hashCode() {
-    return hashCode;
+    String list = "\u00a77Current area:\u00a7f "+perm.getCurrentArea(player);
+    player.addMessage(list);
   }
 }

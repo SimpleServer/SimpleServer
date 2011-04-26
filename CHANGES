@@ -5,10 +5,17 @@
  * Extended chest support
  * Added !localtoggle for quick local conversations
  * Added !time to control time, old !time is !servertime now
- * Added custom server authentication (enableCustomAuth) and !setpassword command
+ * Added !visit & !ok for teleport with agreement
+ * Added !! to repeat last successful command
+ * Added !area to show current area
+ * Added !myarea command to allow each player one ingame personal area
+ * Replaced BlockList, CommandList, GroupList, MemberList and IPMemberList with PermissionConfig (XML)
+ * Added a tool conf2xml.jar to convert old config files to XML format and fix some others
  * Added command disabling
  * Added useXincgc and overwriteArguments options
  * Fixed command redirection
+ * Changed group list syntax a bit
+ * Group -1 is nothing special anymore (global permissions must be set accordingly to achieve same effect)
  * Other bug fixes
 
 == 7.1 ==

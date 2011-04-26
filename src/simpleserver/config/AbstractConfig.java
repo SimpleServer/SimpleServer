@@ -28,10 +28,10 @@ import java.io.InputStream;
 import simpleserver.Resource;
 
 public abstract class AbstractConfig implements Resource {
-  private static final String resourceLocation = "defaults";
+  protected static final String resourceLocation = "defaults";
   private static final String folder = "simpleserver";
 
-  private String filename;
+  protected String filename;
   private String header;
 
   protected AbstractConfig(String filename) {
@@ -97,7 +97,7 @@ public abstract class AbstractConfig implements Resource {
                                               + "-header");
   }
 
-  private void loadHeader() {
+  protected void loadHeader() {
     InputStream headerStream = getHeaderResourceStream();
     try {
       header = readFully(headerStream);

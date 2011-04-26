@@ -29,11 +29,16 @@ public class VisitCommand extends OnlinePlayerArgCommand {
 
   @Override
   protected void executeWithTarget(Player player, String message, Player target) {
-	player.addMessage("\u00a77Requesting "+target.getName()+" for a visit...");
-	player.addMessage("\u00a77If nothing happens within 10 seconds, your request is denied.");
+    if (player.getName().equals(target.getName())) {
+	    player.addMessage("\u00a7cYou can not visit yourself!");
+      return;
+    }
 
-	target.addMessage("\u00a7c"+player.getName()+" would like to visit you. If you agree,");
-	target.addMessage("\u00a7cissue the command " + commandPrefix() + "ok within 10 seconds.");
+	  player.addMessage("\u00a77Requesting "+target.getName()+" for a visit...");
+	  player.addMessage("\u00a77If nothing happens within 10 seconds, your request is denied.");
+
+	  target.addMessage("\u00a7c"+player.getName()+" would like to visit you. If you agree,");
+	  target.addMessage("\u00a7cissue the command " + commandPrefix() + "ok within 10 seconds.");
 
     target.addVisitRequest(player);
 

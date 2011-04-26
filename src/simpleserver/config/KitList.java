@@ -35,7 +35,7 @@ public class KitList extends PropertiesConfig {
   private final Server server;
 
   private static final class Kit {
-    public final ImmutableSet<Integer> groups;
+    public final String groups;
     public final ImmutableList<Entry> items;
 
     private static final class Entry {
@@ -48,7 +48,7 @@ public class KitList extends PropertiesConfig {
       }
     }
 
-    public Kit(ImmutableSet<Integer> groups, ImmutableList<Entry> items) {
+    public Kit(String groups, ImmutableList<Entry> items) {
       this.groups = groups;
       this.items = items;
     }
@@ -65,7 +65,7 @@ public class KitList extends PropertiesConfig {
 
   public boolean giveKit(Player player, String kitName) {
     Kit kit = kits.get(kitName.toLowerCase());
-    if ((kit != null) && (Group.isMember(kit.groups, player))) {
+    if ((kit != null) && (server.permissions.includesPlayer(kit.groups, player))) {
       for (Kit.Entry entry : kit.items) {
         String baseCommand = player.getName() + " " + entry.item;
         for (int c = 0; c < entry.amount / 64; ++c) {
@@ -83,7 +83,7 @@ public class KitList extends PropertiesConfig {
     kitList.append("\u00a77Allowed kits: \u00a7f");
     for (String name : kits.keySet()) {
       Kit kit = kits.get(name);
-      if (Group.isMember(kit.groups, player)) {
+      if (server.permissions.includesPlayer(kit.groups, player)) {
         kitList.append(name);
         kitList.append(", ");
       }
@@ -98,7 +98,7 @@ public class KitList extends PropertiesConfig {
 
     kits.clear();
     for (Entry<Object, Object> entry : properties.entrySet()) {
-      String[] options = entry.getValue().toString().split(",");
+      String[] options = entry.getValue().toString().split("\\|");
       if (options.length < 2) {
         System.out.println("Skipping bad kit list entry " + entry.getValue());
         continue;
@@ -126,7 +126,7 @@ public class KitList extends PropertiesConfig {
         items.add(new Kit.Entry(block, amount));
       }
 
-      Kit kit = new Kit(Group.parseGroups(options[0], ";"), items.build());
+      Kit kit = new Kit(options[0], items.build());
       kits.put(entry.getKey().toString().toLowerCase(), kit);
     }
   }

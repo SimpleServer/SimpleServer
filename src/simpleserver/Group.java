@@ -20,9 +20,6 @@
  */
 package simpleserver;
 
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.ImmutableSortedSet;
-
 public class Group {
   private final String groupName;
   private final boolean showTitle;
@@ -53,58 +50,4 @@ public class Group {
     return color;
   }
 
-  public static boolean isMember(ImmutableSet<Integer> groups, Player player) {
-    return groups.contains(player.getGroupId()) || groups.contains(-1)
-        || (groups.contains(0) && (player.getGroupId() != -1));
-  }
-
-  public static ImmutableSet<Integer> parseGroups(String idString) {
-    return parseGroups(idString, ",");
-  }
-
-  public static ImmutableSet<Integer> parseGroups(String idString,
-                                                  String delimiter) {
-    String[] segments = idString.split(delimiter);
-    ImmutableSortedSet.Builder<Integer> groups = ImmutableSortedSet.naturalOrder();
-    for (String segment : segments) {
-      if (segment.matches("^\\s*$")) {
-        continue;
-      }
-
-      try {
-        groups.add(Integer.valueOf(segment));
-        continue;
-      }
-      catch (NumberFormatException e) {
-      }
-
-      String[] range = segment.split("-");
-      if (range.length != 2) {
-        System.out.println("Unable to parse group: " + segment);
-        continue;
-      }
-
-      int low;
-      int high;
-      try {
-        low = Integer.valueOf(range[0]);
-        high = Integer.valueOf(range[1]);
-      }
-      catch (NumberFormatException e) {
-        System.out.println("Unable to parse group: " + segment);
-        continue;
-      }
-
-      if (low > high) {
-        System.out.println("Unable to parse group: " + segment);
-        continue;
-      }
-
-      for (int k = low; k <= high; ++k) {
-        groups.add(k);
-      }
-    }
-
-    return groups.build();
-  }
 }

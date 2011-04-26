@@ -12,12 +12,15 @@ Installation:
 2) You can now connect to the server using your IP Address (www.whatismyip.com)
    and the port indicated in simpleserver.properties!
 
+Update from versions without area permissions support:
+  Run conf2xml.jar from the server directory. It will
+  convert your old configuration files to the new format
+  and write a new permissions.xml file.
+
 Features (See CHANGES for updates):
  * Denial of service protection.  More than 30 requests/IP/minute will
    automatically ban the IP.
  * RCON access.
- * Guest-mode protection.  Members in group -1 are guests and are not able
-   to place blocks, destroy blocks, or access chests.
  * Optional automated saving, backups, restarts, and mapping.
  * Message translation support (language.properties)
  * Locked chests.  Each player can say !lock and place a single locked chest.
@@ -26,8 +29,8 @@ Features (See CHANGES for updates):
  * Local chat.  Say !l MESSAGE... to send a message to nearby players
  * Customizable message formats.
  * Compatible with SMP API, hey0 and other server mods.
- * Customizable groups (group-list.txt, member-list.txt, ip-member-list.txt).
- * Customizable command permissions (command-list.txt).
+ * Customizable groups, command and block permissions (permissions.xml).
+ * Possibility of local area permissions (permissions.xml).
  * Customizable kits (kit-list.txt).
  * Customizable give aliases (give-alias-list.txt).
  * IP bans (ip-ban-list.txt).
@@ -48,6 +51,7 @@ Added commands:
 In-game Commands:
 Commands are based on rank.  Say !help in game for a list of currently
 accessible commands.
+  !area -- Show current area
   !backup -- Backup the map
   !banip IPADDRESS -- Kick and ban players with this IP
   !ban PLAYER [REASON] -- Kick and ban the named player
@@ -65,6 +69,7 @@ accessible commands.
   !lock -- Prepare to create your locked chest
   !motd -- Display the message of the day
   !mute PLAYER -- Block the named player from normal chat
+  !myarea [start|end|save|unsave] -- Create a private area
   !mystats -- Show own statistics
   !ok -- Response to the !visit command to allow a teleport
   !rcon COMMAND ARGUMENTS... -- Execute a command on the server console
@@ -76,8 +81,8 @@ accessible commands.
   !setgroup PLAYER GROUP -- Set the group ID of the named player
   !stop -- Shutdown the entire server
   !teleport PLAYER1 PLAYER2 -- Teleport the first player to the second
-  !time [0-23999 or day|night] [freeze|unfreeze] -- Set or freeze arbitrary time of day
   !tell PLAYER MESSAGE... -- Send a message to the named player
+  !time [0-23999 or day|night] [freeze|unfreeze] -- Set or freeze arbitrary time of day
   !servertime -- Display the real-world time of the server
   !unbanip IPADDRESS -- Remove the IP address from the ban list
   !unban PLAYER -- Remove the named player from the ban list
@@ -94,3 +99,4 @@ Technical Details:
   This wrapper works by proxying all network and console data to and from the
   minecraft server.  This means that your clients will be connecting to the
   wrapper and not to the minecraft server directly.
+
