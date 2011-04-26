@@ -10,7 +10,6 @@
  * Added !area to show current area
  * Added !myarea command to allow each player one ingame personal area
  * Replaced BlockList, CommandList, GroupList, MemberList and IPMemberList with PermissionConfig (XML)
- * Added a tool conf2xml.jar to convert old config files to XML format and fix some others
  * Added command disabling
  * Added useXincgc and overwriteArguments options
  * Fixed command redirection

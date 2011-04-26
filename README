@@ -12,11 +12,6 @@ Installation:
 2) You can now connect to the server using your IP Address (www.whatismyip.com)
    and the port indicated in simpleserver.properties!
 
-Update from versions without area permissions support:
-  Run conf2xml.jar from the server directory. It will
-  convert your old configuration files to the new format
-  and write a new permissions.xml file.
-
 Features (See CHANGES for updates):
  * Denial of service protection.  More than 30 requests/IP/minute will
    automatically ban the IP.
