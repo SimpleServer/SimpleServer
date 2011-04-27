@@ -28,6 +28,7 @@ class ConfToXml {
 
   private boolean allFilesOk = false;
   private String confpath = "simpleserver";
+  private String backupdir = confpath+"/oldconf";
 
 
   private void failmsg(String message) {
@@ -93,8 +94,6 @@ class ConfToXml {
     File f1 = new File(filename);
     File f2 = new File(newname);
     boolean success = f1.renameTo(f2);
-    if (success)
-      System.out.println("Your old "+filename+" has been renamed to "+newname);
     return success;
   }
 
@@ -124,8 +123,14 @@ class ConfToXml {
       System.out.println("ERROR: Could not read kit-list.txt!");
       return false;
     }
+
+    //Skip conversion if it is already done
+    for(String line: kitlines) {
+      if (line.indexOf("|") != -1)
+          return true;
+    }
     
-    if (!backupFile(confpath+"/kit-list.txt", confpath+"/kit-list.txt.bak")) {
+    if (!backupFile(confpath+"/kit-list.txt", backupdir+"/kit-list.txt")) {
       System.out.println("ERROR: Could not backup old kit-list.txt");
       return false;
     }
@@ -254,6 +259,7 @@ class ConfToXml {
     //write file
 
     if (exists(confpath+"/permissions.xml")) {
+      System.out.println("permissions.xml already exists! Renamed to permissions.xml.bak!");
       backupFile(confpath+"/permissions.xml", confpath+"/permissions.xml.bak");
     }
 
@@ -262,7 +268,7 @@ class ConfToXml {
       return false;
     }
 
-    System.out.println("Your permissions.xml has been generated!");
+    System.out.println("[INFO] Your permissions.xml has been generated!");
     return true;
   }
 
@@ -270,11 +276,22 @@ class ConfToXml {
     if (!checkOldFiles())
       return false;
 
+    (new File(backupdir)).mkdir(); //create dir where the backups go
+
     if (!updateKitlist())
       return false;
 
     if (!generatePermissionsXml())
       return false;
+
+    backupFile(confpath+"/group-list.txt", backupdir+"/group-list.txt");
+    backupFile(confpath+"/member-list.txt", backupdir+"/member-list.txt");
+    backupFile(confpath+"/ip-member-list.txt", backupdir+"/ip-member-list.txt");
+    backupFile(confpath+"/command-list.txt", backupdir+"/command-list.txt");
+    backupFile(confpath+"/block-list.txt", backupdir+"/block-list.txt");
+
+    System.out.println("\tYour old files have been saved in " + backupdir);
+    System.out.println("\tYou can delete them if you want.");
 
     return true;
   }

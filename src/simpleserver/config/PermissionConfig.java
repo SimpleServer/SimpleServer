@@ -618,10 +618,8 @@ public class PermissionConfig extends AbstractConfig {
 	  }
 
 	  catch (FileNotFoundException e) {
+      System.out.println("Trying to convert old configuration files...");
       if (new ConfToXml().convertFiles()) {
-        System.out.println("[INFORMATION] Configuration upgraded!\n"
-                + "\tIf everything works, please remove command-list.txt, block-list.txt,\n"
-                + "\tgroup-list.txt, member-list.txt and ip-member-list.txt!");
         server.kits.load();
         load();
 

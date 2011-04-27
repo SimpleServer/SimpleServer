@@ -15,21 +15,21 @@
   </groups>
 
   <members>
-      <!-- Attribute group has to be a group id,
-           nicknames shall be written lowercase.
-           if a nickname and an ip setting apply
-           for the same player, the IP setting is used
-       -->
-    <player name="spiegalpwns" group="1" />
-    <ip address="127.0.0.0" group="1" />
+    <!-- Attribute group has to be a group id, nicknames shall be written
+         lowercase. If a nickname and an ip setting apply for the same
+         player, the higher group is used.
+     -->
+    <player name="exampleplayer" group="1" />
+    <ip address="127.0.0.1" group="1" />
   </members>
 
   <!-- global permissions -->
   <permissions>
+    <!-- Allow list pattern: [ID[,ID,ID-ID,ID+]][;nickname1,nickname2,...]
+         where ID-ID means all group IDs in the given range
+         and ID+ means all IDs >= the given ID.
+    -->
     <commands>
-        <!-- Allow list pattern: [ID[,ID,ID-ID,ID+]][;nickname,nickname,...]
-             where ID-ID means all group IDs in the given range.     
-        -->
       <command name="area" allow="0+" />
       <command name="backup" allow="4,5" />
       <command name="ban" allow="4,5" />
@@ -82,10 +82,14 @@
   </permissions>
 
   <areas>
-  <!-- Areas can be nested (e.g. area house contains sub-areas for rooms), 
+  <!--
+     An area is a named space where the permissions differ from the rest
+     of the world.
+
+     Areas can be nested (e.g. area house contains sub-areas for rooms), 
      but should not overlap (on the same nesting level), because
      only the first matching area would be found and used.
-     Areas must have distinct names (for identification) and start
+     Areas must have distinct names (for identification) and have start
      and end coordinates. Coordinates must be written as "x,z" or "x,z,y"
      if at least one coordinate has no given y value, the area is declared
      on any height (0-127).
