@@ -355,7 +355,7 @@ public class StreamTunnel {
         boolean drop = false;
 
         boolean[] perms = server.permissions.getPlayerBlockPermissions(
-                player, new Coordinate(x,y,z), dropItem); // permission: [detroy, place, use]
+                player, new Coordinate(x,y,z), dropItem);
         
         if (isServerTunnel || server.chests.isChest(x, y, z)) {
           // continue
