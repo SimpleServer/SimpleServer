@@ -302,8 +302,15 @@ public class StreamTunnel {
           z = in.readInt();
           byte face = in.readByte();
 
-          if (!server.permissions.getPlayerBlockPermissions(player, new Coordinate(x,y,z), 0)[1])
+          boolean[] perms = server.permissions.getPlayerBlockPermissions(player, new Coordinate(x,y,z), 0);
+          if (!perms[2] && status==0) {
+            player.addMessage("\u00a7cYou can not use this block here!");
             break;
+          }
+          if (!perms[1] && status==2) {
+            player.addMessage("\u00a7cYou can not destroy this block here!");
+            break;
+          }
 
           if (!server.chests.isLocked(x, y, z) || player.isAdmin()) {
             if (server.chests.isLocked(x, y, z)
@@ -360,8 +367,11 @@ public class StreamTunnel {
         if (isServerTunnel || server.chests.isChest(x, y, z)) {
           // continue
         } else if ((dropItem!=-1 && !perms[0]) || (dropItem==-1 && !perms[2])) {
-          String badBlock = String.format(server.l.get("BAD_BLOCK"), player.getName(), Short.toString(dropItem));
-          server.runCommand("say", badBlock);
+          if (dropItem == -1)
+            player.addMessage("\u00a7cYou can not use this block here!");
+          else
+            player.addMessage("\u00a7cYou can not place this block here!");
+
           writePacket = false;
           drop = true;
         } else if (dropItem == 54) {
