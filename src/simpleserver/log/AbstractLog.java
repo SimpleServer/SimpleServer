@@ -34,6 +34,9 @@ public class AbstractLog {
   private FileOutputStream stream;
   private Logger logger;
 
+  private boolean logEmpty = true;
+  private File filename;
+
   private volatile boolean run = true;
 
   protected AbstractLog(String name) {
@@ -41,7 +44,8 @@ public class AbstractLog {
 
     queue = new LinkedBlockingQueue<String>();
     try {
-      stream = new FileOutputStream(getLogFile(), true);
+      filename = getLogFile();
+      stream = new FileOutputStream(filename, true);
     }
     catch (FileNotFoundException e) {
       System.out.println("[SimpleServer] " + e);
@@ -56,6 +60,7 @@ public class AbstractLog {
   }
 
   protected void addMessage(String message) {
+    logEmpty = false;
     queue.add(String.format("%tF %1$tT\t%2$s\n", new Date(), message));
   }
 
@@ -101,6 +106,8 @@ public class AbstractLog {
       finally {
         try {
           stream.close();
+          if (logEmpty)
+            filename.delete();
         }
         catch (IOException e) {
         }
