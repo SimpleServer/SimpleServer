@@ -304,11 +304,11 @@ public class StreamTunnel {
 
           boolean[] perms = server.permissions.getPlayerBlockPermissions(player, new Coordinate(x,y,z), 0);
           if (!perms[2] && status==0) {
-            player.addMessage("\u00a7cYou can not use this block here!");
+            player.addMessage("\u00a7c " + server.l.get("USE_FORBIDDEN"));
             break;
           }
           if (!perms[1] && status==2) {
-            player.addMessage("\u00a7cYou can not destroy this block here!");
+            player.addMessage("\u00a7c " + server.l.get("DESTROY_FORBIDDEN"));
             break;
           }
 
@@ -368,9 +368,9 @@ public class StreamTunnel {
           // continue
         } else if ((dropItem!=-1 && !perms[0]) || (dropItem==-1 && !perms[2])) {
           if (dropItem == -1)
-            player.addMessage("\u00a7cYou can not use this block here!");
+            player.addMessage("\u00a7c " + server.l.get("USE_FORBIDDEN"));
           else
-            player.addMessage("\u00a7cYou can not place this block here!");
+            player.addMessage("\u00a7c " + server.l.get("PLACE_FORBIDDEN"));
 
           writePacket = false;
           drop = true;
@@ -402,7 +402,7 @@ public class StreamTunnel {
           Chest adjacentChest = server.chests.adjacentChest(xPosition, yPosition, zPosition);
           
           if (adjacentChest != null && !adjacentChest.isOpen() && !adjacentChest.ownedBy(player)) {
-            player.addMessage("\u00a7cThe adjacent chest is locked!");
+            player.addMessage("\u00a7c " + server.l.get("ADJ_CHEST_LOCKED"));
             writePacket = false;
             drop = true;
           } else {
@@ -618,7 +618,7 @@ public class StreamTunnel {
               if(player.isAttemptingUnlock()) {
                 server.chests.unlock(player.openedChest());
                 player.setAttemptedAction(null);
-                player.addMessage("\u00a77This chest is no longer locked!");
+                player.addMessage("\u00a77 " + server.l.get("CHEST_UNLOCKED"));
                 typeString = "Open Chest";
               } else {
                 typeString = server.chests.chestName(player.openedChest());
@@ -632,7 +632,7 @@ public class StreamTunnel {
             }
             
           } else {
-            player.addMessage("\u00a7cThis chest is locked!");
+            player.addMessage("\u00a7c " + server.l.get("CHEST_LOCKED"));
             in.readByte();
             break;
           }
