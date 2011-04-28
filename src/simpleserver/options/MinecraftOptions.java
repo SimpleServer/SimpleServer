@@ -34,11 +34,14 @@ public class MinecraftOptions extends AbstractOptions {
   @Override
   public void save() {
     load();
-    options.setProperty("online-mode", simpleServerOptions.get("onlineMode"));
     options.setProperty("server-ip", "127.0.0.1");
+    options.setProperty("online-mode", simpleServerOptions.get("onlineMode"));
     options.setProperty("server-port", simpleServerOptions.get("internalPort"));
     options.setProperty("max-players", simpleServerOptions.get("maxPlayers"));
     options.setProperty("level-name", simpleServerOptions.get("levelName"));
+    options.setProperty("spawn-animals", simpleServerOptions.get("spawnAnimals"));
+    options.setProperty("spawn-monsters", simpleServerOptions.get("spawnMonsters"));
+    options.setProperty("pvp", simpleServerOptions.get("pvp"));
 
     super.save();
   }
