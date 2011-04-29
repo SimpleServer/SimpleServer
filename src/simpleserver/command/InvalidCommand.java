@@ -34,13 +34,13 @@ public class InvalidCommand extends AbstractCommand implements PlayerCommand,
     return true;
   }
   
-  public boolean shouldPassThroughToSMPAPI() {
+  public boolean shouldPassThroughToMod() {
     return true;
   }
 
 
   public void execute(Player player, String message) {
-    if(!player.getServer().options.getBoolean("useSMPAPI"))
+    if(!player.getServer().options.getBoolean("useServerMod"))
       player.addMessage("\u00a7cNo such command " + message);
   }
 

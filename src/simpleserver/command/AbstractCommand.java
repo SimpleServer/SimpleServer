@@ -57,7 +57,7 @@ public abstract class AbstractCommand implements Command {
     }
   }
 
-  public boolean shouldPassThroughToSMPAPI() {
+  public boolean shouldPassThroughToMod() {
     return false;
   }
 

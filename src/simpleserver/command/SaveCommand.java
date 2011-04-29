@@ -30,7 +30,7 @@ public class SaveCommand extends AbstractCommand implements PlayerCommand,
   }
 
   @Override
-  public boolean shouldPassThroughToSMPAPI() {
+  public boolean shouldPassThroughToMod() {
     return true;
   }
 
