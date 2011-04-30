@@ -49,6 +49,7 @@ import simpleserver.minecraft.MinecraftWrapper;
 import simpleserver.options.Language;
 import simpleserver.options.Options;
 import simpleserver.rcon.RconServer;
+import simpleserver.telnet.TelnetServer;
 import simpleserver.thread.AutoBackup;
 import simpleserver.thread.AutoRestart;
 import simpleserver.thread.AutoRun;
@@ -89,6 +90,7 @@ public class Server {
 
   private MinecraftWrapper minecraft;
   private RconServer rconServer;
+  private TelnetServer telnetServer;
   private AutoRun c10t;
   private AutoBackup autoBackup;
   private AutoSave autosave;
@@ -378,6 +380,8 @@ public class Server {
       // Already on track to stop/restart.
     }
 
+    if (options.getBoolean("enableTelnet"))
+      telnetServer = new TelnetServer(this);
     if (options.getBoolean("enableRcon"))
       rconServer = new RconServer(this);
     autoBackup = new AutoBackup(this);
@@ -404,6 +408,8 @@ public class Server {
     }
 
     kickAllPlayers();
+    if (telnetServer != null)
+      telnetServer.stop();
     if (rconServer != null)
       rconServer.stop();
     autoBackup.stop();
