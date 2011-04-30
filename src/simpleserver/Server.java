@@ -378,7 +378,8 @@ public class Server {
       // Already on track to stop/restart.
     }
 
-    rconServer = new RconServer(this);
+    if (options.getBoolean("enableRcon"))
+      rconServer = new RconServer(this);
     autoBackup = new AutoBackup(this);
     autosave = new AutoSave(this);
     autoRestart = new AutoRestart(this);
@@ -403,7 +404,8 @@ public class Server {
     }
 
     kickAllPlayers();
-    rconServer.stop();
+    if (rconServer != null)
+      rconServer.stop();
     autoBackup.stop();
     autosave.stop();
     autoRestart.stop();
