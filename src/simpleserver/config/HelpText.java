@@ -18,21 +18,37 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package simpleserver.command;
+package simpleserver.config;
 
-import simpleserver.Player;
+public class HelpText extends AsciiConfig {
+  private String helptext;
 
-public class MOTDCommand extends AbstractCommand implements PlayerCommand {
-  public MOTDCommand() {
-    super("motd", "Display the message of the day");
+  public HelpText() {
+    super("helptext.txt");
   }
 
-  public void execute(Player player, String message) {
-    if (player.getServer().motd.getMOTD().trim().length() > 0) {
-      player.sendMOTD();
-    }
-    else {
-      player.addMessage("\u00a7cMOTD is empty. Edit simpleserver/motd.txt");
-    }
+  public String getHelpText() {
+    return helptext;
+  }
+
+  public void setHelp(String msg) {
+    helptext = msg;
+  }
+
+  @Override
+  public void load() {
+    helptext = "";
+
+    super.load();
+  }
+
+  @Override
+  protected void loadLine(String line) {
+    helptext += line + "\n";
+  }
+
+  @Override
+  protected String saveString() {
+    return helptext;
   }
 }

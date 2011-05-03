@@ -39,7 +39,7 @@ public class TimeCommand extends AbstractCommand implements PlayerCommand {
   private Timer timer;
 
   public TimeCommand() {
-    super("time number|day|night [freeze|unfreeze]",
+    super("time number|day|night|unfreeze [freeze]",
     "Set or freeze time");
   }
 
@@ -97,7 +97,7 @@ public class TimeCommand extends AbstractCommand implements PlayerCommand {
   }
 
   private void usage() {
-    player.addMessage("§7Usage: " + commandPrefix() + "time [0-23999|night|day] [freeze|unfreeze]");
+    player.addMessage("§7Usage: " + commandPrefix() + "time 0-23999|day|night|unfreeze [freeze]");
   }
   
   private void setTime(int time) {
@@ -105,7 +105,7 @@ public class TimeCommand extends AbstractCommand implements PlayerCommand {
   }
 
   public void unfreeze() {
-    if(timer != null) {
+    if(frozen && timer != null) {
       timer.cancel();
       frozen = false;
 

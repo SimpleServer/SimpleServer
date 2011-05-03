@@ -358,7 +358,7 @@ public class Player {
   }
 
   public void sendMOTD() {
-    String[] lines = server.getMOTD().split("\\r?\\n");
+    String[] lines = server.motd.getMOTD().split("\\r?\\n");
     for (String line : lines) {
       addMessage(line);
     }

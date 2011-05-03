@@ -40,6 +40,7 @@ import simpleserver.config.MOTD;
 import simpleserver.config.MuteList;
 import simpleserver.config.RobotList;
 import simpleserver.config.Rules;
+import simpleserver.config.HelpText;
 import simpleserver.config.Stats;
 import simpleserver.config.WhiteList;
 import simpleserver.log.AdminLog;
@@ -66,21 +67,22 @@ public class Server {
 
   public Language l;
   public Options options;
-  private RobotList robots;
-  private MOTD motd;
+  public MOTD motd;
   public KitList kits;
   public ChestList chests;
-  private Rules rules;
+  public Rules rules;
+  public HelpText helptext;
   public IPBanList ipBans;
   public WhiteList whitelist;
   public MuteList mutelist;
   public GiveAliasList giveAliasList;
   public Stats stats;
+  private RobotList robots;
 
   public PermissionConfig permissions;
 
-  private List<Resource> resources;
   public PlayerList playerList;
+  private List<Resource> resources;
   private CommandParser commandParser;
 
   private AdminLog adminLog;
@@ -155,14 +157,6 @@ public class Server {
 
   public int numPlayers() {
     return playerList.size();
-  }
-
-  public String getMOTD() {
-    return motd.getMOTD();
-  }
-
-  public String getRules() {
-    return rules.getRules();
   }
 
   public boolean isIPBanned(String ipAddress) {
@@ -334,6 +328,7 @@ public class Server {
     resources.add(chests = new ChestList());
     resources.add(motd = new MOTD());
     resources.add(rules = new Rules());
+    resources.add(helptext = new HelpText());
     resources.add(kits = new KitList(this));
     resources.add(ipBans = new IPBanList());
     resources.add(whitelist = new WhiteList());
