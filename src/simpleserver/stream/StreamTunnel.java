@@ -203,7 +203,14 @@ public class StreamTunnel {
             }
           }
           
-          sendMessage(message);
+          if (server.options.getBoolean("msgWrap"))
+            sendMessage(message);
+          else {
+            if(message.length() > MAXIMUM_MESSAGE_SIZE)
+              message = message.substring(0, MAXIMUM_MESSAGE_SIZE);
+            write(packetId);
+            write(message);
+          }
         } else if (!isServerTunnel) {
           
           if (player.isMuted() && !message.startsWith("/")
