@@ -41,6 +41,7 @@ public class MinecraftOptions extends AbstractOptions {
     options.setProperty("level-name", simpleServerOptions.get("levelName"));
     options.setProperty("spawn-animals", simpleServerOptions.get("spawnAnimals"));
     options.setProperty("spawn-monsters", simpleServerOptions.get("spawnMonsters"));
+    options.setProperty("allow-flight", simpleServerOptions.get("allowFlight"));
     options.setProperty("pvp", simpleServerOptions.get("pvp"));
 
     super.save();
