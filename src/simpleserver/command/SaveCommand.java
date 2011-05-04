@@ -29,11 +29,6 @@ public class SaveCommand extends AbstractCommand implements PlayerCommand,
     super("save", "Store configuration to disk and force a map save");
   }
 
-  @Override
-  public boolean shouldPassThroughToMod() {
-    return true;
-  }
-
   public void execute(Player player, String message) {
     player.getServer().saveResources();
     player.getServer().runCommand("save-all", null);

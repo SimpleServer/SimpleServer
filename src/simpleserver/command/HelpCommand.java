@@ -28,11 +28,6 @@ public class HelpCommand extends AbstractCommand implements PlayerCommand {
     super("help [COMMAND]", "List commands or get help for one command");
   }
 
-  @Override
-  public boolean shouldPassThroughToMod() {
-    return true;
-  }
-
   public void execute(Player player, String message) {
     String[] arguments = extractArguments(message);
 

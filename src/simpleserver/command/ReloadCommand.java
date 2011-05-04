@@ -29,11 +29,6 @@ public class ReloadCommand extends AbstractCommand implements PlayerCommand,
     super("reload", "Reread the configuration files from disk");
   }
 
-  @Override
-  public boolean shouldPassThroughToMod() {
-    return true;
-  }
-
   public void execute(Player player, String message) {
     player.getServer().loadResources();
     player.addMessage("\u00a77Resources Reloaded!");

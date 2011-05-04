@@ -57,10 +57,6 @@ public abstract class AbstractCommand implements Command {
     }
   }
 
-  public boolean shouldPassThroughToMod() {
-    return false;
-  }
-
   public boolean shouldPassThroughToConsole() {
     return false;
   }
