@@ -230,6 +230,10 @@ class ConfToXml {
       commandxml += "allow=\"" + ids + "\" />\n";
     }
 
+    //hardcoded addition of !area and !myarea (for user convenience)
+    commandxml += "      <command name=\"area\" allow=\"0+\" />\n";
+    commandxml += "      <command name=\"myarea\" allow=\"2+\" />\n";
+
     for(String block: blocks) {
       String[] tmp = block.split("=");
       blockxml += "      <block id=\"" + tmp[0]
