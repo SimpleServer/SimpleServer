@@ -58,7 +58,9 @@ public class HelpCommand extends AbstractCommand implements PlayerCommand {
 
       String prefix = commandPrefix();
       for (PlayerCommand command : parser.getPlayerCommands()) {
-        if (command.isHidden() || !player.commandAllowed(command.getName())) {
+        if ( (command instanceof InvalidCommand)
+             || player.getServer().permissions.commandIsHidden(command.getName())
+             || !player.commandAllowed(command.getName()) ) {
           continue;
         }
 
@@ -75,7 +77,7 @@ public class HelpCommand extends AbstractCommand implements PlayerCommand {
       String[] helplines = player.getServer().helptext.getHelpText().split("\n");
       player.addMessage(" ");
       for(String l: helplines) {
-        player.addMessage("\u00a77" + l);
+        player.addMessage("\u00a7f" + l);
       }
     }
   }

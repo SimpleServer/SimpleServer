@@ -28,11 +28,6 @@ public class AllowVisitCommand extends AbstractCommand implements PlayerCommand 
     super("ok PLAYER", "Teleport to the player if he agrees with ok");
   }
 
-  @Override
-  public boolean isHidden() {
-    return true;
-  }
-  
   public void execute(Player player, String message) {
     player.handleVisitRequests();
   }

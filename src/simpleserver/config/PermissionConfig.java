@@ -602,6 +602,14 @@ public class PermissionConfig extends AbstractConfig {
     return false;
   }
 
+  public boolean commandIsHidden(String cmd) {
+  	String val = config.getString("/permissions/commands/command[@name='"+cmd+"']/@hidden","");
+    if (val.equals("true")) {
+        return true;
+    }
+    return false;
+  }
+
   @Override
   protected void loadHeader() {
 	  //No header for XML config required

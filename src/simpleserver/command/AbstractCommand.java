@@ -61,10 +61,6 @@ public abstract class AbstractCommand implements Command {
     return false;
   }
 
-  public boolean isHidden() {
-    return false;
-  }
-
   protected String[] extractArguments(String message) {
     String[] parts = message.split("\\s+");
 
