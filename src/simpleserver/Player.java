@@ -336,9 +336,9 @@ public class Player {
     command.execute(this, message);
     lastCommand = message;
 
-    return !(server.permissions.commandShouldPassThroughToMod(command.getName())
-        && server.options.getBoolean("useServerMod"))
-        && !server.options.getBoolean("forwardAllCommands");
+    return !server.permissions.commandShouldPassThroughToMod(command.getName())
+        && !server.options.getBoolean("forwardAllCommands")
+        && server.options.get("alternateJarFile").equals("");
   }
   
   public void execute(Class<? extends PlayerCommand> c) {

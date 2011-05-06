@@ -36,13 +36,6 @@ public class Options extends AbstractOptions {
   public void load() {
     super.load();
 
-    //TODO: REMOVE THIS AFTER 8.0...
-    if (get("useSMPAPI") != null) {
-      set("useServerMod", get("useSMPAPI"));
-      options.remove("useSMPAPI");
-      System.out.println("[INFO] useSMPAPI is now called useServerMod!");
-    }
-
     if (get("msgFormat").equals("")) {
       set("msgFormat", defaultOptions.getProperty("msgFormat"));
     }
