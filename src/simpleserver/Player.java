@@ -336,7 +336,7 @@ public class Player {
     command.execute(this, message);
     lastCommand = message;
 
-    return !(command.shouldPassThroughToMod()
+    return !(server.permissions.commandShouldPassThroughToMod(command.getName())
         && server.options.getBoolean("useServerMod"))
         && !server.options.getBoolean("forwardAllCommands");
   }

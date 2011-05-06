@@ -37,7 +37,7 @@
       <command name="give" allow="3-5" />
       <command name="giveplayer" allow="4,5" />
       <command name="gps" allow="3-5" />
-      <command name="help" aliases="commands" allow="0+" />
+      <command name="help" aliases="commands" allow="0+" forward="true" />
       <command name="idbehold" allow="4,5" />
       <command name="iddqd" allow="4,5" />
       <command name="kick" allow="3-5" />
@@ -50,16 +50,16 @@
       <command name="mute" allow="3-5" />
       <command name="myarea" allow="2+" />
       <command name="mystats" allow="1+" />
-      <command name="ok" allow="-" />
+      <command name="ok" allow="-" hidden="true" />
       <command name="rcon" allow="5" />
-      <command name="reload" allow="4,5" />
+      <command name="reload" allow="4,5" forward="true" />
       <command name="reply" aliases="r" allow="1+" />
       <command name="restart" allow="4,5" />
       <command name="rules" allow="0+" />
-      <command name="save" allow="4,5" />
+      <command name="save" allow="4,5" forward="true" />
       <command name="servertime" allow="0+" />
       <command name="setgroup" allow="4,5" />
-      <command name="stop" allow="6" />
+      <command name="stop" allow="-" />
       <command name="teleport" aliases="tp" allow="4,5" />
       <command name="tell" aliases="t" allow="1+" />
       <command name="time" allow="4,5" />

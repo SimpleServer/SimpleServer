@@ -25,7 +25,5 @@ import simpleserver.Player;
 public interface PlayerCommand extends Command {
   public String getHelpText(String prefix);
 
-  public boolean shouldPassThroughToMod();
-
   public void execute(Player player, String message);
 }

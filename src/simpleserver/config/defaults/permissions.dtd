@@ -34,6 +34,8 @@
   aliases CDATA #IMPLIED
   allow CDATA #IMPLIED
   disallow CDATA #IMPLIED
+  forward CDATA #IMPLIED
+  hidden CDATA #IMPLIED
 >
 <!ATTLIST blocks
   allowPlace CDATA #IMPLIED

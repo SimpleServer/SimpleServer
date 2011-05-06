@@ -29,16 +29,6 @@ public class InvalidCommand extends AbstractCommand implements PlayerCommand,
     super(null, "\u00a7cNo such command!");
   }
 
-  @Override
-  public boolean isHidden() {
-    return true;
-  }
-  
-  public boolean shouldPassThroughToMod() {
-    return true;
-  }
-
-
   public void execute(Player player, String message) {
     if(!player.getServer().options.getBoolean("useServerMod"))
       player.addMessage("\u00a7cNo such command " + message);

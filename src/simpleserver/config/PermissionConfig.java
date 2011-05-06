@@ -412,8 +412,8 @@ public class PermissionConfig extends AbstractConfig {
 
   // replacement for CommandList.setGroup
   public void setCommandGroup(String cmd, int grp) {
-  	String val = config.getString("/permissions/commands/command[@name='"+cmd+"']/@allow");
-	  if (val == null) {
+  	String val = config.getString("/permissions/commands/command[@name='"+cmd+"']/@allow","");
+	  if (val.equals("")) {
 		  config.addProperty("/permissions/commands/ command@name", cmd);
 		  config.addProperty("/permissions/commands/command[@name='"+cmd+"'][1] @allow", String.valueOf(grp));
     }
@@ -594,6 +594,21 @@ public class PermissionConfig extends AbstractConfig {
     return !config.getString("/areas/area[@owner='"+name+"']/@owner","").equals("");
   }
 
+  public boolean commandShouldPassThroughToMod(String cmd) {
+  	String val = config.getString("/permissions/commands/command[@name='"+cmd+"']/@forward","");
+    if (val.equals("true")) {
+        return true;
+    }
+    return false;
+  }
+
+  public boolean commandIsHidden(String cmd) {
+  	String val = config.getString("/permissions/commands/command[@name='"+cmd+"']/@hidden","");
+    if (val.equals("true")) {
+        return true;
+    }
+    return false;
+  }
 
   @Override
   protected void loadHeader() {
