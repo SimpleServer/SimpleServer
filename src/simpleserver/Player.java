@@ -569,8 +569,6 @@ public class Player {
           testSource = InetAddress.getByName("127.0.1.2");
         }
         catch (UnknownHostException e) {
-          System.out.println("[SimpleServer] Notice: Unable to bind with 127.0.1.2.");
-
           canCycle = false;
           return false;
         }
@@ -580,8 +578,6 @@ public class Player {
           testSocket.close();
         }
         catch (BindException e) {
-          System.out.println("[SimpleServer] Notice: Unable to bind with 127.0.1.2.");
-
           canCycle = false;
           return false;
         }

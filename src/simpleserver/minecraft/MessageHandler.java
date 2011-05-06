@@ -86,10 +86,14 @@ public class MessageHandler {
     }
     else if (line.contains("[INFO] CONSOLE: Save complete.")) {
       server.setSaving(false);
-      server.runCommand("say", server.l.get("SAVE_COMPLETE"));
+      if(server.options.getBoolean("announceBackup")) {
+        server.runCommand("say", server.l.get("SAVE_COMPLETE"));
+      }
     }
     else if (line.contains("[SEVERE] Unexpected exception")) {
       handleError(new Exception(line));
+    } else if(line.equals(">")) {
+      return;
     }
 
     server.addOutputLine(line);
