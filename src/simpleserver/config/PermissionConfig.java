@@ -92,13 +92,27 @@ class DTDErrorHandler implements ErrorHandler {
 public class PermissionConfig extends AbstractConfig {
   private Server server = null;
 
+  private boolean isDefault = false;  //true if this instance is loaded from defaults
+  private PermissionConfig permDefaults = null;   //contains default configuration as fallback
+
   public boolean loadsuccess = true;
 
   private XMLConfiguration config;
 
   public PermissionConfig(Server server) {
     super("permissions.xml");
-    this.server = server;	
+    this.server = server;
+    this.isDefault = false;
+
+    permDefaults = new PermissionConfig(server, true);      //load defaults in the background
+  }
+
+  public PermissionConfig(Server server, boolean isDefault) {
+    super("permissions.xml");
+    this.server = server;
+    this.isDefault = isDefault;
+
+    loadDefaults();
   }
 
   public InputStream getDTD() {
@@ -407,7 +421,29 @@ public class PermissionConfig extends AbstractConfig {
         return cmd;
     }
 
-	  return null;
+    //not found :(
+    return null;
+  }
+
+  //add new commands from the defaults to the config
+  private void checkNewCommands() {
+    List cmds = config.getList("/permissions/commands/command/@name");
+    List defcmds = permDefaults.config.getList("/permissions/commands/command/@name");
+
+    for (Object cmdname : defcmds) {
+      cmdname = cmdname.toString();
+      if (!cmds.contains(cmdname)) {
+        config.addProperty("/permissions/commands command@name", cmdname);
+
+        String path = "/permissions/commands/command[@name='"+cmdname+"']";
+        String[] attrs = {"@aliases","@allow","@hidden","@forward"};
+        for(String attr : attrs) {
+          String val = permDefaults.config.getString(path+"/"+attr,"");
+          if (!val.equals(""))
+            config.addProperty(path+"[1] "+attr, val);
+        }
+      }
+    }
   }
 
   // replacement for CommandList.setGroup
@@ -617,7 +653,11 @@ public class PermissionConfig extends AbstractConfig {
 
   @Override
   public void load() {
+    if (isDefault)
+      return;  //should not be called in default config!
+
 	  try {
+      //load stored config
       loadsuccess = true;
       InputStream stream = new FileInputStream(getFile());
       initConf(true);
@@ -630,6 +670,7 @@ public class PermissionConfig extends AbstractConfig {
 		    config.load(stream);
       }
 
+      checkNewCommands(); //append new commands found in default to current config
 	  }
 
 	  catch (FileNotFoundException e) {
@@ -641,6 +682,7 @@ public class PermissionConfig extends AbstractConfig {
       } else {
         System.out.println(getFilename() + " is missing.  Loading defaults.");
         loadDefaults();
+        save();
       }
     }
 
@@ -660,7 +702,6 @@ public class PermissionConfig extends AbstractConfig {
       System.out.println("[SimpleServer] " + ex);
       System.out.println("[SimpleServer] Failed to load defaults for " + getFilename());
     }
-    save();
   }
 
   @Override
