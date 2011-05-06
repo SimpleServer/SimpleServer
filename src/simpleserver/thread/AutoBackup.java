@@ -70,7 +70,7 @@ public class AutoBackup {
 
   private void backup() throws IOException {
     System.out.println("[SimpleServer] Backing up server...");
-    server.runCommand("say", server.l.get("BACKING_UP"));
+    announce(server.l.get("BACKING_UP"));
     server.runCommand("save-off", null);
 
     File copy;
@@ -84,7 +84,13 @@ public class AutoBackup {
       deleteRecursively(TEMP_DIRECTORY);
     }
     purgeOldBackups();
-    server.runCommand("say", server.l.get("BACKUP_COMPLETE"));
+    announce(server.l.get("BACKUP_COMPLETE"));
+  }
+  
+  public void announce(String message) {
+    if(server.options.getBoolean("announceBackup")) {
+      server.runCommand("say", message);
+    }
   }
 
   private boolean needsBackup() {

@@ -43,9 +43,10 @@ import simpleserver.thread.SystemInputQueue;
 
 public class MinecraftWrapper {
   private static final String DOWNLOAD_URL = "http://www.minecraft.net/download/minecraft_server.jar";
-  private static final String COMMAND_FORMAT = "java %s %s -jar %s nogui";
+  private static final String COMMAND_FORMAT = "java %s %s &s -jar %s nogui";
   private static final String MEMORY_FORMAT = "-Xmx%sM -Xms%sM";
   private static final String XINCGC_FORMAT = "-Xincgc -Xmx%sM";
+  private static final String BUKKIT_ARGUMENTS = "-Djline.terminal=jline.UnsupportedTerminal";
   private static final String SERVER_JAR = "minecraft_server.jar";
   private static final int MINIMUM_MEMORY = 1024;
 
@@ -190,18 +191,27 @@ public class MinecraftWrapper {
       minimumMemory = options.getInt("memory");
     }
     
-    String memory;
+    String arguments;
     if (options.getBoolean("overwriteArguments")) {
-      memory = "";
-    } else if (options.getBoolean("useXincgc")) {
-      memory = String.format(XINCGC_FORMAT, options.get("memory"));
+      arguments = "";
     } else {
-      memory = String.format(MEMORY_FORMAT, minimumMemory, options.get("memory"));
+      if (options.getBoolean("useXincgc")) {
+        arguments = String.format(XINCGC_FORMAT, options.get("memory"));
+      } else {
+        arguments = String.format(MEMORY_FORMAT, minimumMemory, options.get("memory"));
+      } 
+      arguments += modArguments();
     }
 
-    return String.format(COMMAND_FORMAT, options.get("javaArguments"), memory, getServerJar());
+    return String.format(COMMAND_FORMAT, options.get("javaArguments"), arguments, getServerJar());
   }
 
+  private String modArguments() {
+    if(getServerJar().contains("ukkit"))
+      return BUKKIT_ARGUMENTS;
+    return "";
+  }
+  
   private String getServerJar() {
     if (options.contains("alternateJarFile")) {
       return options.get("alternateJarFile");
