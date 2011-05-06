@@ -43,7 +43,7 @@ import simpleserver.thread.SystemInputQueue;
 
 public class MinecraftWrapper {
   private static final String DOWNLOAD_URL = "http://www.minecraft.net/download/minecraft_server.jar";
-  private static final String COMMAND_FORMAT = "java %s %s &s -jar %s nogui";
+  private static final String COMMAND_FORMAT = "java %s %s -jar %s nogui";
   private static final String MEMORY_FORMAT = "-Xmx%sM -Xms%sM";
   private static final String XINCGC_FORMAT = "-Xincgc -Xmx%sM";
   private static final String BUKKIT_ARGUMENTS = "-Djline.terminal=jline.UnsupportedTerminal";
@@ -208,7 +208,7 @@ public class MinecraftWrapper {
 
   private String modArguments() {
     if(getServerJar().contains("ukkit"))
-      return BUKKIT_ARGUMENTS;
+      return "  " + BUKKIT_ARGUMENTS;
     return "";
   }
   

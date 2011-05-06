@@ -19,6 +19,8 @@
 /ops.txt
 /SimpleServer.jar
 /SimpleServer.zip
+/CraftBukkit.jar
+/bukkit.yml
 /.settings/
 *.orig
 \.ant-*
