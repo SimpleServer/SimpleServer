@@ -40,10 +40,6 @@ public class Main {
   static {
     String extendedVersion = baseVersion;
     
-    String buildversion = getVersionString("BUILDVERSION");
-    if (!buildversion.equals(""))
-        extendedVersion += "."+buildversion;
-
     if (isDev)
         extendedVersion += "-dev";
 

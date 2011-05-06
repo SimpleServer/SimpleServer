@@ -1,19 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <project default="release" name="Create Runnable Jar for Project SimpleServer with Jar-in-Jar Loader">
   <property name="version-file" value="bin/simpleserver/VERSION" />
-  <property name="build-version-file" value="bin/simpleserver/BUILDVERSION" />
 
   <target name="set-version">
     <exec executable="script/update-version.sh" osfamily="unix">
       <arg file="${version-file}" />
-      <arg file="${build-version-file}" />
     </exec>
 
     <exec executable="cmd" osfamily="winnt">
       <arg value="/c" />
       <arg file="script/update-version.bat" />
       <arg file="${version-file}" />
-      <arg file="${build-version-file}" />
     </exec>
   </target>
 
@@ -59,6 +56,5 @@
   <target name="clean">
     <delete dir="release" />
     <delete file="${version-file}" />
-    <delete file="${build-version-file}" />
   </target>
 </project>
