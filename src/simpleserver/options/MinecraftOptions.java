@@ -22,6 +22,8 @@ package simpleserver.options;
 
 import java.util.Properties;
 
+import simpleserver.config.SortedProperties;
+
 public class MinecraftOptions extends AbstractOptions {
   private final Options simpleServerOptions;
 
@@ -54,7 +56,7 @@ public class MinecraftOptions extends AbstractOptions {
 
   @Override
   protected void loadDefaults() {
-    defaultOptions = new Properties();
+    defaultOptions = new SortedProperties();
   }
 
   @Override

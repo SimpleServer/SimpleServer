@@ -30,14 +30,15 @@ import java.io.OutputStream;
 import java.util.Properties;
 
 import simpleserver.Resource;
+import simpleserver.config.SortedProperties;
 
 public abstract class AbstractOptions implements Resource {
   private static final String resourceLocation = "defaults";
 
   protected final String filename;
 
-  protected Properties defaultOptions;
-  protected Properties options;
+  protected SortedProperties defaultOptions;
+  protected SortedProperties options;
 
   protected AbstractOptions(String filename) {
     this.filename = filename;
@@ -78,7 +79,7 @@ public abstract class AbstractOptions implements Resource {
   }
 
   public void load() {
-    options = (Properties) defaultOptions.clone();
+    options = (SortedProperties) defaultOptions.clone();
     File file = new File(filename);
 
     try {
@@ -126,7 +127,7 @@ public abstract class AbstractOptions implements Resource {
   }
 
   protected void loadDefaults() {
-    defaultOptions = new Properties();
+    defaultOptions = new SortedProperties();
     InputStream stream = getClass().getResourceAsStream(resourceLocation + "/"
                                                             + filename);
     try {
@@ -142,6 +143,6 @@ public abstract class AbstractOptions implements Resource {
       System.out.println("[SimpleServer] Could not read default " + filename);
     }
 
-    options = (Properties) defaultOptions.clone();
+    options = (SortedProperties) defaultOptions.clone();
   }
 }

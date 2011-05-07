@@ -32,9 +32,9 @@ import java.util.regex.Pattern;
 
 public abstract class PropertiesConfig extends AbstractConfig {
   private boolean layered;
-  private Properties defaultProperties;
+  private SortedProperties defaultProperties;
 
-  protected Properties properties;
+  protected SortedProperties properties;
 
   protected PropertiesConfig(String filename) {
     this(filename, false);
@@ -44,17 +44,17 @@ public abstract class PropertiesConfig extends AbstractConfig {
     super(filename);
     this.layered = layered;
 
-    properties = new Properties();
+    properties = new SortedProperties();
     loadDefaults();
   }
 
   @Override
   public void load() {
     if (layered) {
-      properties = (Properties) defaultProperties.clone();
+      properties = (SortedProperties) defaultProperties.clone();
     }
     else {
-      properties = new Properties();
+      properties = new SortedProperties();
     }
 
     try {
@@ -68,7 +68,7 @@ public abstract class PropertiesConfig extends AbstractConfig {
     }
     catch (FileNotFoundException e) {
       System.out.println(getFilename() + " is missing.  Loading defaults.");
-      properties = (Properties) defaultProperties.clone();
+      properties = (SortedProperties) defaultProperties.clone();
       save();
     }
     catch (IOException e) {
@@ -96,7 +96,7 @@ public abstract class PropertiesConfig extends AbstractConfig {
 
   private void loadDefaults() {
     InputStream stream = getResourceStream();
-    defaultProperties = new Properties();
+    defaultProperties = new SortedProperties();
     try {
       try {
         defaultProperties.load(stream);
