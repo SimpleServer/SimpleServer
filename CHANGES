@@ -1,3 +1,13 @@
+== 8.0 ==
+ * Update for Minecraft Beta 1.5
+ * Added !area to show current area
+ * Added !myarea command to allow each player one ingame personal area
+ * Replaced BlockList, CommandList, GroupList, MemberList and IPMemberList with PermissionConfig (XML)
+ * Group -1 is nothing special anymore (global permissions must be set accordingly to achieve same effect)
+ * Added permission based redirection of commands to custom mods
+ * Added experimental telnet server
+ * Various bug fixes
+
 == 7.2 (in-development) ==
  * Fixed automated downloading of minecraft_server.jar.
  * Update for Minecraft Beta 1.3 (Thanks andrewdski)
@@ -7,14 +17,10 @@
  * Added !time to control time, old !time is !servertime now
  * Added !visit & !ok for teleport with agreement
  * Added !! to repeat last successful command
- * Added !area to show current area
- * Added !myarea command to allow each player one ingame personal area
- * Replaced BlockList, CommandList, GroupList, MemberList and IPMemberList with PermissionConfig (XML)
  * Added command disabling
  * Added useXincgc and overwriteArguments options
  * Fixed command redirection
  * Changed group list syntax a bit
- * Group -1 is nothing special anymore (global permissions must be set accordingly to achieve same effect)
  * Other bug fixes
 
 == 7.1 ==

@@ -1,11 +1,11 @@
-Simple Server 7.2-dev
+Simple Server 8.0
 An open source simple server tunnel for minecraft beta multiplayer servers.
 Copyright (c) 2011 SimpleServer authors (see CONTRIBUTORS)
 See LICENSE for details.
 
-Wiki: http://www.devfluid.com/simpleserver
+Wiki: http://github.com/SimpleServer/SimpleServer/wiki
 Forum thread: http://www.minecraftforum.net/viewtopic.php?f=1012&t=27756
-Source: https://github.com/spiegalpwns/SimpleServer
+Source: http://github.com/SimpleServer/SimpleServer
 
 Installation:
 1) Run launch.bat or launch.sh to start the server for the first time
@@ -15,15 +15,15 @@ Installation:
 Features (See CHANGES for updates):
  * Denial of service protection.  More than 30 requests/IP/minute will
    automatically ban the IP.
- * RCON access.
+ * RCON and experimental telnet access.
  * Optional automated saving, backups, restarts, and mapping.
  * Message translation support (language.properties)
- * Locked chests.  Each player can say !lock and place a single locked chest.
+ * Locked chests.  Each player can lock as many chests as he wants.
    Other non-admins cannot access or destroy the chest.
  * Automatically makes space for members with higher group IDs.
- * Local chat.  Say !l MESSAGE... to send a message to nearby players
+ * Local chat.  Say !l MESSAGE to send a message to nearby players
  * Customizable message formats.
- * Compatible with SMP API, hey0 and other server mods.
+ * Compatible with CrufBukkit, hey0 and other server mods.
  * Customizable groups, command and block permissions (permissions.xml).
  * Possibility of local area permissions (permissions.xml).
  * Customizable kits (kit-list.txt).
@@ -38,10 +38,11 @@ See simpleserver.properties for general configuration.
 Console Commands:
 Say help in the console for all the standard minecraft server commands.
 Added commands:
-  backup  -- Force a backup
-  reload  -- Reload all configuration files
-  restart -- Restart the server
-  save    -- Save all configuration files
+  backup     -- Force a backup
+  reload     -- Reload all configuration files
+  restart    -- Restart the server
+  save       -- Save all configuration files
+  giveplayer -- Give a player items using the aliases defined in give-alias-list.txt
 
 In-game Commands:
 Commands are based on rank.  Say !help in game for a list of currently
