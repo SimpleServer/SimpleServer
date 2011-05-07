@@ -50,6 +50,7 @@ public class StreamTunnel {
   private static final byte BLOCK_DESTROYED_STATUS = 2;
   private static final Pattern MESSAGE_PATTERN = Pattern.compile("^<([^>]+)> (.*)$");
   private static final Pattern COLOR_PATTERN = Pattern.compile("\u00a7[0-9a-f]");
+  private static final String CONSOLE_CHAT_PATTERN = "\\(CONSOLE:.*\\)";
   private static final int MESSAGE_SIZE = 60;
   private static final int MAXIMUM_MESSAGE_SIZE = 119;
 
@@ -201,6 +202,8 @@ public class StreamTunnel {
               }
               
             }
+          } else if(cleanMessage.matches(CONSOLE_CHAT_PATTERN) && !server.options.getBoolean("chatConsoleToOps")) {
+            break;
           }
           
           if (server.options.getBoolean("msgWrap"))

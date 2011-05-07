@@ -10,7 +10,7 @@ Source: http://github.com/SimpleServer/SimpleServer
 Installation:
 1) Run launch.bat or launch.sh to start the server for the first time
 2) You can now connect to the server using your IP Address (www.whatismyip.com)
-   and the port indicated in simpleserver.properties!
+   and the port indicated in simpleserver.properties/
 
 Features (See CHANGES for updates):
  * Denial of service protection.  More than 30 requests/IP/minute will
@@ -21,7 +21,7 @@ Features (See CHANGES for updates):
  * Locked chests.  Each player can lock as many chests as he wants.
    Other non-admins cannot access or destroy the chest.
  * Automatically makes space for members with higher group IDs.
- * Local chat.  Say !l MESSAGE to send a message to nearby players
+ * Local chat.  Say /l MESSAGE to send a message to nearby players
  * Customizable message formats.
  * Compatible with CrufBukkit, hey0 and other server mods.
  * Customizable groups, command and block permissions (permissions.xml).
@@ -45,51 +45,51 @@ Added commands:
   giveplayer -- Give a player items using the aliases defined in give-alias-list.txt
 
 In-game Commands:
-Commands are based on rank.  Say !help in game for a list of currently
+Commands are based on rank.  Say /help in game for a list of currently
 accessible commands.
-  !area -- Show current area
-  !backup -- Backup the map
-  !banip IPADDRESS -- Kick and ban players with this IP
-  !ban PLAYER [REASON] -- Kick and ban the named player
-  !give ITEM [AMOUNT] -- Spawn items for yourself
-  !giveplayer PLAYER ITEM [AMOUNT] -- Spawn items for another player
-  !gps [PLAYER] -- Display block coordinates of named player or yourself
-  !help [COMMAND] -- List commands or get help for one command
-  !idbehold -- Make tools work instantly for yourself
-  !iddqd -- Make yourself invulnerable to other players attacks
-  !kick PLAYER [REASON] -- Kick the named player from the server
-  !kit [KIT] -- Display all kits or give yourself the named kit
-  !listips -- Display the name and IP of each connected player
-  !local MESSAGE -- Send a chat message to nearby players
-  !localtoggle -- toggle localchat mode
-  !lock -- Prepare to create your locked chest
-  !motd -- Display the message of the day
-  !mute PLAYER -- Block the named player from normal chat
-  !myarea [start|end|save|unsave] -- Create a private area
-  !mystats -- Show own statistics
-  !ok -- Response to the !visit command to allow a teleport
-  !rcon COMMAND ARGUMENTS... -- Execute a command on the server console
-  !reload -- Reread the configuration files from disk
-  !reply MESSAGE -- Send message to the player who last sent you one
-  !restart -- Stop the minecraft server and start it again
-  !rules -- Display the server rules
-  !save -- Store configuration to disk and force a map save
-  !setgroup PLAYER GROUP -- Set the group ID of the named player
-  !stop -- Shutdown the entire server
-  !teleport PLAYER1 PLAYER2 -- Teleport the first player to the second
-  !tell PLAYER MESSAGE... -- Send a message to the named player
-  !time [0-23999 or day|night] [freeze|unfreeze] -- Set or freeze arbitrary time of day
-  !servertime -- Display the real-world time of the server
-  !unbanip IPADDRESS -- Remove the IP address from the ban list
-  !unban PLAYER -- Remove the named player from the ban list
-  !unlock -- Unlock your locked chest (if you have one) for others to access
-  !unmute PLAYER -- Allow the named player to use normal chat again
-  !unwhitelist PLAYER -- Remove player from server access list
-  !visit PLAYER -- Ask a player for permission to be teleported to him
-  !warpmeto PLAYER -- Teleport to the named player
-  !warptome PLAYER -- Teleport the named player to you
-  !whitelist PLAYER -- Add player to server access list
-  !who -- Display online players names
+  /area -- Show current area
+  /backup -- Backup the map
+  /banip IPADDRESS -- Kick and ban players with this IP
+  /ban PLAYER [REASON] -- Kick and ban the named player
+  /give ITEM [AMOUNT] -- Spawn items for yourself
+  /giveplayer PLAYER ITEM [AMOUNT] -- Spawn items for another player
+  /gps [PLAYER] -- Display block coordinates of named player or yourself
+  /help [COMMAND] -- List commands or get help for one command
+  /idbehold -- Make tools work instantly for yourself
+  /iddqd -- Make yourself invulnerable to other players attacks
+  /kick PLAYER [REASON] -- Kick the named player from the server
+  /kit [KIT] -- Display all kits or give yourself the named kit
+  /listips -- Display the name and IP of each connected player
+  /local MESSAGE -- Send a chat message to nearby players
+  /localtoggle -- toggle localchat mode
+  /lock -- Prepare to create your locked chest
+  /motd -- Display the message of the day
+  /mute PLAYER -- Block the named player from normal chat
+  /myarea [start|end|save|unsave] -- Create a private area
+  /mystats -- Show own statistics
+  /ok -- Response to the /visit command to allow a teleport
+  /rcon COMMAND ARGUMENTS... -- Execute a command on the server console
+  /reload -- Reread the configuration files from disk
+  /reply MESSAGE -- Send message to the player who last sent you one
+  /restart -- Stop the minecraft server and start it again
+  /rules -- Display the server rules
+  /save -- Store configuration to disk and force a map save
+  /setgroup PLAYER GROUP -- Set the group ID of the named player
+  /stop -- Shutdown the entire server
+  /teleport PLAYER1 PLAYER2 -- Teleport the first player to the second
+  /tell PLAYER MESSAGE... -- Send a message to the named player
+  /time [0-23999 or day|night] [freeze|unfreeze] -- Set or freeze arbitrary time of day
+  /servertime -- Display the real-world time of the server
+  /unbanip IPADDRESS -- Remove the IP address from the ban list
+  /unban PLAYER -- Remove the named player from the ban list
+  /unlock -- Unlock your locked chest (if you have one) for others to access
+  /unmute PLAYER -- Allow the named player to use normal chat again
+  /unwhitelist PLAYER -- Remove player from server access list
+  /visit PLAYER -- Ask a player for permission to be teleported to him
+  /warpmeto PLAYER -- Teleport to the named player
+  /warptome PLAYER -- Teleport the named player to you
+  /whitelist PLAYER -- Add player to server access list
+  /who -- Display online players names
 
 Technical Details:
   This wrapper works by proxying all network and console data to and from the
