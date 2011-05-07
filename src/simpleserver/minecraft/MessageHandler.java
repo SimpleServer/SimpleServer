@@ -92,7 +92,7 @@ public class MessageHandler {
     }
     else if (line.contains("[SEVERE] Unexpected exception")) {
       handleError(new Exception(line));
-    } else if(line.equals(">")) {
+    } else if(line.matches("^>+$")) {
       return;
     }
 

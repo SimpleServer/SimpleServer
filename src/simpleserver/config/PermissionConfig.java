@@ -373,8 +373,7 @@ public class PermissionConfig extends AbstractConfig {
   public boolean playerCommandAllowed(String cmd, Player player) {
     boolean allowed = false;
     String pathpart = "/permissions/commands/command[@name='"+cmd+"']/@";
-
-	  String globalpermission = config.getString(pathpart + "allow", "");
+    String globalpermission = config.getString(pathpart + "allow", "");
     if (!globalpermission.equals(""))
       allowed = includesPlayer(globalpermission, player);
 
@@ -631,7 +630,7 @@ public class PermissionConfig extends AbstractConfig {
   }
 
   public boolean commandShouldPassThroughToMod(String cmd) {
-  	String val = config.getString("/permissions/commands/command[@name='"+cmd+"']/@forward","");
+    String val = config.getString("/permissions/commands/command[@name='"+cmd+"']/@forward","");
     if (val.equals("true")) {
         return true;
     }

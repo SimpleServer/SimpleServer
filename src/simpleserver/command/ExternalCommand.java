@@ -21,20 +21,18 @@
 package simpleserver.command;
 
 import simpleserver.Player;
-import simpleserver.Server;
 
-public class InvalidCommand extends AbstractCommand implements PlayerCommand,
-    ServerCommand {
-  public InvalidCommand() {
-    super(null, "\u00a7cNo such command!");
+public class ExternalCommand extends AbstractCommand implements PlayerCommand {
+
+  public ExternalCommand() {
+    super("external", "External command");
+  }
+  
+  public ExternalCommand(String name) {
+    super(name, "External command");
   }
 
   public void execute(Player player, String message) {
-    if(!player.getServer().options.contains("alternateJarFile"))
-      player.addMessage("\u00a7cNo such command " + message);
-  }
-
-  public void execute(Server server, String message) {
-    System.out.println("No such command " + message);
+    
   }
 }

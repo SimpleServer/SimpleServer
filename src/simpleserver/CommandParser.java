@@ -31,6 +31,7 @@ import org.reflections.scanners.SubTypesScanner;
 
 import simpleserver.command.AbstractCommand;
 import simpleserver.command.Command;
+import simpleserver.command.ExternalCommand;
 import simpleserver.command.PlayerCommand;
 import simpleserver.command.ServerCommand;
 import simpleserver.config.PermissionConfig;
@@ -67,8 +68,12 @@ public class CommandParser {
     if (message.startsWith(commandPrefix())) {
       PlayerCommand command = playerCommands.get(extractName(message, 1));
       if (command == null) {
-        System.out.println("Illegal command configuration for: " + message);
-        command = playerCommands.get(null);
+        if(options.contains("alternateJarFile")) {
+          return new ExternalCommand(extractName(message, 1));
+        } else {
+          System.out.println("Illegal command configuration for: " + message);
+          command = playerCommands.get(null);
+        }
       }
 
       return command;

@@ -327,18 +327,21 @@ public class Player {
     if (command == null) {
       return false;
     }
+    
+    boolean invalidCommand = command.getName() == null;
 
-    if (command.getName() != null && !commandAllowed(command.getName())) {
+    if (invalidCommand && !commandAllowed(command.getName())) {
       addMessage("\u00a7cInsufficient permission.");
       return true;
     }
 
     command.execute(this, message);
     lastCommand = message;
-
-    return !server.permissions.commandShouldPassThroughToMod(command.getName())
-        && !server.options.getBoolean("forwardAllCommands")
-        && server.options.get("alternateJarFile").equals("");
+    
+    return !((server.permissions.commandShouldPassThroughToMod(command.getName())
+            || server.options.getBoolean("forwardAllCommands")
+            || invalidCommand) 
+            && server.options.contains("alternateJarFile"));
   }
   
   public void execute(Class<? extends PlayerCommand> c) {
