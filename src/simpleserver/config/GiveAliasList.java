@@ -31,7 +31,7 @@ public class GiveAliasList extends PropertiesConfig {
   private final Map<String, Integer> aliases;
 
   public GiveAliasList() {
-    super("give-alias-list.txt");
+    super("give-alias-list.txt", true);
 
     aliases = new HashMap<String, Integer>();
   }
