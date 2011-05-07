@@ -28,6 +28,7 @@ import java.net.UnknownHostException;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import simpleserver.command.ExternalCommand;
 import simpleserver.command.PlayerCommand;
 import simpleserver.stream.StreamTunnel;
 
@@ -340,7 +341,8 @@ public class Player {
     
     return !((server.permissions.commandShouldPassThroughToMod(command.getName())
             || server.options.getBoolean("forwardAllCommands")
-            || invalidCommand) 
+            || invalidCommand
+            || command instanceof ExternalCommand) 
             && server.options.contains("alternateJarFile"));
   }
   
