@@ -20,56 +20,30 @@
  */
 package simpleserver.config;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
+import java.io.File;
 
-public class GiveAliasList extends PropertiesConfig {
-  private static final String[] suffixes = new String[] { "s", "block",
-      "blocks", "ore", "ores", "es" };
-
-  private final Map<String, Integer> aliases;
-
+public class GiveAliasList extends CustomGiveAliasList {
+  private static final String folder = "defaults";
+  private static final CustomGiveAliasList customAliases = new CustomGiveAliasList();
+  
   public GiveAliasList() {
-    super("give-alias-list.txt");
-
-    aliases = new HashMap<String, Integer>();
+    super();
   }
 
-  public Integer getItemId(String itemAlias) {
-    itemAlias = itemAlias.toLowerCase();
-    Integer itemId = aliases.get(itemAlias);
-
-    for (String suffix : suffixes) {
-      if (itemId != null) {
-        break;
-      }
-
-      if (itemAlias.endsWith(suffix)) {
-        int prefixLength = itemAlias.length() - suffix.length();
-        itemId = aliases.get(itemAlias.substring(0, prefixLength));
-      }
-    }
-
-    return itemId;
-  }
-
-  @Override
+  protected File getFile() {
+    return new File(folder + File.separator + filename);
+  }  
+  
   public void load() {
     super.load();
-
-    aliases.clear();
-    for (Entry<Object, Object> alias : properties.entrySet()) {
-      Integer id;
-      try {
-        id = Integer.valueOf((String) alias.getValue());
-      }
-      catch (NumberFormatException e) {
-        System.out.println("Invalid give alias: " + alias.toString());
-        continue;
-      }
-
-      aliases.put(((String) alias.getKey()).toLowerCase(), id);
-    }
+    customAliases.load();
+  }
+  
+  public Integer getItemId(String itemAlias) {
+    Integer id = customAliases.getItemId(itemAlias);
+    if(id == null)
+      id = super.getItemId(itemAlias);
+    
+    return id;
   }
 }
