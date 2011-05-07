@@ -330,7 +330,7 @@ public class Player {
     
     boolean invalidCommand = command.getName() == null;
 
-    if (invalidCommand && !commandAllowed(command.getName())) {
+    if (!invalidCommand && !commandAllowed(command.getName())) {
       addMessage("\u00a7cInsufficient permission.");
       return true;
     }

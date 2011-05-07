@@ -33,7 +33,7 @@ import simpleserver.options.Options;
 public class Main {
   private static final String license = "SimpleServer -- Copyright (C) 2011 SimpleServer authors (see CONTRIBUTORS)";
   private static final String warranty = "This program is licensed under The MIT License.\nSee file LICENSE for details.";
-  private static final String baseVersion = "8.0";
+  private static final String baseVersion = "8.0.1";
   private static final String version;
 
   static {
