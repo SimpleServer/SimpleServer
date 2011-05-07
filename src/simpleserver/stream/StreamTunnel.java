@@ -479,10 +479,6 @@ public class StreamTunnel {
         copyNBytes(16);
         break;
       case 0x15: // Pickup spawn
-        if (player.getGroupId() < 0) {
-          skipNBytes(24);
-          break;
-        }
         write(packetId);
         copyNBytes(24);
         break;
@@ -662,76 +658,46 @@ public class StreamTunnel {
         short slotFrom = in.readShort();
         byte typeTo = in.readByte();
         short slotTo = in.readShort();
-        if ((typeFrom < 0 && typeTo < 0) || player.getGroupId() >= 0) {
-          write(packetId);
-          write(typeFrom);
-          write(slotFrom);
-          write(typeTo);
-          write(slotTo);
-          write(in.readBoolean());
-          short moveItem = in.readShort();
-          write(moveItem);
-          if (moveItem != -1) {
-            write(in.readByte());
-            write(in.readShort());
-          }
-        }
-        else {
-          short moveItem = in.readShort();
-          if (moveItem != -1) {
-            in.readByte();
-            in.readShort();
-          }
+
+        write(packetId);
+        write(typeFrom);
+        write(slotFrom);
+        write(typeTo);
+        write(slotTo);
+        write(in.readBoolean());
+        short moveItem = in.readShort();
+        write(moveItem);
+        if (moveItem != -1) {
+          write(in.readByte());
+          write(in.readShort());
         }
         break;
       case 0x67: // Inventory Item Update
         byte type67 = in.readByte();
-        if (type67 < 0 || player.getGroupId() >= 0) {
-          write(packetId);
-          short slot = in.readShort();
-          write(type67);
-          write(slot);
-          short setItem = in.readShort();
-          write(setItem);
-          if (setItem != -1) {
-            write(in.readByte());
-            write(in.readShort());
-          }
-        }
-        else {
-          in.readShort();
-          short setItem = in.readShort();
-          if (setItem != -1) {
-            in.readByte();
-            in.readShort();
-          }
+        short slot = in.readShort();
+        short setItem = in.readShort();
+        write(packetId);
+        write(type67);
+        write(slot);
+        write(setItem);
+        if (setItem != -1) {
+          write(in.readByte());
+          write(in.readShort());
         }
         break;
       case 0x68: // Inventory
         byte type = in.readByte();
-        if (type < 0 || player.getGroupId() >= 0) {
-          write(packetId);
-          write(type);
-          short count = in.readShort();
-          write(count);
-          for (int c = 0; c < count; ++c) {
-            short item = in.readShort();
-            write(item);
+        write(packetId);
+        write(type);
+        short count = in.readShort();
+        write(count);
+        for (int c = 0; c < count; ++c) {
+          short item = in.readShort();
+          write(item);
 
-            if (item != -1) {
-              write(in.readByte());
-              write(in.readShort());
-            }
-          }
-        }
-        else {
-          short count = in.readShort();
-          for (int c = 0; c < count; ++c) {
-            short item = in.readShort();
-            if (item != -1) {
-              in.readByte();
-              in.readShort();
-            }
+          if (item != -1) {
+            write(in.readByte());
+            write(in.readShort());
           }
         }
         break;
