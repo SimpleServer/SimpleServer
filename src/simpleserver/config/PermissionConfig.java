@@ -186,11 +186,15 @@ public class PermissionConfig extends AbstractConfig {
   }
 
 
+  private String xpath_lcase(String attr) {
+    return "translate("+attr+",'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz')";
+  }
+
   public int getNameGroup(String name) {
     name = name.toLowerCase();
     String group = "";
 
-    group = config.getString("/members/player[@name='"+name+"']/@group", "");
+    group = config.getString("/members/player["+xpath_lcase("@name")+"='"+name+"']/@group", "");
 
     if (group.equals(""))
       return server.options.getInt("defaultGroup");
@@ -224,7 +228,7 @@ public class PermissionConfig extends AbstractConfig {
 
   public void setPlayerGroup(String name, int group) {
     name = name.toLowerCase();
-    String val = config.getString("/members/player[@name='"+name+"']/@group","");
+    String val = config.getString("/members/player["+xpath_lcase("@name")+"='"+name+"']/@group","");
     if (val.equals("")) {
       config.addProperty("/members player@name", name);
       config.addProperty("/members/player[@name='"+name+"'][1] @group", "");
@@ -247,6 +251,9 @@ public class PermissionConfig extends AbstractConfig {
       return isgrpmember;
 
     String[] nicks = str[1].split(",");
+    for (int i=0; i<nicks.length; i++)
+      nicks[i] = nicks[i].toLowerCase();
+
     return isgrpmember || Arrays.asList(nicks).contains(player.getName().toLowerCase());
   }
 

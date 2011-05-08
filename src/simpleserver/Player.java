@@ -419,8 +419,7 @@ public class Player {
   }
 
   public void updateGroup() {
-	group = server.permissions.getPlayerGroup(this);
-
+    group = server.permissions.getPlayerGroup(this);
     groupObject = server.permissions.getGroup(group);
   }
 

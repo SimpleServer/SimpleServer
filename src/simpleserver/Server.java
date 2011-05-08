@@ -206,6 +206,8 @@ public class Server {
     for (Resource resource : resources) {
       resource.load();
     }
+    if (playerList != null)
+      playerList.updatePlayerGroups(); //reflect changes of permission.xml without player relogin
   }
 
   public void saveResources() {
