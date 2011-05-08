@@ -322,6 +322,8 @@ public class Server {
 
   private void initialize() {
     resources = new LinkedList<Resource>();
+
+    resources.add(permissions = new PermissionConfig(this));
     resources.add(l = new Language());
     resources.add(options = new Options());
     resources.add(robots = new RobotList());
@@ -335,8 +337,6 @@ public class Server {
     resources.add(mutelist = new MuteList());
     resources.add(giveAliasList = new GiveAliasList());
     resources.add(stats = new Stats());
-
-    resources.add(permissions = new PermissionConfig(this));
 
     systemInput = new SystemInputQueue();
     adminLog = new AdminLog();
@@ -358,6 +358,12 @@ public class Server {
     restart = false;
 
     loadResources();
+    
+    if (permissions.loadsuccess == false) {
+      System.out.println("[SimpleServer] Syntax error in permissions.xml! Emergency shutdown...");
+      System.exit(1);
+    }
+
     playerList = new PlayerList(options);
     requestTracker = new RequestTracker(this);
 

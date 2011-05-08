@@ -66,7 +66,7 @@ class DTDEntityResolver implements EntityResolver {
 }
 
 class DTDErrorHandler implements ErrorHandler {
-  private final String prefix = "[ERROR][permissions.xml] ";
+  private final String prefix = "[WARNING][permissions.xml] ";
   private PermissionConfig parent = null;
 
   public DTDErrorHandler(PermissionConfig p) {
@@ -119,8 +119,9 @@ public class PermissionConfig extends AbstractConfig {
     return super.getClass().getResourceAsStream(resourceLocation + "/permissions.dtd");
   }
 
-  private void initConf(boolean validate) {
-    config = new XMLConfiguration();
+  //prepare a new XMLConfiguration Object for loading
+  private XMLConfiguration initConf(boolean validate) {
+    XMLConfiguration conf = new XMLConfiguration();
 
     DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
     DocumentBuilder db = null;
@@ -134,11 +135,13 @@ public class PermissionConfig extends AbstractConfig {
       db.setEntityResolver(new DTDEntityResolver(this));
       db.setErrorHandler(new DTDErrorHandler(this));
 
-      config.setDocumentBuilder(db);
+      conf.setDocumentBuilder(db);
     }
 
-    config.setExpressionEngine(new XPathExpressionEngine());
-    config.setDelimiterParsingDisabled(true);
+    conf.setExpressionEngine(new XPathExpressionEngine());
+    conf.setDelimiterParsingDisabled(true);
+
+    return conf;
   }
 
   // replacement for GroupList.groupExists
@@ -655,20 +658,24 @@ public class PermissionConfig extends AbstractConfig {
     if (isDefault)
       return;  //should not be called in default config!
 
+    XMLConfiguration confbuff = null;
+
 	  try {
       //load stored config
       loadsuccess = true;
       InputStream stream = new FileInputStream(getFile());
-      initConf(true);
-		  config.load(stream);
+      confbuff = initConf(true);
+      confbuff.load(stream);
 
-      if (loadsuccess == false) {
-        System.out.println("Trying to load permissions.xml ignoring errors...");
+      if (!loadsuccess) {
+        loadsuccess = true;
+        System.out.println("Trying to load permissions.xml ignoring DTD warnings...");
         stream = new FileInputStream(getFile());
-        initConf(false);
-		    config.load(stream);
+        confbuff = initConf(false);
+        confbuff.load(stream);
       }
-
+      
+      config = confbuff;  //No problems loading -> set loaded config as real config
       checkNewCommands(); //append new commands found in default to current config
 	  }
 
@@ -688,18 +695,27 @@ public class PermissionConfig extends AbstractConfig {
 	  catch (ConfigurationException e) {
       System.out.println("[SimpleServer] " + e);
       System.out.println("[SimpleServer] Failed to load " + getFilename());
-	  }
+
+      if (config != null) {
+        System.out.println("[SimpleServer] Warning:   permission.xml NOT reloaded!");
+        System.out.println("               Saving now will overwrite your changes!");
+      }
+
+      loadsuccess = false;
+    }
   }
 
   public void loadDefaults() {
     try {
-      initConf(true);
+      config = initConf(true);
       InputStream stream = getResourceStream();
       config.load(stream);
+      loadsuccess = true;
     }
     catch(ConfigurationException ex) {
       System.out.println("[SimpleServer] " + ex);
       System.out.println("[SimpleServer] Failed to load defaults for " + getFilename());
+      loadsuccess = false;
     }
   }
 
