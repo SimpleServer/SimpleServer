@@ -10,7 +10,7 @@ Source: http://github.com/SimpleServer/SimpleServer
 Installation:
 1) Run launch.bat or launch.sh to start the server for the first time
 2) You can now connect to the server using your IP Address (www.whatismyip.com)
-   and the port indicated in simpleserver.properties/
+   and the port indicated in simpleserver.properties
 
 Features (See CHANGES for updates):
  * Denial of service protection.  More than 30 requests/IP/minute will

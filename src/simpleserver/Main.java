@@ -34,14 +34,10 @@ public class Main {
   private static final String license = "SimpleServer -- Copyright (C) 2011 SimpleServer authors (see CONTRIBUTORS)";
   private static final String warranty = "This program is licensed under The MIT License.\nSee file LICENSE for details.";
   private static final String baseVersion = "8.0.3";
-  private static final boolean isDev = false;
   private static final String version;
 
   static {
     String extendedVersion = baseVersion;
-    
-    if (isDev)
-        extendedVersion += "-dev";
 
     String commitversion = getVersionString("VERSION");
     if (!commitversion.equals(""))
