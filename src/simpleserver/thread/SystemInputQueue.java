@@ -25,17 +25,28 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.Scanner;
+import java.util.NoSuchElementException;
 
 public class SystemInputQueue {
   private final BlockingQueue<String> queue;
   private final BufferedReader input;
+  private final Scanner scanner;
   private final Reader reader;
+
+  private final boolean isWindows;
 
   private volatile boolean run = true;
 
   public SystemInputQueue() {
     queue = new LinkedBlockingQueue<String>();
     input = new BufferedReader(new InputStreamReader(System.in));
+    scanner = new Scanner(input);
+    
+    if (System.getProperty("os.name").toLowerCase().contains("win"))
+      isWindows = true;
+    else
+      isWindows =false;
 
     reader = new Reader();
     reader.start();
@@ -60,6 +71,8 @@ public class SystemInputQueue {
     public void run() {
       StringBuilder builder = new StringBuilder();
       while (run) {
+
+      if (!isWindows) { //Running NOT on windows plattform
         try {
           builder.setLength(0);
           while (input.ready()) {
@@ -91,6 +104,14 @@ public class SystemInputQueue {
         catch (IOException e) {
           break;
         }
+      } else { //Running on windows -> use other read method!
+        try {
+          String line = scanner.nextLine();
+          queue.put(line);
+        }
+        catch (InterruptedException e) { continue; }
+        catch (NoSuchElementException e) { continue; }
+      }
 
         try {
           Thread.sleep(50);
