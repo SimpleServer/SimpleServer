@@ -52,6 +52,11 @@ public class SetGroupCommand extends PlayerArgCommand {
       }
       else {
         server.permissions.setPlayerGroup(target, group);
+
+        Player t = player.getServer().findPlayer(target);
+        if (t != null)
+          t.updateGroup();
+
         player.addMessage("\u00a77Player " + target + "'s group was set to "
             + group + "!");
         server.adminLog("User " + player.getName() + " set player's group:\t "
