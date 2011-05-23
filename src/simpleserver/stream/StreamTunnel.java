@@ -242,7 +242,9 @@ public class StreamTunnel {
         break;
       case 0x04: // Time Update
         write(packetId);
-        copyNBytes(8);
+        long time = in.readLong();
+        server.setTime(time);
+        write(time);
         break;
       case 0x05: // Player Inventory
         write(packetId);

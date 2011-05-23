@@ -105,6 +105,8 @@ public class Server {
 
   public Semaphore saveLock = new Semaphore(1);
 
+  private long time;
+
   public Server() {
     listener = new Listener();
     listener.start();
@@ -502,5 +504,13 @@ public class Server {
 
       cleanup();
     }
+  }
+
+  public void setTime(long time) {
+    this.time = time;
+  }
+  
+  public long time() {
+    return time;
   }
 }

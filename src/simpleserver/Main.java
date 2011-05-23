@@ -25,11 +25,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-import simpleserver.command.InvalidCommand;
-import simpleserver.command.PlayerCommand;
-import simpleserver.config.PermissionConfig;
-import simpleserver.options.Options;
-
 public class Main {
   private static final String license = "SimpleServer -- Copyright (C) 2011 SimpleServer authors (see CONTRIBUTORS)";
   private static final String warranty = "This program is licensed under The MIT License.\nSee file LICENSE for details.";

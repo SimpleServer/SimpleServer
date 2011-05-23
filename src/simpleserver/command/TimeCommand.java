@@ -101,7 +101,8 @@ public class TimeCommand extends AbstractCommand implements PlayerCommand {
   }
   
   private void setTime(int time) {
-    server.runCommand("time", "set "+time);
+    long servertime = server.time();
+    server.runCommand("time", "add " + (24000-servertime%24000+time));
   }
 
   public void unfreeze() {
