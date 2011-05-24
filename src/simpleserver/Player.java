@@ -45,6 +45,7 @@ public class Player {
   private Watchdog watchdog;
 
   private String name = null;
+  private String connectionHash;
   private boolean closed = false;
   private boolean isKicked = false;
   private Action attemptedAction;
@@ -56,6 +57,8 @@ public class Player {
   private int entityId = 0;
   private Group groupObject = null;
   private boolean isRobot = false;
+  private boolean guest = false;        // in the scence that player is not authenticated with minecraft.net
+  private boolean usedAuthenticator = false;
   private boolean localChat = false;
   private int blocksPlaced = 0;
   private int blocksDestroyed = 0;
@@ -169,6 +172,12 @@ public class Player {
    
   public String getName() {
     return name;
+  }
+  
+  public String getConnectionHash(){
+    if (connectionHash == null)
+      connectionHash = server.nextHash();
+    return connectionHash;
   }
 
   public double distanceTo(Player player) {
@@ -289,6 +298,22 @@ public class Player {
       return groupObject.isAdmin();
     }
     return false;
+  }
+
+  public void setGuest(boolean guest) {
+    this.guest = guest;
+  }
+
+  public boolean isGuest() {
+    return guest;
+  }
+
+  public void setUsedAuthenticator(boolean usedAuthenticator) {
+    this.usedAuthenticator = usedAuthenticator;
+  }
+
+  public boolean usedAuthenticator() {
+    return usedAuthenticator;
   }
 
   public String getIPAddress() {
@@ -465,6 +490,16 @@ public class Player {
     }
 
     if (name != null) {
+      if(usedAuthenticator){
+        if(guest){
+          server.authenticator.releaseGuestName(name);
+        } else{
+          server.authenticator.rememberAuthentication(name, getIPAddress());
+        }
+      } else if (guest){
+        server.authenticator.rememberGuest(name, getIPAddress());
+      }
+      
       server.stats.addOnlineMinutes(this, (int)(System.currentTimeMillis() - connected)/1000/60);
       server.stats.addDestroyedBlocks(this, blocksDestroyed);
       server.stats.addPlacedBlocks(this, blocksPlaced);

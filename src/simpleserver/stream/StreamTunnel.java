@@ -35,6 +35,7 @@ import java.util.IllegalFormatException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import simpleserver.Authenticator.LoginRequest;
 import simpleserver.Coordinate;
 import simpleserver.Group;
 import simpleserver.Player;
@@ -148,23 +149,78 @@ public class StreamTunnel {
       case 0x01: // Login Request/Response
         write(packetId);
         if (isServerTunnel) {
+          if(server.options.getBoolean("custAuth") 
+              && server.options.getBoolean("onlineMode") 
+              && !server.authenticator.onlineAuthenticate(player)){
+            player.kick("[CustAuth] Failed to login: User not premium");
+          }
           player.setEntityId(in.readInt());
           write(player.getEntityId());
-        }
-        else {
+          write(readUTF16());
+        } else {
           write(in.readInt());
+          readUTF16();
+          write(player.getName());
         }
-        write(readUTF16());
         write(in.readLong());
         write(in.readByte());
         break;
       case 0x02: // Handshake
         String name = readUTF16();
-        if (isServerTunnel || player.setName(name)) {
+        boolean nameSet = false;
+        
+        if (server.options.getBoolean("custAuth")) {
+          if (!isServerTunnel) {
+
+            if (name.equals("Player")) {
+              // is not logged in to minecraft.net
+              
+              LoginRequest req = server.authenticator.getLoginRequest(player.getIPAddress());
+              if (req != null) {
+                name = req.playerName;
+                nameSet = server.authenticator.completeLogin(req, player);
+              }
+              
+              if (req == null || nameSet == false){
+                player.setGuest(true);
+                name = server.authenticator.getFreeGuestName(player.getIPAddress());
+                nameSet = player.setName(name);
+              }
+            } else {
+              if (!server.authenticator.isMinecraftUp) {
+                // this is impossible without name spoofing -> kick? or should onlineMode be attracted?
+                server.authenticator.updateMinecraftState();
+                if (!server.authenticator.isMinecraftUp) {
+                  kick("Please restart your client and use offline mode to join.");
+                } else {
+                  nameSet = player.setName(name);
+                }
+              } else {
+                nameSet = player.setName(name);
+              }
+            }
+          } else {
+            // send '-' if no authentication needed and hash if minecraft.net auth
+            if (!server.authenticator.isMinecraftUp || !server.options.getBoolean("onlineMode")) {
+              name = "-";
+            } else {
+              name = player.getConnectionHash();
+            }
+          }
+        } else {
+          if (name.equals("Player")) {
+            player.setGuest(true);
+            name = server.authenticator.getFreeGuestName(player.getIPAddress());
+          }
+          nameSet = player.setName(name);
+        }
+        
+        if(isServerTunnel || nameSet){
           tunneler.setName(streamType + "-" + player.getName());
           write(packetId);
-		      write(name);
+          write(name);
         }
+        
         break;
       case 0x03: // Chat Message
         String message = readUTF16();

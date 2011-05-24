@@ -25,6 +25,7 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.security.SecureRandom;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Semaphore;
@@ -32,6 +33,7 @@ import java.util.concurrent.Semaphore;
 import simpleserver.config.PermissionConfig;
 
 import simpleserver.command.TimeCommand;
+import simpleserver.config.AuthenticationList;
 import simpleserver.config.ChestList;
 import simpleserver.config.GiveAliasList;
 import simpleserver.config.IPBanList;
@@ -77,11 +79,15 @@ public class Server {
   public MuteList mutelist;
   public GiveAliasList giveAliasList;
   public Stats stats;
+  public AuthenticationList auths;
   private RobotList robots;
+  
+  private SecureRandom random = new SecureRandom();
 
   public PermissionConfig permissions;
 
   public PlayerList playerList;
+  public Authenticator authenticator;
   private List<Resource> resources;
   private CommandParser commandParser;
 
@@ -149,6 +155,11 @@ public class Server {
       return robots.getRobotPorts();
     }
     return null;
+  }
+  
+  public String nextHash(){
+    //return Long.toString(random.nextLong(), 16);
+    return "83f8c94ad9634c7e";
   }
 
   public boolean cmdAllowed(String cmd, Player p) {
@@ -339,11 +350,13 @@ public class Server {
     resources.add(mutelist = new MuteList());
     resources.add(giveAliasList = new GiveAliasList());
     resources.add(stats = new Stats());
+    resources.add(auths = new AuthenticationList());
 
     systemInput = new SystemInputQueue();
     adminLog = new AdminLog();
     errorLog = new ErrorLog();
     connectionLog = new ConnectionLog();
+    authenticator = new Authenticator(this);
 
     commandParser = new CommandParser(options, permissions);
   }
@@ -411,6 +424,7 @@ public class Server {
     }
 
     kickAllPlayers();
+    authenticator.finalize();
     if (telnetServer != null)
       telnetServer.stop();
     if (rconServer != null)
