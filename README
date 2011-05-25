@@ -33,6 +33,8 @@ Features (See CHANGES for updates):
  * Muting players from global chat (mute-list.txt).
  * Rules listing (rules.txt).
  * Optional member whitelist (white-list.txt).
+ * CustAuth lets people login even if verification servers are down 
+   and provides better handling of unverified players.
 See simpleserver.properties for general configuration.
 
 Console Commands:
@@ -63,23 +65,25 @@ accessible commands.
   /local MESSAGE -- Send a chat message to nearby players
   /localtoggle -- toggle localchat mode
   /lock -- Prepare to create your locked chest
+  /login PLAYER PASSWORD -- Login to the server as PLAYER with CustAuth
   /motd -- Display the message of the day
   /mute PLAYER -- Block the named player from normal chat
   /myarea [start|end|save|unsave] -- Create a private area
   /mystats -- Show own statistics
   /ok -- Response to the /visit command to allow a teleport
+  /passwd [OLD PW] PW PW -- Register for CustAuth or change password
   /rcon COMMAND ARGUMENTS... -- Execute a command on the server console
   /reload -- Reread the configuration files from disk
   /reply MESSAGE -- Send message to the player who last sent you one
   /restart -- Stop the minecraft server and start it again
   /rules -- Display the server rules
   /save -- Store configuration to disk and force a map save
+  /servertime -- Display the real-world time of the server
   /setgroup PLAYER GROUP -- Set the group ID of the named player
   /stop -- Shutdown the entire server
   /teleport PLAYER1 PLAYER2 -- Teleport the first player to the second
   /tell PLAYER MESSAGE... -- Send a message to the named player
   /time [0-23999 or day|night] [freeze|unfreeze] -- Set or freeze arbitrary time of day
-  /servertime -- Display the real-world time of the server
   /unbanip IPADDRESS -- Remove the IP address from the ban list
   /unban PLAYER -- Remove the named player from the ban list
   /unlock -- Unlock your locked chest (if you have one) for others to access
