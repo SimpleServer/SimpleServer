@@ -235,6 +235,8 @@ public class PermissionConfig extends AbstractConfig {
     }
 
     config.setProperty("/members/player[@name='"+name+"']/@group", String.valueOf(group));
+    server.updateGroup(name);
+    save();
   }
 
   // replaces Group.isMember with nickname permissions
