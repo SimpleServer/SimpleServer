@@ -281,7 +281,7 @@ public class StreamTunnel {
         write(packetId);
         byte world = in.readByte();
         write(world);
-        System.out.println(world);
+        player.setWorld(world);
         break;
       case 0x0a: // Player
         write(packetId);
