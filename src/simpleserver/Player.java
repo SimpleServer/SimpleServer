@@ -634,4 +634,8 @@ public class Player {
     this.world = world;
   }
   
+  public byte getWorld(){
+    return this.world;
+  }
+  
 }
