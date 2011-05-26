@@ -624,6 +624,7 @@ public class StreamTunnel {
         copyNBytes(recordCount * 3);
         break;
       case 0x3d: // Unknown
+        write(packetId);
         write(in.readInt());
         write(in.readInt());
         write(in.readByte());
