@@ -27,41 +27,53 @@ public class SetGroupCommand extends PlayerArgCommand {
   public SetGroupCommand() {
     super("setgroup PLAYER GROUP", "Set the group ID of the named player");
   }
-
-  @Override
-  protected void executeWithTarget(Player player, String message, String target) {
+  
+  public SetGroupCommand(String name, String description) {
+    super(name, description);
+  }
+  
+  protected boolean allowed(Player player, int group, String target) {
     Server server = player.getServer();
     if ( player.getGroupId() <= server.permissions.getNameGroup(target) ) {
       player.addMessage("\u00a7cYou cannot set the group of this user!");
+      return false;
+    }
+    if (group >= player.getGroupId()) {
+      player.addMessage("\u00a7cYou cannot promote to your group or higher!");
+      return false;
+    }
+    return true;
+  }
+  
+  @Override
+  protected void executeWithTarget(Player player, String message, String target) {
+    String[] arguments = extractArguments(message);
+    int group;
+    
+    if(arguments.length < 2) {
+      player.addMessage("\u00a7cYou must specify a group!");
       return;
     }
-
-    String[] arguments = extractArguments(message);
-    if (arguments.length > 1) {
-      int group;
-      try {
-        group = Integer.parseInt(arguments[1]);
-      }
-      catch (NumberFormatException e) {
-        player.addMessage("\u00a7cGroup must be a number!");
-        return;
-      }
-
-      if (group >= player.getGroupId()) {
-        player.addMessage("\u00a7cYou cannot promote to your group or higher!");
-      }
-      else {
-        server.permissions.setPlayerGroup(target, group);
-
-        Player t = player.getServer().findPlayer(target);
-        if (t != null)
-          t.updateGroup();
-
-        player.addMessage("\u00a77Player " + target + "'s group was set to "
-            + group + "!");
-        server.adminLog("User " + player.getName() + " set player's group:\t "
-            + target + "\t(" + group + ")");
-      }
+    try {
+      group = Integer.parseInt(arguments[1]);
     }
+    catch (NumberFormatException e) {
+      player.addMessage("\u00a7cGroup must be a number!");
+      return;
+    }
+    
+    if(allowed(player, group, target)) {
+      setGroup(player, group, target);
+    }
+  }
+  
+  protected void setGroup(Player player, int group, String target) {
+    Server server = player.getServer();
+    server.permissions.setPlayerGroup(target, group);
+  
+    player.addMessage("\u00a77Player " + target + "'s group was set to "
+        + group + "!");
+    server.adminLog("User " + player.getName() + " set player's group:\t "
+        + target + "\t(" + group + ")");
   }
 }

@@ -27,15 +27,12 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.NoSuchElementException;
 
 import org.apache.commons.configuration.*;
 import org.apache.commons.configuration.tree.xpath.*;
-import org.apache.commons.lang.exception.*;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSortedSet;
@@ -236,6 +233,18 @@ public class PermissionConfig extends AbstractConfig {
 
     config.setProperty("/members/player[@name='"+name+"']/@group", String.valueOf(group));
     server.updateGroup(name);
+    save();
+  }
+  
+  public void setIPGroup(String ip, int group) {
+    String val = config.getString("/members/ip["+xpath_lcase("@address")+"='"+ip+"']/@group","");
+    if (val.equals("")) {
+      config.addProperty("/members ip@address", ip);
+      config.addProperty("/members/ip[@address='"+ip+"'][1] @group", "");
+    }
+    
+    config.setProperty("/members/ip[@address='"+ip+"']/@group", String.valueOf(group));
+    server.updateGroups();
     save();
   }
 
@@ -741,5 +750,6 @@ public class PermissionConfig extends AbstractConfig {
     }
 
   }
+
 
 }

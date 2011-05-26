@@ -242,6 +242,10 @@ public class Server {
     }
   }
 
+  public void updateGroups() {
+    playerList.updatePlayerGroups();
+  }
+
   public int localChat(Player player, String msg) {
     String chat = "\u00a77" + player.getName() + " says:\u00a7f " + msg;
     int localPlayers = 0;
@@ -513,4 +517,5 @@ public class Server {
   public long time() {
     return time;
   }
+
 }
