@@ -34,6 +34,7 @@ public class VisitCommand extends OnlinePlayerArgCommand {
       return;
     }
 
+    if(player.getWorld() == target.getWorld()){
 	  player.addMessage("\u00a77Requesting "+target.getName()+" for a visit...");
 	  player.addMessage("\u00a77If nothing happens within 10 seconds, your request is denied.");
 
@@ -41,6 +42,9 @@ public class VisitCommand extends OnlinePlayerArgCommand {
 	  target.addMessage("\u00a7cissue the command " + commandPrefix() + "ok within 10 seconds.");
 
     target.addVisitRequest(player);
+    } else{
+      player.addMessage("\u00a7cYou and " + target.getName() + " are in different dimensions. No visit possible!");
+    }
 
   }
 }
