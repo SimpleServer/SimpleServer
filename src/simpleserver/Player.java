@@ -631,6 +631,7 @@ public class Player {
   }
 
   public void setWorld(byte world) {
+    // 0 = Normal, -1 Nether
     this.world = world;
   }
   
