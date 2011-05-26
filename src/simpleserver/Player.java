@@ -53,6 +53,7 @@ public class Player {
   private boolean godMode = false;
   private String kickMsg = null;
   private double x, y, z;
+  private byte world;
   private int group = 0;
   private int entityId = 0;
   private Group groupObject = null;
@@ -77,6 +78,7 @@ public class Player {
   //temporary coordinate storage for !myarea command
   public Coordinate areastart;
   public Coordinate areaend;
+
 
   public Player(Socket inc, Server parent) {
     connected = System.currentTimeMillis();
@@ -661,6 +663,15 @@ public class Player {
 
   public boolean isAttemptingUnlock() {
     return attemptedAction == Action.Unlock;
+  }
+
+  public void setWorld(byte world) {
+    // 0 = Normal, -1 Nether
+    this.world = world;
+  }
+  
+  public byte getWorld(){
+    return this.world;
   }
   
 }

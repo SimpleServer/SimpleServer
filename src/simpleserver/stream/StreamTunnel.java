@@ -72,6 +72,7 @@ public class StreamTunnel {
 
   private volatile long lastRead;
   private volatile boolean run = true;
+  private Byte lastPacket;
 
   public StreamTunnel(InputStream in, OutputStream out, boolean isServerTunnel,
                       Player player) {
@@ -298,7 +299,9 @@ public class StreamTunnel {
         break;
       case 0x04: // Time Update
         write(packetId);
-        copyNBytes(8);
+        long time = in.readLong();
+        server.setTime(time);
+        write(time);
         break;
       case 0x05: // Player Inventory
         write(packetId);
@@ -332,6 +335,9 @@ public class StreamTunnel {
         break;
       case 0x09: // Respawn
         write(packetId);
+        byte world = in.readByte();
+        write(world);
+        player.setWorld(world);
         break;
       case 0x0a: // Player
         write(packetId);
@@ -544,7 +550,18 @@ public class StreamTunnel {
         break;
       case 0x17: // Add Object/Vehicle
         write(packetId);
-        copyNBytes(17);
+        write(in.readInt());
+        write(in.readByte());
+        write(in.readInt());
+        write(in.readInt());
+        write(in.readInt());
+        int flag = in.readInt();
+        write(flag);
+        if(flag > 0) {
+          write(in.readShort());
+          write(in.readShort());
+          write(in.readShort());
+        }
         break;
       case 0x18: // Mob Spawn
         write(packetId);
@@ -662,11 +679,18 @@ public class StreamTunnel {
         write(recordCount);
         copyNBytes(recordCount * 3);
         break;
+      case 0x3d: // Unknown
+        write(in.readInt());
+        write(in.readInt());
+        write(in.readByte());
+        write(in.readInt());
+        write(in.readInt());
+        break;
       case 0x46: // Invalid Bed
         write(packetId);
         copyNBytes(1);
         break;
-      case 0x47: // Weather
+      case 0x47: // Thunder
         write(packetId);
         copyNBytes(17);
         break;
@@ -779,7 +803,15 @@ public class StreamTunnel {
         write(readUTF16());
         write(readUTF16());
         break;
-      case (byte)0xc8:  //weather
+      case (byte) 0x83:  // Map data
+        write(packetId);
+        write(in.readShort());
+        write(in.readShort());
+        byte length = in.readByte();
+        write(length);
+        copyNBytes(0xff & length);
+        break;
+      case (byte)0xc8:  // Statistic
         write(packetId);
         copyNBytes(5);
         break;
@@ -802,10 +834,11 @@ public class StreamTunnel {
         else {
           throw new IOException("Unable to parse unknown " + streamType
               + " packet 0x" + Integer.toHexString(packetId) + " for player "
-              + player.getName());
+              + player.getName() + " (after 0x" + Integer.toHexString(lastPacket));
         }
     }
     packetFinished();
+    lastPacket = packetId;
   }
   
   private String readUTF16() throws IOException {

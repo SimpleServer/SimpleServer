@@ -20,30 +20,32 @@
  */
 package simpleserver.command;
 
-import simpleserver.Player;
+import java.util.regex.Pattern;
 
-public class GPSCommand extends OnlinePlayerArgCommand {
-  public GPSCommand() {
-    super("gps [PLAYER]",
-          "Display block coordinates of named player or yourself", true);
+import simpleserver.Player;
+import simpleserver.Server;
+
+public class SetIPGroupCommand extends SetGroupCommand {
+  public SetIPGroupCommand() {
+    super("setipgroup IP|Player", "Set the group ID of an IP address");
   }
 
-  @Override
-  protected void executeWithTarget(Player player, String message, Player target) {
-    String name = "Your";
-    if (target == null) {
-      target = player;
-    }
-    else {
-      name = target.getName() + "'s";
-    }
 
-    String world = (target.getWorld() == 0) ? "Normal" : "Nether";
-    
-    player.addMessage("\u00a77" + name + " Latitude: \u00a7f"
-        + (int) target.getX() + "\u00a77 Longitude: \u00a7f"
-        + (int) target.getZ() + "\u00a77 Altitude: \u00a7f"
-        + (int) target.getY() + "\u00a77 World: \u00a7f"
-        + world);
+  @Override
+  protected void setGroup(Player player, int group, String target) {
+    Server server = player.getServer();
+    Player targetPlayer = player.getServer().findPlayer(target);
+    if (targetPlayer != null) {
+      target = targetPlayer.getIPAddress();
+    } else if(!Pattern.matches("^(\\d{1,3}\\.){3}\\d{1,3}$", target)) {
+      player.addMessage("\u00a7cYou must specify a user or a valid IP!");
+      return;   
+    }
+    server.permissions.setIPGroup(target, group);
+  
+    player.addMessage("\u00a77Group of " + target + " was set to "
+        + group + "!");
+    server.adminLog("User " + player.getName() + " set IP's group:\t "
+        + target + "\t(" + group + ")");
   }
 }
