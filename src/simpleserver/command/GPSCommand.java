@@ -44,6 +44,6 @@ public class GPSCommand extends OnlinePlayerArgCommand {
         + (int) target.getX() + "\u00a77 Longitude: \u00a7f"
         + (int) target.getZ() + "\u00a77 Altitude: \u00a7f"
         + (int) target.getY() + "\u00a77 World: \u00a7f"
-        + world + " or " + target.getWorld());
+        + world);
   }
 }
