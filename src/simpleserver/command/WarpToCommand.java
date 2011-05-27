@@ -29,7 +29,7 @@ public class WarpToCommand extends OnlinePlayerArgCommand {
 
   @Override
   protected void executeWithTarget(Player player, String message, Player target) {
-    if(player.getWorld() == target.getWorld()){
+    if(player.getDimension() == target.getDimension()){
       player.teleportTo(target);
   
       player.getServer().adminLog("Admin " + player.getName() + " teleported:\t "

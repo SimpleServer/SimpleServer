@@ -37,13 +37,11 @@ public class GPSCommand extends OnlinePlayerArgCommand {
     else {
       name = target.getName() + "'s";
     }
-
-    String world = (target.getWorld() == 0) ? "Normal" : "Nether";
     
     player.addMessage("\u00a77" + name + " Latitude: \u00a7f"
         + (int) target.getX() + "\u00a77 Longitude: \u00a7f"
         + (int) target.getZ() + "\u00a77 Altitude: \u00a7f"
         + (int) target.getY() + "\u00a77 World: \u00a7f"
-        + world);
+        + target.getDimension());
   }
 }

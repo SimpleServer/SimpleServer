@@ -52,7 +52,7 @@ public class Player {
   private boolean godMode = false;
   private String kickMsg = null;
   private double x, y, z;
-  private byte world;
+  private Dimension dimension;
   private int group = 0;
   private int entityId = 0;
   private Group groupObject = null;
@@ -630,13 +630,40 @@ public class Player {
     return attemptedAction == Action.Unlock;
   }
 
-  public void setWorld(byte world) {
-    // 0 = Normal, -1 Nether
-    this.world = world;
+  public void setDimension(byte index) {
+    this.dimension = Dimension.get(index);
   }
   
-  public byte getWorld(){
-    return this.world;
+  public Dimension getDimension(){
+    return this.dimension;
+  }
+  
+  public enum Dimension {
+    WORLD ((byte)0),
+    NETHER ((byte)-1),
+    LIMBO;
+    
+    private byte index;
+
+    Dimension(byte index) {
+      this.index = index;
+    }
+    
+    Dimension() {
+    }
+    
+    public String toString() {
+      String name = super.toString();
+      return name.substring(0, 1) + name.substring(1).toLowerCase();
+    }
+    
+    public static Dimension get(byte index) {
+      for(Dimension dim : Dimension.values()) {
+        if(dim.index == index)
+          return dim;
+      }
+      return Dimension.LIMBO;
+    }
   }
   
 }

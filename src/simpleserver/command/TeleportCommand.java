@@ -39,7 +39,7 @@ public class TeleportCommand extends OnlinePlayerArgCommand {
         player.addMessage("\u00a7cPlayer not online (" + arguments[1] + ")");
       }
       else {
-        if(target1.getWorld() == target2.getWorld()){
+        if(target1.getDimension() == target2.getDimension()){
           target1.teleportTo(target2);
   
           player.addMessage("\u00a77Teleported " + target1.getName() + " to "

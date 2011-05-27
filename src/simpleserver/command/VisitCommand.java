@@ -34,7 +34,7 @@ public class VisitCommand extends OnlinePlayerArgCommand {
       return;
     }
 
-    if(player.getWorld() == target.getWorld()){
+    if(player.getDimension() == target.getDimension()){
 	  player.addMessage("\u00a77Requesting "+target.getName()+" for a visit...");
 	  player.addMessage("\u00a77If nothing happens within 10 seconds, your request is denied.");
 
