@@ -630,8 +630,8 @@ public class Player {
     return attemptedAction == Action.Unlock;
   }
 
-  public void setDimension(byte index) {
-    this.dimension = Dimension.get(index);
+  public void setDimension(Dimension dimension) {
+    this.dimension = dimension;
   }
   
   public Dimension getDimension(){

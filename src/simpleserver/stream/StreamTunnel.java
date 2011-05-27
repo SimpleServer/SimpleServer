@@ -39,6 +39,7 @@ import simpleserver.Coordinate;
 import simpleserver.Group;
 import simpleserver.Player;
 import simpleserver.Server;
+import simpleserver.Player.Dimension;
 import simpleserver.command.LocalSayCommand;
 import simpleserver.command.PlayerListCommand;
 import simpleserver.config.ChestList.Chest;
@@ -142,6 +143,7 @@ public class StreamTunnel {
     int x;
     byte y;
     int z;
+    byte dimension;
     switch (packetId) {
       case 0x00: // Keep Alive
         write(packetId);
@@ -157,7 +159,11 @@ public class StreamTunnel {
         }
         write(readUTF16());
         write(in.readLong());
-        write(in.readByte());
+        dimension = in.readByte();
+        if(isServerTunnel) {
+          player.setDimension(Dimension.get(dimension));
+        }
+        write(dimension);
         break;
       case 0x02: // Handshake
         String name = readUTF16();
@@ -279,9 +285,9 @@ public class StreamTunnel {
         break;
       case 0x09: // Respawn
         write(packetId);
-        byte world = in.readByte();
-        write(world);
-        player.setDimension(world);
+        dimension = in.readByte();
+        write(dimension);
+        player.setDimension(Dimension.get(dimension));
         break;
       case 0x0a: // Player
         write(packetId);
