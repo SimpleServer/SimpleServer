@@ -46,7 +46,7 @@ public class MinecraftOptions extends AbstractOptions {
     options.setProperty("allow-flight", simpleServerOptions.get("allowFlight"));
     options.setProperty("pvp", simpleServerOptions.get("pvp"));
     options.setProperty("view-distance", simpleServerOptions.get("viewDistance"));
-    options.setProperty("allow-nether", simpleServerOptions.get("allow-nether"));
+    options.setProperty("allow-nether", simpleServerOptions.get("allowNether"));
 
     super.save();
   }
