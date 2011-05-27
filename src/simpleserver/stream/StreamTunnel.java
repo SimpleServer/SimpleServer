@@ -950,7 +950,16 @@ public class StreamTunnel {
     write(reason);
     packetFinished();
   }
-
+  
+  private String getLastColorCode(String message) {
+    String colorCode = "";
+    int lastIndex = message.lastIndexOf('\u00a7');
+    if (lastIndex != -1 && lastIndex + 1 < message.length())
+      colorCode = message.substring(lastIndex, lastIndex + 2);
+    
+    return colorCode;
+  }
+  
   private void sendMessage(String message) throws IOException {
     if(message.length() > MESSAGE_SIZE) {
       int end = MESSAGE_SIZE-1;
@@ -961,8 +970,13 @@ public class StreamTunnel {
         end = MESSAGE_SIZE;
       else
         end++;
-      sendMessagePacket(message.substring(0,end));
-      sendMessage(message.substring(end));
+      
+      if (message.charAt(end) == '\u00a7')
+        end--;
+      
+      String firstPart = message.substring(0,end);
+      sendMessagePacket(firstPart);
+      sendMessage(getLastColorCode(firstPart) + message.substring(end));
     } else {
       sendMessagePacket(message);
     }
