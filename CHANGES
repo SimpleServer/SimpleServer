@@ -1,3 +1,10 @@
+== 8.1 ==
+ * Update for Minecraft Beta 1.6
+ * Added !setipgroup
+ * updated windows launcher to run better in an unpropper environment
+ * fixed !setgroup to update instantly
+ * fixed invisible input in server console under windows
+
 == 8.0 ==
  * Update for Minecraft Beta 1.5
  * Added !area to show current area
