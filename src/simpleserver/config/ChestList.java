@@ -67,11 +67,11 @@ public class ChestList extends AsciiConfig {
   }
   
   public boolean canOpen(Player player, Coordinate coords) {
-    return coords == null || canOpen(player, coords.x, coords.y, coords.z);
+    return coords == null || canOpen(player, coords.x(), coords.y(), coords.z());
   }
 
   private Chest adjacentChest(Coordinate coords) {
-    return adjacentChest(coords.x, coords.y, coords.z);
+    return adjacentChest(coords.x(), coords.y(), coords.z());
   }
   
   public Chest adjacentChest(int x, byte y, int z) {
@@ -104,7 +104,7 @@ public class ChestList extends AsciiConfig {
   }
 
   public boolean isLocked(Coordinate coords) {
-    return !(coords == null) && isLocked(coords.x, coords.y, coords.z);
+    return !(coords == null) && isLocked(coords.x(), coords.y(), coords.z());
   }
 
   public synchronized void releaseLock(int x, byte y, int z) {
@@ -205,11 +205,11 @@ public class ChestList extends AsciiConfig {
       output.append(",");
       output.append(chest.isGroup);
       output.append(",");
-      output.append(chest.coordinate.x);
+      output.append(chest.coordinate.x());
       output.append(",");
-      output.append(chest.coordinate.y);
+      output.append(chest.coordinate.y());
       output.append(",");
-      output.append(chest.coordinate.z);
+      output.append(chest.coordinate.z());
       output.append(",");
       output.append(chest.name());
       output.append("\n");

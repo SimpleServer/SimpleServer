@@ -20,13 +20,21 @@
  */
 package simpleserver;
 
+import simpleserver.Player.Dimension;
+
 public class Coordinate {
-  public int x;
-  public byte y;
-  public int z;
+  private int x;
+  private byte y;
+  private int z;
+  private Dimension dimension;
   private final int hashCode;
 
   public Coordinate(int x, byte y, int z) {
+    this(x,y,z,Dimension.EARTH);
+  }
+
+  public Coordinate(int x, byte y, int z, Dimension dimension) {
+    this.dimension = dimension;
     this.x = x;
     this.y = y;
     this.z = z;
@@ -35,7 +43,40 @@ public class Coordinate {
     code = 37 * code + x;
     code = 37 * code + y;
     code = 37 * code + z;
+    code = 37 * code + dimension.ordinal();
     hashCode = code;
+  }
+  
+  public int x() {
+    return x;
+  }
+  
+  public byte y() {
+    return y;
+  }
+  
+  public int z() {
+    return z;
+  }
+  
+  public Dimension dimension() {
+    return dimension;
+  }
+  
+  public Coordinate setX(int x) {
+    return new Coordinate(x, y, z, dimension);
+  }
+  
+  public Coordinate setY(byte y) {
+    return new Coordinate(x, y, z, dimension);
+  }
+  
+  public Coordinate setT(int z) {
+    return new Coordinate(x, y, z, dimension);
+  }
+  
+  public Coordinate setDimension(Dimension dimension) {
+    return new Coordinate(x, y, z, dimension);
   }
 
   public boolean equals(Coordinate coordinate) {

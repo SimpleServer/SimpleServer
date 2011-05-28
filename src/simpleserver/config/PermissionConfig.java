@@ -566,35 +566,23 @@ public class PermissionConfig extends AbstractConfig {
   }
 
   private boolean areaContainsCoordinate(Coordinate start, Coordinate end, Coordinate coord) {
-    // swap coordinates if start > end
-    int t=0;
-    byte u=0;
-    if (start.x > end.x) {
-      t = start.x;
-	    start.x = end.x;
-      end.x = t;
-    }
-	  if (start.z > end.z) {
-		  t = start.z;
-	    start.z = end.z;
-		  end.z = t;
-    }
-	  if (start.y > end.y) {
-      u = start.y;
-	    start.y = end.y;
-	 	  end.y = u;
+    Coordinate max = new Coordinate(Math.max(start.x(), end.x()),
+                                    (byte)Math.max(start.y(), end.y()),
+                                    Math.max(start.z(), end.z()));
+    Coordinate min = new Coordinate(Math.min(start.x(), end.x()),
+                                    (byte)Math.min(start.y(), end.y()),
+                                    Math.min(start.z(), end.z()));
+    
+    if(max.y() == 0) {
+      max = max.setY((byte)128);
     }
 
-    if (start.y == 0 || end.y == 0) {
-		  if (coord.x >= start.x && coord.z >= start.z
-          && coord.x <= end.x && coord.z <= end.z)
-			  return true;
-    } else if (coord.x >= start.x && coord.z >= start.z && coord.y >= start.y
-          && coord.x <= end.x && coord.z <= end.z && coord.y <= end.y) {
-        return true;
-    }
-
-    return false;
+    return coord.x() >= min.x() && 
+           coord.z() >= min.z() &&
+           coord.y() >= min.y() &&
+           coord.x() <= max.x() && 
+           coord.z() <= max.z() &&
+           coord.y() <= max.y();
   }
 
   private Coordinate parseCoords(String c) {
@@ -625,8 +613,8 @@ public class PermissionConfig extends AbstractConfig {
     String path = "/areas/area[@owner='"+name+"']";
 
     config.addProperty(path+"[1] @name", name+"s private area");
-    config.addProperty(path+"[1] @start", player.areastart.x+","+player.areastart.z);
-    config.addProperty(path+"[1] @end", player.areaend.x+","+player.areaend.z);
+    config.addProperty(path+"[1] @start", player.areastart.x()+","+player.areastart.z());
+    config.addProperty(path+"[1] @end", player.areaend.x()+","+player.areaend.z());
 
     config.addProperty(path+"[1] permissions/blocks@allowPlace",";"+name);
     config.addProperty(path+"[1]/permissions/blocks @allowDestroy",";"+name);

@@ -805,7 +805,7 @@ public class StreamTunnel {
 
 
   private void lockChest(Coordinate coords) {
-    lockChest(coords.x, coords.y, coords.z);
+    lockChest(coords.x(), coords.y(), coords.z());
   }
   
   private void lockChest(int x, byte y, int z) {

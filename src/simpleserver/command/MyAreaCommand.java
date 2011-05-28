@@ -29,8 +29,8 @@ public class MyAreaCommand extends AbstractCommand implements PlayerCommand {
   }
 
   private boolean areaSizeOk(Player player) {
-      return (Math.abs(player.areastart.x - player.areaend.x) <= 50)
-          && (Math.abs(player.areastart.y - player.areaend.y) <= 50);
+      return (Math.abs(player.areastart.x()- player.areaend.x()) <= 50)
+          && (Math.abs(player.areastart.y() - player.areaend.y()) <= 50);
   }
 
   public void execute(Player player, String message) {
@@ -44,11 +44,11 @@ public class MyAreaCommand extends AbstractCommand implements PlayerCommand {
 
     if (arguments[0].equals("start")) {
       player.areastart = perm.coordinateFromPlayer(player);
-      player.areastart.y = 0; //no height limit
+      player.areastart = player.areastart.setY((byte)0); //no height limit
       player.addMessage("\u00a77Start coordinate set.");
     } else if (arguments[0].equals("end")) {
       player.areaend = perm.coordinateFromPlayer(player);
-      player.areaend.y = 0; //no height limit
+      player.areaend = player.areaend.setY((byte)0); //no height limit
       player.addMessage("\u00a77End coordinate set.");
     } else if (arguments[0].equals("save")) {
       if (perm.playerHasArea(player)) {
