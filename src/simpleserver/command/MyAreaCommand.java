@@ -34,7 +34,7 @@ public class MyAreaCommand extends AbstractCommand implements PlayerCommand {
   }
 
   public void execute(Player player, String message) {
-    PermissionConfig perm = perm = player.getServer().permissions;
+    PermissionConfig perm = player.getServer().permissions;
     String arguments[] = extractArguments(message);
 
     if (arguments.length == 0) {

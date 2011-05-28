@@ -29,7 +29,7 @@ public class AreaCommand extends AbstractCommand implements PlayerCommand {
   }
 
   public void execute(Player player, String message) {
-    PermissionConfig perm = perm = player.getServer().permissions;
+    PermissionConfig perm = player.getServer().permissions;
 
     String list = "\u00a77Current area:\u00a7f "+perm.getCurrentArea(player);
     player.addMessage(list);

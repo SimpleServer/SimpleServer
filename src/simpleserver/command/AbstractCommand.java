@@ -21,7 +21,6 @@
 package simpleserver.command;
 
 import simpleserver.CommandParser;
-import simpleserver.Server;
 
 public abstract class AbstractCommand implements Command {
   private final String name;

@@ -24,12 +24,10 @@ import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import simpleserver.Group;
 import simpleserver.Player;
 import simpleserver.Server;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
 
 public class KitList extends PropertiesConfig {
   private final Server server;

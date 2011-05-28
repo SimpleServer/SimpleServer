@@ -20,7 +20,6 @@
  */
 package simpleserver.command;
 
-import simpleserver.CommandParser;
 import simpleserver.Player;
 
 public class HelpCommand extends AbstractCommand implements PlayerCommand {

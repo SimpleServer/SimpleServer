@@ -86,6 +86,7 @@ class DTDErrorHandler implements ErrorHandler {
   }
 }
 
+@SuppressWarnings("unchecked")
 public class PermissionConfig extends AbstractConfig {
   private Server server = null;
 

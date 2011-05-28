@@ -20,8 +20,6 @@
  */
 package simpleserver.options;
 
-import java.util.Properties;
-
 import simpleserver.config.SortedProperties;
 
 public class MinecraftOptions extends AbstractOptions {
