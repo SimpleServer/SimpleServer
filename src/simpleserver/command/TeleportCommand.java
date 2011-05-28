@@ -48,7 +48,8 @@ public class TeleportCommand extends OnlinePlayerArgCommand {
               + target1.getName() + "\tto\t" + target2.getName());
         } else{
           player.addMessage("\u00a7cUser " + target1.getName() + " and "
-                            + target2.getName() + " are in different dimensions. No teleport possible!");
+                            + target2.getName() + " are in different dimensions.");
+          player.addMessage("\u00a7cNo teleport possible!");
         }
       }
     }
