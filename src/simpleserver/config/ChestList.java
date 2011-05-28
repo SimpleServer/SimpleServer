@@ -65,10 +65,7 @@ public class ChestList extends AsciiConfig {
   }
 
   public Chest adjacentChest(Coordinate coordinate) {
-    Chest chest = chestAt(coordinate);
-    if (chest == null) {
-      chest = chestAt(coordinate.add(1, 0, 0));
-    }
+    Chest chest = chestAt(coordinate.add(1, 0, 0));
     if (chest == null) {
       chest = chestAt(coordinate.add(-1, 0, 0));
     }
