@@ -21,7 +21,6 @@
 package simpleserver.command;
 
 import simpleserver.CommandParser;
-import simpleserver.Server;
 
 public abstract class AbstractCommand implements Command {
   private final String name;
@@ -87,15 +86,16 @@ public abstract class AbstractCommand implements Command {
   protected String extractArgument(String message) {
     return extractArgument(message, 0);
   }
-  
+
   protected String commandPrefix() {
-    if(parser != null) {
+    if (parser != null) {
       return parser.commandPrefix();
-    } else {
+    }
+    else {
       return "!";
     }
   }
-  
+
   public void setParser(CommandParser parser) {
     this.parser = parser;
   }

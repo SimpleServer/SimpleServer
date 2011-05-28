@@ -29,28 +29,30 @@ public class MyAreaCommand extends AbstractCommand implements PlayerCommand {
   }
 
   private boolean areaSizeOk(Player player) {
-      return (Math.abs(player.areastart.x - player.areaend.x) <= 50)
-          && (Math.abs(player.areastart.y - player.areaend.y) <= 50);
+    return (Math.abs(player.areastart.x() - player.areaend.x()) <= 50)
+          && (Math.abs(player.areastart.y() - player.areaend.y()) <= 50);
   }
 
   public void execute(Player player, String message) {
-    PermissionConfig perm = perm = player.getServer().permissions;
+    PermissionConfig perm = player.getServer().permissions;
     String arguments[] = extractArguments(message);
 
     if (arguments.length == 0) {
-        player.addMessage("\u00a7cError! Command requires argument!");
-        return;
+      player.addMessage("\u00a7cError! Command requires argument!");
+      return;
     }
 
     if (arguments[0].equals("start")) {
       player.areastart = perm.coordinateFromPlayer(player);
-      player.areastart.y = 0; //no height limit
+      player.areastart = player.areastart.setY((byte) 0); // no height limit
       player.addMessage("\u00a77Start coordinate set.");
-    } else if (arguments[0].equals("end")) {
+    }
+    else if (arguments[0].equals("end")) {
       player.areaend = perm.coordinateFromPlayer(player);
-      player.areaend.y = 0; //no height limit
+      player.areaend = player.areaend.setY((byte) 0); // no height limit
       player.addMessage("\u00a77End coordinate set.");
-    } else if (arguments[0].equals("save")) {
+    }
+    else if (arguments[0].equals("save")) {
       if (perm.playerHasArea(player)) {
         player.addMessage("\u00a7cNew area can not be saved before you unsave your old one!");
         return;
@@ -70,7 +72,8 @@ public class MyAreaCommand extends AbstractCommand implements PlayerCommand {
 
       perm.createPlayerArea(player);
       player.addMessage("\u00a77Your area has been saved!");
-    } else if (arguments[0].equals("unsave")) {
+    }
+    else if (arguments[0].equals("unsave")) {
       if (!perm.playerHasArea(player)) {
         player.addMessage("\u00a7cYou currently have no personal area which can be unsaved!");
         return;

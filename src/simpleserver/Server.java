@@ -30,19 +30,18 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Semaphore;
 
-import simpleserver.config.PermissionConfig;
-
 import simpleserver.command.TimeCommand;
 import simpleserver.config.AuthenticationList;
 import simpleserver.config.ChestList;
 import simpleserver.config.GiveAliasList;
+import simpleserver.config.HelpText;
 import simpleserver.config.IPBanList;
 import simpleserver.config.KitList;
 import simpleserver.config.MOTD;
 import simpleserver.config.MuteList;
+import simpleserver.config.PermissionConfig;
 import simpleserver.config.RobotList;
 import simpleserver.config.Rules;
-import simpleserver.config.HelpText;
 import simpleserver.config.Stats;
 import simpleserver.config.WhiteList;
 import simpleserver.log.AdminLog;
@@ -61,7 +60,7 @@ import simpleserver.thread.RequestTracker;
 import simpleserver.thread.SystemInputQueue;
 
 public class Server {
-  
+
   private final Listener listener;
 
   private ServerSocket socket;
@@ -81,7 +80,7 @@ public class Server {
   public Stats stats;
   public AuthenticationList auths;
   private RobotList robots;
-  
+
   private SecureRandom random = new SecureRandom();
 
   public PermissionConfig permissions;
@@ -153,14 +152,13 @@ public class Server {
   }
 
   public Integer[] getRobotPorts() {
-    if (robots != null) {
+    if (robots != null)
       return robots.getRobotPorts();
-    }
     return null;
   }
-  
-  public String nextHash(){
-    //return Long.toString(random.nextLong(), 16);
+
+  public String nextHash() {
+    // return Long.toString(random.nextLong(), 16);
     return "83f8c94ad9634c7e";
   }
 
@@ -219,8 +217,10 @@ public class Server {
     for (Resource resource : resources) {
       resource.load();
     }
-    if (playerList != null)
-      playerList.updatePlayerGroups(); //reflect changes of permission.xml without player relogin
+    if (playerList != null) {
+      playerList.updatePlayerGroups(); // reflect changes of permission.xml
+      // without player relogin
+    }
   }
 
   public void saveResources() {
@@ -231,9 +231,8 @@ public class Server {
 
   public String findName(String prefix) {
     Player i = playerList.findPlayer(prefix);
-    if (i != null) {
+    if (i != null)
       return i.getName();
-    }
 
     return null;
   }
@@ -379,7 +378,7 @@ public class Server {
     restart = false;
 
     loadResources();
-    
+
     if (permissions.loadsuccess == false) {
       System.out.println("[SimpleServer] Syntax error in permissions.xml! Emergency shutdown...");
       System.exit(1);
@@ -402,10 +401,12 @@ public class Server {
       // Already on track to stop/restart.
     }
 
-    if (options.getBoolean("enableTelnet"))
+    if (options.getBoolean("enableTelnet")) {
       telnetServer = new TelnetServer(this);
-    if (options.getBoolean("enableRcon"))
+    }
+    if (options.getBoolean("enableRcon")) {
       rconServer = new RconServer(this);
+    }
     autoBackup = new AutoBackup(this);
     autosave = new AutoSave(this);
     autoRestart = new AutoRestart(this);
@@ -431,10 +432,12 @@ public class Server {
 
     kickAllPlayers();
     authenticator.finalize();
-    if (telnetServer != null)
+    if (telnetServer != null) {
       telnetServer.stop();
-    if (rconServer != null)
+    }
+    if (rconServer != null) {
       rconServer.stop();
+    }
     autoBackup.stop();
     autosave.stop();
     autoRestart.stop();
@@ -527,7 +530,7 @@ public class Server {
   public void setTime(long time) {
     this.time = time;
   }
-  
+
   public long time() {
     return time;
   }

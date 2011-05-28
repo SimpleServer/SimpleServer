@@ -55,24 +55,28 @@ public class GivePlayerCommand extends GiveCommand implements ServerCommand {
 
     target.give(item, amount);
   }
-  
+
   @Override
   protected Player getTarget(Player player, Server server, String[] arguments) {
     Player target = null;
     if (arguments.length > 0) {
       target = server.findPlayer(arguments[0]);
       if (target == null) {
-        if (player != null)
+        if (player != null) {
           player.addMessage("\u00a7cPlayer not online (" + arguments[0] + ")");
-        else
+        }
+        else {
           System.out.println("Player not online (" + arguments[0] + ")");
+        }
       }
     }
     else {
-      if (player != null)
+      if (player != null) {
         player.addMessage("\u00a7cNo player or item specified!");
-      else
+      }
+      else {
         System.out.println("No player or item specified!");
+      }
     }
 
     return target;

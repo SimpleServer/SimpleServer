@@ -37,6 +37,7 @@ import simpleserver.command.ServerCommand;
 import simpleserver.config.PermissionConfig;
 import simpleserver.options.Options;
 
+@SuppressWarnings("unchecked")
 public class CommandParser {
   private final Map<String, PlayerCommand> playerCommands;
   private final Map<Class, PlayerCommand> playerCommandClasses;
@@ -56,21 +57,24 @@ public class CommandParser {
     loadCommands(PlayerCommand.class, playerCommands, playerCommandClasses);
     loadCommands(ServerCommand.class, serverCommands, serverCommandClasses);
   }
-  
+
   public PlayerCommand getPlayerCommand(Class<? extends PlayerCommand> c) {
-    if(playerCommandClasses.containsKey(c))
+    if (playerCommandClasses.containsKey(c)) {
       return playerCommandClasses.get(c);
-    else
+    }
+    else {
       return null;
+    }
   }
-  
+
   public PlayerCommand getPlayerCommand(String message) {
     if (message.startsWith(commandPrefix())) {
       PlayerCommand command = playerCommands.get(extractName(message, 1));
       if (command == null) {
-        if(options.contains("alternateJarFile")) {
+        if (options.contains("alternateJarFile")) {
           return new ExternalCommand(extractName(message, 1));
-        } else {
+        }
+        else {
           System.out.println("Illegal command configuration for: " + message);
           command = playerCommands.get(null);
         }
@@ -85,12 +89,14 @@ public class CommandParser {
   public ServerCommand getServerCommand(String message) {
     return serverCommands.get(extractName(message, 0));
   }
-  
+
   public ServerCommand getServerCommand(Class<? extends ServerCommand> c) {
-    if(serverCommandClasses.containsKey(c))
+    if (serverCommandClasses.containsKey(c)) {
       return serverCommandClasses.get(c);
-    else
+    }
+    else {
       return null;
+    }
   }
 
   public Collection<PlayerCommand> getPlayerCommands() {

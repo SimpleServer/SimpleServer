@@ -86,9 +86,9 @@ public class AutoBackup {
     purgeOldBackups();
     announce(server.l.get("BACKUP_COMPLETE"));
   }
-  
+
   public void announce(String message) {
-    if(server.options.getBoolean("announceBackup")) {
+    if (server.options.getBoolean("announceBackup")) {
       server.runCommand("say", message);
     }
   }

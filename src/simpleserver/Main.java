@@ -28,16 +28,17 @@ import java.io.InputStreamReader;
 public class Main {
   private static final String license = "SimpleServer -- Copyright (C) 2011 SimpleServer authors (see CONTRIBUTORS)";
   private static final String warranty = "This program is licensed under The MIT License.\nSee file LICENSE for details.";
-  private static final String baseVersion = "8.1.0 alpha";
+  private static final String baseVersion = "8.1.0 beta";
   private static final String version;
 
   static {
     String extendedVersion = baseVersion;
 
     String commitversion = getVersionString("VERSION");
-    if (!commitversion.equals(""))
-        extendedVersion += "-"+commitversion;
-    
+    if (!commitversion.equals("")) {
+      extendedVersion += "-" + commitversion;
+    }
+
     version = extendedVersion;
   }
 
@@ -49,7 +50,7 @@ public class Main {
       BufferedReader reader = new BufferedReader(new InputStreamReader(input));
       try {
         try {
-           retversion = reader.readLine();
+          retversion = reader.readLine();
         }
         finally {
           reader.close();
@@ -66,8 +67,8 @@ public class Main {
 
   public static void main(String[] args) {
     if (args.length > 0) {
-      for(String x: args) {
-        if(x.equals("--version") || x.equals("-v")) {
+      for (String x : args) {
+        if (x.equals("--version") || x.equals("-v")) {
           System.out.println(version);
           return;
         }

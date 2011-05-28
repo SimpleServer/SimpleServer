@@ -27,12 +27,12 @@ public class ExternalCommand extends AbstractCommand implements PlayerCommand {
   public ExternalCommand() {
     super("external", "External command");
   }
-  
+
   public ExternalCommand(String name) {
     super(name, "External command");
   }
 
   public void execute(Player player, String message) {
-    
+
   }
 }

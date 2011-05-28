@@ -1,3 +1,13 @@
+== 8.1 ==
+ * Update for Minecraft Beta 1.6
+ * Added !setipgroup
+ * updated windows launcher to run better in an improper environment
+ * fixed locked chests to support multiple dimension
+ * fixed !time to no longer crash redstone circuits
+ * fixed !setgroup to update instantly
+ * fixed invisible input in server console under windows
+ * fixed messages to preserve coloring when wrapped
+
 == 8.0 ==
  * Update for Minecraft Beta 1.5
  * Added !area to show current area

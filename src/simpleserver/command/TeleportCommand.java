@@ -39,12 +39,19 @@ public class TeleportCommand extends OnlinePlayerArgCommand {
         player.addMessage("\u00a7cPlayer not online (" + arguments[1] + ")");
       }
       else {
-        target1.teleportTo(target2);
+        if (target1.getDimension() == target2.getDimension()) {
+          target1.teleportTo(target2);
 
-        player.addMessage("\u00a77Teleported " + target1.getName() + " to "
-            + target2.getName() + "!");
-        server.adminLog("User " + player.getName() + " teleported:\t "
-            + target1.getName() + "\tto\t" + target2.getName());
+          player.addMessage("\u00a77Teleported " + target1.getName() + " to "
+              + target2.getName() + "!");
+          server.adminLog("User " + player.getName() + " teleported:\t "
+              + target1.getName() + "\tto\t" + target2.getName());
+        }
+        else {
+          player.addMessage("\u00a7cUser " + target1.getName() + " and "
+                            + target2.getName() + " are in different dimensions.");
+          player.addMessage("\u00a7cNo teleport possible!");
+        }
       }
     }
     else {

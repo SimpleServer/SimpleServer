@@ -20,7 +20,6 @@
  */
 package simpleserver.command;
 
-import simpleserver.CommandParser;
 import simpleserver.Player;
 
 public class HelpCommand extends AbstractCommand implements PlayerCommand {
@@ -58,9 +57,9 @@ public class HelpCommand extends AbstractCommand implements PlayerCommand {
 
       String prefix = commandPrefix();
       for (PlayerCommand command : parser.getPlayerCommands()) {
-        if ( (command instanceof InvalidCommand)
+        if ((command instanceof InvalidCommand)
              || player.getServer().permissions.commandIsHidden(command.getName())
-             || !player.commandAllowed(command.getName()) ) {
+             || !player.commandAllowed(command.getName())) {
           continue;
         }
 
@@ -73,10 +72,10 @@ public class HelpCommand extends AbstractCommand implements PlayerCommand {
       player.addMessage("\u00a77Say " + prefix
           + "help command for details of a specific command.");
 
-      //additional custom help text from helptext.txt
+      // additional custom help text from helptext.txt
       String[] helplines = player.getServer().helptext.getHelpText().split("\n");
       player.addMessage(" ");
-      for(String l: helplines) {
+      for (String l : helplines) {
         player.addMessage("\u00a7f" + l);
       }
     }

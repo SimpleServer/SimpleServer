@@ -70,7 +70,9 @@ public class TelnetServer {
       int port = 25678;
       try {
         port = Integer.valueOf(portstr);
-      } catch (NumberFormatException e) { }
+      }
+      catch (NumberFormatException e) {
+      }
 
       InetAddress address;
       if (ip.equals("0.0.0.0")) {

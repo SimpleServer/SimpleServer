@@ -30,16 +30,19 @@ public class LocalToggle extends AbstractCommand implements PlayerCommand {
 
   public void execute(Player player, String message) {
     String[] arguments = extractArguments(message);
-    if(arguments.length >= 1) {
-      if(arguments[0].equals("on")) {
+    if (arguments.length >= 1) {
+      if (arguments[0].equals("on")) {
         player.setLocalChat(true);
-      } else if(arguments[0].equals("off")) {
+      }
+      else if (arguments[0].equals("off")) {
         player.setLocalChat(false);
-      } else {
+      }
+      else {
         player.addMessage("\u00a7cOnly modes \"on\" and \"off\" allowed!");
         return;
       }
-    } else {
+    }
+    else {
       player.setLocalChat(!player.localChat());
     }
     String mode = (player.localChat()) ? "enabled" : "disabled";

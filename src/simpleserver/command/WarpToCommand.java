@@ -29,10 +29,16 @@ public class WarpToCommand extends OnlinePlayerArgCommand {
 
   @Override
   protected void executeWithTarget(Player player, String message, Player target) {
-    player.teleportTo(target);
+    if (player.getDimension() == target.getDimension()) {
+      player.teleportTo(target);
 
-    player.getServer().adminLog("Admin " + player.getName() + " teleported:\t "
-                                    + player.getName() + "\tto\t"
-                                    + target.getName());
+      player.getServer().adminLog("Admin " + player.getName() + " teleported:\t "
+                                      + player.getName() + "\tto\t"
+                                      + target.getName());
+    }
+    else {
+      player.addMessage("\u00a7cYou and " + target.getName() + " are in different dimensions.");
+      player.addMessage("\u00a7cNo teleport possible!");
+    }
   }
 }

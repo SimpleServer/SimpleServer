@@ -34,18 +34,20 @@ public class UnlockCommand extends AbstractCommand implements PlayerCommand {
 
   public void execute(Player player, String message) {
     String name = extractArgument(message);
-    if(name == null) {
+    if (name == null) {
       player.setAttemptedAction(Action.Unlock);
       player.addMessage("\u00a77The next chest you open will get unlocked.");
-    } else {
+    }
+    else {
       List<Chest> chests = player.getServer().chests.getChestsByName(name);
-      for(Chest chest : chests) {
+      for (Chest chest : chests) {
         chest.unlock();
       }
       player.getServer().chests.save();
-      if(chests.size() > 1) {
+      if (chests.size() > 1) {
         player.addMessage("\u00a77" + chests.size() + " chests have been unlocked!");
-      } else {
+      }
+      else {
         player.addMessage("\u00a77The chest has been unlocked!");
       }
     }

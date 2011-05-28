@@ -20,8 +20,6 @@
  */
 package simpleserver.options;
 
-import java.util.Properties;
-
 import simpleserver.config.SortedProperties;
 
 public class MinecraftOptions extends AbstractOptions {
@@ -49,6 +47,8 @@ public class MinecraftOptions extends AbstractOptions {
     options.setProperty("spawn-monsters", simpleServerOptions.get("spawnMonsters"));
     options.setProperty("allow-flight", simpleServerOptions.get("allowFlight"));
     options.setProperty("pvp", simpleServerOptions.get("pvp"));
+    options.setProperty("view-distance", simpleServerOptions.get("viewDistance"));
+    options.setProperty("allow-nether", simpleServerOptions.get("allowNether"));
 
     super.save();
   }

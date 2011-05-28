@@ -106,8 +106,9 @@ public class AbstractLog {
       finally {
         try {
           stream.close();
-          if (logEmpty)
+          if (logEmpty) {
             filename.delete();
+          }
         }
         catch (IOException e) {
         }

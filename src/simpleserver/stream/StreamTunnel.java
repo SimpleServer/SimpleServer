@@ -40,6 +40,7 @@ import simpleserver.Coordinate;
 import simpleserver.Group;
 import simpleserver.Player;
 import simpleserver.Server;
+import simpleserver.Coordinate.Dimension;
 import simpleserver.command.LocalSayCommand;
 import simpleserver.command.PlayerListCommand;
 import simpleserver.config.ChestList.Chest;
@@ -143,6 +144,8 @@ public class StreamTunnel {
     int x;
     byte y;
     int z;
+    byte dimension;
+    Coordinate coordinate;
     switch (packetId) {
       case 0x00: // Keep Alive
         write(packetId);
@@ -164,7 +167,11 @@ public class StreamTunnel {
           write(player.getName());
         }
         write(in.readLong());
-        write(in.readByte());
+        dimension = in.readByte();
+        if (isServerTunnel) {
+          player.setDimension(Dimension.get(dimension));
+        }
+        write(dimension);
         break;
       case 0x02: // Handshake
         String name = readUTF16();
@@ -226,12 +233,10 @@ public class StreamTunnel {
       case 0x03: // Chat Message
         String message = readUTF16();
         if (isServerTunnel && server.options.getBoolean("useMsgFormats")) {
-          
+
           Matcher colorMatcher = COLOR_PATTERN.matcher(message);
           String cleanMessage = colorMatcher.replaceAll("");
-          
-          
-          
+
           Matcher messageMatcher = MESSAGE_PATTERN.matcher(cleanMessage);
           if (messageMatcher.find()) {
             Player friend = server.findPlayerExact(messageMatcher.group(1));
@@ -257,22 +262,26 @@ public class StreamTunnel {
               catch (IllegalFormatException e) {
                 System.out.println("[SimpleServer] There is an error in your msgFormat/msgTitleFormat settings!");
               }
-              
+
             }
-          } else if(cleanMessage.matches(CONSOLE_CHAT_PATTERN) && !server.options.getBoolean("chatConsoleToOps")) {
+          }
+          else if (cleanMessage.matches(CONSOLE_CHAT_PATTERN) && !server.options.getBoolean("chatConsoleToOps")) {
             break;
           }
-          
-          if (server.options.getBoolean("msgWrap"))
+
+          if (server.options.getBoolean("msgWrap")) {
             sendMessage(message);
+          }
           else {
-            if(message.length() > MAXIMUM_MESSAGE_SIZE)
+            if (message.length() > MAXIMUM_MESSAGE_SIZE) {
               message = message.substring(0, MAXIMUM_MESSAGE_SIZE);
+            }
             write(packetId);
             write(message);
           }
-        } else if (!isServerTunnel) {
-          
+        }
+        else if (!isServerTunnel) {
+
           if (player.isMuted() && !message.startsWith("/")
               && !message.startsWith("!")) {
             player.addMessage("\u00a7cYou are muted! You may not send messages to all players.");
@@ -282,13 +291,13 @@ public class StreamTunnel {
           if (player.parseCommand(message)) {
             break;
           }
-          
-          if(player.localChat() && !message.startsWith("/") && !message.startsWith("!")) {
+
+          if (player.localChat() && !message.startsWith("/") && !message.startsWith("!")) {
             player.execute(LocalSayCommand.class, message);
             break;
           }
-          
-          if(message.length() > MAXIMUM_MESSAGE_SIZE) {
+
+          if (message.length() > MAXIMUM_MESSAGE_SIZE) {
             message = message.substring(0, MAXIMUM_MESSAGE_SIZE);
           }
 
@@ -335,21 +344,21 @@ public class StreamTunnel {
         break;
       case 0x09: // Respawn
         write(packetId);
-        byte world = in.readByte();
-        write(world);
-        player.setWorld(world);
+        dimension = in.readByte();
+        write(dimension);
+        player.setDimension(Dimension.get(dimension));
         break;
       case 0x0a: // Player
         write(packetId);
         copyNBytes(1);
         if (!inGame && !isServerTunnel) {
           player.sendMOTD();
-            
-          if(server.options.getBoolean("showListOnConnect")){
-            //display player list if enabled in config
+
+          if (server.options.getBoolean("showListOnConnect")) {
+            // display player list if enabled in config
             player.execute(PlayerListCommand.class);
           }
-          
+
           inGame = true;
         }
         break;
@@ -374,20 +383,23 @@ public class StreamTunnel {
           z = in.readInt();
           byte face = in.readByte();
 
-          boolean[] perms = server.permissions.getPlayerBlockPermissions(player, new Coordinate(x,y,z), 0);
-          if (!perms[2] && status==0) {
+          coordinate = new Coordinate(x, y, z, player);
+
+          boolean[] perms = server.permissions.getPlayerBlockPermissions(player, coordinate, 0);
+          if (!perms[2] && status == 0) {
             player.addMessage("\u00a7c " + server.l.get("USE_FORBIDDEN"));
             break;
           }
-          if (!perms[1] && status==2) {
+          if (!perms[1] && status == 2) {
             player.addMessage("\u00a7c " + server.l.get("DESTROY_FORBIDDEN"));
             break;
           }
 
-          if (!server.chests.isLocked(x, y, z) || player.isAdmin()) {
-            if (server.chests.isLocked(x, y, z)
-                && status == BLOCK_DESTROYED_STATUS) {
-              server.chests.releaseLock(x, y, z);
+          boolean locked = server.chests.isLocked(coordinate);
+
+          if (!locked || player.isAdmin()) {
+            if (locked && status == BLOCK_DESTROYED_STATUS) {
+              server.chests.releaseLock(coordinate);
             }
 
             write(packetId);
@@ -406,8 +418,8 @@ public class StreamTunnel {
               write(z);
               write(face);
             }
-             
-            if(status == BLOCK_DESTROYED_STATUS) {
+
+            if (status == BLOCK_DESTROYED_STATUS) {
               player.destroyedBlock();
             }
           }
@@ -421,6 +433,7 @@ public class StreamTunnel {
         x = in.readInt();
         y = in.readByte();
         z = in.readInt();
+        coordinate = new Coordinate(x, y, z, player);
         final byte direction = in.readByte();
         final short dropItem = in.readShort();
         byte itemCount = 0;
@@ -429,24 +442,27 @@ public class StreamTunnel {
           itemCount = in.readByte();
           uses = in.readShort();
         }
-        
+
         boolean writePacket = true;
         boolean drop = false;
 
-        boolean[] perms = server.permissions.getPlayerBlockPermissions(
-                player, new Coordinate(x,y,z), dropItem);
-        
-        if (isServerTunnel || server.chests.isChest(x, y, z)) {
+        boolean[] perms = server.permissions.getPlayerBlockPermissions(player, coordinate, dropItem);
+
+        if (isServerTunnel || server.chests.isChest(coordinate)) {
           // continue
-        } else if ((dropItem!=-1 && !perms[0]) || (dropItem==-1 && !perms[2])) {
-          if (dropItem == -1)
+        }
+        else if ((dropItem != -1 && !perms[0]) || (dropItem == -1 && !perms[2])) {
+          if (dropItem == -1) {
             player.addMessage("\u00a7c " + server.l.get("USE_FORBIDDEN"));
-          else
+          }
+          else {
             player.addMessage("\u00a7c " + server.l.get("PLACE_FORBIDDEN"));
+          }
 
           writePacket = false;
           drop = true;
-        } else if (dropItem == 54) {
+        }
+        else if (dropItem == 54) {
           int xPosition = x;
           byte yPosition = y;
           int zPosition = z;
@@ -471,14 +487,17 @@ public class StreamTunnel {
               break;
           }
 
-          Chest adjacentChest = server.chests.adjacentChest(xPosition, yPosition, zPosition);
-          
+          Coordinate targetBlock = new Coordinate(xPosition, yPosition, zPosition, player);
+
+          Chest adjacentChest = server.chests.adjacentChest(targetBlock);
+
           if (adjacentChest != null && !adjacentChest.isOpen() && !adjacentChest.ownedBy(player)) {
             player.addMessage("\u00a7c " + server.l.get("ADJ_CHEST_LOCKED"));
             writePacket = false;
             drop = true;
-          } else {
-            player.placingChest(new Coordinate(xPosition, yPosition, zPosition));
+          }
+          else {
+            player.placingChest(targetBlock);
           }
         }
 
@@ -493,16 +512,16 @@ public class StreamTunnel {
           if (dropItem != -1) {
             write(itemCount);
             write(uses);
-            
-            if(dropItem <= 94 && direction >= 0) {
+
+            if (dropItem <= 94 && direction >= 0) {
               player.placedBlock();
             }
           }
-          
-          player.openingChest(x,y,z);
-          
+
+          player.openingChest(coordinate);
+
         }
-        else if(drop) {
+        else if (drop) {
           // Drop the item in hand. This keeps the client state in-sync with the
           // server. This generally prevents empty-hand clicks by the client
           // from placing blocks the server thinks the client has in hand.
@@ -514,8 +533,6 @@ public class StreamTunnel {
           write(direction);
         }
 
-     
-        
         break;
       case 0x10: // Holding Change
         write(packetId);
@@ -557,7 +574,7 @@ public class StreamTunnel {
         write(in.readInt());
         int flag = in.readInt();
         write(flag);
-        if(flag > 0) {
+        if (flag > 0) {
           write(in.readShort());
           write(in.readShort());
           write(in.readShort());
@@ -655,18 +672,19 @@ public class StreamTunnel {
         z = in.readInt();
         byte blockType = in.readByte();
         byte metadata = in.readByte();
-        
-        if(blockType == 54 && player.placedChest(x,y,z)) {
-          lockChest(x,y,z);
+        coordinate = new Coordinate(x, y, z, player);
+
+        if (blockType == 54 && player.placedChest(coordinate)) {
+          lockChest(coordinate);
           player.placingChest(null);
         }
-        
+
         write(x);
         write(y);
         write(z);
         write(blockType);
         write(metadata);
-        
+
         break;
       case 0x36: // ???
         write(packetId);
@@ -680,6 +698,7 @@ public class StreamTunnel {
         copyNBytes(recordCount * 3);
         break;
       case 0x3d: // Unknown
+        write(packetId);
         write(in.readInt());
         write(in.readInt());
         write(in.readByte());
@@ -698,26 +717,29 @@ public class StreamTunnel {
         byte id = in.readByte();
         byte invtype = in.readByte();
         String typeString = in.readUTF();
-        if(invtype == 0) {
-          if(server.chests.canOpen(player, player.openedChest()) || player.isAdmin()) {
-            if(server.chests.isLocked(player.openedChest())) {
-              if(player.isAttemptingUnlock()) {
+        if (invtype == 0) {
+          if (server.chests.canOpen(player, player.openedChest()) || player.isAdmin()) {
+            if (server.chests.isLocked(player.openedChest())) {
+              if (player.isAttemptingUnlock()) {
                 server.chests.unlock(player.openedChest());
                 player.setAttemptedAction(null);
                 player.addMessage("\u00a77 " + server.l.get("CHEST_UNLOCKED"));
                 typeString = "Open Chest";
-              } else {
+              }
+              else {
                 typeString = server.chests.chestName(player.openedChest());
               }
-            } else {
+            }
+            else {
               typeString = "Open Chest";
-              if(player.isAttemptLock()) {
+              if (player.isAttemptLock()) {
                 lockChest(player.openedChest());
                 typeString = player.nextChestName();
               }
             }
-            
-          } else {
+
+          }
+          else {
             player.addMessage("\u00a7c " + server.l.get("CHEST_LOCKED"));
             in.readByte();
             break;
@@ -803,7 +825,7 @@ public class StreamTunnel {
         write(readUTF16());
         write(readUTF16());
         break;
-      case (byte) 0x83:  // Map data
+      case (byte) 0x83: // Map data
         write(packetId);
         write(in.readShort());
         write(in.readShort());
@@ -811,7 +833,7 @@ public class StreamTunnel {
         write(length);
         copyNBytes(0xff & length);
         break;
-      case (byte)0xc8:  // Statistic
+      case (byte) 0xc8: // Statistic
         write(packetId);
         copyNBytes(5);
         break;
@@ -840,39 +862,36 @@ public class StreamTunnel {
     packetFinished();
     lastPacket = packetId;
   }
-  
+
   private String readUTF16() throws IOException {
     short length = in.readShort();
-    byte[] bytes = new byte[length*2+2];
-    for(short i = 0; i < length*2; i++) {
-      bytes[i+2] = in.readByte();
+    byte[] bytes = new byte[length * 2 + 2];
+    for (short i = 0; i < length * 2; i++) {
+      bytes[i + 2] = in.readByte();
     }
-    bytes[0] = (byte)0xfffffffe;
-    bytes[1] = (byte)0xffffffff;
+    bytes[0] = (byte) 0xfffffffe;
+    bytes[1] = (byte) 0xffffffff;
     return new String(bytes, "UTF-16");
   }
 
-
-  private void lockChest(Coordinate coords) {
-    lockChest(coords.x, coords.y, coords.z);
-  }
-  
-  private void lockChest(int x, byte y, int z) {
-    Chest adjacentChest = server.chests.adjacentChest(x, y, z);
-    if(player.isAttemptLock() || adjacentChest != null && !adjacentChest.isOpen()) {
-      if(adjacentChest != null && !adjacentChest.isOpen()) {
-          server.chests.giveLock(adjacentChest.owner(), x, y, z, false, adjacentChest.name());
-      } else {
-        if(adjacentChest != null) {
+  private void lockChest(Coordinate coordinate) {
+    Chest adjacentChest = server.chests.adjacentChest(coordinate);
+    if (player.isAttemptLock() || adjacentChest != null && !adjacentChest.isOpen()) {
+      if (adjacentChest != null && !adjacentChest.isOpen()) {
+        server.chests.giveLock(adjacentChest.owner(), coordinate, false, adjacentChest.name());
+      }
+      else {
+        if (adjacentChest != null) {
           adjacentChest.lock(player);
           adjacentChest.rename(player.nextChestName());
         }
-        server.chests.giveLock(player, x, y, z, false, player.nextChestName());
+        server.chests.giveLock(player, coordinate, false, player.nextChestName());
       }
       player.setAttemptedAction(null);
       player.addMessage("\u00a77This chest is now locked.");
-    } else if(!server.chests.isChest(x, y, z)){
-      server.chests.addOpenChest(x, y, z);
+    }
+    else if (!server.chests.isChest(coordinate)) {
+      server.chests.addOpenChest(coordinate);
     }
   }
 
@@ -962,18 +981,18 @@ public class StreamTunnel {
 
   private void write(String s) throws IOException {
     byte[] bytes = s.getBytes("UTF-16");
-    if(s.length() == 0) {
-      write((byte)0x00);
-      write((byte)0x00);
+    if (s.length() == 0) {
+      write((byte) 0x00);
+      write((byte) 0x00);
       return;
     }
-    bytes[0] = (byte)((s.length()>>8)&0xFF);
-    bytes[1] = (byte) ((s.length()&0xFF));
-    for(int i = 0; i < bytes.length; i++) {
+    bytes[0] = (byte) ((s.length() >> 8) & 0xFF);
+    bytes[1] = (byte) ((s.length() & 0xFF));
+    for (int i = 0; i < bytes.length; i++) {
       write(bytes[i]);
     }
   }
-  
+
   private void write8(String s) throws IOException {
     out.writeUTF(s);
   }
@@ -1006,25 +1025,44 @@ public class StreamTunnel {
     packetFinished();
   }
 
+  private String getLastColorCode(String message) {
+    String colorCode = "";
+    int lastIndex = message.lastIndexOf('\u00a7');
+    if (lastIndex != -1 && lastIndex + 1 < message.length()) {
+      colorCode = message.substring(lastIndex, lastIndex + 2);
+    }
+
+    return colorCode;
+  }
+
   private void sendMessage(String message) throws IOException {
-    if(message.length() > MESSAGE_SIZE) {
-      int end = MESSAGE_SIZE-1;
-      while(end > 0 && message.charAt(end) != ' ') {
+    if (message.length() > MESSAGE_SIZE) {
+      int end = MESSAGE_SIZE - 1;
+      while (end > 0 && message.charAt(end) != ' ') {
         end--;
       }
-      if(end == 0)
+      if (end == 0) {
         end = MESSAGE_SIZE;
-      else
+      }
+      else {
         end++;
-      sendMessagePacket(message.substring(0,end));
-      sendMessage(message.substring(end));
-    } else {
+      }
+
+      if (message.charAt(end) == '\u00a7') {
+        end--;
+      }
+
+      String firstPart = message.substring(0, end);
+      sendMessagePacket(firstPart);
+      sendMessage(getLastColorCode(firstPart) + message.substring(end));
+    }
+    else {
       sendMessagePacket(message);
     }
   }
-  
+
   private void sendMessagePacket(String message) throws IOException {
-    if(message.length() > MESSAGE_SIZE) {
+    if (message.length() > MESSAGE_SIZE) {
       System.out.println("[SimpleServer] Invalid message size: " + message);
       return;
     }
@@ -1032,7 +1070,6 @@ public class StreamTunnel {
     write(message);
     packetFinished();
   }
-  
 
   private void packetFinished() throws IOException {
     if (EXPENSIVE_DEBUG_LOGGING) {

@@ -20,13 +20,11 @@
  */
 package simpleserver.telnet;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 
@@ -41,7 +39,7 @@ public class TelnetHandler implements Runnable {
   private Server server;
   private boolean authorized = false;
 
-  static final int IDLE_TIME = 60*1000;
+  static final int IDLE_TIME = 60 * 1000;
 
   public TelnetHandler(Socket s, TelnetTCP r, Server server) throws IOException {
     in = new BufferedReader(new InputStreamReader(s.getInputStream()));
@@ -71,9 +69,9 @@ public class TelnetHandler implements Runnable {
         line = in.readLine();
         parent.lastRead = System.currentTimeMillis();
         if (line == null || line.equals("exit")) {
-            output("Bye!\n");
-            parent.close();
-            break;
+          output("Bye!\n");
+          parent.close();
+          break;
         }
 
         parseLine(line);
@@ -82,7 +80,7 @@ public class TelnetHandler implements Runnable {
     catch (InterruptedException e1) {
     }
     catch (SocketTimeoutException e) {
-      
+
     }
     catch (Exception e) {
       e.printStackTrace();
@@ -101,25 +99,25 @@ public class TelnetHandler implements Runnable {
 
   private void output(String text) {
     try {
-      out.write(text,0,text.length());
+      out.write(text, 0, text.length());
       out.flush();
-    } catch(IOException e) {
+    }
+    catch (IOException e) {
     }
   }
 
   private void parseLine(String command) throws IOException, InterruptedException {
     String[] tokens = command.split("\\s");
 
-    if (tokens.length == 0)
-        return;
-
-
+    if (tokens.length == 0) {
+      return;
+    }
 
     if (tokens[0].equals("help")) {
       output("Commands:\nhelp\nexit\nshow-console\nany valid server commands (no checking!)\n");
       return;
     }
-    
+
     if (!authorized) {
       output("Error: You are not authenticated!\n");
       return;

@@ -29,6 +29,7 @@ import java.util.concurrent.ConcurrentMap;
 
 import simpleserver.Coordinate;
 import simpleserver.Player;
+import simpleserver.Coordinate.Dimension;
 
 public class ChestList extends AsciiConfig {
   private final ConcurrentMap<Coordinate, Chest> locations;
@@ -39,9 +40,7 @@ public class ChestList extends AsciiConfig {
     locations = new ConcurrentHashMap<Coordinate, Chest>();
   }
 
-  public boolean giveLock(String player, int x, byte y, int z,
-                        boolean isGroupLock, String name) {
-    Coordinate coordinate = new Coordinate(x, y, z);
+  public boolean giveLock(String player, Coordinate coordinate, boolean isGroupLock, String name) {
     if (locations.containsKey(coordinate)) {
       locations.remove(coordinate);
     }
@@ -53,91 +52,84 @@ public class ChestList extends AsciiConfig {
     return true;
   }
 
-  public synchronized boolean giveLock(Player player, int x, byte y, int z,
-                                       boolean isGroupLock, String name) {
-    return giveLock(player.getName(), x, y, z, isGroupLock, name);
-  }
-  
-  public void addOpenChest(int x, byte y, int z) {
-    giveLock("-", x, y, z, false, "");
+  public synchronized boolean giveLock(Player player, Coordinate coordinate, boolean isGroupLock, String name) {
+    return giveLock(player.getName(), coordinate, isGroupLock, name);
   }
 
-  public boolean isChest(int x, byte y, int z) {
-    return locations.containsKey(new Coordinate(x, y, z));
-  }
-  
-  public boolean canOpen(Player player, Coordinate coords) {
-    return coords == null || canOpen(player, coords.x, coords.y, coords.z);
+  public void addOpenChest(Coordinate coord) {
+    giveLock("-", coord, false, "-");
   }
 
-  private Chest adjacentChest(Coordinate coords) {
-    return adjacentChest(coords.x, coords.y, coords.z);
+  public boolean isChest(Coordinate coordinate) {
+    return locations.containsKey(coordinate);
   }
-  
-  public Chest adjacentChest(int x, byte y, int z) {
-    Chest chest = chestAt(new Coordinate(x + 1, y, z));
-    if(chest == null)
-      chest = chestAt(new Coordinate(x - 1, y, z));
-    if(chest == null)
-      chest = chestAt(new Coordinate(x, y, z + 1));
-    if(chest == null)
-      chest = chestAt(new Coordinate(x, y, z - 1));
+
+  public Chest adjacentChest(Coordinate coordinate) {
+    Chest chest = chestAt(coordinate);
+    if (chest == null) {
+      chest = chestAt(coordinate.add(1, 0, 0));
+    }
+    if (chest == null) {
+      chest = chestAt(coordinate.add(-1, 0, 0));
+    }
+    if (chest == null) {
+      chest = chestAt(coordinate.add(0, 0, 1));
+    }
+    if (chest == null) {
+      chest = chestAt(coordinate.add(0, 0, -1));
+    }
     return chest;
   }
-  
+
   private Chest chestAt(Coordinate coord) {
-    if(locations.containsKey(coord)) {
+    if (locations.containsKey(coord)) {
       return locations.get(coord);
     }
     return null;
   }
 
-  public boolean canOpen(Player player, int x, byte y, int z) {
-    Coordinate coordinate = new Coordinate(x, y, z);
+  public boolean canOpen(Player player, Coordinate coordinate) {
     Chest chest = chestAt(coordinate);
     return (chest == null) || (chest.ownedBy(player) || chest.isOpen());
   }
 
-  public boolean isLocked(int x, byte y, int z) {
-    Chest chest = locations.get(new Coordinate(x, y, z));
+  public boolean isLocked(Coordinate coordinate) {
+    Chest chest = locations.get(coordinate);
     return chest != null && !chest.isOpen();
   }
 
-  public boolean isLocked(Coordinate coords) {
-    return !(coords == null) && isLocked(coords.x, coords.y, coords.z);
-  }
-
-  public synchronized void releaseLock(int x, byte y, int z) {
-    Chest chest = chestAt(new Coordinate(x,y,z));
-    if(chest != null) {
+  public synchronized void releaseLock(Coordinate coordinate) {
+    Chest chest = chestAt(coordinate);
+    if (chest != null) {
       chest.unlock();
       save();
     }
   }
-  
+
   public Map<String, Integer> chestList(Player player) {
     Map<String, Integer> list = new HashMap<String, Integer>();
-    for(Chest chest : locations.values()) {
-      if(chest.ownedBy(player)) {
-        if(list.containsKey(chest.name)) {
-          list.put(chest.name, list.get(chest.name)+1);
-        } else {
+    for (Chest chest : locations.values()) {
+      if (chest.ownedBy(player)) {
+        if (list.containsKey(chest.name)) {
+          list.put(chest.name, list.get(chest.name) + 1);
+        }
+        else {
           list.put(chest.name, 1);
         }
       }
     }
     return list;
   }
-  
+
   public String chestName(Coordinate coords) {
     Chest chest = chestAt(coords);
     return (chest == null) ? "Open Chest" : chest.name();
   }
-  
+
   public List<Chest> getChestsByName(String name) {
     List<Chest> chests = new ArrayList<Chest>();
-    for(Chest chest : locations.values()) {
-      if(chest.name().equals(name)) {
+    for (Chest chest : locations.values()) {
+      if (chest.name().equals(name)) {
         chests.add(chest);
       }
     }
@@ -146,16 +138,15 @@ public class ChestList extends AsciiConfig {
 
   public void unlock(Coordinate coords) {
     Chest chest = chestAt(coords);
-    if(chest != null) {
-       chest.unlock();
-       chest = this.adjacentChest(coords);
-       if(chest != null) {
-         chest.unlock();
-       }
-       save();
+    if (chest != null) {
+      chest.unlock();
+      chest = adjacentChest(coords);
+      if (chest != null) {
+        chest.unlock();
+      }
+      save();
     }
   }
-  
 
   @Override
   public void load() {
@@ -176,6 +167,7 @@ public class ChestList extends AsciiConfig {
       int x;
       byte y;
       int z;
+      Dimension dimension = Dimension.EARTH;
       String name;
       try {
         x = Integer.parseInt(tokens[2]);
@@ -186,14 +178,20 @@ public class ChestList extends AsciiConfig {
         System.out.println("Skipping malformed chest metadata: " + line);
         return;
       }
-      
-      if(tokens.length >= 6) {
-         name = tokens[5];
-      } else {
-        name = (tokens[0].equals("-")) ? "" : "Locked Chest";
+
+      if (tokens.length == 6) {
+        name = tokens[5];
       }
-      
-      giveLock(tokens[0], x, y, z, Boolean.parseBoolean(tokens[1]), name);
+      else if (tokens.length >= 7) {
+        dimension = Dimension.get(tokens[5]);
+        name = tokens[6];
+      }
+      else {
+        name = (tokens[0].equals("-")) ? "-" : "Locked Chest";
+      }
+
+      Coordinate coordinate = new Coordinate(x, y, z, dimension);
+      locations.put(coordinate, new Chest(tokens[0], coordinate, Boolean.parseBoolean(tokens[1]), name));
     }
   }
 
@@ -205,18 +203,19 @@ public class ChestList extends AsciiConfig {
       output.append(",");
       output.append(chest.isGroup);
       output.append(",");
-      output.append(chest.coordinate.x);
+      output.append(chest.coordinate.x());
       output.append(",");
-      output.append(chest.coordinate.y);
+      output.append(chest.coordinate.y());
       output.append(",");
-      output.append(chest.coordinate.z);
+      output.append(chest.coordinate.z());
+      output.append(",");
+      output.append(chest.coordinate.dimension());
       output.append(",");
       output.append(chest.name());
       output.append("\n");
     }
     return output.toString();
   }
-
 
   public static final class Chest {
     private String owner;
@@ -225,10 +224,10 @@ public class ChestList extends AsciiConfig {
     private String name;
 
     private Chest(String player, Coordinate coordinate, boolean isGroup, String name) {
-      this.owner = player;
+      owner = player;
       this.coordinate = coordinate;
       this.isGroup = isGroup;
-      this.rename(name);
+      rename(name);
     }
 
     public String name() {
@@ -237,7 +236,7 @@ public class ChestList extends AsciiConfig {
 
     public void unlock() {
       owner = "-";
-      
+
     }
 
     public boolean isOpen() {
@@ -249,7 +248,7 @@ public class ChestList extends AsciiConfig {
     }
 
     public void lock(Player player) {
-      this.owner = player.getName();
+      owner = player.getName();
     }
 
     public boolean ownedBy(Player player) {
@@ -260,6 +259,5 @@ public class ChestList extends AsciiConfig {
       this.name = name;
     }
   }
-
 
 }

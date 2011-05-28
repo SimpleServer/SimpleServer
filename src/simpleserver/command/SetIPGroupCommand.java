@@ -30,19 +30,19 @@ public class SetIPGroupCommand extends SetGroupCommand {
     super("setipgroup IP|Player", "Set the group ID of an IP address");
   }
 
-
   @Override
   protected void setGroup(Player player, int group, String target) {
     Server server = player.getServer();
     Player targetPlayer = player.getServer().findPlayer(target);
     if (targetPlayer != null) {
       target = targetPlayer.getIPAddress();
-    } else if(!Pattern.matches("^(\\d{1,3}\\.){3}\\d{1,3}$", target)) {
+    }
+    else if (!Pattern.matches("^(\\d{1,3}\\.){3}\\d{1,3}$", target)) {
       player.addMessage("\u00a7cYou must specify a user or a valid IP!");
-      return;   
+      return;
     }
     server.permissions.setIPGroup(target, group);
-  
+
     player.addMessage("\u00a77Group of " + target + " was set to "
         + group + "!");
     server.adminLog("User " + player.getName() + " set IP's group:\t "
