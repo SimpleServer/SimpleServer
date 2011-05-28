@@ -20,8 +20,6 @@
  */
 package simpleserver;
 
-import simpleserver.Player.Dimension;
-
 public class Coordinate {
   private int x;
   private byte y;
@@ -80,7 +78,7 @@ public class Coordinate {
   }
 
   public boolean equals(Coordinate coordinate) {
-    return (coordinate.x == x) && (coordinate.y == y) && (coordinate.z == z);
+    return (coordinate.x == x) && (coordinate.y == y) && (coordinate.z == z) && coordinate.dimension == dimension;
   }
 
   @Override
@@ -91,5 +89,46 @@ public class Coordinate {
   @Override
   public int hashCode() {
     return hashCode;
+  }
+  
+  public enum Dimension {
+    EARTH ((byte)0),
+    NETHER ((byte)-1),
+    LIMBO;
+    
+    private byte index;
+
+    Dimension(byte index) {
+      this.index = index;
+    }
+    
+    Dimension() {
+    }
+    
+    public String toString() {
+      String name = super.toString();
+      return name.substring(0, 1) + name.substring(1).toLowerCase();
+    }
+    
+    private boolean isNamed(String name) {
+      return super.toString().equals(name.toUpperCase());
+    }
+    
+    public static Dimension get(byte index) {
+      for(Dimension dim : Dimension.values()) {
+        if(dim.index == index)
+          return dim;
+      }
+      return Dimension.LIMBO;
+    }
+    
+    public static Dimension get(String name) {
+      for(Dimension dim : Dimension.values()) {
+        if(dim.isNamed(name))
+          return dim;
+      }
+      return Dimension.LIMBO;
+    }
+
   }
 }

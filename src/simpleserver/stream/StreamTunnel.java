@@ -39,7 +39,7 @@ import simpleserver.Coordinate;
 import simpleserver.Group;
 import simpleserver.Player;
 import simpleserver.Server;
-import simpleserver.Player.Dimension;
+import simpleserver.Coordinate.Dimension;
 import simpleserver.command.LocalSayCommand;
 import simpleserver.command.PlayerListCommand;
 import simpleserver.config.ChestList.Chest;

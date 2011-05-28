@@ -28,6 +28,7 @@ import java.net.UnknownHostException;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import simpleserver.Coordinate.Dimension;
 import simpleserver.command.ExternalCommand;
 import simpleserver.command.PlayerCommand;
 import simpleserver.stream.StreamTunnel;
@@ -636,34 +637,6 @@ public class Player {
   
   public Dimension getDimension(){
     return this.dimension;
-  }
-  
-  public enum Dimension {
-    EARTH ((byte)0),
-    NETHER ((byte)-1),
-    LIMBO;
-    
-    private byte index;
-
-    Dimension(byte index) {
-      this.index = index;
-    }
-    
-    Dimension() {
-    }
-    
-    public String toString() {
-      String name = super.toString();
-      return name.substring(0, 1) + name.substring(1).toLowerCase();
-    }
-    
-    public static Dimension get(byte index) {
-      for(Dimension dim : Dimension.values()) {
-        if(dim.index == index)
-          return dim;
-      }
-      return Dimension.LIMBO;
-    }
   }
   
 }
