@@ -1,4 +1,4 @@
-#Sat May 28 22:03:35 CEST 2011
+#Sat May 28 22:34:47 CEST 2011
 cleanup.add_default_serial_version_id=true
 cleanup.add_generated_serial_version_id=false
 cleanup.add_missing_annotations=true
@@ -66,7 +66,7 @@ sp_cleanup.add_missing_methods=false
 sp_cleanup.add_missing_nls_tags=false
 sp_cleanup.add_missing_override_annotations=true
 sp_cleanup.add_serial_version_id=false
-sp_cleanup.always_use_blocks=false
+sp_cleanup.always_use_blocks=true
 sp_cleanup.always_use_parentheses_in_expressions=false
 sp_cleanup.always_use_this_for_non_static_field_access=false
 sp_cleanup.always_use_this_for_non_static_method_access=false
@@ -103,7 +103,7 @@ sp_cleanup.remove_unused_private_types=true
 sp_cleanup.sort_members=false
 sp_cleanup.sort_members_all=false
 sp_cleanup.use_blocks=true
-sp_cleanup.use_blocks_only_for_return_and_throw=true
+sp_cleanup.use_blocks_only_for_return_and_throw=false
 sp_cleanup.use_parentheses_in_expressions=false
 sp_cleanup.use_this_for_non_static_field_access=true
 sp_cleanup.use_this_for_non_static_field_access_only_if_necessary=true

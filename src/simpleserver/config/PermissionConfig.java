@@ -394,8 +394,8 @@ public class PermissionConfig extends AbstractConfig {
     String xpath = getAreanodeForCoordinate(blockCoord);
     String[] areas = getAllAreasFromAreaXPath(xpath);
 
-    for (int i = 0; i < areas.length; i++) {
-      String areapath = "//area[@name='" + areas[i] + "']";
+    for (String area : areas) {
+      String areapath = "//area[@name='" + area + "']";
 
       // get area wide permissions
       for (int n = 0; n < attrs.size(); n++) {
@@ -432,8 +432,8 @@ public class PermissionConfig extends AbstractConfig {
     String xpath = getAreanodeForCoordinate(coordinateFromPlayer(player));
     String[] areas = getAllAreasFromAreaXPath(xpath);
 
-    for (int i = 0; i < areas.length; i++) {
-      String path = "//area[@name='" + areas[i] + "']";
+    for (String area : areas) {
+      String path = "//area[@name='" + area + "']";
       String areaallow = config.getString(path + pathpart + "allow", "");
       String areadisallow = config.getString(path + pathpart + "disallow", "");
 
@@ -565,8 +565,7 @@ public class PermissionConfig extends AbstractConfig {
       List starts = config.getList(nodepath + "/areas/area/@start");
       List ends = config.getList(nodepath + "/areas/area/@end");
 
-      if (areas.size() == 0 || areas.size() != starts.size()
-              || areas.size() != ends.size()) {
+      if (areas.size() == 0 || areas.size() != starts.size() || areas.size() != ends.size()) {
         break;
       }
 
@@ -607,6 +606,10 @@ public class PermissionConfig extends AbstractConfig {
   }
 
   private boolean areaContainsCoordinate(Coordinate start, Coordinate end, Coordinate coord) {
+    if (start.dimension() != coord.dimension() || end.dimension() != coord.dimension()) {
+      return false;
+    }
+
     Coordinate max = new Coordinate(Math.max(start.x(), end.x()),
                                     (byte) Math.max(start.y(), end.y()),
                                     Math.max(start.z(), end.z()));

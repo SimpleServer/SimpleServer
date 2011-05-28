@@ -657,7 +657,7 @@ public class StreamTunnel {
         write(packetId);
         copyNBytes(17);
         break;
-      case 0x64:
+      case 0x64: // Open window
         byte id = in.readByte();
         byte invtype = in.readByte();
         String typeString = in.readUTF();
@@ -932,8 +932,8 @@ public class StreamTunnel {
     }
     bytes[0] = (byte) ((s.length() >> 8) & 0xFF);
     bytes[1] = (byte) ((s.length() & 0xFF));
-    for (int i = 0; i < bytes.length; i++) {
-      write(bytes[i]);
+    for (byte b : bytes) {
+      write(b);
     }
   }
 

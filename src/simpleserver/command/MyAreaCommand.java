@@ -21,6 +21,7 @@
 package simpleserver.command;
 
 import simpleserver.Player;
+import simpleserver.Coordinate.Dimension;
 import simpleserver.config.PermissionConfig;
 
 public class MyAreaCommand extends AbstractCommand implements PlayerCommand {
@@ -39,6 +40,11 @@ public class MyAreaCommand extends AbstractCommand implements PlayerCommand {
 
     if (arguments.length == 0) {
       player.addMessage("\u00a7cError! Command requires argument!");
+      return;
+    }
+
+    if (player.getDimension() != Dimension.EARTH && (arguments[0].equals("start") || arguments[0].equals("end"))) {
+      player.addMessage("\u00a7cYou can only create areas on earth!");
       return;
     }
 
