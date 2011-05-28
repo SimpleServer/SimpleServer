@@ -639,7 +639,7 @@ public class Player {
   }
   
   public enum Dimension {
-    WORLD ((byte)0),
+    EARTH ((byte)0),
     NETHER ((byte)-1),
     LIMBO;
     
