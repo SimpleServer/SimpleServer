@@ -57,7 +57,7 @@ public class ChestList extends AsciiConfig {
   }
   
   public void addOpenChest(Coordinate coord) {
-    giveLock("-", coord, false, "");
+    giveLock("-", coord, false, "-");
   }
 
   public boolean isChest(Coordinate coordinate) {
@@ -179,7 +179,7 @@ public class ChestList extends AsciiConfig {
         dimension = Dimension.get(tokens[5]);
         name = tokens[6];
       } else {
-        name = (tokens[0].equals("-")) ? "" : "Locked Chest";
+        name = (tokens[0].equals("-")) ? "-" : "Locked Chest";
       }
       
       Coordinate coordinate = new Coordinate(x,y,z,dimension);
