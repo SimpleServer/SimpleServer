@@ -144,6 +144,7 @@ public class StreamTunnel {
     byte y;
     int z;
     byte dimension;
+    Coordinate coordinate;
     switch (packetId) {
       case 0x00: // Keep Alive
         write(packetId);
@@ -323,8 +324,10 @@ public class StreamTunnel {
           y = in.readByte();
           z = in.readInt();
           byte face = in.readByte();
+          
+          coordinate = new Coordinate(x,y,z,player);
 
-          boolean[] perms = server.permissions.getPlayerBlockPermissions(player, new Coordinate(x,y,z), 0);
+          boolean[] perms = server.permissions.getPlayerBlockPermissions(player, coordinate, 0);
           if (!perms[2] && status==0) {
             player.addMessage("\u00a7c " + server.l.get("USE_FORBIDDEN"));
             break;
@@ -333,11 +336,12 @@ public class StreamTunnel {
             player.addMessage("\u00a7c " + server.l.get("DESTROY_FORBIDDEN"));
             break;
           }
+          
+          boolean locked = server.chests.isLocked(coordinate);
 
-          if (!server.chests.isLocked(x, y, z) || player.isAdmin()) {
-            if (server.chests.isLocked(x, y, z)
-                && status == BLOCK_DESTROYED_STATUS) {
-              server.chests.releaseLock(x, y, z);
+          if (!locked || player.isAdmin()) {
+            if (locked && status == BLOCK_DESTROYED_STATUS) {
+              server.chests.releaseLock(coordinate);
             }
 
             write(packetId);
@@ -371,6 +375,7 @@ public class StreamTunnel {
         x = in.readInt();
         y = in.readByte();
         z = in.readInt();
+        coordinate = new Coordinate(x,y,z,player);
         final byte direction = in.readByte();
         final short dropItem = in.readShort();
         byte itemCount = 0;
@@ -383,10 +388,9 @@ public class StreamTunnel {
         boolean writePacket = true;
         boolean drop = false;
 
-        boolean[] perms = server.permissions.getPlayerBlockPermissions(
-                player, new Coordinate(x,y,z), dropItem);
+        boolean[] perms = server.permissions.getPlayerBlockPermissions(player, coordinate, dropItem);
         
-        if (isServerTunnel || server.chests.isChest(x, y, z)) {
+        if (isServerTunnel || server.chests.isChest(coordinate)) {
           // continue
         } else if ((dropItem!=-1 && !perms[0]) || (dropItem==-1 && !perms[2])) {
           if (dropItem == -1)
@@ -420,15 +424,17 @@ public class StreamTunnel {
               ++xPosition;
               break;
           }
+          
+          Coordinate targetBlock = new Coordinate(xPosition, yPosition, zPosition, player);
 
-          Chest adjacentChest = server.chests.adjacentChest(xPosition, yPosition, zPosition);
+          Chest adjacentChest = server.chests.adjacentChest(targetBlock);
           
           if (adjacentChest != null && !adjacentChest.isOpen() && !adjacentChest.ownedBy(player)) {
             player.addMessage("\u00a7c " + server.l.get("ADJ_CHEST_LOCKED"));
             writePacket = false;
             drop = true;
           } else {
-            player.placingChest(new Coordinate(xPosition, yPosition, zPosition));
+            player.placingChest(targetBlock);
           }
         }
 
@@ -449,7 +455,7 @@ public class StreamTunnel {
             }
           }
           
-          player.openingChest(x,y,z);
+          player.openingChest(coordinate);
           
         }
         else if(drop) {
@@ -605,9 +611,10 @@ public class StreamTunnel {
         z = in.readInt();
         byte blockType = in.readByte();
         byte metadata = in.readByte();
+        coordinate = new Coordinate(x,y,z,player);
         
-        if(blockType == 54 && player.placedChest(x,y,z)) {
-          lockChest(x,y,z);
+        if(blockType == 54 && player.placedChest(coordinate)) {
+          lockChest(coordinate);
           player.placingChest(null);
         }
         
@@ -804,26 +811,22 @@ public class StreamTunnel {
   }
 
 
-  private void lockChest(Coordinate coords) {
-    lockChest(coords.x(), coords.y(), coords.z());
-  }
-  
-  private void lockChest(int x, byte y, int z) {
-    Chest adjacentChest = server.chests.adjacentChest(x, y, z);
+  private void lockChest(Coordinate coordinate) {
+    Chest adjacentChest = server.chests.adjacentChest(coordinate);
     if(player.isAttemptLock() || adjacentChest != null && !adjacentChest.isOpen()) {
       if(adjacentChest != null && !adjacentChest.isOpen()) {
-          server.chests.giveLock(adjacentChest.owner(), x, y, z, false, adjacentChest.name());
+          server.chests.giveLock(adjacentChest.owner(), coordinate, false, adjacentChest.name());
       } else {
         if(adjacentChest != null) {
           adjacentChest.lock(player);
           adjacentChest.rename(player.nextChestName());
         }
-        server.chests.giveLock(player, x, y, z, false, player.nextChestName());
+        server.chests.giveLock(player, coordinate, false, player.nextChestName());
       }
       player.setAttemptedAction(null);
       player.addMessage("\u00a77This chest is now locked.");
-    } else if(!server.chests.isChest(x, y, z)){
-      server.chests.addOpenChest(x, y, z);
+    } else if(!server.chests.isChest(coordinate)){
+      server.chests.addOpenChest(coordinate);
     }
   }
 

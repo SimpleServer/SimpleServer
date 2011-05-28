@@ -30,6 +30,10 @@ public class Coordinate {
   public Coordinate(int x, byte y, int z) {
     this(x,y,z,Dimension.EARTH);
   }
+  
+  public Coordinate(int x, byte y, int z, Player player) {
+    this(x,y,z,player.getDimension());
+  }
 
   public Coordinate(int x, byte y, int z, Dimension dimension) {
     this.dimension = dimension;
@@ -45,6 +49,10 @@ public class Coordinate {
     hashCode = code;
   }
   
+  public Coordinate(int x, int y, int z, Dimension dimension) {
+    this(x, (byte)y, z, dimension);
+  }
+
   public int x() {
     return x;
   }
@@ -69,12 +77,27 @@ public class Coordinate {
     return new Coordinate(x, y, z, dimension);
   }
   
-  public Coordinate setT(int z) {
+  public Coordinate setY(int y) {
+    return setY((byte)y);
+  }
+  
+  public Coordinate setZ(int z) {
     return new Coordinate(x, y, z, dimension);
   }
   
   public Coordinate setDimension(Dimension dimension) {
     return new Coordinate(x, y, z, dimension);
+  }
+  
+  public Coordinate add(int x, byte y, int z) {
+    return new Coordinate(this.x + x,
+                          this.y + y,
+                          this.z + z,
+                          this.dimension);
+  }
+  
+  public Coordinate add(int x, int y, int z) {
+    return add(x, (byte)y, z);
   }
 
   public boolean equals(Coordinate coordinate) {

@@ -603,12 +603,12 @@ public class Player {
       chestPlaced = coord;
   }
 
-  public boolean placedChest(int x, byte y, int z) {
-    return chestPlaced != null && chestPlaced.equals(new Coordinate(x,y,z));
+  public boolean placedChest(Coordinate coordinate) {
+    return chestPlaced != null && chestPlaced.equals(coordinate);
   }
 
-  public void openingChest(int x, byte y, int z) {
-    chestOpened = new Coordinate(x,y,z);
+  public void openingChest(Coordinate coordinate) {
+    chestOpened = coordinate;
   }
 
   public Coordinate openedChest() {
