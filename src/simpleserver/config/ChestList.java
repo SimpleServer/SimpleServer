@@ -69,9 +69,11 @@ public class ChestList extends AsciiConfig {
     if(chest == null)
       chest = chestAt(coordinate.add(1,0,0));
     if(chest == null)
-      chest = chestAt(coordinate.add(1,0,0));
+      chest = chestAt(coordinate.add(-1,0,0));
     if(chest == null)
-      chest = chestAt(coordinate.add(1,0,0));
+      chest = chestAt(coordinate.add(0,0,1));
+    if(chest == null)
+      chest = chestAt(coordinate.add(0,0,-1));
     return chest;
   }
   
