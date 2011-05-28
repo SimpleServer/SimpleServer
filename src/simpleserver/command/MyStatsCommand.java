@@ -30,8 +30,8 @@ public class MyStatsCommand extends AbstractCommand implements PlayerCommand {
 
   public void execute(Player player, String message) {
     Integer[] stats = player.stats();
-    player.addMessage("\u00a77You're online for " + (int)stats[0]/60 + " hours and " + stats[0]%60 + " minutes.");
-    player.addMessage("\u00a77Over all you've been online for " + (int)stats[1]/60 + " hours and " + stats[1]%60 + " minutes.");
-    player.addMessage("\u00a77You've placed " + stats[2] + " blocks and destroyed " + stats[3]); 
+    player.addMessage("\u00a77You're online for " + (int) stats[0] / 60 + " hours and " + stats[0] % 60 + " minutes.");
+    player.addMessage("\u00a77Over all you've been online for " + (int) stats[1] / 60 + " hours and " + stats[1] % 60 + " minutes.");
+    player.addMessage("\u00a77You've placed " + stats[2] + " blocks and destroyed " + stats[3]);
   }
 }

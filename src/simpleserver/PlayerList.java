@@ -53,8 +53,9 @@ public class PlayerList {
   }
 
   public void updatePlayerGroups() {
-    for (Player p : players.values()) 
+    for (Player p : players.values()) {
       p.updateGroup();
+    }
   }
 
   public Player findPlayer(int entityId) {

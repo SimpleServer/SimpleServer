@@ -35,7 +35,7 @@ public class PlayerListCommand extends AbstractCommand implements PlayerCommand 
     for (Player friend : server.playerList.getArray()) {
       list += friend.getName() + ", ";
     }
-	list = list.substring(0, list.length()-2); //remove trailing ", "
+    list = list.substring(0, list.length() - 2); // remove trailing ", "
     player.addMessage(list);
   }
 }

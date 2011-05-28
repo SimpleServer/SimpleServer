@@ -86,13 +86,14 @@ public class MessageHandler {
     }
     else if (line.contains("[INFO] CONSOLE: Save complete.")) {
       server.setSaving(false);
-      if(server.options.getBoolean("announceBackup")) {
+      if (server.options.getBoolean("announceBackup")) {
         server.runCommand("say", server.l.get("SAVE_COMPLETE"));
       }
     }
     else if (line.contains("[SEVERE] Unexpected exception")) {
       handleError(new Exception(line));
-    } else if(line.matches("^>+$")) {
+    }
+    else if (line.matches("^>+$")) {
       return;
     }
 

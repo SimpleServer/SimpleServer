@@ -63,7 +63,7 @@ public class Player {
   private int blocksDestroyed = 0;
   private Player reply = null;
   private String lastCommand = "";
-  
+
   private Queue<String> messages = new ConcurrentLinkedQueue<String>();
   private Queue<PlayerVisitRequest> visitreqs = new ConcurrentLinkedQueue<PlayerVisitRequest>();
 
@@ -73,10 +73,9 @@ public class Player {
 
   private String nextChestName;
 
-  //temporary coordinate storage for !myarea command
+  // temporary coordinate storage for !myarea command
   public Coordinate areastart;
   public Coordinate areaend;
-
 
   public Player(Socket inc, Server parent) {
     connected = System.currentTimeMillis();
@@ -105,10 +104,12 @@ public class Player {
       intsocket = new Socket(InetAddress.getByName(null),
                              server.options.getInt("internalPort"),
                              localAddress, 0);
-    } catch (Exception e) { 
+    }
+    catch (Exception e) {
       try {
         intsocket = new Socket(InetAddress.getByName(null), server.options.getInt("internalPort"));
-      } catch (Exception E) {
+      }
+      catch (Exception E) {
         e.printStackTrace();
         if (server.options.getBoolean("exitOnFailure")) {
           server.stop();
@@ -116,7 +117,7 @@ public class Player {
         else {
           server.restart();
         }
-  
+
         cleanup();
         return;
       }
@@ -169,7 +170,7 @@ public class Player {
     server.playerList.addPlayer(this);
     return true;
   }
-   
+
   public String getName() {
     return name;
   }
@@ -218,7 +219,7 @@ public class Player {
   }
 
   public String getMessage() {
-	return messages.remove();
+    return messages.remove();
   }
 
   public void addVisitRequest(Player source) {
@@ -226,10 +227,10 @@ public class Player {
   }
 
   public void handleVisitRequests() {
-    while(visitreqs.size() > 0) {
+    while (visitreqs.size() > 0) {
       PlayerVisitRequest req = visitreqs.remove();
-      if (System.currentTimeMillis() < req.timestamp+10000 && server.findPlayerExact(req.source.getName())!=null) {
-	  	  req.source.addMessage("\u00a77Request accepted!");
+      if (System.currentTimeMillis() < req.timestamp + 10000 && server.findPlayerExact(req.source.getName()) != null) {
+        req.source.addMessage("\u00a77Request accepted!");
         req.source.teleportTo(this);
       }
     }
@@ -309,11 +310,11 @@ public class Player {
   public double getZ() {
     return z;
   }
-  
+
   public void setLocalChat(boolean mode) {
     localChat = mode;
   }
-  
+
   public boolean localChat() {
     return localChat;
   }
@@ -323,15 +324,16 @@ public class Player {
       return true;
     }
 
-    //Repeat last command
-    if (message.equals(server.getCommandParser().commandPrefix()+"!"))
+    // Repeat last command
+    if (message.equals(server.getCommandParser().commandPrefix() + "!")) {
       message = lastCommand;
+    }
 
     PlayerCommand command = server.getCommandParser().getPlayerCommand(message);
     if (command == null) {
       return false;
     }
-    
+
     boolean invalidCommand = command.getName() == null;
 
     if (!invalidCommand && !commandAllowed(command.getName())) {
@@ -341,14 +343,12 @@ public class Player {
 
     command.execute(this, message);
     lastCommand = message;
-    
+
     return !((server.permissions.commandShouldPassThroughToMod(command.getName())
             || server.options.getBoolean("forwardAllCommands")
-            || invalidCommand
-            || command instanceof ExternalCommand) 
-            && server.options.contains("alternateJarFile"));
+            || invalidCommand || command instanceof ExternalCommand) && server.options.contains("alternateJarFile"));
   }
-  
+
   public void execute(Class<? extends PlayerCommand> c) {
     execute(c, "");
   }
@@ -360,7 +360,7 @@ public class Player {
   public boolean commandAllowed(String command) {
     return server.permissions.playerCommandAllowed(command, this);
   }
-  
+
   public void teleportTo(Player target) {
     server.runCommand("tp", getName() + " " + target.getName());
   }
@@ -429,35 +429,35 @@ public class Player {
   public void placedBlock() {
     blocksPlaced += 1;
   }
-  
+
   public void destroyedBlock() {
     blocksDestroyed += 1;
   }
-  
+
   public Integer[] stats() {
     Integer[] stats = new Integer[4];
-    
-    stats[0] = (int)(System.currentTimeMillis() - connected)/1000/60;
+
+    stats[0] = (int) (System.currentTimeMillis() - connected) / 1000 / 60;
     stats[1] = server.stats.getMinutes(this) + stats[0];
     stats[2] = server.stats.addPlacedBlocks(this, blocksPlaced);
     stats[3] = server.stats.addDestroyedBlocks(this, blocksDestroyed);
-    
+
     blocksPlaced = 0;
     blocksDestroyed = 0;
     server.stats.save();
-    
+
     return stats;
   }
-  
-  public void setReply(Player answer){
+
+  public void setReply(Player answer) {
     // set Player to reply with !reply command
     reply = answer;
   }
-  
-  public Player getReply(){
+
+  public Player getReply() {
     return reply;
   }
-  
+
   public void close() {
     if (serverToClient != null) {
       serverToClient.stop();
@@ -468,11 +468,11 @@ public class Player {
     }
 
     if (name != null) {
-      server.stats.addOnlineMinutes(this, (int)(System.currentTimeMillis() - connected)/1000/60);
+      server.stats.addOnlineMinutes(this, (int) (System.currentTimeMillis() - connected) / 1000 / 60);
       server.stats.addDestroyedBlocks(this, blocksDestroyed);
       server.stats.addPlacedBlocks(this, blocksPlaced);
       server.stats.save();
-      
+
       server.playerList.removePlayer(this);
       name = null;
     }
@@ -482,7 +482,6 @@ public class Player {
     if (!closed) {
       closed = true;
       entityId = 0;
-      
 
       close();
 
@@ -600,7 +599,7 @@ public class Player {
   }
 
   public void placingChest(Coordinate coord) {
-      chestPlaced = coord;
+    chestPlaced = coord;
   }
 
   public boolean placedChest(Coordinate coordinate) {
@@ -634,9 +633,9 @@ public class Player {
   public void setDimension(Dimension dimension) {
     this.dimension = dimension;
   }
-  
-  public Dimension getDimension(){
-    return this.dimension;
+
+  public Dimension getDimension() {
+    return dimension;
   }
-  
+
 }

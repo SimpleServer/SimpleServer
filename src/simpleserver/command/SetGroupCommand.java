@@ -27,14 +27,14 @@ public class SetGroupCommand extends PlayerArgCommand {
   public SetGroupCommand() {
     super("setgroup PLAYER GROUP", "Set the group ID of the named player");
   }
-  
+
   public SetGroupCommand(String name, String description) {
     super(name, description);
   }
-  
+
   protected boolean allowed(Player player, int group, String target) {
     Server server = player.getServer();
-    if ( player.getGroupId() <= server.permissions.getNameGroup(target) ) {
+    if (player.getGroupId() <= server.permissions.getNameGroup(target)) {
       player.addMessage("\u00a7cYou cannot set the group of this user!");
       return false;
     }
@@ -44,13 +44,13 @@ public class SetGroupCommand extends PlayerArgCommand {
     }
     return true;
   }
-  
+
   @Override
   protected void executeWithTarget(Player player, String message, String target) {
     String[] arguments = extractArguments(message);
     int group;
-    
-    if(arguments.length < 2) {
+
+    if (arguments.length < 2) {
       player.addMessage("\u00a7cYou must specify a group!");
       return;
     }
@@ -61,16 +61,16 @@ public class SetGroupCommand extends PlayerArgCommand {
       player.addMessage("\u00a7cGroup must be a number!");
       return;
     }
-    
-    if(allowed(player, group, target)) {
+
+    if (allowed(player, group, target)) {
       setGroup(player, group, target);
     }
   }
-  
+
   protected void setGroup(Player player, int group, String target) {
     Server server = player.getServer();
     server.permissions.setPlayerGroup(target, group);
-  
+
     player.addMessage("\u00a77Player " + target + "'s group was set to "
         + group + "!");
     server.adminLog("User " + player.getName() + " set player's group:\t "

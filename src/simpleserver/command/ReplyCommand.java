@@ -27,15 +27,16 @@ public class ReplyCommand extends AbstractCommand implements PlayerCommand {
   public ReplyCommand() {
     super("reply MESSAGE", "Sends a message to the player that last told you something");
   }
-  
+
   public void execute(Player player, String message) {
     Player target = player.getReply();
-    
+
     message = extractArgument(message);
-    
-    if (target != null && target.getName() != null){
+
+    if (target != null && target.getName() != null) {
       player.execute(TellCommand.class, target.getName() + " " + message);
-    } else{
+    }
+    else {
       player.addMessage("\u00a7cNobody sent you a message yet.");
     }
   }

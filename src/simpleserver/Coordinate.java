@@ -28,11 +28,11 @@ public class Coordinate {
   private final int hashCode;
 
   public Coordinate(int x, byte y, int z) {
-    this(x,y,z,Dimension.EARTH);
+    this(x, y, z, Dimension.EARTH);
   }
-  
+
   public Coordinate(int x, byte y, int z, Player player) {
-    this(x,y,z,player.getDimension());
+    this(x, y, z, player.getDimension());
   }
 
   public Coordinate(int x, byte y, int z, Dimension dimension) {
@@ -48,56 +48,56 @@ public class Coordinate {
     code = 37 * code + dimension.ordinal();
     hashCode = code;
   }
-  
+
   public Coordinate(int x, int y, int z, Dimension dimension) {
-    this(x, (byte)y, z, dimension);
+    this(x, (byte) y, z, dimension);
   }
 
   public int x() {
     return x;
   }
-  
+
   public byte y() {
     return y;
   }
-  
+
   public int z() {
     return z;
   }
-  
+
   public Dimension dimension() {
     return dimension;
   }
-  
+
   public Coordinate setX(int x) {
     return new Coordinate(x, y, z, dimension);
   }
-  
+
   public Coordinate setY(byte y) {
     return new Coordinate(x, y, z, dimension);
   }
-  
+
   public Coordinate setY(int y) {
-    return setY((byte)y);
+    return setY((byte) y);
   }
-  
+
   public Coordinate setZ(int z) {
     return new Coordinate(x, y, z, dimension);
   }
-  
+
   public Coordinate setDimension(Dimension dimension) {
     return new Coordinate(x, y, z, dimension);
   }
-  
+
   public Coordinate add(int x, byte y, int z) {
     return new Coordinate(this.x + x,
                           this.y + y,
                           this.z + z,
-                          this.dimension);
+                          dimension);
   }
-  
+
   public Coordinate add(int x, int y, int z) {
-    return add(x, (byte)y, z);
+    return add(x, (byte) y, z);
   }
 
   public boolean equals(Coordinate coordinate) {
@@ -113,42 +113,45 @@ public class Coordinate {
   public int hashCode() {
     return hashCode;
   }
-  
+
   public enum Dimension {
-    EARTH ((byte)0),
-    NETHER ((byte)-1),
+    EARTH((byte) 0),
+    NETHER((byte) -1),
     LIMBO;
-    
+
     private byte index;
 
     Dimension(byte index) {
       this.index = index;
     }
-    
+
     Dimension() {
     }
-    
+
+    @Override
     public String toString() {
       String name = super.toString();
       return name.substring(0, 1) + name.substring(1).toLowerCase();
     }
-    
+
     private boolean isNamed(String name) {
       return super.toString().equals(name.toUpperCase());
     }
-    
+
     public static Dimension get(byte index) {
-      for(Dimension dim : Dimension.values()) {
-        if(dim.index == index)
+      for (Dimension dim : Dimension.values()) {
+        if (dim.index == index) {
           return dim;
+        }
       }
       return Dimension.LIMBO;
     }
-    
+
     public static Dimension get(String name) {
-      for(Dimension dim : Dimension.values()) {
-        if(dim.isNamed(name))
+      for (Dimension dim : Dimension.values()) {
+        if (dim.isNamed(name)) {
           return dim;
+        }
       }
       return Dimension.LIMBO;
     }

@@ -29,18 +29,17 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Semaphore;
 
-import simpleserver.config.PermissionConfig;
-
 import simpleserver.command.TimeCommand;
 import simpleserver.config.ChestList;
 import simpleserver.config.GiveAliasList;
+import simpleserver.config.HelpText;
 import simpleserver.config.IPBanList;
 import simpleserver.config.KitList;
 import simpleserver.config.MOTD;
 import simpleserver.config.MuteList;
+import simpleserver.config.PermissionConfig;
 import simpleserver.config.RobotList;
 import simpleserver.config.Rules;
-import simpleserver.config.HelpText;
 import simpleserver.config.Stats;
 import simpleserver.config.WhiteList;
 import simpleserver.log.AdminLog;
@@ -59,7 +58,7 @@ import simpleserver.thread.RequestTracker;
 import simpleserver.thread.SystemInputQueue;
 
 public class Server {
-  
+
   private final Listener listener;
 
   private ServerSocket socket;
@@ -208,8 +207,10 @@ public class Server {
     for (Resource resource : resources) {
       resource.load();
     }
-    if (playerList != null)
-      playerList.updatePlayerGroups(); //reflect changes of permission.xml without player relogin
+    if (playerList != null) {
+      playerList.updatePlayerGroups(); // reflect changes of permission.xml
+      // without player relogin
+    }
   }
 
   public void saveResources() {
@@ -366,7 +367,7 @@ public class Server {
     restart = false;
 
     loadResources();
-    
+
     if (permissions.loadsuccess == false) {
       System.out.println("[SimpleServer] Syntax error in permissions.xml! Emergency shutdown...");
       System.exit(1);
@@ -389,10 +390,12 @@ public class Server {
       // Already on track to stop/restart.
     }
 
-    if (options.getBoolean("enableTelnet"))
+    if (options.getBoolean("enableTelnet")) {
       telnetServer = new TelnetServer(this);
-    if (options.getBoolean("enableRcon"))
+    }
+    if (options.getBoolean("enableRcon")) {
       rconServer = new RconServer(this);
+    }
     autoBackup = new AutoBackup(this);
     autosave = new AutoSave(this);
     autoRestart = new AutoRestart(this);
@@ -417,10 +420,12 @@ public class Server {
     }
 
     kickAllPlayers();
-    if (telnetServer != null)
+    if (telnetServer != null) {
       telnetServer.stop();
-    if (rconServer != null)
+    }
+    if (rconServer != null) {
       rconServer.stop();
+    }
     autoBackup.stop();
     autosave.stop();
     autoRestart.stop();
@@ -513,7 +518,7 @@ public class Server {
   public void setTime(long time) {
     this.time = time;
   }
-  
+
   public long time() {
     return time;
   }

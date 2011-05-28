@@ -190,16 +190,18 @@ public class MinecraftWrapper {
     if (options.getInt("memory") < minimumMemory) {
       minimumMemory = options.getInt("memory");
     }
-    
+
     String arguments;
     if (options.getBoolean("overwriteArguments")) {
       arguments = "";
-    } else {
+    }
+    else {
       if (options.getBoolean("useXincgc")) {
         arguments = String.format(XINCGC_FORMAT, options.get("memory"));
-      } else {
+      }
+      else {
         arguments = String.format(MEMORY_FORMAT, minimumMemory, options.get("memory"));
-      } 
+      }
       arguments += modArguments();
     }
 
@@ -207,11 +209,12 @@ public class MinecraftWrapper {
   }
 
   private String modArguments() {
-    if(getServerJar().contains("ukkit"))
+    if (getServerJar().contains("ukkit")) {
       return "  " + BUKKIT_ARGUMENTS;
+    }
     return "";
   }
-  
+
   private String getServerJar() {
     if (options.contains("alternateJarFile")) {
       return options.get("alternateJarFile");

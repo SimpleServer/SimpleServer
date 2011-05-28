@@ -28,14 +28,15 @@ import java.util.Vector;
 public class SortedProperties extends Properties {
   private static final long serialVersionUID = 2327114648488311204L;
 
+  @Override
   @SuppressWarnings("unchecked")
   public synchronized Enumeration keys() {
-     Enumeration keysEnum = super.keys();
-     Vector keyList = new Vector();
-     while(keysEnum.hasMoreElements()){
-       keyList.add(keysEnum.nextElement());
-     }
-     Collections.sort(keyList);
-     return keyList.elements();
+    Enumeration keysEnum = super.keys();
+    Vector keyList = new Vector();
+    while (keysEnum.hasMoreElements()) {
+      keyList.add(keysEnum.nextElement());
+    }
+    Collections.sort(keyList);
+    return keyList.elements();
   }
 }

@@ -23,10 +23,10 @@ package simpleserver.thread;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.NoSuchElementException;
+import java.util.Scanner;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.Scanner;
-import java.util.NoSuchElementException;
 
 public class SystemInputQueue {
   private final BlockingQueue<String> queue;
@@ -42,11 +42,13 @@ public class SystemInputQueue {
     queue = new LinkedBlockingQueue<String>();
     input = new BufferedReader(new InputStreamReader(System.in));
     scanner = new Scanner(input);
-    
-    if (System.getProperty("os.name").toLowerCase().contains("win"))
+
+    if (System.getProperty("os.name").toLowerCase().contains("win")) {
       isWindows = true;
-    else
-      isWindows =false;
+    }
+    else {
+      isWindows = false;
+    }
 
     reader = new Reader();
     reader.start();
@@ -72,46 +74,51 @@ public class SystemInputQueue {
       StringBuilder builder = new StringBuilder();
       while (run) {
 
-      if (!isWindows) { //Running NOT on windows plattform
-        try {
-          builder.setLength(0);
-          while (input.ready()) {
-            int character = input.read();
-            if (character == -1) {
-              run = false;
-              break;
-            }
-            else if ((char) character != '\n') {
-              builder.append((char) character);
-            }
-            else {
-              String line = builder.toString();
-              builder.setLength(0);
-
-              if (line.endsWith("\r")) {
-                line = line.substring(0, line.length() - 1);
+        if (!isWindows) { // Running NOT on windows plattform
+          try {
+            builder.setLength(0);
+            while (input.ready()) {
+              int character = input.read();
+              if (character == -1) {
+                run = false;
+                break;
               }
-
-              try {
-                queue.put(line);
+              else if ((char) character != '\n') {
+                builder.append((char) character);
               }
-              catch (InterruptedException e) {
-                continue;
+              else {
+                String line = builder.toString();
+                builder.setLength(0);
+
+                if (line.endsWith("\r")) {
+                  line = line.substring(0, line.length() - 1);
+                }
+
+                try {
+                  queue.put(line);
+                }
+                catch (InterruptedException e) {
+                  continue;
+                }
               }
             }
           }
+          catch (IOException e) {
+            break;
+          }
         }
-        catch (IOException e) {
-          break;
+        else { // Running on windows -> use other read method!
+          try {
+            String line = scanner.nextLine();
+            queue.put(line);
+          }
+          catch (InterruptedException e) {
+            continue;
+          }
+          catch (NoSuchElementException e) {
+            continue;
+          }
         }
-      } else { //Running on windows -> use other read method!
-        try {
-          String line = scanner.nextLine();
-          queue.put(line);
-        }
-        catch (InterruptedException e) { continue; }
-        catch (NoSuchElementException e) { continue; }
-      }
 
         try {
           Thread.sleep(50);

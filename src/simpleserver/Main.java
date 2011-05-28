@@ -35,9 +35,10 @@ public class Main {
     String extendedVersion = baseVersion;
 
     String commitversion = getVersionString("VERSION");
-    if (!commitversion.equals(""))
-        extendedVersion += "-"+commitversion;
-    
+    if (!commitversion.equals("")) {
+      extendedVersion += "-" + commitversion;
+    }
+
     version = extendedVersion;
   }
 
@@ -49,7 +50,7 @@ public class Main {
       BufferedReader reader = new BufferedReader(new InputStreamReader(input));
       try {
         try {
-           retversion = reader.readLine();
+          retversion = reader.readLine();
         }
         finally {
           reader.close();
@@ -66,8 +67,8 @@ public class Main {
 
   public static void main(String[] args) {
     if (args.length > 0) {
-      for(String x: args) {
-        if(x.equals("--version") || x.equals("-v")) {
+      for (String x : args) {
+        if (x.equals("--version") || x.equals("-v")) {
           System.out.println(version);
           return;
         }
