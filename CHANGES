@@ -2,7 +2,7 @@
  * Update for Minecraft Beta 1.6
  * Added !setipgroup
  * updated windows launcher to run better in an improper environment
- * fixed locked chests to support multiple dimension
+ * fixed locked chests to support multiple dimensions
  * fixed !time to no longer crash redstone circuits
  * fixed !setgroup to update instantly
  * fixed invisible input in server console under windows
