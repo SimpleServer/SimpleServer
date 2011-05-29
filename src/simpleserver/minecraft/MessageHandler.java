@@ -84,7 +84,7 @@ public class MessageHandler {
         notifyAll();
       }
     }
-    else if (line.contains("[INFO] CONSOLE: Save complete.")) {
+    else if (line.contains("[INFO] CONSOLE: Save complete.") || line.contains("[INFO] Save complete.")) {
       server.setSaving(false);
       if (server.options.getBoolean("announceBackup")) {
         server.runCommand("say", server.l.get("SAVE_COMPLETE"));

@@ -69,7 +69,9 @@ public class AutoBackup {
   }
 
   private void backup() throws IOException {
-    System.out.println("[SimpleServer] Backing up server...");
+    if (server.options.getBoolean("announceBackup")) {
+      System.out.println("[SimpleServer] Backing up server...");
+    }
     announce(server.l.get("BACKING_UP"));
     server.runCommand("save-off", null);
 
