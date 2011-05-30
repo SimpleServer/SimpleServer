@@ -35,8 +35,7 @@ public abstract class AbstractCommand implements Command {
       if (splitIndex != -1) {
         name = name.substring(0, splitIndex);
       }
-    }
-    else {
+    } else {
       this.helpText = helpText;
     }
 
@@ -50,8 +49,7 @@ public abstract class AbstractCommand implements Command {
   public String getHelpText(String prefix) {
     if (name != null) {
       return "\u00a72" + prefix + helpText;
-    }
-    else {
+    } else {
       return helpText;
     }
   }
@@ -90,8 +88,7 @@ public abstract class AbstractCommand implements Command {
   protected String commandPrefix() {
     if (parser != null) {
       return parser.commandPrefix();
-    }
-    else {
+    } else {
       return "!";
     }
   }

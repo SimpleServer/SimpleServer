@@ -44,8 +44,7 @@ public class RobotList extends PropertiesConfig {
   public void addRobotPort(int port) {
     try {
       robotLock.acquire();
-    }
-    catch (InterruptedException e) {
+    } catch (InterruptedException e) {
       // TODO Auto-generated catch block
       e.printStackTrace();
     }
@@ -56,8 +55,7 @@ public class RobotList extends PropertiesConfig {
   public void removeRobotPort(int port) {
     try {
       robotLock.acquire();
-    }
-    catch (InterruptedException e) {
+    } catch (InterruptedException e) {
       // TODO Auto-generated catch block
       e.printStackTrace();
     }
@@ -68,8 +66,7 @@ public class RobotList extends PropertiesConfig {
   public Integer[] getRobotPorts() {
     try {
       robotLock.acquire();
-    }
-    catch (InterruptedException e) {
+    } catch (InterruptedException e) {
       // TODO Auto-generated catch block
       e.printStackTrace();
     }
@@ -96,8 +93,7 @@ public class RobotList extends PropertiesConfig {
     if (!isRobot(ip)) {
       if (!isPotentialRobot(ip)) {
         potentialRobots.add(new UnconfirmedRobot(ip));
-      }
-      else {
+      } else {
         for (UnconfirmedRobot i : potentialRobots) {
           if (ip.equals(i.ipAddress)) {
             i.tries++;

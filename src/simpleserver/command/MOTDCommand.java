@@ -30,8 +30,7 @@ public class MOTDCommand extends AbstractCommand implements PlayerCommand {
   public void execute(Player player, String message) {
     if (player.getServer().motd.getMOTD().trim().length() > 0) {
       player.sendMOTD();
-    }
-    else {
+    } else {
       player.addMessage("\u00a7cMOTD is empty. Edit simpleserver/motd.txt");
     }
   }

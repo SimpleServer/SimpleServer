@@ -53,8 +53,7 @@ public class TelnetServer {
     if (socket != null) {
       try {
         socket.close();
-      }
-      catch (IOException e) {
+      } catch (IOException e) {
       }
     }
     for (TelnetTCP connection : connections) {
@@ -70,19 +69,16 @@ public class TelnetServer {
       int port = 25678;
       try {
         port = Integer.valueOf(portstr);
-      }
-      catch (NumberFormatException e) {
+      } catch (NumberFormatException e) {
       }
 
       InetAddress address;
       if (ip.equals("0.0.0.0")) {
         address = null;
-      }
-      else {
+      } else {
         try {
           address = InetAddress.getByName(ip);
-        }
-        catch (UnknownHostException e) {
+        } catch (UnknownHostException e) {
           e.printStackTrace();
           System.out.println("Invalid listening address " + ip);
           return;
@@ -91,8 +87,7 @@ public class TelnetServer {
 
       try {
         socket = new ServerSocket(port, 0, address);
-      }
-      catch (IOException e) {
+      } catch (IOException e) {
         System.out.println("Could not listen on port " + port
             + "!\nIs it already in use? Telnet is not available!");
         return;
@@ -107,8 +102,7 @@ public class TelnetServer {
           Socket client;
           try {
             client = socket.accept();
-          }
-          catch (IOException e) {
+          } catch (IOException e) {
             if (run) {
               e.printStackTrace();
               System.out.println("Telnet server failed!");
@@ -117,12 +111,10 @@ public class TelnetServer {
           }
           connections.add(new TelnetTCP(client, server));
         }
-      }
-      finally {
+      } finally {
         try {
           socket.close();
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
         }
       }
     }

@@ -76,12 +76,10 @@ public abstract class AbstractConfig implements Resource {
         buffer = new byte[dataInput.available()];
         dataInput.readFully(buffer);
         return new String(buffer, 0, buffer.length, "UTF-8");
-      }
-      finally {
+      } finally {
         dataInput.close();
       }
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       e.printStackTrace();
     }
 
@@ -101,12 +99,10 @@ public abstract class AbstractConfig implements Resource {
     InputStream headerStream = getHeaderResourceStream();
     try {
       header = readFully(headerStream);
-    }
-    finally {
+    } finally {
       try {
         headerStream.close();
-      }
-      catch (IOException e) {
+      } catch (IOException e) {
         e.printStackTrace();
       }
     }

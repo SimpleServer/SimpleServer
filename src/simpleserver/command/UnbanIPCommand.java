@@ -37,8 +37,7 @@ public class UnbanIPCommand extends AbstractCommand implements PlayerCommand {
                                       + " unbanned ip:\t " + arguments[0]);
       player.addMessage("\u00a77IP Address " + arguments[0]
           + " has been unbanned!");
-    }
-    else {
+    } else {
       player.addMessage("\u00a7cNo IP specified.");
     }
   }

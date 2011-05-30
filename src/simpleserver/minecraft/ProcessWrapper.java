@@ -53,8 +53,7 @@ public class ProcessWrapper implements Wrapper {
           try {
             process.waitFor();
             return;
-          }
-          catch (InterruptedException e) {
+          } catch (InterruptedException e) {
           }
         }
 
@@ -63,14 +62,12 @@ public class ProcessWrapper implements Wrapper {
           try {
             process.exitValue();
             return;
-          }
-          catch (IllegalThreadStateException e) {
+          } catch (IllegalThreadStateException e) {
           }
         }
 
         process.destroy();
-      }
-      finally {
+      } finally {
         messageHandler.handleQuit();
       }
     }

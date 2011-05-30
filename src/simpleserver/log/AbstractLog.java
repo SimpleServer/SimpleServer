@@ -46,8 +46,7 @@ public class AbstractLog {
     try {
       filename = getLogFile();
       stream = new FileOutputStream(filename, true);
-    }
-    catch (FileNotFoundException e) {
+    } catch (FileNotFoundException e) {
       System.out.println("[SimpleServer] " + e);
       System.out.println("[SimpleServer] Unable to open " + name
           + " log for writing!");
@@ -86,31 +85,27 @@ public class AbstractLog {
           String line;
           try {
             line = queue.take();
-          }
-          catch (InterruptedException e1) {
+          } catch (InterruptedException e1) {
             continue;
           }
 
           try {
             stream.write(line.getBytes());
             stream.flush();
-          }
-          catch (IOException e) {
+          } catch (IOException e) {
             System.out.println("[SimpleServer] " + e);
             System.out.println("[SimpleServer] Writing to " + name
                 + " log failed!");
             break;
           }
         }
-      }
-      finally {
+      } finally {
         try {
           stream.close();
           if (logEmpty) {
             filename.delete();
           }
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
         }
       }
     }

@@ -40,8 +40,7 @@ public class BanIPCommand extends AbstractCommand implements PlayerCommand {
             + " has been banned!");
         server.adminLog("User " + player.getName() + " banned ip:\t "
             + arguments[0]);
-      }
-      else {
+      } else {
         server.ipBans.addBan(p.getIPAddress());
         server.kick(p.getName(), "IP Banned!");
         server.runCommand("say", "Player " + p.getName()
@@ -49,8 +48,7 @@ public class BanIPCommand extends AbstractCommand implements PlayerCommand {
         server.adminLog("User " + player.getName() + " banned ip:\t "
             + arguments[0] + "\t(" + p.getName() + ")");
       }
-    }
-    else {
+    } else {
       player.addMessage("\u00a7cNo player or IP specified.");
     }
   }

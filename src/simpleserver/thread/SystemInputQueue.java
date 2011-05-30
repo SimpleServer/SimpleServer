@@ -45,8 +45,7 @@ public class SystemInputQueue {
 
     if (System.getProperty("os.name").toLowerCase().contains("win")) {
       isWindows = true;
-    }
-    else {
+    } else {
       isWindows = false;
     }
 
@@ -82,11 +81,9 @@ public class SystemInputQueue {
               if (character == -1) {
                 run = false;
                 break;
-              }
-              else if ((char) character != '\n') {
+              } else if ((char) character != '\n') {
                 builder.append((char) character);
-              }
-              else {
+              } else {
                 String line = builder.toString();
                 builder.setLength(0);
 
@@ -96,34 +93,28 @@ public class SystemInputQueue {
 
                 try {
                   queue.put(line);
-                }
-                catch (InterruptedException e) {
+                } catch (InterruptedException e) {
                   continue;
                 }
               }
             }
-          }
-          catch (IOException e) {
+          } catch (IOException e) {
             break;
           }
-        }
-        else { // Running on windows -> use other read method!
+        } else { // Running on windows -> use other read method!
           try {
             String line = scanner.nextLine();
             queue.put(line);
-          }
-          catch (InterruptedException e) {
+          } catch (InterruptedException e) {
             continue;
-          }
-          catch (NoSuchElementException e) {
+          } catch (NoSuchElementException e) {
             continue;
           }
         }
 
         try {
           Thread.sleep(50);
-        }
-        catch (InterruptedException e) {
+        } catch (InterruptedException e) {
         }
       }
     }

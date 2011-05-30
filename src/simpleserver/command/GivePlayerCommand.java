@@ -64,17 +64,14 @@ public class GivePlayerCommand extends GiveCommand implements ServerCommand {
       if (target == null) {
         if (player != null) {
           player.addMessage("\u00a7cPlayer not online (" + arguments[0] + ")");
-        }
-        else {
+        } else {
           System.out.println("Player not online (" + arguments[0] + ")");
         }
       }
-    }
-    else {
+    } else {
       if (player != null) {
         player.addMessage("\u00a7cNo player or item specified!");
-      }
-      else {
+      } else {
         System.out.println("No player or item specified!");
       }
     }

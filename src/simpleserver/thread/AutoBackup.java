@@ -81,8 +81,7 @@ public class AutoBackup {
       server.runCommand("save-on", null);
 
       zipBackup(copy);
-    }
-    finally {
+    } finally {
       deleteRecursively(TEMP_DIRECTORY);
     }
     purgeOldBackups();
@@ -143,12 +142,10 @@ public class AutoBackup {
       ZipOutputStream out = new ZipOutputStream(new BufferedOutputStream(fout));
       try {
         zipRecursively(source, out);
-      }
-      finally {
+      } finally {
         out.close();
       }
-    }
-    finally {
+    } finally {
       fout.close();
     }
     System.out.println("[SimpleServer] Backup saved: " + backup.getPath());
@@ -172,8 +169,7 @@ public class AutoBackup {
       for (File file : source.listFiles()) {
         zipRecursively(file, out, prefixLength);
       }
-    }
-    else {
+    } else {
       ZipEntry entry = new ZipEntry(name);
       out.putNextEntry(entry);
 
@@ -184,8 +180,7 @@ public class AutoBackup {
           out.write(copyBuffer, 0, length);
           Thread.yield();
         }
-      }
-      finally {
+      } finally {
         in.close();
       }
       out.closeEntry();
@@ -201,8 +196,7 @@ public class AutoBackup {
           copyRecursively(new File(source, child), new File(target, child));
         }
       }
-    }
-    else {
+    } else {
       InputStream in = new FileInputStream(source);
       OutputStream out = new FileOutputStream(target);
 
@@ -211,12 +205,10 @@ public class AutoBackup {
         while ((length = in.read(copyBuffer)) > 0) {
           out.write(copyBuffer, 0, length);
         }
-      }
-      finally {
+      } finally {
         try {
           in.close();
-        }
-        finally {
+        } finally {
           out.close();
         }
       }
@@ -228,8 +220,7 @@ public class AutoBackup {
       for (File file : path.listFiles()) {
         if (file.isDirectory()) {
           deleteRecursively(file);
-        }
-        else {
+        } else {
           file.delete();
         }
       }
@@ -244,8 +235,7 @@ public class AutoBackup {
         if (needsBackup()) {
           try {
             server.saveLock.acquire();
-          }
-          catch (InterruptedException e) {
+          } catch (InterruptedException e) {
             continue;
           }
           forceBackup = false;
@@ -256,15 +246,13 @@ public class AutoBackup {
           while (server.isSaving()) {
             try {
               Thread.sleep(100);
-            }
-            catch (InterruptedException e) {
+            } catch (InterruptedException e) {
             }
           }
 
           try {
             backup();
-          }
-          catch (IOException e) {
+          } catch (IOException e) {
             server.errorLog(e, "Server Backup Failure");
             System.out.println("[SimpleServer] " + e);
             System.out.println("[SimpleServer] Automated Server Backup Failure!");
@@ -274,8 +262,7 @@ public class AutoBackup {
 
         try {
           Thread.sleep(60000);
-        }
-        catch (InterruptedException e) {
+        } catch (InterruptedException e) {
         }
       }
     }

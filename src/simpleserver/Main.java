@@ -51,12 +51,10 @@ public class Main {
       try {
         try {
           retversion = reader.readLine();
-        }
-        finally {
+        } finally {
           reader.close();
         }
-      }
-      catch (IOException e) {
+      } catch (IOException e) {
         System.out.println("[SimpleServer] " + e);
         System.out.println("[SimpleServer] Warning, jar may be corrupted!");
       }

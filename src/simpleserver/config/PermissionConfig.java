@@ -131,8 +131,7 @@ public class PermissionConfig extends AbstractConfig {
     try {
       dbf.setValidating(validate);
       db = dbf.newDocumentBuilder();
-    }
-    catch (ParserConfigurationException e) {
+    } catch (ParserConfigurationException e) {
     }
 
     if (db != null) {
@@ -226,8 +225,7 @@ public class PermissionConfig extends AbstractConfig {
 
     if (ipGroup > nameGroup) {
       grp = ipGroup;
-    }
-    else {
+    } else {
       grp = nameGroup;
     }
 
@@ -300,16 +298,14 @@ public class PermissionConfig extends AbstractConfig {
       try {
         groups.add(Integer.valueOf(segment));
         continue;
-      }
-      catch (NumberFormatException e) {
+      } catch (NumberFormatException e) {
       }
 
       if (segment.indexOf('+') == segment.length() - 1) {
         int num = 0;
         try {
           num = Integer.valueOf(segment.split("\\+")[0]);
-        }
-        catch (NumberFormatException e) {
+        } catch (NumberFormatException e) {
           System.out.println("Unable to parse group: " + segment);
           continue;
         }
@@ -334,8 +330,7 @@ public class PermissionConfig extends AbstractConfig {
       try {
         low = Integer.valueOf(range[0]);
         high = Integer.valueOf(range[1]);
-      }
-      catch (NumberFormatException e) {
+      } catch (NumberFormatException e) {
         System.out.println("Unable to parse group: " + segment);
         continue;
       }
@@ -375,8 +370,7 @@ public class PermissionConfig extends AbstractConfig {
       String permstr = config.getString("/permissions/blocks/@" + attrs.get(i), "");
       if (permstr.equals("")) {
         perms[i] = true;
-      }
-      else {
+      } else {
         perms[i] = includesPlayer(permstr, player);
       }
     }
@@ -763,8 +757,7 @@ public class PermissionConfig extends AbstractConfig {
         server.kits.load();
         load();
 
-      }
-      else {
+      } else {
         System.out.println(getFilename() + " is missing.  Loading defaults.");
         loadDefaults();
         save();
@@ -790,8 +783,7 @@ public class PermissionConfig extends AbstractConfig {
       InputStream stream = getResourceStream();
       config.load(stream);
       loadsuccess = true;
-    }
-    catch (ConfigurationException ex) {
+    } catch (ConfigurationException ex) {
       System.out.println("[SimpleServer] " + ex);
       System.out.println("[SimpleServer] Failed to load defaults for " + getFilename());
       loadsuccess = false;

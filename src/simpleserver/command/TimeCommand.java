@@ -51,30 +51,24 @@ public class TimeCommand extends AbstractCommand implements PlayerCommand {
 
     if (arguments.length == 0) {
       usage();
-    }
-    else if (arguments.length >= 1) {
+    } else if (arguments.length >= 1) {
       String argument = arguments[0];
       int time = 0;
       if (argument.equals("day")) {
         time = DAY;
-      }
-      else if (argument.equals("night")) {
+      } else if (argument.equals("night")) {
         time = NIGHT;
-      }
-      else if (argument.equals("set") || argument.equals("add")) {
+      } else if (argument.equals("set") || argument.equals("add")) {
         player.addMessage("§cThis is not the standard time command.");
         usage();
         return;
-      }
-      else if (argument.equals("unfreeze")) {
+      } else if (argument.equals("unfreeze")) {
         unfreeze();
         return;
-      }
-      else {
+      } else {
         try {
           time = Integer.parseInt(argument);
-        }
-        catch (NumberFormatException e) {
+        } catch (NumberFormatException e) {
           player.addMessage("\u00a7cInvalid argument!");
           usage();
           return;
@@ -96,8 +90,7 @@ public class TimeCommand extends AbstractCommand implements PlayerCommand {
 
         if (argument.equals("freeze")) {
           freeze(time);
-        }
-        else {
+        } else {
           player.addMessage("\u00a7cOptional 2nd argument must be freeze!");
         }
       }
@@ -129,8 +122,7 @@ public class TimeCommand extends AbstractCommand implements PlayerCommand {
       int delay = DELAY;
       if (time == DAY) {
         delay = DELAY_DAY;
-      }
-      else if (time == NIGHT) {
+      } else if (time == NIGHT) {
         delay = DELAY_NIGHT;
       }
       timer.schedule(new TimeFreezer(this, time), 0, delay);

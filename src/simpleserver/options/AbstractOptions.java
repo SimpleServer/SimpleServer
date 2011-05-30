@@ -58,14 +58,12 @@ public abstract class AbstractOptions implements Resource {
     String value = options.getProperty(option);
     try {
       return Integer.parseInt(value);
-    }
-    catch (NumberFormatException e) {
+    } catch (NumberFormatException e) {
       String defaultValue = defaultOptions.getProperty(option);
       if (!defaultValue.equals(value)) {
         options.setProperty(option, defaultValue);
         return getInt(option);
-      }
-      else {
+      } else {
         e.printStackTrace();
         System.out.println("Error: Asked for int value of " + option);
         return Integer.MIN_VALUE;
@@ -85,15 +83,12 @@ public abstract class AbstractOptions implements Resource {
       InputStream stream = new FileInputStream(file);
       try {
         options.load(stream);
-      }
-      finally {
+      } finally {
         stream.close();
       }
-    }
-    catch (FileNotFoundException e) {
+    } catch (FileNotFoundException e) {
       missingFile();
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       System.out.println("[SimpleServer] " + e);
       System.out.println("[SimpleServer] Could not read " + filename);
     }
@@ -106,12 +101,10 @@ public abstract class AbstractOptions implements Resource {
       OutputStream stream = new FileOutputStream(file);
       try {
         options.store(stream, getComment());
-      }
-      finally {
+      } finally {
         stream.close();
       }
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       System.out.println("[SimpleServer] " + e);
       System.out.println("[SimpleServer] Could not write " + filename);
     }
@@ -132,12 +125,10 @@ public abstract class AbstractOptions implements Resource {
     try {
       try {
         defaultOptions.load(stream);
-      }
-      finally {
+      } finally {
         stream.close();
       }
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       System.out.println("[SimpleServer] " + e);
       System.out.println("[SimpleServer] Could not read default " + filename);
     }

@@ -45,8 +45,7 @@ public class OutputWrapper implements Wrapper {
     run = false;
     try {
       scanner.close();
-    }
-    catch (IllegalStateException e) {
+    } catch (IllegalStateException e) {
     }
   }
 
@@ -62,23 +61,19 @@ public class OutputWrapper implements Wrapper {
           String line;
           try {
             line = scanner.nextLine();
-          }
-          catch (NoSuchElementException e) {
+          } catch (NoSuchElementException e) {
             messageHandler.handleError(e);
             break;
-          }
-          catch (IllegalStateException e) {
+          } catch (IllegalStateException e) {
             break;
           }
 
           messageHandler.handleOutput(line);
         }
-      }
-      finally {
+      } finally {
         try {
           scanner.close();
-        }
-        catch (IllegalStateException e) {
+        } catch (IllegalStateException e) {
         }
       }
     }

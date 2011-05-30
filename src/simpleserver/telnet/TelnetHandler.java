@@ -76,21 +76,17 @@ public class TelnetHandler implements Runnable {
 
         parseLine(line);
       }
-    }
-    catch (InterruptedException e1) {
-    }
-    catch (SocketTimeoutException e) {
+    } catch (InterruptedException e1) {
+    } catch (SocketTimeoutException e) {
 
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       e.printStackTrace();
     }
     try {
       in.close();
       out.close();
       s.close();
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
     }
     in = null;
     out = null;
@@ -101,8 +97,7 @@ public class TelnetHandler implements Runnable {
     try {
       out.write(text, 0, text.length());
       out.flush();
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
     }
   }
 

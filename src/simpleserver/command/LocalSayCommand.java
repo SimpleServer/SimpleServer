@@ -34,8 +34,7 @@ public class LocalSayCommand extends AbstractCommand implements PlayerCommand {
       if (numPlayers <= 0) {
         player.addMessage("\u00a7cNobody is around to hear you.");
       }
-    }
-    else {
+    } else {
       player.addMessage("\u00a7cPlease supply a message.");
     }
   }

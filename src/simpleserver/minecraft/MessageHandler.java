@@ -49,8 +49,7 @@ public class MessageHandler {
       if (server.options.getBoolean("exitOnFailure")) {
         System.out.println(baseError);
         server.stop();
-      }
-      else {
+      } else {
         System.out.println(baseError + " Automatically restarting...");
         server.restart();
       }
@@ -83,17 +82,14 @@ public class MessageHandler {
         loaded = true;
         notifyAll();
       }
-    }
-    else if (line.contains("[INFO] CONSOLE: Save complete.") || line.contains("[INFO] Save complete.")) {
+    } else if (line.contains("[INFO] CONSOLE: Save complete.") || line.contains("[INFO] Save complete.")) {
       server.setSaving(false);
       if (server.options.getBoolean("announceBackup")) {
         server.runCommand("say", server.l.get("SAVE_COMPLETE"));
       }
-    }
-    else if (line.contains("[SEVERE] Unexpected exception")) {
+    } else if (line.contains("[SEVERE] Unexpected exception")) {
       handleError(new Exception(line));
-    }
-    else if (line.matches("^>+$")) {
+    } else if (line.matches("^>+$")) {
       return;
     }
 

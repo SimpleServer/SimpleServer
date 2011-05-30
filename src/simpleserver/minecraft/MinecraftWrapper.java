@@ -84,45 +84,38 @@ public class MinecraftWrapper {
 
       try {
         responseBody = httpclient.execute(httpget, responseHandler);
-      }
-      catch (ClientProtocolException e) {
+      } catch (ClientProtocolException e) {
+        autodownloadError(e, "download");
+        return false;
+      } catch (IOException e) {
         autodownloadError(e, "download");
         return false;
       }
-      catch (IOException e) {
-        autodownloadError(e, "download");
-        return false;
-      }
-    }
-    finally {
+    } finally {
       httpclient.getConnectionManager().shutdown();
     }
 
     OutputStream outputFile;
     try {
       outputFile = new FileOutputStream(SERVER_JAR);
-    }
-    catch (FileNotFoundException e) {
+    } catch (FileNotFoundException e) {
       autodownloadError(e, "save");
       return false;
     }
 
     try {
       outputFile.write(responseBody.getBytes("ISO-8859-1"));
-    }
-    catch (UnsupportedEncodingException e) {
+    } catch (UnsupportedEncodingException e) {
       autodownloadError(e, "save");
       return false;
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       autodownloadError(e, "save");
       return false;
     }
 
     if (verifyMinecraftJar()) {
       return true;
-    }
-    else {
+    } else {
       System.out.println("[SimpleServer] " + SERVER_JAR + " is corrupt!");
       return false;
     }
@@ -135,8 +128,7 @@ public class MinecraftWrapper {
 
     try {
       minecraft = runtime.exec(command);
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       System.out.println("[SimpleServer] " + e);
       System.out.println("[SimpleServer] FATAL ERROR: Could not start minecraft_server.jar!");
       System.exit(-1);
@@ -174,8 +166,7 @@ public class MinecraftWrapper {
       try {
         wrapper.join();
         wrappers.remove(wrapper);
-      }
-      catch (InterruptedException e) {
+      } catch (InterruptedException e) {
       }
     }
     active = false;
@@ -194,12 +185,10 @@ public class MinecraftWrapper {
     String arguments;
     if (options.getBoolean("overwriteArguments")) {
       arguments = "";
-    }
-    else {
+    } else {
       if (options.getBoolean("useXincgc")) {
         arguments = String.format(XINCGC_FORMAT, options.get("memory"));
-      }
-      else {
+      } else {
         arguments = String.format(MEMORY_FORMAT, minimumMemory, options.get("memory"));
       }
     }
@@ -232,8 +221,7 @@ public class MinecraftWrapper {
       ZipFile jar = new ZipFile(SERVER_JAR);
       valid = jar.size() > 200;
       jar.close();
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
     }
 
     return valid;

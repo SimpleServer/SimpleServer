@@ -65,8 +65,7 @@ public class InputWrapper implements Wrapper {
           String line;
           try {
             line = in.nextLine();
-          }
-          catch (InterruptedException e) {
+          } catch (InterruptedException e) {
             continue;
           }
 
@@ -78,18 +77,15 @@ public class InputWrapper implements Wrapper {
           try {
             out.write(line.getBytes());
             out.flush();
-          }
-          catch (IOException e) {
+          } catch (IOException e) {
             messageHandler.handleError(e);
             break;
           }
         }
-      }
-      finally {
+      } finally {
         try {
           out.close();
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
         }
       }
     }

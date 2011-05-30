@@ -88,8 +88,7 @@ class ConfToXml {
       BufferedWriter out = new BufferedWriter(new FileWriter(filename));
       out.write(data);
       out.close();
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       System.err.println("ERROR: " + e.getMessage());
       return false;
     }
@@ -127,8 +126,7 @@ class ConfToXml {
     ArrayList<String> kitlines = null;
     try {
       kitlines = readLines(confpath + "/kit-list.txt");
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       System.out.println("ERROR: Could not read kit-list.txt!");
       return false;
     }
@@ -189,8 +187,7 @@ class ConfToXml {
       ipmembers = readLines(confpath + "/ip-member-list.txt");
       commands = readLines(confpath + "/command-list.txt");
       blocks = readLines(confpath + "/block-list.txt");
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       System.out.println("ERROR: Could not load one or more of your config files!");
       System.err.println("Exception message: " + e.getMessage());
 
@@ -230,8 +227,7 @@ class ConfToXml {
       if (command.indexOf(";") != -1) {
         aliases = command.split("=")[1].split(";")[0];
         ids = convertIdList(command.split("=")[1].split(";")[1]);
-      }
-      else {
+      } else {
         ids = convertIdList(command.split("=")[1]);
       }
 

@@ -32,8 +32,7 @@ public class InstantDestroyCommand extends AbstractCommand implements
     player.toggleInstantDestroy();
     if (player.instantDestroyEnabled()) {
       player.addMessage("\u00a77Instant destroy Enabled!");
-    }
-    else {
+    } else {
       player.addMessage("\u00a77Instant destroy Disabled!");
     }
   }

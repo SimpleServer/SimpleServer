@@ -71,8 +71,7 @@ public class AutoRun {
       try {
         while (in.read(buf) >= 0) {
         }
-      }
-      catch (IOException e) {
+      } catch (IOException e) {
       }
     }
   }
@@ -84,8 +83,7 @@ public class AutoRun {
         if (needsRun()) {
           try {
             server.saveLock.acquire();
-          }
-          catch (InterruptedException e) {
+          } catch (InterruptedException e) {
             continue;
           }
           server.runCommand("say", "Mapping Server!");
@@ -96,8 +94,7 @@ public class AutoRun {
             Process process;
             try {
               process = Runtime.getRuntime().exec(command);
-            }
-            catch (IOException e) {
+            } catch (IOException e) {
               server.runCommand("say", "Mapping Failed!");
               System.out.println("[SimpleServer] " + e);
               System.out.println("[SimpleServer] Cron Failed! Bad Command!");
@@ -113,8 +110,7 @@ public class AutoRun {
               try {
                 exitCode = process.waitFor();
                 break;
-              }
-              catch (InterruptedException e) {
+              } catch (InterruptedException e) {
                 if (!run) {
                   process.destroy();
                 }
@@ -125,12 +121,10 @@ public class AutoRun {
               System.out.println("[SimpleServer] c10t Failed! Exited with code "
                   + exitCode + "!");
               server.runCommand("say", "Mapping Failed!");
-            }
-            else {
+            } else {
               server.runCommand("say", "Mapping Complete!");
             }
-          }
-          finally {
+          } finally {
             server.runCommand("save-on", null);
             server.saveLock.release();
           }
@@ -138,8 +132,7 @@ public class AutoRun {
 
         try {
           Thread.sleep(60000);
-        }
-        catch (InterruptedException e) {
+        } catch (InterruptedException e) {
         }
       }
     }

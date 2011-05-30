@@ -64,8 +64,7 @@ public class AutoRestart {
             Thread.sleep(27000);
             server.runCommand("say", server.l.get("SERVER_RESTART_3"));
             Thread.sleep(3000);
-          }
-          catch (InterruptedException e) {
+          } catch (InterruptedException e) {
             continue;
           }
 
@@ -76,8 +75,7 @@ public class AutoRestart {
 
         try {
           Thread.sleep(60000);
-        }
-        catch (InterruptedException e) {
+        } catch (InterruptedException e) {
         }
       }
     }
