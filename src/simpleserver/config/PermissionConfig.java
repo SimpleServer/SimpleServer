@@ -607,7 +607,6 @@ public class PermissionConfig extends AbstractConfig {
 
   private boolean areaContainsCoordinate(Coordinate start, Coordinate end, Coordinate coord) {
     if (start.dimension() != coord.dimension() || end.dimension() != coord.dimension()) {
-      System.out.println("schubidu");
       return false;
     }
 
