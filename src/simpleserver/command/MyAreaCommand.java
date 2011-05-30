@@ -96,15 +96,16 @@ public class MyAreaCommand extends AbstractCommand implements PlayerCommand {
 
       String label = extractArgument(message, 1);
       if (label != null) {
-          if (perm.hasAreaWithName(label)) {
-              perm.renamePlayerArea(player, label);
-              player.addMessage("\u00a77An area with that name already exists!");
-          } else {
-              perm.renamePlayerArea(player, label);
-              player.addMessage("\u00a77Your area has been renamed!");
-          }
-      } else {
-          player.addMessage("\u00a7cPlease supply an area name.");
+        if (perm.hasAreaWithName(label)) {
+          player.addMessage("\u00a7cAn area with that name already exists!");
+        }
+        else {
+          perm.renamePlayerArea(player, label);
+          player.addMessage("\u00a77Your area has been renamed!");
+        }
+      }
+      else {
+        player.addMessage("\u00a7cPlease supply an area name.");
       }
     }
   }

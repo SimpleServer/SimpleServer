@@ -203,7 +203,7 @@ public class PermissionConfig extends AbstractConfig {
     name = name.toLowerCase();
     String group = "";
 
-    group = config.getString("/members/player[" + xpath_lcase("@name") + "='" + name + "']/@group", "");
+    group = config.getString("/members/player[" + xpath_lcase("@name") + "='" + escape(name) + "']/@group", "");
 
     if (group.equals("")) {
       return server.options.getInt("defaultGroup");
@@ -241,13 +241,13 @@ public class PermissionConfig extends AbstractConfig {
 
   public void setPlayerGroup(String name, int group) {
     name = name.toLowerCase();
-    String val = config.getString("/members/player[" + xpath_lcase("@name") + "='" + name + "']/@group", "");
+    String val = config.getString("/members/player[" + xpath_lcase("@name") + "='" + escape(name) + "']/@group", "");
     if (val.equals("")) {
       config.addProperty("/members player@name", name);
-      config.addProperty("/members/player[@name='" + name + "'][1] @group", "");
+      config.addProperty("/members/player[@name='" + escape(name) + "'][1] @group", "");
     }
 
-    config.setProperty("/members/player[@name='" + name + "']/@group", String.valueOf(group));
+    config.setProperty("/members/player[@name='" + escape(name) + "']/@group", String.valueOf(group));
     server.updateGroup(name);
     save();
   }
@@ -422,7 +422,7 @@ public class PermissionConfig extends AbstractConfig {
   // replacement for CommandList.playerAllowed
   public boolean playerCommandAllowed(String cmd, Player player) {
     boolean allowed = false;
-    String pathpart = "/permissions/commands/command[@name='" + cmd + "']/@";
+    String pathpart = "/permissions/commands/command[@name='" + escape(cmd) + "']/@";
     String globalpermission = config.getString(pathpart + "allow", "");
     if (!globalpermission.equals("")) {
       allowed = includesPlayer(globalpermission, player);
@@ -433,7 +433,7 @@ public class PermissionConfig extends AbstractConfig {
     String[] areas = getAllAreasFromAreaXPath(xpath);
 
     for (String area : areas) {
-      String path = "//area[@name='" + area + "']";
+      String path = "//area[@name='" + escape(area) + "']";
       String areaallow = config.getString(path + pathpart + "allow", "");
       String areadisallow = config.getString(path + pathpart + "disallow", "");
 
@@ -450,7 +450,7 @@ public class PermissionConfig extends AbstractConfig {
 
   // replacement for CommandList.getAliases
   public String[] getCommandAliases(String name) {
-    String aliasstr = config.getString("/permissions/commands/command[@name='" + name + "']/@aliases", "");
+    String aliasstr = config.getString("/permissions/commands/command[@name='" + escape(name) + "']/@aliases", "");
 
     if (aliasstr.equals("")) {
       return new String[] {};
@@ -468,7 +468,7 @@ public class PermissionConfig extends AbstractConfig {
     }
 
     for (int i = 0; i < cmds.size(); i++) { // alias?
-      String cmd = (String) cmds.get(i);
+      String cmd = cmds.get(i).toString();
       String[] aliases = getCommandAliases(cmd);
 
       if (Arrays.asList(aliases).contains(name)) {
@@ -504,13 +504,13 @@ public class PermissionConfig extends AbstractConfig {
 
   // replacement for CommandList.setGroup
   public void setCommandGroup(String cmd, int grp) {
-    String val = config.getString("/permissions/commands/command[@name='" + cmd + "']/@allow", "");
+    String val = config.getString("/permissions/commands/command[@name='" + escape(cmd) + "']/@allow", "");
     if (val.equals("")) {
       config.addProperty("/permissions/commands/ command@name", cmd);
-      config.addProperty("/permissions/commands/command[@name='" + cmd + "'][1] @allow", String.valueOf(grp));
+      config.addProperty("/permissions/commands/command[@name='" + escape(cmd) + "'][1] @allow", String.valueOf(grp));
     }
 
-    config.setProperty("/permissions/commands/command[@name='" + cmd + "']/@allow", String.valueOf(grp));
+    config.setProperty("/permissions/commands/command[@name='" + escape(cmd) + "']/@allow", String.valueOf(grp));
   }
 
   public static String joinStrings(String[] strs, String delim) {
@@ -572,7 +572,7 @@ public class PermissionConfig extends AbstractConfig {
       for (int i = 0; i < areas.size(); i++) {
         if (areaContainsCoordinate(parseCoords(starts.get(i).toString()),
                                    parseCoords(ends.get(i).toString()), coord)) {
-          nodepath += "/areas/area[@name='" + areas.get(i) + "']";
+          nodepath += "/areas/area[@name='" + escape(areas.get(i).toString()) + "']";
           found = false;
           break;
         }
@@ -658,9 +658,9 @@ public class PermissionConfig extends AbstractConfig {
     }
 
     config.addProperty("/areas area@owner", name);
-    String path = "/areas/area[@owner='" + name + "']";
+    String path = "/areas/area[@owner='" + escape(name) + "']";
 
-    config.addProperty(path + "[1] @name", name + "s private area");
+    config.addProperty(path + "[1] @name", name + "'s private area");
     config.addProperty(path + "[1] @start", player.areastart.x() + "," + player.areastart.z());
     config.addProperty(path + "[1] @end", player.areaend.x() + "," + player.areaend.z());
 
@@ -678,7 +678,7 @@ public class PermissionConfig extends AbstractConfig {
       return;
     }
 
-    String path = "/areas/area[@owner='" + name + "']";
+    String path = "/areas/area[@owner='" + escape(name) + "']";
     config.clearTree(path);
 
     if (config.getList("/areas/area/@name").size() == 0) {
@@ -692,21 +692,23 @@ public class PermissionConfig extends AbstractConfig {
       return;
     }
 
-    String path = "/areas/area[@owner='" + name + "']";
+    String path = "/areas/area[@owner='" + escape(name) + "']";
     config.setProperty(path + "/ @name", label);
+
+    save();
   }
 
   public boolean hasAreaWithName(String label) {
-    return !config.getString("/areas/area[@name='" + label + "']/@name", "").equals("");
+    return !config.getString("/areas/area[@name='" + escape(label) + "']/@name", "").equals("");
   }
 
   public boolean playerHasArea(Player player) {
     String name = player.getName().toLowerCase();
-    return !config.getString("/areas/area[@owner='" + name + "']/@owner", "").equals("");
+    return !config.getString("/areas/area[@owner='" + escape(name) + "']/@owner", "").equals("");
   }
 
   public boolean commandShouldPassThroughToMod(String cmd) {
-    String val = config.getString("/permissions/commands/command[@name='" + cmd + "']/@forward", "");
+    String val = config.getString("/permissions/commands/command[@name='" + escape(cmd) + "']/@forward", "");
     if (val.equals("true")) {
       return true;
     }
@@ -714,7 +716,7 @@ public class PermissionConfig extends AbstractConfig {
   }
 
   public boolean commandIsHidden(String cmd) {
-    String val = config.getString("/permissions/commands/command[@name='" + cmd + "']/@hidden", "");
+    String val = config.getString("/permissions/commands/command[@name='" + escape(cmd) + "']/@hidden", "");
     if (val.equals("true")) {
       return true;
     }
@@ -807,7 +809,9 @@ public class PermissionConfig extends AbstractConfig {
       System.out.println("[SimpleServer] " + e);
       System.out.println("[SimpleServer] Failed to save " + getFilename());
     }
-
   }
 
+  private static String escape(String attribute) {
+    return attribute.replaceAll("'", "&apos;");
+  }
 }
