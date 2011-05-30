@@ -607,6 +607,7 @@ public class PermissionConfig extends AbstractConfig {
 
   private boolean areaContainsCoordinate(Coordinate start, Coordinate end, Coordinate coord) {
     if (start.dimension() != coord.dimension() || end.dimension() != coord.dimension()) {
+      System.out.println("schubidu");
       return false;
     }
 
@@ -618,7 +619,7 @@ public class PermissionConfig extends AbstractConfig {
                                     Math.min(start.z(), end.z()));
 
     if (max.y() == 0) {
-      max = max.setY((byte) 128);
+      max = max.setY((byte) 127);
     }
 
     return coord.x() >= min.x() &&
@@ -668,6 +669,8 @@ public class PermissionConfig extends AbstractConfig {
     config.addProperty(path + "[1]/permissions/blocks @allowDestroy", ";" + name);
     config.addProperty(path + "[1]/permissions/blocks @allowUse", ";" + name);
     config.addProperty(path + "[1]/permissions/blocks @allowTake", ";" + name);
+
+    save();
   }
 
   public void removePlayerArea(Player player) {
