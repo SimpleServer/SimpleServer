@@ -39,8 +39,7 @@ public class TellCommand extends OnlinePlayerArgCommand implements
       target.addMessage(formattedChat);
 
       target.setReply(player);
-    }
-    else {
+    } else {
       player.addMessage("\u00a7cPlease supply a message.");
     }
   }

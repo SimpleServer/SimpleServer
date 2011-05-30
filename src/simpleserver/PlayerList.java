@@ -46,8 +46,7 @@ public class PlayerList {
     while (players.size() > 0) {
       try {
         wait();
-      }
-      catch (InterruptedException e) {
+      } catch (InterruptedException e) {
       }
     }
   }
@@ -89,8 +88,7 @@ public class PlayerList {
   public synchronized void addPlayer(Player player) {
     if (players.size() < options.getInt("maxPlayers")) {
       players.put(player.getName().toLowerCase(), player);
-    }
-    else {
+    } else {
       Player playerToKick = null;
       for (Player friend : players.values()) {
         if (!((friend.getGroupId() >= player.getGroupId()) || (playerToKick != null)
@@ -102,8 +100,7 @@ public class PlayerList {
 
       if (playerToKick == null) {
         player.kick("Sorry, server is full!");
-      }
-      else {
+      } else {
         playerToKick.kick("Sorry, making space for more senior member.");
         players.remove(playerToKick.getName().toLowerCase());
         players.put(player.getName().toLowerCase(), player);

@@ -115,8 +115,7 @@ public class KitList extends PropertiesConfig {
         try {
           block = Integer.parseInt(item[0]);
           amount = Integer.parseInt(item[1]);
-        }
-        catch (NumberFormatException e) {
+        } catch (NumberFormatException e) {
           System.out.println("Skipping bad kit item " + options[c]);
           continue;
         }

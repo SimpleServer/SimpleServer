@@ -48,12 +48,10 @@ public abstract class AsciiConfig extends AbstractConfig {
         writer.flush();
 
         success = true;
-      }
-      finally {
+      } finally {
         writer.close();
       }
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       e.printStackTrace();
     }
 
@@ -77,19 +75,16 @@ public abstract class AsciiConfig extends AbstractConfig {
           }
         }
         success = true;
-      }
-      finally {
+      } finally {
         reader.close();
       }
-    }
-    catch (FileNotFoundException e) {
+    } catch (FileNotFoundException e) {
       System.out.println(getFilename() + " is missing.  Loading defaults.");
       loadDefaults();
 
       save();
       success = true;
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       e.printStackTrace();
     }
 
@@ -107,12 +102,10 @@ public abstract class AsciiConfig extends AbstractConfig {
     String defaults;
     try {
       defaults = readFully(stream);
-    }
-    finally {
+    } finally {
       try {
         stream.close();
-      }
-      catch (IOException e) {
+      } catch (IOException e) {
         e.printStackTrace();
       }
     }

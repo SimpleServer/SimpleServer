@@ -73,8 +73,7 @@ public class RequestTracker {
 
         try {
           Thread.sleep(CLEAR_SECONDS * 1000);
-        }
-        catch (InterruptedException e) {
+        } catch (InterruptedException e) {
         }
       }
     }

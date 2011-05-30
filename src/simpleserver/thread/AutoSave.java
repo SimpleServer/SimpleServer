@@ -66,8 +66,7 @@ public class AutoSave {
         if (needsSave()) {
           try {
             server.saveLock.acquire();
-          }
-          catch (InterruptedException e) {
+          } catch (InterruptedException e) {
             continue;
           }
           forceSave = false;
@@ -78,8 +77,7 @@ public class AutoSave {
           while (server.isSaving()) {
             try {
               Thread.sleep(100);
-            }
-            catch (InterruptedException e) {
+            } catch (InterruptedException e) {
             }
           }
 
@@ -89,8 +87,7 @@ public class AutoSave {
 
         try {
           Thread.sleep(60000);
-        }
-        catch (InterruptedException e) {
+        } catch (InterruptedException e) {
         }
       }
     }

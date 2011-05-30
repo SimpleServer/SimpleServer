@@ -56,8 +56,7 @@ public class SetGroupCommand extends PlayerArgCommand {
     }
     try {
       group = Integer.parseInt(arguments[1]);
-    }
-    catch (NumberFormatException e) {
+    } catch (NumberFormatException e) {
       player.addMessage("\u00a7cGroup must be a number!");
       return;
     }

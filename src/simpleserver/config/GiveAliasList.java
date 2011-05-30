@@ -63,8 +63,7 @@ public class GiveAliasList extends PropertiesConfig {
       Integer id;
       try {
         id = Integer.valueOf((String) alias.getValue());
-      }
-      catch (NumberFormatException e) {
+      } catch (NumberFormatException e) {
         System.out.println("Invalid give alias: " + alias.toString());
         continue;
       }

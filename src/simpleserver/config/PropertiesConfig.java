@@ -51,8 +51,7 @@ public abstract class PropertiesConfig extends AbstractConfig {
   public void load() {
     if (layered) {
       properties = (SortedProperties) defaultProperties.clone();
-    }
-    else {
+    } else {
       properties = new SortedProperties();
     }
 
@@ -60,17 +59,14 @@ public abstract class PropertiesConfig extends AbstractConfig {
       InputStream stream = new FileInputStream(getFile());
       try {
         properties.load(stream);
-      }
-      finally {
+      } finally {
         stream.close();
       }
-    }
-    catch (FileNotFoundException e) {
+    } catch (FileNotFoundException e) {
       System.out.println(getFilename() + " is missing.  Loading defaults.");
       properties = (SortedProperties) defaultProperties.clone();
       save();
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       System.out.println("[SimpleServer] " + e);
       System.out.println("[SimpleServer] Failed to load " + getFilename());
     }
@@ -82,12 +78,10 @@ public abstract class PropertiesConfig extends AbstractConfig {
       OutputStream stream = new FileOutputStream(getFile());
       try {
         properties.store(stream, getHeader());
-      }
-      finally {
+      } finally {
         stream.close();
       }
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       System.out.println("[SimpleServer] " + e);
       System.out.println("[SimpleServer] Failed to save " + getFilename());
     }
@@ -99,12 +93,10 @@ public abstract class PropertiesConfig extends AbstractConfig {
     try {
       try {
         defaultProperties.load(stream);
-      }
-      finally {
+      } finally {
         stream.close();
       }
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       System.out.println("[SimpleServer] " + e);
       System.out.println("[SimpleServer] Failed to load defaults for "
           + getFilename());

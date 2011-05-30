@@ -45,8 +45,7 @@ public class InputStreamDumper extends FilterInputStream implements DataInput,
   public void cleanup() {
     try {
       dump.close();
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
     }
   }
 
@@ -59,8 +58,7 @@ public class InputStreamDumper extends FilterInputStream implements DataInput,
   public void close() throws IOException {
     try {
       in.close();
-    }
-    finally {
+    } finally {
       dump.close();
     }
   }
@@ -96,8 +94,7 @@ public class InputStreamDumper extends FilterInputStream implements DataInput,
     if (!inPacket) {
       inPacket = true;
       dump.write(String.format("\nPacket ID: 0x%02x\n", newByte));
-    }
-    else {
+    } else {
       dump.write(newByte + "b\n");
     }
     return newByte;

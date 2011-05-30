@@ -34,8 +34,7 @@ public class RulesCommand extends AbstractCommand implements PlayerCommand {
       for (String line : lines) {
         player.addMessage(line);
       }
-    }
-    else {
+    } else {
       player.addMessage("\u00a7cRules is empty. Edit simpleserver/rules.txt");
     }
   }

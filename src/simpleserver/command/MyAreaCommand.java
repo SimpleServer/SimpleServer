@@ -26,7 +26,7 @@ import simpleserver.config.PermissionConfig;
 
 public class MyAreaCommand extends AbstractCommand implements PlayerCommand {
   public MyAreaCommand() {
-    super("myarea [start|end|save|unsave]", "Manage your personal area");
+    super("myarea [start|end|save|unsave|rename]", "Manage your personal area");
   }
 
   private boolean areaSizeOk(Player player) {
@@ -52,13 +52,11 @@ public class MyAreaCommand extends AbstractCommand implements PlayerCommand {
       player.areastart = perm.coordinateFromPlayer(player);
       player.areastart = player.areastart.setY((byte) 0); // no height limit
       player.addMessage("\u00a77Start coordinate set.");
-    }
-    else if (arguments[0].equals("end")) {
+    } else if (arguments[0].equals("end")) {
       player.areaend = perm.coordinateFromPlayer(player);
       player.areaend = player.areaend.setY((byte) 0); // no height limit
       player.addMessage("\u00a77End coordinate set.");
-    }
-    else if (arguments[0].equals("save")) {
+    } else if (arguments[0].equals("save")) {
       if (perm.playerHasArea(player)) {
         player.addMessage("\u00a7cNew area can not be saved before you unsave your old one!");
         return;
@@ -78,8 +76,7 @@ public class MyAreaCommand extends AbstractCommand implements PlayerCommand {
 
       perm.createPlayerArea(player);
       player.addMessage("\u00a77Your area has been saved!");
-    }
-    else if (arguments[0].equals("unsave")) {
+    } else if (arguments[0].equals("unsave")) {
       if (!perm.playerHasArea(player)) {
         player.addMessage("\u00a7cYou currently have no personal area which can be unsaved!");
         return;
@@ -87,7 +84,23 @@ public class MyAreaCommand extends AbstractCommand implements PlayerCommand {
 
       perm.removePlayerArea(player);
       player.addMessage("\u00a77Your area has been unsaved!");
-    }
+    } else if (arguments[0].equals("rename")) {
+      if (!perm.playerHasArea(player)) {
+        player.addMessage("\u00a7cYou currently have no personal area which can be renamed!");
+        return;
+      }
 
+      String label = extractArgument(message, 1);
+      if (label != null) {
+        if (perm.hasAreaWithName(label)) {
+          player.addMessage("\u00a7cAn area with that name already exists!");
+        } else {
+          perm.renamePlayerArea(player, label);
+          player.addMessage("\u00a77Your area has been renamed!");
+        }
+      } else {
+        player.addMessage("\u00a7cPlease supply an area name.");
+      }
+    }
   }
 }

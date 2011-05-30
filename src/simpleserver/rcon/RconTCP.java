@@ -63,8 +63,7 @@ public class RconTCP {
 
     try {
       new Thread(new RconHandler(socket, this, server)).start();
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       e.printStackTrace();
       close();
     }
@@ -90,8 +89,7 @@ public class RconTCP {
       t1.interrupt();
       try {
         socket.close();
-      }
-      catch (IOException e) {
+      } catch (IOException e) {
       }
     }
   }
