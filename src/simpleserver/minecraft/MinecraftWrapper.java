@@ -46,7 +46,7 @@ public class MinecraftWrapper {
   private static final String COMMAND_FORMAT = "java %s -jar %s %s nogui";
   private static final String MEMORY_FORMAT = "-Xmx%sM -Xms%sM";
   private static final String XINCGC_FORMAT = "-Xincgc -Xmx%sM";
-  private static final String DEFAULT_ARGUMENTS = "-server -XX:+AggressiveOpts";
+  private static final String DEFAULT_ARGUMENTS = "-XX:+AggressiveOpts";
   private static final String BUKKIT_ARGUMENTS = "-nojline";
   private static final String SERVER_JAR = "minecraft_server.jar";
   private static final int MINIMUM_MEMORY = 1024;

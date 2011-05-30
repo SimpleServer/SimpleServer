@@ -804,6 +804,9 @@ public class PermissionConfig extends AbstractConfig {
   }
 
   private static String escape(String attribute) {
+    if (attribute == null) {
+      return "";
+    }
     return attribute.replaceAll("'", "&apos;");
   }
 }
