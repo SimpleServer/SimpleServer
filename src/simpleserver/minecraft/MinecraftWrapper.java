@@ -43,9 +43,10 @@ import simpleserver.thread.SystemInputQueue;
 
 public class MinecraftWrapper {
   private static final String DOWNLOAD_URL = "http://www.minecraft.net/download/minecraft_server.jar";
-  private static final String COMMAND_FORMAT = "java %s %s -jar %s %s nogui";
+  private static final String COMMAND_FORMAT = "java %s -jar %s %s nogui";
   private static final String MEMORY_FORMAT = "-Xmx%sM -Xms%sM";
   private static final String XINCGC_FORMAT = "-Xincgc -Xmx%sM";
+  private static final String DEFAULT_ARGUMENTS = "-server -XX:+AggressiveOpts";
   private static final String BUKKIT_ARGUMENTS = "-nojline";
   private static final String SERVER_JAR = "minecraft_server.jar";
   private static final int MINIMUM_MEMORY = 1024;
@@ -178,22 +179,27 @@ public class MinecraftWrapper {
 
   private String getCommand() {
     int minimumMemory = MINIMUM_MEMORY;
+    String arguments = "";
+
+    if (options.contains("javaArguments")) {
+      arguments = options.get("javaArguments");
+    }
+
     if (options.getInt("memory") < minimumMemory) {
       minimumMemory = options.getInt("memory");
     }
 
-    String arguments;
-    if (options.getBoolean("overwriteArguments")) {
-      arguments = "";
-    } else {
+    if (!options.getBoolean("overwriteArguments")) {
+      String memoryArgs;
       if (options.getBoolean("useXincgc")) {
-        arguments = String.format(XINCGC_FORMAT, options.get("memory"));
+        memoryArgs = String.format(XINCGC_FORMAT, options.get("memory"));
       } else {
-        arguments = String.format(MEMORY_FORMAT, minimumMemory, options.get("memory"));
+        memoryArgs = String.format(MEMORY_FORMAT, minimumMemory, options.get("memory"));
       }
+      arguments = String.format("%s %s %s", arguments, memoryArgs, DEFAULT_ARGUMENTS);
     }
 
-    return String.format(COMMAND_FORMAT, options.get("javaArguments"), arguments, getServerJar(), modArguments());
+    return String.format(COMMAND_FORMAT, arguments, getServerJar(), modArguments());
   }
 
   private String modArguments() {
