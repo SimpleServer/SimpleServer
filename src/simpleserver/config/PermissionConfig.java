@@ -686,6 +686,20 @@ public class PermissionConfig extends AbstractConfig {
     }
   }
 
+  public void renamePlayerArea(Player player, String label) {
+    String name = player.getName().toLowerCase();
+    if (!playerHasArea(player)) {
+      return;
+    }
+
+    String path = "/areas/area[@owner='" + name + "']";
+    config.setProperty(path + "/ @name", label);
+  }
+
+  public boolean hasAreaWithName(String label) {
+    return !config.getString("/areas/area[@name='" + label + "']/@name", "").equals("");
+  }
+
   public boolean playerHasArea(Player player) {
     String name = player.getName().toLowerCase();
     return !config.getString("/areas/area[@owner='" + name + "']/@owner", "").equals("");

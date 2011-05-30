@@ -26,7 +26,7 @@ import simpleserver.config.PermissionConfig;
 
 public class MyAreaCommand extends AbstractCommand implements PlayerCommand {
   public MyAreaCommand() {
-    super("myarea [start|end|save|unsave]", "Manage your personal area");
+    super("myarea [start|end|save|unsave|rename]", "Manage your personal area");
   }
 
   private boolean areaSizeOk(Player player) {
@@ -88,6 +88,24 @@ public class MyAreaCommand extends AbstractCommand implements PlayerCommand {
       perm.removePlayerArea(player);
       player.addMessage("\u00a77Your area has been unsaved!");
     }
+    else if (arguments[0].equals("rename")) {
+      if (!perm.playerHasArea(player)) {
+        player.addMessage("\u00a7cYou currently have no personal area which can be renamed!");
+        return;
+      }
 
+      String label = extractArgument(message, 1);
+      if (label != null) {
+          if (perm.hasAreaWithName(label)) {
+              perm.renamePlayerArea(player, label);
+              player.addMessage("\u00a77An area with that name already exists!");
+          } else {
+              perm.renamePlayerArea(player, label);
+              player.addMessage("\u00a77Your area has been renamed!");
+          }
+      } else {
+          player.addMessage("\u00a7cPlease supply an area name.");
+      }
+    }
   }
 }
