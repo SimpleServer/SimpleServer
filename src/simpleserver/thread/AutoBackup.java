@@ -240,7 +240,9 @@ public class AutoBackup {
           }
           forceBackup = false;
 
-          server.runCommand("say", server.l.get("SAVING_MAP"));
+          if (server.options.getBoolean("announceSave")) {
+            server.runCommand("say", server.l.get("SAVING_MAP"));
+          }
           server.setSaving(true);
           server.runCommand("save-all", null);
           while (server.isSaving()) {

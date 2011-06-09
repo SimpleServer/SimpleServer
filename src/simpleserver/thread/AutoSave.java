@@ -59,6 +59,12 @@ public class AutoSave {
         && server.numPlayers() > 0 || forceSave;
   }
 
+  public void announce(String message) {
+    if (server.options.getBoolean("announceSave")) {
+      server.runCommand("say", message);
+    }
+  }
+
   private final class Saver extends Thread {
     @Override
     public void run() {
@@ -71,7 +77,7 @@ public class AutoSave {
           }
           forceSave = false;
 
-          server.runCommand("say", server.l.get("SAVING_MAP"));
+          announce(server.l.get("SAVING_MAP"));
           server.setSaving(true);
           server.runCommand("save-all", null);
           while (server.isSaving()) {

@@ -46,6 +46,12 @@ public class AutoRestart {
     restarter.interrupt();
   }
 
+  public void announce(String message) {
+    if (server.options.getBoolean("announceRestart")) {
+      server.runCommand("say", message);
+    }
+  }
+
   private boolean needsRestart() {
     long maxAge = System.currentTimeMillis() - MILLISECONDS_PER_MINUTE
         * server.options.getInt("autoRestartMins");
@@ -57,12 +63,12 @@ public class AutoRestart {
     public void run() {
       while (run) {
         if (needsRestart()) {
-          server.runCommand("say", server.l.get("SERVER_RESTART_60"));
+          announce(server.l.get("SERVER_RESTART_60"));
           try {
             Thread.sleep(30000);
-            server.runCommand("say", server.l.get("SERVER_RESTART_30"));
+            announce(server.l.get("SERVER_RESTART_30"));
             Thread.sleep(27000);
-            server.runCommand("say", server.l.get("SERVER_RESTART_3"));
+            announce(server.l.get("SERVER_RESTART_3"));
             Thread.sleep(3000);
           } catch (InterruptedException e) {
             continue;
