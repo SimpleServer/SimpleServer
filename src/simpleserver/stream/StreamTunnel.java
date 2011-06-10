@@ -766,20 +766,12 @@ public class StreamTunnel {
       case (byte) 0xe6: // ModLoaderMP by SDK
         write(in.readInt()); // mod
         write(in.readInt()); // packet id
-        int sizeInt = in.readInt(); // number of ints
-        write(sizeInt);
-        copyNBytes(sizeInt * 4);
-        int sizeFloat = in.readInt(); // number of floats
-        write(sizeFloat);
-        copyNBytes(sizeFloat * 4);
-        int sizeString = in.readInt(); // number of strings
-        write(sizeString);
+        copyNBytes(write(in.readInt()) * 4); // ints
+        copyNBytes(write(in.readInt()) * 4); // floats
+        int sizeString = write(in.readInt()); // strings
         for (int i = 0; i < sizeString; i++) {
-          int stringLength = in.readInt();
-          write(stringLength);
-          copyNBytes(stringLength);
+          copyNBytes(write(in.readInt()));
         }
-
         break;
       case (byte) 0xff: // Disconnect/Kick
         write(packetId);
@@ -895,50 +887,59 @@ public class StreamTunnel {
     }
   }
 
-  private void write(byte b) throws IOException {
+  private byte write(byte b) throws IOException {
     out.writeByte(b);
+    return b;
   }
 
-  private void write(short s) throws IOException {
+  private short write(short s) throws IOException {
     out.writeShort(s);
+    return s;
   }
 
-  private void write(int i) throws IOException {
+  private int write(int i) throws IOException {
     out.writeInt(i);
+    return i;
   }
 
-  private void write(long l) throws IOException {
+  private long write(long l) throws IOException {
     out.writeLong(l);
+    return l;
   }
 
-  private void write(float f) throws IOException {
+  private float write(float f) throws IOException {
     out.writeFloat(f);
+    return f;
   }
 
-  private void write(double d) throws IOException {
+  private double write(double d) throws IOException {
     out.writeDouble(d);
+    return d;
   }
 
-  private void write(String s) throws IOException {
+  private String write(String s) throws IOException {
     byte[] bytes = s.getBytes("UTF-16");
     if (s.length() == 0) {
       write((byte) 0x00);
       write((byte) 0x00);
-      return;
+      return s;
     }
     bytes[0] = (byte) ((s.length() >> 8) & 0xFF);
     bytes[1] = (byte) ((s.length() & 0xFF));
     for (byte b : bytes) {
       write(b);
     }
+    return s;
   }
 
-  private void write8(String s) throws IOException {
+  private String write8(String s) throws IOException {
     out.writeUTF(s);
+    return s;
   }
 
-  private void write(boolean b) throws IOException {
+  private boolean write(boolean b) throws IOException {
     out.writeBoolean(b);
+    return b;
   }
 
   private void skipNBytes(int bytes) throws IOException {
