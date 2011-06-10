@@ -678,6 +678,8 @@ public class PermissionConfig extends AbstractConfig {
     if (config.getList("/areas/area/@name").size() == 0) {
       config.addProperty("/ areas", " "); // add areas tag back
     }
+
+    save();
   }
 
   public void renamePlayerArea(Player player, String label) {

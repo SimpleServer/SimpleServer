@@ -20,8 +20,8 @@
  */
 package simpleserver.command;
 
-import simpleserver.Player;
 import simpleserver.Coordinate.Dimension;
+import simpleserver.Player;
 import simpleserver.config.PermissionConfig;
 
 public class MyAreaCommand extends AbstractCommand implements PlayerCommand {
@@ -101,6 +101,8 @@ public class MyAreaCommand extends AbstractCommand implements PlayerCommand {
       } else {
         player.addMessage("\u00a7cPlease supply an area name.");
       }
+    } else {
+      player.addMessage("\u00a7cYou entered an invalid argument.");
     }
   }
 }
