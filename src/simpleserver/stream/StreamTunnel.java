@@ -763,6 +763,24 @@ public class StreamTunnel {
         write(packetId);
         copyNBytes(5);
         break;
+      case (byte) 0xe6:
+        write(in.readInt()); // mod
+        write(in.readInt()); // packet id
+        int sizeInt = in.readInt(); // number of ints
+        write(sizeInt);
+        copyNBytes(sizeInt * 4);
+        int sizeFloat = in.readInt(); // number of floats
+        write(sizeFloat);
+        copyNBytes(sizeFloat * 4);
+        int sizeString = in.readInt(); // number of strings
+        write(sizeString);
+        for (int i = 0; i < sizeString; i++) {
+          int stringLength = in.readInt();
+          write(stringLength);
+          copyNBytes(stringLength);
+        }
+
+        break;
       case (byte) 0xff: // Disconnect/Kick
         write(packetId);
         String reason = readUTF16();
