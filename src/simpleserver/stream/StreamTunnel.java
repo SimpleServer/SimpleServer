@@ -37,10 +37,10 @@ import java.util.regex.Pattern;
 
 import simpleserver.Authenticator.LoginRequest;
 import simpleserver.Coordinate;
+import simpleserver.Coordinate.Dimension;
 import simpleserver.Group;
 import simpleserver.Player;
 import simpleserver.Server;
-import simpleserver.Coordinate.Dimension;
 import simpleserver.command.LocalSayCommand;
 import simpleserver.command.PlayerListCommand;
 import simpleserver.config.ChestList.Chest;
@@ -80,8 +80,7 @@ public class StreamTunnel {
     this.isServerTunnel = isServerTunnel;
     if (isServerTunnel) {
       streamType = "ServerStream";
-    }
-    else {
+    } else {
       streamType = "PlayerStream";
     }
 
@@ -96,8 +95,7 @@ public class StreamTunnel {
         InputStreamDumper dumper = new InputStreamDumper(dIn, dump);
         inputDumper = dumper;
         this.in = dumper;
-      }
-      catch (FileNotFoundException e) {
+      } catch (FileNotFoundException e) {
         System.out.println("Unable to open input debug dump!");
         throw new RuntimeException(e);
       }
@@ -107,13 +105,11 @@ public class StreamTunnel {
         OutputStreamDumper dumper = new OutputStreamDumper(dOut, dump);
         outputDumper = dumper;
         this.out = dumper;
-      }
-      catch (FileNotFoundException e) {
+      } catch (FileNotFoundException e) {
         System.out.println("Unable to open output debug dump!");
         throw new RuntimeException(e);
       }
-    }
-    else {
+    } else {
       this.in = dIn;
       this.out = dOut;
     }
@@ -153,9 +149,9 @@ public class StreamTunnel {
       case 0x01: // Login Request/Response
         write(packetId);
         if (isServerTunnel) {
-          if(server.options.getBoolean("custAuth") 
-              && server.options.getBoolean("onlineMode") 
-              && !server.authenticator.onlineAuthenticate(player)){
+          if (server.options.getBoolean("custAuth")
+              && server.options.getBoolean("onlineMode")
+              && !server.authenticator.onlineAuthenticate(player)) {
             player.kick("[CustAuth] Failed to login: User not premium");
           }
           player.setEntityId(in.readInt());
@@ -176,27 +172,28 @@ public class StreamTunnel {
       case 0x02: // Handshake
         String name = readUTF16();
         boolean nameSet = false;
-        
+
         if (server.options.getBoolean("custAuth")) {
           if (!isServerTunnel) {
 
             if (name.equals("Player")) {
               // is not logged in to minecraft.net
-              
+
               LoginRequest req = server.authenticator.getLoginRequest(player.getIPAddress());
               if (req != null) {
                 name = req.playerName;
                 nameSet = server.authenticator.completeLogin(req, player);
               }
-              
-              if (req == null || nameSet == false){
+
+              if (req == null || nameSet == false) {
                 player.setGuest(true);
                 name = server.authenticator.getFreeGuestName(player.getIPAddress());
                 nameSet = player.setName(name);
               }
             } else {
               if (!server.authenticator.isMinecraftUp) {
-                // this is impossible without name spoofing -> kick? or should onlineMode be attracted?
+                // this is impossible without name spoofing -> kick? or should
+                // onlineMode be attracted?
                 server.authenticator.updateMinecraftState();
                 if (!server.authenticator.isMinecraftUp) {
                   kick("Please restart your client and use offline mode to join.");
@@ -208,7 +205,8 @@ public class StreamTunnel {
               }
             }
           } else {
-            // send '-' if no authentication needed and hash if minecraft.net auth
+            // send '-' if no authentication needed and hash if minecraft.net
+            // auth
             if (!server.authenticator.isMinecraftUp || !server.options.getBoolean("onlineMode")) {
               name = "-";
             } else {
@@ -222,13 +220,13 @@ public class StreamTunnel {
           }
           nameSet = player.setName(name);
         }
-        
-        if(isServerTunnel || nameSet){
+
+        if (isServerTunnel || nameSet) {
           tunneler.setName(streamType + "-" + player.getName());
           write(packetId);
           write(name);
         }
-        
+
         break;
       case 0x03: // Chat Message
         String message = readUTF16();
@@ -258,29 +256,25 @@ public class StreamTunnel {
               try {
                 message = String.format(format, friend.getName(), title, color)
                     + messageMatcher.group(2);
-              }
-              catch (IllegalFormatException e) {
+              } catch (IllegalFormatException e) {
                 System.out.println("[SimpleServer] There is an error in your msgFormat/msgTitleFormat settings!");
               }
 
             }
-          }
-          else if (cleanMessage.matches(CONSOLE_CHAT_PATTERN) && !server.options.getBoolean("chatConsoleToOps")) {
+          } else if (cleanMessage.matches(CONSOLE_CHAT_PATTERN) && !server.options.getBoolean("chatConsoleToOps")) {
             break;
           }
 
           if (server.options.getBoolean("msgWrap")) {
             sendMessage(message);
-          }
-          else {
+          } else {
             if (message.length() > MAXIMUM_MESSAGE_SIZE) {
               message = message.substring(0, MAXIMUM_MESSAGE_SIZE);
             }
             write(packetId);
             write(message);
           }
-        }
-        else if (!isServerTunnel) {
+        } else if (!isServerTunnel) {
 
           if (player.isMuted() && !message.startsWith("/")
               && !message.startsWith("!")) {
@@ -423,8 +417,7 @@ public class StreamTunnel {
               player.destroyedBlock();
             }
           }
-        }
-        else {
+        } else {
           write(packetId);
           copyNBytes(11);
         }
@@ -450,19 +443,16 @@ public class StreamTunnel {
 
         if (isServerTunnel || server.chests.isChest(coordinate)) {
           // continue
-        }
-        else if ((dropItem != -1 && !perms[0]) || (dropItem == -1 && !perms[2])) {
+        } else if ((dropItem != -1 && !perms[0]) || (dropItem == -1 && !perms[2])) {
           if (dropItem == -1) {
             player.addMessage("\u00a7c " + server.l.get("USE_FORBIDDEN"));
-          }
-          else {
+          } else {
             player.addMessage("\u00a7c " + server.l.get("PLACE_FORBIDDEN"));
           }
 
           writePacket = false;
           drop = true;
-        }
-        else if (dropItem == 54) {
+        } else if (dropItem == 54) {
           int xPosition = x;
           byte yPosition = y;
           int zPosition = z;
@@ -495,8 +485,7 @@ public class StreamTunnel {
             player.addMessage("\u00a7c " + server.l.get("ADJ_CHEST_LOCKED"));
             writePacket = false;
             drop = true;
-          }
-          else {
+          } else {
             player.placingChest(targetBlock);
           }
         }
@@ -520,8 +509,7 @@ public class StreamTunnel {
 
           player.openingChest(coordinate);
 
-        }
-        else if (drop) {
+        } else if (drop) {
           // Drop the item in hand. This keeps the client state in-sync with the
           // server. This generally prevents empty-hand clicks by the client
           // from placing blocks the server thinks the client has in hand.
@@ -713,7 +701,7 @@ public class StreamTunnel {
         write(packetId);
         copyNBytes(17);
         break;
-      case 0x64:
+      case 0x64: // Open window
         byte id = in.readByte();
         byte invtype = in.readByte();
         String typeString = in.readUTF();
@@ -725,12 +713,10 @@ public class StreamTunnel {
                 player.setAttemptedAction(null);
                 player.addMessage("\u00a77 " + server.l.get("CHEST_UNLOCKED"));
                 typeString = "Open Chest";
-              }
-              else {
+              } else {
                 typeString = server.chests.chestName(player.openedChest());
               }
-            }
-            else {
+            } else {
               typeString = "Open Chest";
               if (player.isAttemptLock()) {
                 lockChest(player.openedChest());
@@ -738,8 +724,7 @@ public class StreamTunnel {
               }
             }
 
-          }
-          else {
+          } else {
             player.addMessage("\u00a7c " + server.l.get("CHEST_LOCKED"));
             in.readByte();
             break;
@@ -837,6 +822,16 @@ public class StreamTunnel {
         write(packetId);
         copyNBytes(5);
         break;
+      case (byte) 0xe6: // ModLoaderMP by SDK
+        write(in.readInt()); // mod
+        write(in.readInt()); // packet id
+        copyNBytes(write(in.readInt()) * 4); // ints
+        copyNBytes(write(in.readInt()) * 4); // floats
+        int sizeString = write(in.readInt()); // strings
+        for (int i = 0; i < sizeString; i++) {
+          copyNBytes(write(in.readInt()));
+        }
+        break;
       case (byte) 0xff: // Disconnect/Kick
         write(packetId);
         String reason = readUTF16();
@@ -852,8 +847,7 @@ public class StreamTunnel {
             skipNBytes(1);
             flushAll();
           }
-        }
-        else {
+        } else {
           throw new IOException("Unable to parse unknown " + streamType
               + " packet 0x" + Integer.toHexString(packetId) + " for player "
               + player.getName() + " (after 0x" + Integer.toHexString(lastPacket));
@@ -879,8 +873,7 @@ public class StreamTunnel {
     if (player.isAttemptLock() || adjacentChest != null && !adjacentChest.isOpen()) {
       if (adjacentChest != null && !adjacentChest.isOpen()) {
         server.chests.giveLock(adjacentChest.owner(), coordinate, false, adjacentChest.name());
-      }
-      else {
+      } else {
         if (adjacentChest != null) {
           adjacentChest.lock(player);
           adjacentChest.rename(player.nextChestName());
@@ -889,8 +882,7 @@ public class StreamTunnel {
       }
       player.setAttemptedAction(null);
       player.addMessage("\u00a77This chest is now locked.");
-    }
-    else if (!server.chests.isChest(coordinate)) {
+    } else if (!server.chests.isChest(coordinate)) {
       server.chests.addOpenChest(coordinate);
     }
   }
@@ -910,8 +902,7 @@ public class StreamTunnel {
       write(stance);
       write(z);
       copyNBytes(1);
-    }
-    else {
+    } else {
       copyNBytes(33);
     }
   }
@@ -955,50 +946,59 @@ public class StreamTunnel {
     }
   }
 
-  private void write(byte b) throws IOException {
+  private byte write(byte b) throws IOException {
     out.writeByte(b);
+    return b;
   }
 
-  private void write(short s) throws IOException {
+  private short write(short s) throws IOException {
     out.writeShort(s);
+    return s;
   }
 
-  private void write(int i) throws IOException {
+  private int write(int i) throws IOException {
     out.writeInt(i);
+    return i;
   }
 
-  private void write(long l) throws IOException {
+  private long write(long l) throws IOException {
     out.writeLong(l);
+    return l;
   }
 
-  private void write(float f) throws IOException {
+  private float write(float f) throws IOException {
     out.writeFloat(f);
+    return f;
   }
 
-  private void write(double d) throws IOException {
+  private double write(double d) throws IOException {
     out.writeDouble(d);
+    return d;
   }
 
-  private void write(String s) throws IOException {
+  private String write(String s) throws IOException {
     byte[] bytes = s.getBytes("UTF-16");
     if (s.length() == 0) {
       write((byte) 0x00);
       write((byte) 0x00);
-      return;
+      return s;
     }
     bytes[0] = (byte) ((s.length() >> 8) & 0xFF);
     bytes[1] = (byte) ((s.length() & 0xFF));
-    for (int i = 0; i < bytes.length; i++) {
-      write(bytes[i]);
+    for (byte b : bytes) {
+      write(b);
     }
+    return s;
   }
 
-  private void write8(String s) throws IOException {
+  private String write8(String s) throws IOException {
     out.writeUTF(s);
+    return s;
   }
 
-  private void write(boolean b) throws IOException {
+  private boolean write(boolean b) throws IOException {
     out.writeBoolean(b);
+    return b;
   }
 
   private void skipNBytes(int bytes) throws IOException {
@@ -1043,8 +1043,7 @@ public class StreamTunnel {
       }
       if (end == 0) {
         end = MESSAGE_SIZE;
-      }
-      else {
+      } else {
         end++;
       }
 
@@ -1055,8 +1054,7 @@ public class StreamTunnel {
       String firstPart = message.substring(0, end);
       sendMessagePacket(firstPart);
       sendMessage(getLastColorCode(firstPart) + message.substring(end));
-    }
-    else {
+    } else {
       sendMessagePacket(message);
     }
   }
@@ -1081,8 +1079,7 @@ public class StreamTunnel {
   private void flushAll() throws IOException {
     try {
       ((OutputStream) out).flush();
-    }
-    finally {
+    } finally {
       if (EXPENSIVE_DEBUG_LOGGING) {
         inputDumper.flush();
       }
@@ -1106,8 +1103,7 @@ public class StreamTunnel {
             }
 
             flushAll();
-          }
-          catch (IOException e) {
+          } catch (IOException e) {
             if (run && !player.isRobot()) {
               System.out.println("[SimpleServer] " + e);
               System.out.println("[SimpleServer] " + streamType
@@ -1122,11 +1118,9 @@ public class StreamTunnel {
             kick(player.getKickMsg());
           }
           flushAll();
+        } catch (IOException e) {
         }
-        catch (IOException e) {
-        }
-      }
-      finally {
+      } finally {
         if (EXPENSIVE_DEBUG_LOGGING) {
           inputDumper.cleanup();
           outputDumper.cleanup();

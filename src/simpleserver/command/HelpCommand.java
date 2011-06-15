@@ -50,8 +50,7 @@ public class HelpCommand extends AbstractCommand implements PlayerCommand {
         }
         player.addMessage(line.toString());
       }
-    }
-    else {
+    } else {
       StringBuffer line = new StringBuffer();
       line.append("\u00a77Available Commands:\u00a7f ");
 

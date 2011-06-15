@@ -53,8 +53,7 @@ public class RconServer {
     if (socket != null) {
       try {
         socket.close();
-      }
-      catch (IOException e) {
+      } catch (IOException e) {
       }
     }
     for (RconTCP connection : connections) {
@@ -71,12 +70,10 @@ public class RconServer {
       InetAddress address;
       if (ip.equals("0.0.0.0")) {
         address = null;
-      }
-      else {
+      } else {
         try {
           address = InetAddress.getByName(ip);
-        }
-        catch (UnknownHostException e) {
+        } catch (UnknownHostException e) {
           e.printStackTrace();
           System.out.println("Invalid listening address " + ip);
           return;
@@ -85,8 +82,7 @@ public class RconServer {
 
       try {
         socket = new ServerSocket(port, 0, address);
-      }
-      catch (IOException e) {
+      } catch (IOException e) {
         System.out.println("Could not listen on port " + port
             + "!\nIs it already in use? RCON is not available!");
         return;
@@ -101,8 +97,7 @@ public class RconServer {
           Socket client;
           try {
             client = socket.accept();
-          }
-          catch (IOException e) {
+          } catch (IOException e) {
             if (run) {
               e.printStackTrace();
               System.out.println("RCON server failed!");
@@ -111,12 +106,10 @@ public class RconServer {
           }
           connections.add(new RconTCP(client, server));
         }
-      }
-      finally {
+      } finally {
         try {
           socket.close();
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
         }
       }
     }

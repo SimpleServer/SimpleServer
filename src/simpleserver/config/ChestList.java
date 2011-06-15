@@ -65,10 +65,7 @@ public class ChestList extends AsciiConfig {
   }
 
   public Chest adjacentChest(Coordinate coordinate) {
-    Chest chest = chestAt(coordinate);
-    if (chest == null) {
-      chest = chestAt(coordinate.add(1, 0, 0));
-    }
+    Chest chest = chestAt(coordinate.add(1, 0, 0));
     if (chest == null) {
       chest = chestAt(coordinate.add(-1, 0, 0));
     }
@@ -112,8 +109,7 @@ public class ChestList extends AsciiConfig {
       if (chest.ownedBy(player)) {
         if (list.containsKey(chest.name)) {
           list.put(chest.name, list.get(chest.name) + 1);
-        }
-        else {
+        } else {
           list.put(chest.name, 1);
         }
       }
@@ -173,20 +169,17 @@ public class ChestList extends AsciiConfig {
         x = Integer.parseInt(tokens[2]);
         y = Byte.parseByte(tokens[3]);
         z = Integer.parseInt(tokens[4]);
-      }
-      catch (NumberFormatException e) {
+      } catch (NumberFormatException e) {
         System.out.println("Skipping malformed chest metadata: " + line);
         return;
       }
 
       if (tokens.length == 6) {
         name = tokens[5];
-      }
-      else if (tokens.length >= 7) {
+      } else if (tokens.length >= 7) {
         dimension = Dimension.get(tokens[5]);
         name = tokens[6];
-      }
-      else {
+      } else {
         name = (tokens[0].equals("-")) ? "-" : "Locked Chest";
       }
 

@@ -37,8 +37,7 @@ public class LockCommand extends AbstractCommand implements PlayerCommand {
         player.setAttemptedAction(null);
         player.addMessage("\u00a77Chests you place or open will no longer be locked.");
         return;
-      }
-      else {
+      } else {
         name = "Locked Chest";
       }
     }
@@ -46,15 +45,13 @@ public class LockCommand extends AbstractCommand implements PlayerCommand {
       Map<String, Integer> list = player.getServer().chests.chestList(player);
       if (list.size() == 0) {
         player.addMessage("\u00a77Your don't have any locked chests.");
-      }
-      else {
+      } else {
         player.addMessage("\u00a77Your locked chests:");
         for (String current : list.keySet()) {
           player.addMessage("\u00a77 " + list.get(current) + " " + current);
         }
       }
-    }
-    else {
+    } else {
       player.addMessage("\u00a77Create or open a chest, and it will be locked to you.");
       player.setAttemptedAction(Action.Lock);
       player.setChestName(name);

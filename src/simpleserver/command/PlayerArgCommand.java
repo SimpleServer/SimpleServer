@@ -39,8 +39,7 @@ public abstract class PlayerArgCommand extends AbstractCommand implements
       }
 
       executeWithTarget(player, message, name);
-    }
-    else {
+    } else {
       noTargetSpecified(player, message);
     }
   }

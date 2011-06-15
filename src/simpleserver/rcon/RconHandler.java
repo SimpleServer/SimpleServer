@@ -101,8 +101,7 @@ public class RconHandler implements Runnable {
         if (requestType == SERVERDATA_EXECCOMMAND && parent.auth) {
           response = parsePacket(s1);
           done = true;
-        }
-        else if (requestType == SERVERDATA_AUTH) {
+        } else if (requestType == SERVERDATA_AUTH) {
           response = auth(s1);
           responseType = SERVERDATA_AUTH_RESPONSE;
           if (response == null) {
@@ -110,13 +109,11 @@ public class RconHandler implements Runnable {
             response = "";
           }
           junkResponse();
-        }
-        else if (!parent.auth) {
+        } else if (!parent.auth) {
           responseType = SERVERDATA_AUTH_RESPONSE;
           requestID = -1;
           response = "";
-        }
-        else {
+        } else {
           responseType = SERVERDATA_RESPONSE_VALUE;
           requestID = -1;
           response = "Error";
@@ -132,8 +129,7 @@ public class RconHandler implements Runnable {
           out.write(assemblePacket(response.substring(i), requestID,
                                    responseType));
 
-        }
-        else {
+        } else {
           out.write(assemblePacket("", requestID, responseType));
         }
         out.flush();
@@ -151,36 +147,31 @@ public class RconHandler implements Runnable {
         bb.order(ByteOrder.LITTLE_ENDIAN);
         Thread.sleep(20);
       }
-    }
-    catch (InterruptedException e1) {
+    } catch (InterruptedException e1) {
       // We don't care about an Interrupted Exception.
       // Don't even print out to the console that we received the exception.
       // We are only interrupted if we are closing.
       // e1.printStackTrace();
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       e.printStackTrace();
     }
     // try {s.shutdownInput();} catch (IOException e2) {}
     // try {s.shutdownOutput();} catch (IOException e2) {}
     try {
       out.close();
-    }
-    catch (IOException e1) {
+    } catch (IOException e1) {
 
     }
     try {
       in.close();
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
 
     }
     in = null;
     out = null;
     try {
       s.close();
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
     }
     parent = null;
     lock = null;
@@ -237,8 +228,7 @@ public class RconHandler implements Runnable {
           int idx = command.indexOf(tokens[1]) + tokens[1].length() + 1;
           server.runCommand(tokens[1], command.substring(idx));
           return command;
-        }
-        else {
+        } else {
           return "Error: No Command";
         }
       }
@@ -272,8 +262,7 @@ public class RconHandler implements Runnable {
     if (passwd.equals(server.options.get("rconPassword"))) {
       parent.auth = true;
       return "";
-    }
-    else {
+    } else {
       System.out.println("[SimpleServer] RCON Authentication Failed from "
           + s.getInetAddress().getHostAddress() + "!");
       return null;
@@ -303,12 +292,10 @@ public class RconHandler implements Runnable {
       }
       lock.release();
       return a;
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       lock.release();
       throw e;
-    }
-    catch (InterruptedException e) {
+    } catch (InterruptedException e) {
       lock.release();
       throw e;
     }
@@ -340,8 +327,7 @@ public class RconHandler implements Runnable {
       b = readByte();
       if (b != 0) {
         bb.put(b);
-      }
-      else {
+      } else {
         break;
       }
       i++;

@@ -36,8 +36,7 @@ public class SetIPGroupCommand extends SetGroupCommand {
     Player targetPlayer = player.getServer().findPlayer(target);
     if (targetPlayer != null) {
       target = targetPlayer.getIPAddress();
-    }
-    else if (!Pattern.matches("^(\\d{1,3}\\.){3}\\d{1,3}$", target)) {
+    } else if (!Pattern.matches("^(\\d{1,3}\\.){3}\\d{1,3}$", target)) {
       player.addMessage("\u00a7cYou must specify a user or a valid IP!");
       return;
     }

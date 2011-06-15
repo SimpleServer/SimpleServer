@@ -61,8 +61,7 @@ public class GiveCommand extends AbstractCommand implements PlayerCommand {
                                       + target.getName() + "\t" + item + "\t("
                                       + amount + ")");
       target.give(item, amount);
-    }
-    else {
+    } else {
       player.addMessage("\u00a7cNo item or amount specified!");
     }
   }

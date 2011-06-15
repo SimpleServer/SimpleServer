@@ -61,8 +61,7 @@ public class CommandParser {
   public PlayerCommand getPlayerCommand(Class<? extends PlayerCommand> c) {
     if (playerCommandClasses.containsKey(c)) {
       return playerCommandClasses.get(c);
-    }
-    else {
+    } else {
       return null;
     }
   }
@@ -73,8 +72,7 @@ public class CommandParser {
       if (command == null) {
         if (options.contains("alternateJarFile")) {
           return new ExternalCommand(extractName(message, 1));
-        }
-        else {
+        } else {
           System.out.println("Illegal command configuration for: " + message);
           command = playerCommands.get(null);
         }
@@ -93,8 +91,7 @@ public class CommandParser {
   public ServerCommand getServerCommand(Class<? extends ServerCommand> c) {
     if (serverCommandClasses.containsKey(c)) {
       return serverCommandClasses.get(c);
-    }
-    else {
+    } else {
       return null;
     }
   }
@@ -106,8 +103,7 @@ public class CommandParser {
   public String commandPrefix() {
     if (options.getBoolean("useSlashes")) {
       return "/";
-    }
-    else {
+    } else {
       return "!";
     }
   }
@@ -135,8 +131,7 @@ public class CommandParser {
       try {
         command = commandType.getConstructor().newInstance(new Object[] {});
         ((AbstractCommand) command).setParser(this);
-      }
-      catch (Exception e) {
+      } catch (Exception e) {
         e.printStackTrace();
         System.out.println("Unexpected exception.  Skipping command "
             + commandType.getName());

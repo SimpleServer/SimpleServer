@@ -69,7 +69,9 @@ public class KitList extends PropertiesConfig {
         for (int c = 0; c < entry.amount / 64; ++c) {
           server.runCommand("give", baseCommand + " " + 64);
         }
-        server.runCommand("give", baseCommand + " " + entry.amount % 64);
+        if (entry.amount % 64 > 0) {
+          server.runCommand("give", baseCommand + " " + entry.amount % 64);
+        }
       }
       return true;
     }
@@ -115,8 +117,7 @@ public class KitList extends PropertiesConfig {
         try {
           block = Integer.parseInt(item[0]);
           amount = Integer.parseInt(item[1]);
-        }
-        catch (NumberFormatException e) {
+        } catch (NumberFormatException e) {
           System.out.println("Skipping bad kit item " + options[c]);
           continue;
         }

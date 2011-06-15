@@ -128,8 +128,7 @@ public class Server {
 
     try {
       socket.close();
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
     }
 
     listener.interrupt();
@@ -395,8 +394,7 @@ public class Server {
 
     try {
       minecraft.start();
-    }
-    catch (InterruptedException e) {
+    } catch (InterruptedException e) {
       // Severe error happened while starting up.
       // Already on track to stop/restart.
     }
@@ -423,8 +421,7 @@ public class Server {
         try {
           saveLock.acquire();
           break;
-        }
-        catch (InterruptedException e) {
+        } catch (InterruptedException e) {
           e.printStackTrace();
         }
       }
@@ -465,12 +462,10 @@ public class Server {
         InetAddress address;
         if (ip.equals("0.0.0.0")) {
           address = null;
-        }
-        else {
+        } else {
           try {
             address = InetAddress.getByName(ip);
-          }
-          catch (UnknownHostException e) {
+          } catch (UnknownHostException e) {
             System.out.println("[SimpleServer] " + e);
             System.out.println("[SimpleServer] Invalid listening address " + ip);
             break;
@@ -479,8 +474,7 @@ public class Server {
 
         try {
           socket = new ServerSocket(port, 0, address);
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
           System.out.println("[SimpleServer] " + e);
           System.out.println("[SimpleServer] Could not listen on port " + port
               + "!\nIs it already in use? Exiting application...");
@@ -500,8 +494,7 @@ public class Server {
             Socket client;
             try {
               client = socket.accept();
-            }
-            catch (IOException e) {
+            } catch (IOException e) {
               if (run && !restart) {
                 System.out.println("[SimpleServer] " + e);
                 System.out.println("[SimpleServer] Accept failed on port "
@@ -511,12 +504,10 @@ public class Server {
             }
             new Player(client, Server.this);
           }
-        }
-        finally {
+        } finally {
           try {
             socket.close();
-          }
-          catch (IOException e) {
+          } catch (IOException e) {
           }
         }
 

@@ -89,8 +89,7 @@ public class Player {
       System.out.println("[SimpleServer] Robot Heartbeat: " + getIPAddress()
           + ".");
       isRobot = true;
-    }
-    else {
+    } else {
       System.out.println("[SimpleServer] IP Connection from " + getIPAddress()
           + "!");
     }
@@ -108,17 +107,14 @@ public class Player {
       intsocket = new Socket(InetAddress.getByName(null),
                              server.options.getInt("internalPort"),
                              localAddress, 0);
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       try {
         intsocket = new Socket(InetAddress.getByName(null), server.options.getInt("internalPort"));
-      }
-      catch (Exception E) {
+      } catch (Exception E) {
         e.printStackTrace();
         if (server.options.getBoolean("exitOnFailure")) {
           server.stop();
-        }
-        else {
+        } else {
           server.restart();
         }
 
@@ -134,8 +130,7 @@ public class Player {
       clientToServer = new StreamTunnel(extsocket.getInputStream(),
                                         intsocket.getOutputStream(), false,
                                         this);
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       e.printStackTrace();
       cleanup();
       return;
@@ -407,8 +402,7 @@ public class Player {
         addMessage("\u00a7cItem ID must be positive!");
         success = false;
       }
-    }
-    catch (NumberFormatException e) {
+    } catch (NumberFormatException e) {
       addMessage("\u00a7cItem ID must map to a number!");
       success = false;
     }
@@ -422,8 +416,7 @@ public class Player {
           addMessage("\u00a7cAmount must be within 1-1000!");
           success = false;
         }
-      }
-      catch (NumberFormatException e) {
+      } catch (NumberFormatException e) {
         addMessage("\u00a7cAmount must be a number!");
         success = false;
       }
@@ -523,13 +516,11 @@ public class Player {
 
       try {
         extsocket.close();
-      }
-      catch (Exception e) {
+      } catch (Exception e) {
       }
       try {
         intsocket.close();
-      }
-      catch (Exception e) {
+      } catch (Exception e) {
       }
 
       if (!isRobot) {
@@ -562,8 +553,7 @@ public class Player {
 
         try {
           Thread.sleep(2000);
-        }
-        catch (InterruptedException e) {
+        } catch (InterruptedException e) {
         }
       }
 
@@ -583,18 +573,15 @@ public class Player {
         if (octets[1] >= 255) {
           if (octets[0] >= 255) {
             octets[0] = 0;
-          }
-          else {
+          } else {
             ++octets[0];
           }
           octets[1] = 0;
-        }
-        else {
+        } else {
           ++octets[1];
         }
         octets[2] = 2;
-      }
-      else {
+      } else {
         ++octets[2];
       }
 
@@ -608,8 +595,7 @@ public class Player {
         try {
           testDestination = InetAddress.getByName(null);
           testSource = InetAddress.getByName("127.0.1.2");
-        }
-        catch (UnknownHostException e) {
+        } catch (UnknownHostException e) {
           canCycle = false;
           return false;
         }
@@ -617,12 +603,10 @@ public class Player {
         try {
           Socket testSocket = new Socket(testDestination, 80, testSource, 0);
           testSocket.close();
-        }
-        catch (BindException e) {
+        } catch (BindException e) {
           canCycle = false;
           return false;
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
           // Probably nothing listening on port 80
         }
 

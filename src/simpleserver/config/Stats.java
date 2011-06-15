@@ -53,8 +53,7 @@ public class Stats extends PropertiesConfig {
         for (int i = 0; i < 3; i++) {
           ints[i] = Integer.parseInt(objects[i]);
         }
-      }
-      catch (NumberFormatException e) {
+      } catch (NumberFormatException e) {
         System.out.println("Skipping bad statistics fory " + entry.getKey());
         continue;
       }
@@ -97,8 +96,7 @@ public class Stats extends PropertiesConfig {
     String key = player.getName().toLowerCase();
     if (stats.containsKey(key)) {
       return stats.get(key);
-    }
-    else {
+    } else {
       Statistic empty = new Statistic();
       stats.put(key, empty);
       return empty;

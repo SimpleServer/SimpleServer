@@ -37,7 +37,7 @@
       <command name="give" allow="3-5" />
       <command name="giveplayer" allow="4,5" />
       <command name="gps" allow="3-5" />
-      <command name="help" aliases="commands" allow="0+" forward="true" />
+      <command name="help" aliases="commands" allow="0+" />
       <command name="idbehold" allow="4,5" />
       <command name="iddqd" allow="4,5" />
       <command name="kick" allow="3-5" />

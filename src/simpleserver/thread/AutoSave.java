@@ -59,6 +59,12 @@ public class AutoSave {
         && server.numPlayers() > 0 || forceSave;
   }
 
+  public void announce(String message) {
+    if (server.options.getBoolean("announceSave")) {
+      server.runCommand("say", message);
+    }
+  }
+
   private final class Saver extends Thread {
     @Override
     public void run() {
@@ -66,20 +72,18 @@ public class AutoSave {
         if (needsSave()) {
           try {
             server.saveLock.acquire();
-          }
-          catch (InterruptedException e) {
+          } catch (InterruptedException e) {
             continue;
           }
           forceSave = false;
 
-          server.runCommand("say", server.l.get("SAVING_MAP"));
+          announce(server.l.get("SAVING_MAP"));
           server.setSaving(true);
           server.runCommand("save-all", null);
           while (server.isSaving()) {
             try {
               Thread.sleep(100);
-            }
-            catch (InterruptedException e) {
+            } catch (InterruptedException e) {
             }
           }
 
@@ -89,8 +93,7 @@ public class AutoSave {
 
         try {
           Thread.sleep(60000);
-        }
-        catch (InterruptedException e) {
+        } catch (InterruptedException e) {
         }
       }
     }

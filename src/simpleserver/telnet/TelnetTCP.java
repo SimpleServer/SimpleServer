@@ -63,8 +63,7 @@ public class TelnetTCP {
 
     try {
       new Thread(new TelnetHandler(socket, this, server)).start();
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       e.printStackTrace();
       close();
     }
@@ -92,8 +91,7 @@ public class TelnetTCP {
       t1.interrupt();
       try {
         socket.close();
-      }
-      catch (IOException e) {
+      } catch (IOException e) {
       }
     }
   }

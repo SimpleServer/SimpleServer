@@ -33,8 +33,7 @@ public class GPSCommand extends OnlinePlayerArgCommand {
     String name = "Your";
     if (target == null) {
       target = player;
-    }
-    else {
+    } else {
       name = target.getName() + "'s";
     }
 

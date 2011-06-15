@@ -42,8 +42,7 @@ public class VisitCommand extends OnlinePlayerArgCommand {
       target.addMessage("\u00a7cissue the command " + commandPrefix() + "ok within 10 seconds.");
 
       target.addVisitRequest(player);
-    }
-    else {
+    } else {
       player.addMessage("\u00a7cYou and " + target.getName() + " are in different dimensions.");
       player.addMessage("\u00a7cNo teleport possible!");
     }

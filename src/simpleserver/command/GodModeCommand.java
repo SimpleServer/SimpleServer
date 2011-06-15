@@ -31,8 +31,7 @@ public class GodModeCommand extends AbstractCommand implements PlayerCommand {
     player.toggleGodMode();
     if (player.godModeEnabled()) {
       player.addMessage("\u00a77God-Mode Enabled!");
-    }
-    else {
+    } else {
       player.addMessage("\u00a77God-Mode Disabled!");
     }
   }

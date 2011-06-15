@@ -45,8 +45,7 @@ public class OutputStreamDumper extends FilterOutputStream implements
   public void cleanup() {
     try {
       dump.close();
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
     }
   }
 
@@ -59,8 +58,7 @@ public class OutputStreamDumper extends FilterOutputStream implements
   public void close() throws IOException {
     try {
       out.close();
-    }
-    finally {
+    } finally {
       dump.close();
     }
   }
@@ -104,8 +102,7 @@ public class OutputStreamDumper extends FilterOutputStream implements
     if (!inPacket) {
       inPacket = true;
       dump.write(String.format("\nPacket ID: 0x%02x\n", (byte) v));
-    }
-    else {
+    } else {
       dump.write(v + "b\n");
     }
   }
