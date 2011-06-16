@@ -20,6 +20,7 @@
  */
 package simpleserver.command;
 
+import simpleserver.Color;
 import simpleserver.Player;
 import simpleserver.Server;
 
@@ -31,7 +32,7 @@ public class ReloadCommand extends AbstractCommand implements PlayerCommand,
 
   public void execute(Player player, String message) {
     player.getServer().loadResources();
-    player.addMessage("\u00a77" + t.get("Resources Reloaded!"));
+    player.addTMessage(Color.GRAY, "Resources Reloaded!");
   }
 
   public void execute(Server server, String message) {

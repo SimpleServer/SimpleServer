@@ -20,6 +20,7 @@
  */
 package simpleserver.command;
 
+import simpleserver.Color;
 import simpleserver.Player;
 
 public class MOTDCommand extends AbstractCommand implements PlayerCommand {
@@ -31,7 +32,7 @@ public class MOTDCommand extends AbstractCommand implements PlayerCommand {
     if (player.getServer().motd.getMOTD().trim().length() > 0) {
       player.sendMOTD();
     } else {
-      player.addMessage("\u00a7c" + t.get("MOTD is empty."));
+      player.addTMessage(Color.RED, "MOTD is empty.");
     }
   }
 }

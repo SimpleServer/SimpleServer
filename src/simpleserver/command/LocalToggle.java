@@ -20,6 +20,7 @@
  */
 package simpleserver.command;
 
+import simpleserver.Color;
 import simpleserver.Player;
 
 public class LocalToggle extends AbstractCommand implements PlayerCommand {
@@ -35,17 +36,13 @@ public class LocalToggle extends AbstractCommand implements PlayerCommand {
       } else if (arguments[0].equals("off")) {
         player.setLocalChat(false);
       } else {
-        String msg = String.format(t.get("Only modes %s allowed!"),
-                                   "\"on\" & \"off\"");
-        player.addMessage("\u00a7c" + msg);
+        player.addTMessage(Color.RED, "Only modes %s allowed!", "\"on\" & \"off\"");
         return;
       }
     } else {
       player.setLocalChat(!player.localChat());
     }
-    String mode = (player.localChat()) ?
-        t.get("enabled") : t.get("disabled");
-    String msg = String.format(t.get("Local chat %s"), mode);
-    player.addMessage("\u00a77" + msg);
+    String mode = (player.localChat()) ? t.get("enabled") : t.get("disabled");
+    player.addTMessage(Color.GRAY, "Local chat %s", mode);
   }
 }

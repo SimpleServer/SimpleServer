@@ -20,6 +20,7 @@
  */
 package simpleserver.command;
 
+import simpleserver.Color;
 import simpleserver.Player;
 
 public abstract class OnlinePlayerArgCommand extends AbstractCommand implements
@@ -43,7 +44,7 @@ public abstract class OnlinePlayerArgCommand extends AbstractCommand implements
     if (arguments.length > 0) {
       Player target = player.getServer().findPlayer(arguments[0]);
       if (target == null) {
-        player.addMessage("\u00a7c" + t.get("Player not online") + " (" + arguments[0] + ")");
+        player.addTMessage(Color.RED, "Player not online (%s)", arguments[0]);
       } else {
         executeWithTarget(player, message, target);
       }
@@ -60,7 +61,7 @@ public abstract class OnlinePlayerArgCommand extends AbstractCommand implements
                                             Player target);
 
   protected void noTargetSpecified(Player player, String message) {
-    player.addMessage("\u00a7c" + t.get("No player specified."));
+    player.addTMessage(Color.RED, "No player specified.");
   }
 
   @Override

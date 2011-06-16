@@ -22,6 +22,7 @@ package simpleserver.command;
 
 import java.util.regex.Pattern;
 
+import simpleserver.Color;
 import simpleserver.Player;
 import simpleserver.Server;
 
@@ -38,14 +39,12 @@ public class SetIPGroupCommand extends SetGroupCommand {
     if (targetPlayer != null) {
       target = targetPlayer.getIPAddress();
     } else if (!Pattern.matches("^(\\d{1,3}\\.){3}\\d{1,3}$", target)) {
-      player.addMessage("\u00a7c" + t.get("You must specify a user or a valid IP!"));
+      player.addTMessage(Color.RED, "You must specify a user or a valid IP!");
       return;
     }
     server.permissions.setIPGroup(target, group);
 
-    String msg = String.format("Group of %s was set to %s!",
-                               target, group);
-    player.addMessage("\u00a77" + msg);
+    player.addTMessage(Color.GRAY, "Group of %s was set to %s!", target, group);
     server.adminLog("User " + player.getName() + " set IP's group:\t "
         + target + "\t(" + group + ")");
   }

@@ -20,6 +20,7 @@
  */
 package simpleserver.command;
 
+import simpleserver.Color;
 import simpleserver.Player;
 import simpleserver.Server;
 
@@ -36,11 +37,11 @@ public class SetGroupCommand extends PlayerArgCommand {
   protected boolean allowed(Player player, int group, String target) {
     Server server = player.getServer();
     if (player.getGroupId() <= server.permissions.getNameGroup(target)) {
-      player.addMessage("\u00a7c" + t.get("You cannot set the group of this user!"));
+      player.addTMessage(Color.RED, "You cannot set the group of this user!");
       return false;
     }
     if (group >= player.getGroupId()) {
-      player.addMessage("\u00a7c" + t.get("You cannot promote to your group or higher!"));
+      player.addTMessage(Color.RED, "You cannot promote to your group or higher!");
       return false;
     }
     return true;
@@ -52,13 +53,13 @@ public class SetGroupCommand extends PlayerArgCommand {
     int group;
 
     if (arguments.length < 2) {
-      player.addMessage("\u00a7c" + t.get("You must specify a group!"));
+      player.addTMessage(Color.RED, "You must specify a group!");
       return;
     }
     try {
       group = Integer.parseInt(arguments[1]);
     } catch (NumberFormatException e) {
-      player.addMessage("\u00a7c" + t.get("Group must be a number!"));
+      player.addTMessage(Color.RED, "Group must be a number!");
       return;
     }
 
@@ -71,10 +72,8 @@ public class SetGroupCommand extends PlayerArgCommand {
     Server server = player.getServer();
     server.permissions.setPlayerGroup(target, group);
 
-    String msg = String.format(t.get("Player %s's group was set to %s!"),
-                               target,
-                               new Integer(group).toString());
-    player.addMessage("\u00a77" + msg);
+    player.addTMessage(Color.GRAY, "Player %s's group was set to %s!",
+                       target, new Integer(group).toString());
     server.adminLog("User " + player.getName() + " set player's group:\t "
         + target + "\t(" + group + ")");
   }

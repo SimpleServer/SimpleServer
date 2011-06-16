@@ -20,6 +20,7 @@
  */
 package simpleserver.command;
 
+import simpleserver.Color;
 import simpleserver.Player;
 
 public class MyStatsCommand extends AbstractCommand implements PlayerCommand {
@@ -30,17 +31,14 @@ public class MyStatsCommand extends AbstractCommand implements PlayerCommand {
 
   public void execute(Player player, String message) {
     Integer[] stats = player.stats();
-    player.addMessage("\u00a77" +
-        String.format(t.get("You're online for %s hours and %s minutes."),
-                      new Integer(stats[0] / 60).toString(),
-                      new Integer(stats[0] % 60).toString()));
-    player.addMessage("\u00a77" +
-        String.format(t.get("Over all you've been online for %s hours and %s minutes."),
-                      new Integer(stats[1] / 60).toString(),
-                      new Integer(stats[1] % 60).toString()));
-    player.addMessage("\u00a77" +
-        String.format(t.get("You've placed %s blocks and destroyed %s."),
-                      new Integer(stats[2]).toString(),
-                      new Integer(stats[3]).toString()));
+    player.addTMessage(Color.GRAY, "You're online for %s hours and %s minutes.",
+                       new Integer(stats[0] / 60).toString(),
+                       new Integer(stats[0] % 60).toString());
+    player.addTMessage(Color.GRAY, "Over all you've been online for %s hours and %s minutes.",
+                       new Integer(stats[1] / 60).toString(),
+                       new Integer(stats[1] % 60).toString());
+    player.addTMessage(Color.GRAY, "You've placed %s blocks and destroyed %s.",
+                       new Integer(stats[2]).toString(),
+                       new Integer(stats[3]).toString());
   }
 }

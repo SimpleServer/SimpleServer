@@ -20,6 +20,7 @@
  */
 package simpleserver.command;
 
+import simpleserver.Color;
 import simpleserver.Player;
 
 public class RulesCommand extends AbstractCommand implements PlayerCommand {
@@ -35,7 +36,7 @@ public class RulesCommand extends AbstractCommand implements PlayerCommand {
         player.addMessage(line);
       }
     } else {
-      player.addMessage("\u00a7c" + t.get("Rules are empty."));
+      player.addTMessage(Color.RED, "Rules are empty.");
     }
   }
 }

@@ -23,6 +23,7 @@ package simpleserver.command;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import simpleserver.Color;
 import simpleserver.Player;
 import simpleserver.Server;
 
@@ -59,7 +60,7 @@ public class TimeCommand extends AbstractCommand implements PlayerCommand {
       } else if (argument.equals("night")) {
         time = NIGHT;
       } else if (argument.equals("set") || argument.equals("add")) {
-        player.addMessage("§c" + t.get("This is not the standard time command."));
+        player.addTMessage(Color.RED, "This is not the standard time command.");
         usage();
         return;
       } else if (argument.equals("unfreeze")) {
@@ -69,15 +70,13 @@ public class TimeCommand extends AbstractCommand implements PlayerCommand {
         try {
           time = Integer.parseInt(argument);
         } catch (NumberFormatException e) {
-          player.addMessage("\u00a7c" + t.get("Invalid argument!"));
+          player.addTMessage(Color.RED, "Invalid argument!");
           usage();
           return;
         }
         if (time < 0 || time > 23999) {
-          String msg =
-              String.format(t.get("Time must be either a value in the range 0-23999 or %s!"),
-                            "day/night");
-          player.addMessage("\u00a7c" + msg);
+          player.addTMessage(Color.RED, "Time must be either a value in the range 0-23999 or %s!",
+                             "day/night");
           return;
         }
       }
@@ -94,17 +93,16 @@ public class TimeCommand extends AbstractCommand implements PlayerCommand {
         if (argument.equals("freeze")) {
           freeze(time);
         } else {
-          String msg = String.format(t.get("Optional 2nd argument must be %s!"), "freeze");
-          player.addMessage("\u00a7c" + msg);
+          player.addTMessage(Color.RED, "Optional 2nd argument must be %s!",
+                             "freeze");
         }
       }
     }
   }
 
   private void usage() {
-    String msg = String.format(t.get("Usage: %s"),
-                               commandPrefix() + "time 0-23999|day|night|unfreeze [freeze]");
-    player.addMessage("§7" + msg);
+    player.addTMessage(Color.GRAY, "Usage: %s",
+                       commandPrefix() + "time 0-23999|day|night|unfreeze [freeze]");
   }
 
   private void setTime(int time) {
@@ -117,7 +115,7 @@ public class TimeCommand extends AbstractCommand implements PlayerCommand {
       timer.cancel();
       frozen = false;
 
-      player.addMessage("\u00a77" + t.get("Time unfrozen"));
+      player.addTMessage(Color.GRAY, "Time unfrozen");
     }
   }
 
@@ -133,7 +131,7 @@ public class TimeCommand extends AbstractCommand implements PlayerCommand {
       }
       timer.schedule(new TimeFreezer(this, time), 0, delay);
 
-      player.addMessage("\u00a77" + t.get("Time frozen"));
+      player.addTMessage(Color.GRAY, "Time frozen");
     }
   }
 

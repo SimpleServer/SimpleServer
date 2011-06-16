@@ -20,6 +20,7 @@
  */
 package simpleserver.command;
 
+import simpleserver.Color;
 import simpleserver.Player;
 import simpleserver.config.PermissionConfig;
 
@@ -31,8 +32,7 @@ public class AreaCommand extends AbstractCommand implements PlayerCommand {
   public void execute(Player player, String message) {
     PermissionConfig perm = player.getServer().permissions;
 
-    String list = "\u00a77" + t.get("Current area:") + "\u00a7f "
-        + perm.getCurrentArea(player);
-    player.addMessage(list);
+    player.addTMessage(Color.GRAY, "Current area: %s %s",
+                       Color.WHITE, perm.getCurrentArea(player));
   }
 }

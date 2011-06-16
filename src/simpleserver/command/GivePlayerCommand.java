@@ -20,6 +20,7 @@
  */
 package simpleserver.command;
 
+import simpleserver.Color;
 import simpleserver.Player;
 import simpleserver.Server;
 
@@ -63,15 +64,15 @@ public class GivePlayerCommand extends GiveCommand implements ServerCommand {
       target = server.findPlayer(arguments[0]);
       if (target == null) {
         if (player != null) {
-          player.addMessage("\u00a7c" + t.get("Player not online") +
-              " (" + arguments[0] + ")");
+          player.addTMessage(Color.RED, "Player not online (%s)",
+                             arguments[0]);
         } else {
           System.out.println("Player not online (" + arguments[0] + ")");
         }
       }
     } else {
       if (player != null) {
-        player.addMessage("\u00a7c" + t.get("No item or amount specified!"));
+        player.addTMessage(Color.RED, "No item or amount specified!");
       } else {
         System.out.println("No player or item specified!");
       }

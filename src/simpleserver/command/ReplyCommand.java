@@ -20,6 +20,7 @@
  */
 package simpleserver.command;
 
+import simpleserver.Color;
 import simpleserver.Player;
 
 public class ReplyCommand extends AbstractCommand implements PlayerCommand {
@@ -37,7 +38,7 @@ public class ReplyCommand extends AbstractCommand implements PlayerCommand {
     if (target != null && target.getName() != null) {
       player.execute(TellCommand.class, target.getName() + " " + message);
     } else {
-      player.addMessage("\u00a7c" + t.get("Nobody sent you a message yet."));
+      player.addTMessage(Color.RED, "Nobody sent you a message yet.");
     }
   }
 }

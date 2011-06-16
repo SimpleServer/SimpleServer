@@ -22,6 +22,7 @@ package simpleserver.command;
 
 import java.util.Date;
 
+import simpleserver.Color;
 import simpleserver.Player;
 
 public class ServerTimeCommand extends AbstractCommand implements PlayerCommand {
@@ -31,7 +32,7 @@ public class ServerTimeCommand extends AbstractCommand implements PlayerCommand 
   }
 
   public void execute(Player player, String message) {
-    player.addMessage(String.format("\u00a77" + t.get("Server time:") +
-                                    "\u00a7f %tc", new Date()));
+    player.addTMessage(Color.GRAY, "Server time: %s %tc",
+                       Color.WHITE, new Date());
   }
 }

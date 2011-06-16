@@ -20,6 +20,7 @@
  */
 package simpleserver.command;
 
+import simpleserver.Color;
 import simpleserver.Player;
 import simpleserver.Server;
 
@@ -62,7 +63,7 @@ public class GiveCommand extends AbstractCommand implements PlayerCommand {
                                   + amount + ")");
       target.give(item, amount);
     } else {
-      player.addMessage("\u00a7c" + t.get("No item or amount specified!"));
+      player.addTMessage(Color.RED, "No item or amount specified!");
     }
   }
 

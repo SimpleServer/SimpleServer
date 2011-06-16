@@ -20,6 +20,7 @@
  */
 package simpleserver.command;
 
+import simpleserver.Color;
 import simpleserver.Player;
 
 public class TellCommand extends OnlinePlayerArgCommand implements
@@ -41,12 +42,12 @@ public class TellCommand extends OnlinePlayerArgCommand implements
 
       target.setReply(player);
     } else {
-      player.addMessage("\u00a7c" + t.get("Please supply a message."));
+      player.addTMessage(Color.RED, "Please supply a message.");
     }
   }
 
   @Override
   protected void noTargetSpecified(Player player, String message) {
-    player.addMessage("\u00a7c" + t.get("No player or message specified."));
+    player.addTMessage(Color.RED, "No player or message specified.");
   }
 }

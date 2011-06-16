@@ -31,6 +31,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import simpleserver.Coordinate.Dimension;
 import simpleserver.command.ExternalCommand;
 import simpleserver.command.PlayerCommand;
+import simpleserver.lang.Translations;
 import simpleserver.stream.StreamTunnel;
 
 public class Player {
@@ -214,11 +215,23 @@ public class Player {
   }
 
   public void addMessage(Color color, String message) {
-    messages.add(color + message);
+    addMessage(color + message);
   }
 
   public void addMessage(String msg) {
     messages.add(msg);
+  }
+
+  public void addTMessage(Color color, String format, Object... args) {
+    addMessage(color + String.format(Translations.getInstance().get(format), args));
+  }
+
+  public void addTMessage(Color color, String message) {
+    addMessage(color + Translations.getInstance().get(message));
+  }
+
+  public void addTMessage(String msg) {
+    addMessage(Translations.getInstance().get(msg));
   }
 
   public String getMessage() {

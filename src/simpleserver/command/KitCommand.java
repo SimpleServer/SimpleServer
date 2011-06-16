@@ -20,6 +20,7 @@
  */
 package simpleserver.command;
 
+import simpleserver.Color;
 import simpleserver.Player;
 
 public class KitCommand extends AbstractCommand implements PlayerCommand {
@@ -32,7 +33,7 @@ public class KitCommand extends AbstractCommand implements PlayerCommand {
 
     if (arguments.length > 0) {
       if (!player.getServer().kits.giveKit(player, arguments[0])) {
-        player.addMessage("\u00a7c" + t.get("Invalid kit name."));
+        player.addTMessage(Color.RED, "Invalid kit name.");
       }
     } else {
       player.getServer().kits.listKits(player);

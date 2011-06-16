@@ -20,6 +20,7 @@
  */
 package simpleserver.command;
 
+import simpleserver.Color;
 import simpleserver.Player;
 
 public class HelpCommand extends AbstractCommand implements PlayerCommand {
@@ -69,15 +70,14 @@ public class HelpCommand extends AbstractCommand implements PlayerCommand {
 
       player.addMessage(line.toString());
 
-      String msg = String.format(t.get("Say %s command for details of a specific command."),
-                                 prefix + "help");
-      player.addMessage("\u00a77" + msg);
+      player.addTMessage(Color.GRAY, "Say %s command for details of a specific command.",
+                         prefix + "help");
 
       // additional custom help text from helptext.txt
       String[] helplines = player.getServer().helptext.getHelpText().split("\n");
       player.addMessage(" ");
       for (String l : helplines) {
-        player.addMessage("\u00a7f" + l);
+        player.addMessage(Color.WHITE, l);
       }
     }
   }

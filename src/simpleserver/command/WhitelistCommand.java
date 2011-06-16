@@ -20,6 +20,7 @@
  */
 package simpleserver.command;
 
+import simpleserver.Color;
 import simpleserver.Player;
 
 public class WhitelistCommand extends PlayerArgCommand {
@@ -33,8 +34,6 @@ public class WhitelistCommand extends PlayerArgCommand {
 
     player.getServer().adminLog("User " + player.getName()
                                 + " whitelisted player:\t " + name);
-    String msg = String.format(t.get("Player %s was whitelisted!"),
-                               name);
-    player.addMessage("\u00a77" + msg);
+    player.addTMessage(Color.GRAY, "Player %s was whitelisted!", name);
   }
 }

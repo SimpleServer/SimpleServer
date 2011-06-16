@@ -20,6 +20,7 @@
  */
 package simpleserver.command;
 
+import simpleserver.Color;
 import simpleserver.Player;
 
 public class VisitCommand extends OnlinePlayerArgCommand {
@@ -30,31 +31,21 @@ public class VisitCommand extends OnlinePlayerArgCommand {
   @Override
   protected void executeWithTarget(Player player, String message, Player target) {
     if (player.getName().equals(target.getName())) {
-      player.addMessage("\u00a7c" + t.get("You can not visit yourself!"));
+      player.addTMessage(Color.RED, "You can not visit yourself!");
       return;
     }
 
     if (player.getDimension() == target.getDimension()) {
-      String msg;
+      player.addTMessage(Color.GRAY, "Requesting %s for a visit...", target.getName());
+      player.addTMessage(Color.GRAY, "If nothing happens within 10 seconds, your request is denied.");
 
-      msg = String.format(t.get("Requesting %s for a visit..."), target.getName());
-      player.addMessage("\u00a77" + msg);
-      player.addMessage("\u00a77" +
-          t.get("If nothing happens within 10 seconds, your request is denied."));
-
-      msg = String.format(t.get("%s would like to visit you. If you agree,"),
-                          player.getName());
-      target.addMessage("\u00a7c" + msg);
-      msg = String.format(t.get("issue the command %s within 10 seconds."),
-                          commandPrefix() + "ok");
-      target.addMessage("\u00a7c" + msg);
+      target.addTMessage(Color.GRAY, "%s would like to visit you. If you agree,", player.getName());
+      target.addTMessage(Color.GRAY, "issue the command %s within 10 seconds.", commandPrefix() + "ok");
 
       target.addVisitRequest(player);
     } else {
-      String msg = String.format(t.get("You and %s are in different dimensions."),
-                                 target.getName());
-      player.addMessage("\u00a7c" + msg);
-      player.addMessage("\u00a7c" + t.get("No teleport possible!"));
+      player.addTMessage(Color.RED, "You and %s are in different dimensions.", target.getName());
+      player.addTMessage(Color.RED, "No teleport possible!");
     }
   }
 }

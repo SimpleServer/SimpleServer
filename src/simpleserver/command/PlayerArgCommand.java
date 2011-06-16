@@ -20,6 +20,7 @@
  */
 package simpleserver.command;
 
+import simpleserver.Color;
 import simpleserver.Player;
 
 public abstract class PlayerArgCommand extends AbstractCommand implements
@@ -47,7 +48,7 @@ public abstract class PlayerArgCommand extends AbstractCommand implements
                                             String target);
 
   protected void noTargetSpecified(Player player, String message) {
-    player.addMessage("\u00a7c" + t.get("No player specified."));
+    player.addTMessage(Color.RED, "No player specified.");
   }
 
   @Override

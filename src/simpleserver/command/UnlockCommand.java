@@ -22,6 +22,7 @@ package simpleserver.command;
 
 import java.util.List;
 
+import simpleserver.Color;
 import simpleserver.Player;
 import simpleserver.Player.Action;
 import simpleserver.config.ChestList.Chest;
@@ -35,7 +36,7 @@ public class UnlockCommand extends AbstractCommand implements PlayerCommand {
     String name = extractArgument(message);
     if (name == null) {
       player.setAttemptedAction(Action.Unlock);
-      player.addMessage("\u00a77" + t.get("The next chest you open will get unlocked."));
+      player.addTMessage(Color.GRAY, "The next chest you open will get unlocked.");
     } else {
       List<Chest> chests = player.getServer().chests.getChestsByName(name);
       for (Chest chest : chests) {
@@ -43,11 +44,9 @@ public class UnlockCommand extends AbstractCommand implements PlayerCommand {
       }
       player.getServer().chests.save();
       if (chests.size() > 1) {
-        String msg = String.format(t.get("%d chests have been unlocked!"),
-                                   chests.size());
-        player.addMessage("\u00a77" + msg);
+        player.addTMessage(Color.GRAY, "%d chests have been unlocked!", chests.size());
       } else {
-        player.addMessage("\u00a77" + t.get("The chest has been unlocked!"));
+        player.addTMessage(Color.GRAY, "The chest has been unlocked!");
       }
     }
   }

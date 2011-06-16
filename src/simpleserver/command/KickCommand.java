@@ -20,6 +20,7 @@
  */
 package simpleserver.command;
 
+import simpleserver.Color;
 import simpleserver.Player;
 
 public class KickCommand extends OnlinePlayerArgCommand {
@@ -37,13 +38,13 @@ public class KickCommand extends OnlinePlayerArgCommand {
     target.kick(reason);
     player.getServer().adminLog("Admin " + player.getName() + " kicked player:\t " +
         target.getName() + "\t(" + reason + ")");
-    String msg = String.format(t.get("Player %s has been kicked!"),
-                               target.getName());
-    player.getServer().runCommand("say", msg + " (" + reason + ")");
+    String msg = String.format(t.get("Player %s has been kicked! (%s)"),
+                               target.getName(), reason);
+    player.getServer().runCommand("say", msg);
   }
 
   @Override
   protected void noTargetSpecified(Player player, String message) {
-    player.addMessage("\u00a7c" + t.get("No player or reason specified."));
+    player.addTMessage(Color.RED, "No player or reason specified.");
   }
 }

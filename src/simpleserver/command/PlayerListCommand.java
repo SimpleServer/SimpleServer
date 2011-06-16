@@ -36,6 +36,6 @@ public class PlayerListCommand extends AbstractCommand implements PlayerCommand 
       list += friend.getName() + ", ";
     }
     list = list.substring(0, list.length() - 2); // remove trailing ", "
-    player.addMessage(Color.GRAY, list, server.numPlayers(), Color.WHITE);
+    player.addTMessage(Color.GRAY, list, server.numPlayers(), Color.WHITE);
   }
 }

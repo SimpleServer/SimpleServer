@@ -20,6 +20,7 @@
  */
 package simpleserver.command;
 
+import simpleserver.Color;
 import simpleserver.Player;
 
 public class UnwhitelistCommand extends PlayerArgCommand {
@@ -33,7 +34,6 @@ public class UnwhitelistCommand extends PlayerArgCommand {
 
     player.getServer().adminLog("User " + player.getName()
                                     + " unwhitelisted player:\t " + name);
-    String msg = String.format(t.get("Player %s was unwhitelisted!"), name);
-    player.addMessage("\u00a77" + msg);
+    player.addTMessage(Color.GRAY, "Player %s was unwhitelisted!", name);
   }
 }

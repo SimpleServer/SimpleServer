@@ -20,6 +20,7 @@
  */
 package simpleserver.command;
 
+import simpleserver.Color;
 import simpleserver.Player;
 import simpleserver.Server;
 
@@ -37,33 +38,29 @@ public class TeleportCommand extends OnlinePlayerArgCommand {
     if (arguments.length > 1) {
       Player target2 = server.findPlayer(arguments[1]);
       if (target2 == null) {
-        player.addMessage("\u00a7c" + t.get("Player not online") +
-                          " (" + arguments[1] + ")");
+        player.addTMessage(Color.RED, "Player not online (%s)", arguments[1]);
       } else {
         if (target1.getDimension() == target2.getDimension()) {
           target1.teleportTo(target2);
 
-          String msg = String.format(t.get("Teleported %s to %s!"),
-                                     target1.getName(),
-                                     target2.getName());
-          player.addMessage("\u00a77" + msg);
+          player.addTMessage(Color.GRAY, "Teleported %s to %s!",
+                             target1.getName(), target2.getName());
           server.adminLog("User " + player.getName() + " teleported:\t "
                           + target1.getName() + "\tto\t" + target2.getName());
         } else {
-          String msg = String.format(t.get("Players %s and %s are in different dimensions."),
-                                     target1.getName(),
-                                     target2.getName());
-          player.addMessage("\u00a7c" + msg);
-          player.addMessage("\u00a7c" + t.get("No teleport possible!"));
+          player.addTMessage(Color.RED, "Players %s and %s are in different dimensions.",
+                             target1.getName(),
+                             target2.getName());
+          player.addTMessage(Color.RED, "No teleport possible!");
         }
       }
     } else {
-      player.addMessage("\u00a7c" + t.get("Must specify two players."));
+      player.addTMessage(Color.RED, "Must specify two players.");
     }
   }
 
   @Override
   protected void noTargetSpecified(Player player, String message) {
-    player.addMessage("\u00a7c" + t.get("No players specified."));
+    player.addTMessage(Color.RED, "No players specified.");
   }
 }

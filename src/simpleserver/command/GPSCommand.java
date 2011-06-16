@@ -20,6 +20,7 @@
  */
 package simpleserver.command;
 
+import simpleserver.Color;
 import simpleserver.Player;
 
 public class GPSCommand extends OnlinePlayerArgCommand {
@@ -38,10 +39,10 @@ public class GPSCommand extends OnlinePlayerArgCommand {
       name = String.format(t.get("%s's"), target.getName());
     }
 
-    player.addMessage("\u00a77" + name + " " +
-                     t.get("Latitude:") + " \u00a7f" + (int) target.getX() +
-        "\u00a77 " + t.get("Longitude:") + " \u00a7f" + (int) target.getZ() +
-        "\u00a77 " + t.get("Altitude:") + " \u00a7f" + (int) target.getY() +
-        "\u00a77 " + t.get("Dimension:") + " \u00a7f" + target.getDimension());
+    player.addTMessage(Color.GRAY,
+                       "%s Latitude: %s %d %s Longitude: %s %d %s Altitude: %s %d %s Dimension: %s %s",
+                       name, Color.WHITE, (int) target.getX(), Color.GRAY, Color.WHITE,
+                       (int) target.getZ(), Color.GRAY, Color.WHITE, (int) target.getY(), Color.GRAY,
+                       Color.WHITE, target.getDimension());
   }
 }
