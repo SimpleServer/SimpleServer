@@ -27,12 +27,12 @@ public class TimeServerCommand extends TimeCommand implements ServerCommand {
   }
 
   @Override
-  protected void info(String key, String value) {
-    System.out.println("[SimpleServer] " + key + ": " + value);
+  protected void error(String message) {
+    System.out.println("[SimpleServer] Error: " + message);
   }
 
   @Override
-  protected void error(String message) {
-    System.out.println("[SimpleServer] Error: " + message);
+  protected void captionedInfo(String caption, String message, Object... args) {
+    System.out.println("[SimpleServer] " + caption + ": " + String.format(message, args));
   }
 }

@@ -226,6 +226,10 @@ public class Player {
     addMessage(String.format(format, args));
   }
 
+  public void addCaptionedMessage(String caption, String format, Object... args) {
+    addMessage("%s%s: %s%s", Color.GRAY, caption, Color.WHITE, String.format(format, args));
+  }
+
   public void addMessage(String msg) {
     messages.add(msg);
   }

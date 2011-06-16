@@ -42,7 +42,7 @@ public class TimePlayerCommand extends TimeCommand implements PlayerCommand {
   }
 
   @Override
-  protected void info(String key, String value) {
-    player.addMessage(Color.GRAY, "%s: %s%s", key, Color.WHITE, value);
+  protected void captionedInfo(String caption, String message, Object... args) {
+    player.addCaptionedMessage(caption, message, args);
   }
 }

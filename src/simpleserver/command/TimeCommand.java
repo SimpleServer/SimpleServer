@@ -36,7 +36,7 @@ public abstract class TimeCommand extends AbstractCommand {
     if (arguments.length == 0) {
       long servertime = time.get();
       long realtime = (servertime + 6000) % 24000;
-      info("Current time", String.format("%d:%d (%d)", realtime / 1000, (realtime % 1000) * 6 / 100, servertime % 24000));
+      captionedInfo("Current time", "%d:%d (%d)", realtime / 1000, (realtime % 1000) * 6 / 100, servertime % 24000);
     } else if (arguments.length >= 1) {
       int arg = 0;
       if (arguments[arg].equals("set")) {
@@ -92,7 +92,7 @@ public abstract class TimeCommand extends AbstractCommand {
 
   protected abstract void info(String message);
 
-  protected abstract void info(String key, String value);
+  protected abstract void captionedInfo(String caption, String message, Object... args);
 
   private void usage() {
     info("Usage: " + commandPrefix() + "time [set] [0-23999|day|night|unfreeze] [freeze]");
