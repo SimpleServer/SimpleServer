@@ -29,7 +29,7 @@ public class Translations implements Resource {
   protected String translationName;
   private final Map<String, TranslationFile> translations;
 
-  public Translations() {
+  private Translations() {
     translationName = "en";
 
     translations = new HashMap<String, TranslationFile>();
