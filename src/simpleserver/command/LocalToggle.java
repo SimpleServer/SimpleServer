@@ -36,7 +36,7 @@ public class LocalToggle extends AbstractCommand implements PlayerCommand {
       } else if (arguments[0].equals("off")) {
         player.setLocalChat(false);
       } else {
-        player.addTMessage(Color.RED, "Only modes %s allowed!", "\"on\" & \"off\"");
+        player.addTMessage(Color.RED, "Only modes %s and %s allowed!", "\"on\"", "\"off\"");
         return;
       }
     } else {
