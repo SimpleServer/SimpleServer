@@ -703,9 +703,17 @@ public class PermissionConfig extends AbstractConfig {
     return !config.getString("/areas/area[@owner='" + escape(name) + "']/@owner", "").equals("");
   }
 
+  public boolean commandShouldBeExecuted(String cmd) {
+    String val = config.getString("/permissions/commands/command[@name='" + escape(cmd) + "']/@forward", "");
+    if (val.equals("only")) {
+      return false;
+    }
+    return true;
+  }
+
   public boolean commandShouldPassThroughToMod(String cmd) {
     String val = config.getString("/permissions/commands/command[@name='" + escape(cmd) + "']/@forward", "");
-    if (val.equals("true")) {
+    if (val.equals("true") || val.equals("only")) {
       return true;
     }
     return false;
