@@ -18,24 +18,34 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package simpleserver.command;
+package simpleserver;
 
-import simpleserver.Color;
-import simpleserver.Player;
-import simpleserver.Server;
+public enum Color {
+  BLACK('0'),
+  DARK_BLUE('1'),
+  DARK_GREEN('2'),
+  DARK_CYAN('3'),
+  DARK_RED('4'),
+  PURPLE('5'),
+  GOLD('6'),
+  GRAY('7'),
+  DARK_GRAY('8'),
+  BLUE('9'),
+  GREEN('a'),
+  CYAN('b'),
+  RED('c'),
+  PINK('d'),
+  YELLOW('e'),
+  WHITE('f');
 
-public class PlayerListCommand extends AbstractCommand implements PlayerCommand {
-  public PlayerListCommand() {
-    super("who", "Display online players names");
+  private char code;
+
+  Color(char code) {
+    this.code = code;
   }
 
-  public void execute(Player player, String message) {
-    Server server = player.getServer();
-    String list = "Connected Players (%s): %s";
-    for (Player friend : server.playerList.getArray()) {
-      list += friend.getName() + ", ";
-    }
-    list = list.substring(0, list.length() - 2); // remove trailing ", "
-    player.addMessage(Color.GRAY, list, server.numPlayers(), Color.WHITE);
+  @Override
+  public String toString() {
+    return "§" + code;
   }
 }

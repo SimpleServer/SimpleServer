@@ -209,6 +209,14 @@ public class Player {
     return !messages.isEmpty();
   }
 
+  public void addMessage(Color color, String format, Object... args) {
+    addMessage(color + String.format(format, args));
+  }
+
+  public void addMessage(Color color, String message) {
+    messages.add(color + message);
+  }
+
   public void addMessage(String msg) {
     messages.add(msg);
   }
