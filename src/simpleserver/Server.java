@@ -401,7 +401,7 @@ public class Server {
     c10t = new AutoRun(this, options.get("c10tArgs"));
     if (options.contains("freezeTime")) {
       try {
-        time.freeze(Integer.parseInt(options.get("freezeTime")));
+        time.freeze(time.parse(options.get("freezeTime")));
       } catch (Exception e) {
         System.out.println("[SimpleServer] Warning: freezeTime option is not valid");
       }
