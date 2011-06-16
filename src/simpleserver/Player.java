@@ -353,7 +353,9 @@ public class Player {
       return true;
     }
 
-    command.execute(this, message);
+    if (server.permissions.commandShouldBeExecuted(command.getName())) {
+      command.execute(this, message);
+    }
     lastCommand = message;
 
     return !((server.permissions.commandShouldPassThroughToMod(command.getName())
