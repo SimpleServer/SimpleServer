@@ -35,7 +35,7 @@ public class RulesCommand extends AbstractCommand implements PlayerCommand {
         player.addMessage(line);
       }
     } else {
-      player.addMessage("\u00a7cRules is empty. Edit simpleserver/rules.txt");
+      player.addMessage("\u00a7c" + t.get("Rules are empty."));
     }
   }
 }

@@ -42,11 +42,11 @@ import simpleserver.config.RobotList;
 import simpleserver.config.Rules;
 import simpleserver.config.Stats;
 import simpleserver.config.WhiteList;
+import simpleserver.lang.Translations;
 import simpleserver.log.AdminLog;
 import simpleserver.log.ConnectionLog;
 import simpleserver.log.ErrorLog;
 import simpleserver.minecraft.MinecraftWrapper;
-import simpleserver.options.Language;
 import simpleserver.options.Options;
 import simpleserver.rcon.RconServer;
 import simpleserver.telnet.TelnetServer;
@@ -64,8 +64,8 @@ public class Server {
   private ServerSocket socket;
   private List<String> outputLog = new LinkedList<String>();
 
-  public Language l;
   public Options options;
+  public Translations t;
   public MOTD motd;
   public KitList kits;
   public ChestList chests;
@@ -144,6 +144,10 @@ public class Server {
     robots.removeRobotPort(port);
   }
 
+  public List<Resource> getResources() {
+    return resources;
+  }
+
   public Integer[] getRobotPorts() {
     if (robots != null) {
       return robots.getRobotPorts();
@@ -177,7 +181,7 @@ public class Server {
   }
 
   public void banKickIP(String ipAddress) {
-    banKickIP(ipAddress, "Banned!");
+    banKickIP(ipAddress, t.get("Banned!"));
   }
 
   public void banKick(String name, String msg) {
@@ -192,7 +196,7 @@ public class Server {
   }
 
   public void banKick(String name) {
-    banKick(name, "Banned!");
+    banKick(name, t.get("Banned!"));
   }
 
   public void kick(String name, String reason) {
@@ -210,6 +214,13 @@ public class Server {
       playerList.updatePlayerGroups(); // reflect changes of permission.xml
       // without player relogin
     }
+
+    if (!t.setLanguage(options.get("serverLanguage"))) {
+      options.set("serverLanguage", "en");
+      options.save();
+    }
+
+    commandParser.reload();
   }
 
   public void saveResources() {
@@ -318,9 +329,9 @@ public class Server {
   }
 
   private void kickAllPlayers() {
-    String message = "Server shutting down!";
+    String message = t.get("Server shutting down!");
     if (restart) {
-      message = "Server restarting!";
+      message = t.get("Server restarting!");
     }
 
     for (Player player : playerList.getArray()) {
@@ -332,8 +343,8 @@ public class Server {
     resources = new LinkedList<Resource>();
 
     resources.add(permissions = new PermissionConfig(this));
-    resources.add(l = new Language());
     resources.add(options = new Options());
+    resources.add(t = Translations.getInstance());
     resources.add(robots = new RobotList());
     resources.add(chests = new ChestList());
     resources.add(motd = new MOTD());

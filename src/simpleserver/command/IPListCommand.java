@@ -30,7 +30,7 @@ public class IPListCommand extends AbstractCommand implements PlayerCommand,
   }
 
   public void execute(Player player, String message) {
-    player.addMessage("\u00a77IP Addresses:");
+    player.addMessage("\u00a77" + t.get("IP Addresses:"));
     for (Player friend : player.getServer().playerList.getArray()) {
       player.addMessage(friend.getName() + " " + friend.getIPAddress());
     }

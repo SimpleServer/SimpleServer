@@ -33,20 +33,21 @@ public class BanCommand extends PlayerArgCommand {
     Server server = player.getServer();
     String reason = extractArgument(message, 1);
     if (reason == null) {
-      reason = "Banned by admin.";
+      reason = t.get("Banned by admin.");
     }
 
     server.runCommand("ban", target);
     server.kick(target, reason);
 
-    server.adminLog("User " + player.getName() + " banned player:\t " + target
-        + "\t(" + reason + ")");
-    server.runCommand("say", "Player " + target + " has been banned! ("
-        + reason + ")");
+    server.adminLog("User " + player.getName() + " banned player:\t " + target +
+        "\t(Banned by admin.)");
+
+    String msg = String.format(t.get("Player %s has been banned!"), target);
+    server.runCommand("say", msg + " (" + reason + ")");
   }
 
   @Override
   protected void noTargetSpecified(Player player, String message) {
-    player.addMessage("\u00a7cNo player or reason specified.");
+    player.addMessage("\u00a7c" + t.get("No player or reason specified."));
   }
 }

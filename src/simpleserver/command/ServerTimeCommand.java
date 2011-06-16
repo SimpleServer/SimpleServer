@@ -31,7 +31,7 @@ public class ServerTimeCommand extends AbstractCommand implements PlayerCommand 
   }
 
   public void execute(Player player, String message) {
-    player.addMessage(String.format("\u00a77Server time:\u00a7f %tc",
-                                    new Date()));
+    player.addMessage(String.format("\u00a77" + t.get("Server time:") +
+                                    "\u00a7f %tc", new Date()));
   }
 }

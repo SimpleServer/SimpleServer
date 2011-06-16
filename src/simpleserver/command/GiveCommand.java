@@ -30,8 +30,8 @@ public class GiveCommand extends AbstractCommand implements PlayerCommand {
     this("give ITEM [AMOUNT]", "Spawn items for yourself", 0);
   }
 
-  protected GiveCommand(String name, String helpText, int offset) {
-    super(name, helpText);
+  protected GiveCommand(String name, String commandCode, int offset) {
+    super(name, commandCode);
 
     this.offset = offset;
   }
@@ -57,12 +57,12 @@ public class GiveCommand extends AbstractCommand implements PlayerCommand {
       }
 
       player.getServer().adminLog("User " + player.getName()
-                                      + " used giveplayer:\t"
-                                      + target.getName() + "\t" + item + "\t("
-                                      + amount + ")");
+                                  + " used giveplayer:\t"
+                                  + target.getName() + "\t" + item + "\t("
+                                  + amount + ")");
       target.give(item, amount);
     } else {
-      player.addMessage("\u00a7cNo item or amount specified!");
+      player.addMessage("\u00a7c" + t.get("No item or amount specified!"));
     }
   }
 

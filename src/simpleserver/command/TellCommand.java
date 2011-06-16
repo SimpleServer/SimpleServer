@@ -26,7 +26,8 @@ public class TellCommand extends OnlinePlayerArgCommand implements
     PlayerCommand {
 
   public TellCommand() {
-    super("tell PLAYER MESSAGE...", "Send a message to the named player");
+    super("tell PLAYER MESSAGE...",
+          "Send a message to the named player");
   }
 
   @Override
@@ -40,12 +41,12 @@ public class TellCommand extends OnlinePlayerArgCommand implements
 
       target.setReply(player);
     } else {
-      player.addMessage("\u00a7cPlease supply a message.");
+      player.addMessage("\u00a7c" + t.get("Please supply a message."));
     }
   }
 
   @Override
   protected void noTargetSpecified(Player player, String message) {
-    player.addMessage("\u00a7cNo player or message specified.");
+    player.addMessage("\u00a7c" + t.get("No player or message specified."));
   }
 }

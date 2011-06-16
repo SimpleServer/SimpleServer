@@ -36,20 +36,22 @@ public class BanIPCommand extends AbstractCommand implements PlayerCommand {
       Player p = player.getServer().findPlayer(arguments[0]);
       if (p == null) {
         server.ipBans.addBan(arguments[0]);
-        player.addMessage("\u00a77IP Address " + arguments[0]
-            + " has been banned!");
-        server.adminLog("User " + player.getName() + " banned ip:\t "
+        String msg = String.format(t.get("IP Address %s has been banned!"),
+                                   arguments[0]);
+        player.addMessage("\u00a77" + msg);
+        server.adminLog("User " + player.getName() + " banned IP:\t "
             + arguments[0]);
       } else {
         server.ipBans.addBan(p.getIPAddress());
-        server.kick(p.getName(), "IP Banned!");
-        server.runCommand("say", "Player " + p.getName()
-            + " has been IP banned!");
+        server.kick(p.getName(), t.get("IP Banned!"));
+        String msg = String.format(t.get("Player %s has been IP banned!"),
+                                   p.getName());
+        server.runCommand("say", msg);
         server.adminLog("User " + player.getName() + " banned ip:\t "
             + arguments[0] + "\t(" + p.getName() + ")");
       }
     } else {
-      player.addMessage("\u00a7cNo player or IP specified.");
+      player.addMessage("\u00a7c" + t.get("No player or IP specified."));
     }
   }
 }

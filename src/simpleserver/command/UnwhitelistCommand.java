@@ -33,6 +33,7 @@ public class UnwhitelistCommand extends PlayerArgCommand {
 
     player.getServer().adminLog("User " + player.getName()
                                     + " unwhitelisted player:\t " + name);
-    player.addMessage("\u00a77Player " + name + " was un-whitelisted!");
+    String msg = String.format(t.get("Player %s was unwhitelisted!"), name);
+    player.addMessage("\u00a77" + msg);
   }
 }

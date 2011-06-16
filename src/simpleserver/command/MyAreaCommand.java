@@ -26,7 +26,8 @@ import simpleserver.config.PermissionConfig;
 
 public class MyAreaCommand extends AbstractCommand implements PlayerCommand {
   public MyAreaCommand() {
-    super("myarea [start|end|save|unsave|rename]", "Manage your personal area");
+    super("myarea [start|end|save|unsave|rename]",
+          "Manage your personal area");
   }
 
   private boolean areaSizeOk(Player player) {
@@ -39,70 +40,71 @@ public class MyAreaCommand extends AbstractCommand implements PlayerCommand {
     String arguments[] = extractArguments(message);
 
     if (arguments.length == 0) {
-      player.addMessage("\u00a7cError! Command requires argument!");
+      player.addMessage("\u00a7c" + t.get("Error! Command requires argument!"));
       return;
     }
 
     if (player.getDimension() != Dimension.EARTH && (arguments[0].equals("start") || arguments[0].equals("end"))) {
-      player.addMessage("\u00a7cYou can only create areas on earth!");
+      player.addMessage("\u00a7c" + t.get("You can only create areas on Earth!"));
       return;
     }
 
     if (arguments[0].equals("start")) {
       player.areastart = perm.coordinateFromPlayer(player);
       player.areastart = player.areastart.setY((byte) 0); // no height limit
-      player.addMessage("\u00a77Start coordinate set.");
+      player.addMessage("\u00a77" + t.get("Start coordinate set") + ".");
     } else if (arguments[0].equals("end")) {
       player.areaend = perm.coordinateFromPlayer(player);
       player.areaend = player.areaend.setY((byte) 0); // no height limit
-      player.addMessage("\u00a77End coordinate set.");
+      player.addMessage("\u00a77" + t.get("End coordinate set") + ".");
     } else if (arguments[0].equals("save")) {
       if (perm.playerHasArea(player)) {
-        player.addMessage("\u00a7cNew area can not be saved before you unsave your old one!");
+        player.addMessage("\u00a7c" +
+            t.get("New area can not be saved before you remove your old one!"));
         return;
       }
       if (!perm.getCurrentArea(player).equals("")) {
-        player.addMessage("\u00a7cYou can not create your area within an existing area!");
+        player.addMessage("\u00a7c" + t.get("You can not create your area within an existing area!"));
         return;
       }
       if (player.areastart == null || player.areaend == null) {
-        player.addMessage("\u00a7cDefine start and end coordinates for your area first!");
+        player.addMessage("\u00a7c" + t.get("Define start and end coordinates for your area first!"));
         return;
       }
       if (!areaSizeOk(player)) {
-        player.addMessage("\u00a7cYour area is allowed to have a maximum size of 50x50!");
+        player.addMessage("\u00a7c" + t.get("Your area is allowed to have a maximum size of 50x50!"));
         return;
       }
 
       perm.createPlayerArea(player);
-      player.addMessage("\u00a77Your area has been saved!");
+      player.addMessage("\u00a77" + t.get("Your area has been saved!"));
     } else if (arguments[0].equals("unsave")) {
       if (!perm.playerHasArea(player)) {
-        player.addMessage("\u00a7cYou currently have no personal area which can be unsaved!");
+        player.addMessage("\u00a7c" + t.get("You currently have no personal area which can be removed!"));
         return;
       }
 
       perm.removePlayerArea(player);
-      player.addMessage("\u00a77Your area has been unsaved!");
+      player.addMessage("\u00a77" + t.get("Your area has been removed!"));
     } else if (arguments[0].equals("rename")) {
       if (!perm.playerHasArea(player)) {
-        player.addMessage("\u00a7cYou currently have no personal area which can be renamed!");
+        player.addMessage("\u00a7c" + t.get("You currently have no personal area which can be renamed!"));
         return;
       }
 
       String label = extractArgument(message, 1);
       if (label != null) {
         if (perm.hasAreaWithName(label)) {
-          player.addMessage("\u00a7cAn area with that name already exists!");
+          player.addMessage("\u00a7c" + t.get("An area with that name already exists!"));
         } else {
           perm.renamePlayerArea(player, label);
-          player.addMessage("\u00a77Your area has been renamed!");
+          player.addMessage("\u00a77" + t.get("Your area has been renamed!"));
         }
       } else {
-        player.addMessage("\u00a7cPlease supply an area name.");
+        player.addMessage("\u00a7c" + t.get("Please supply an area name."));
       }
     } else {
-      player.addMessage("\u00a7cYou entered an invalid argument.");
+      player.addMessage("\u00a7c" + t.get("You entered an invalid argument."));
     }
   }
 }

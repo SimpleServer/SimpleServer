@@ -30,7 +30,7 @@ public class PlayerListCommand extends AbstractCommand implements PlayerCommand 
 
   public void execute(Player player, String message) {
     Server server = player.getServer();
-    String list = "\u00a77Connected Players (" + server.numPlayers()
+    String list = "\u00a77" + t.get("Connected Players") + " (" + server.numPlayers()
         + "):\u00a7f ";
     for (Player friend : server.playerList.getArray()) {
       list += friend.getName() + ", ";

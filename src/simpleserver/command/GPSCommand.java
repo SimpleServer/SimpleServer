@@ -25,22 +25,23 @@ import simpleserver.Player;
 public class GPSCommand extends OnlinePlayerArgCommand {
   public GPSCommand() {
     super("gps [PLAYER]",
-          "Display block coordinates of named player or yourself", true);
+          "Display block coordinates of named player or yourself",
+          true);
   }
 
   @Override
   protected void executeWithTarget(Player player, String message, Player target) {
-    String name = "Your";
+    String name = t.get("Your");
     if (target == null) {
       target = player;
     } else {
-      name = target.getName() + "'s";
+      name = String.format(t.get("%s's"), target.getName());
     }
 
-    player.addMessage("\u00a77" + name + " Latitude: \u00a7f"
-        + (int) target.getX() + "\u00a77 Longitude: \u00a7f"
-        + (int) target.getZ() + "\u00a77 Altitude: \u00a7f"
-        + (int) target.getY() + "\u00a77 Dimension: \u00a7f"
-        + target.getDimension());
+    player.addMessage("\u00a77" + name + " " +
+                     t.get("Latitude:") + " \u00a7f" + (int) target.getX() +
+        "\u00a77 " + t.get("Longitude:") + " \u00a7f" + (int) target.getZ() +
+        "\u00a77 " + t.get("Altitude:") + " \u00a7f" + (int) target.getY() +
+        "\u00a77 " + t.get("Dimension:") + " \u00a7f" + target.getDimension());
   }
 }

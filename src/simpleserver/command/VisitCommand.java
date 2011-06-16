@@ -30,22 +30,31 @@ public class VisitCommand extends OnlinePlayerArgCommand {
   @Override
   protected void executeWithTarget(Player player, String message, Player target) {
     if (player.getName().equals(target.getName())) {
-      player.addMessage("\u00a7cYou can not visit yourself!");
+      player.addMessage("\u00a7c" + t.get("You can not visit yourself!"));
       return;
     }
 
     if (player.getDimension() == target.getDimension()) {
-      player.addMessage("\u00a77Requesting " + target.getName() + " for a visit...");
-      player.addMessage("\u00a77If nothing happens within 10 seconds, your request is denied.");
+      String msg;
 
-      target.addMessage("\u00a7c" + player.getName() + " would like to visit you. If you agree,");
-      target.addMessage("\u00a7cissue the command " + commandPrefix() + "ok within 10 seconds.");
+      msg = String.format(t.get("Requesting %s for a visit..."), target.getName());
+      player.addMessage("\u00a77" + msg);
+      player.addMessage("\u00a77" +
+          t.get("If nothing happens within 10 seconds, your request is denied."));
+
+      msg = String.format(t.get("%s would like to visit you. If you agree,"),
+                          player.getName());
+      target.addMessage("\u00a7c" + msg);
+      msg = String.format(t.get("issue the command %s within 10 seconds."),
+                          commandPrefix() + "ok");
+      target.addMessage("\u00a7c" + msg);
 
       target.addVisitRequest(player);
     } else {
-      player.addMessage("\u00a7cYou and " + target.getName() + " are in different dimensions.");
-      player.addMessage("\u00a7cNo teleport possible!");
+      String msg = String.format(t.get("You and %s are in different dimensions."),
+                                 target.getName());
+      player.addMessage("\u00a7c" + msg);
+      player.addMessage("\u00a7c" + t.get("No teleport possible!"));
     }
-
   }
 }

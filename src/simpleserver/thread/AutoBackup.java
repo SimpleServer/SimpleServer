@@ -72,7 +72,7 @@ public class AutoBackup {
     if (server.options.getBoolean("announceBackup")) {
       System.out.println("[SimpleServer] Backing up server...");
     }
-    announce(server.l.get("BACKING_UP"));
+    announce(server.t.get("Backing up..."));
     server.runCommand("save-off", null);
 
     File copy;
@@ -85,7 +85,7 @@ public class AutoBackup {
       deleteRecursively(TEMP_DIRECTORY);
     }
     purgeOldBackups();
-    announce(server.l.get("BACKUP_COMPLETE"));
+    announce(server.t.get("Backup Complete!"));
   }
 
   public void announce(String message) {
@@ -241,7 +241,7 @@ public class AutoBackup {
           forceBackup = false;
 
           if (server.options.getBoolean("announceSave")) {
-            server.runCommand("say", server.l.get("SAVING_MAP"));
+            server.runCommand("say", server.t.get("Saving Map..."));
           }
           server.setSaving(true);
           server.runCommand("save-all", null);

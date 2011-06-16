@@ -32,7 +32,7 @@ public class KitCommand extends AbstractCommand implements PlayerCommand {
 
     if (arguments.length > 0) {
       if (!player.getServer().kits.giveKit(player, arguments[0])) {
-        player.addMessage("\u00a7cInvalid kit name.");
+        player.addMessage("\u00a7c" + t.get("Invalid kit name."));
       }
     } else {
       player.getServer().kits.listKits(player);

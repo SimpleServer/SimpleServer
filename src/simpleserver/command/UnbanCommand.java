@@ -33,6 +33,7 @@ public class UnbanCommand extends PlayerArgCommand {
 
     player.getServer().adminLog("User " + player.getName()
                                     + " unbanned player:\t " + name);
-    player.addMessage("\u00a77Unbanned " + name + "!");
+    String msg = String.format(t.get("Unbanned %s!"), name);
+    player.addMessage("\u00a77" + msg);
   }
 }

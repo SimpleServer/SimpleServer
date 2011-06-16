@@ -86,7 +86,7 @@ public class AutoRun {
           } catch (InterruptedException e) {
             continue;
           }
-          server.runCommand("say", "Mapping Server!");
+          server.runCommand("say", server.t.get("Mapping Server!"));
           server.runCommand("save-off", null);
 
           lastRun = System.currentTimeMillis();
@@ -95,7 +95,7 @@ public class AutoRun {
             try {
               process = Runtime.getRuntime().exec(command);
             } catch (IOException e) {
-              server.runCommand("say", "Mapping Failed!");
+              server.runCommand("say", server.t.get("Mapping Failed!"));
               System.out.println("[SimpleServer] " + e);
               System.out.println("[SimpleServer] Cron Failed! Bad Command!");
               server.errorLog(e, "AutoRun Failure");
@@ -120,9 +120,9 @@ public class AutoRun {
             if (exitCode < 0) {
               System.out.println("[SimpleServer] c10t Failed! Exited with code "
                   + exitCode + "!");
-              server.runCommand("say", "Mapping Failed!");
+              server.runCommand("say", server.t.get("Mapping Failed!"));
             } else {
-              server.runCommand("say", "Mapping Complete!");
+              server.runCommand("say", server.t.get("Mapping Complete!"));
             }
           } finally {
             server.runCommand("save-on", null);

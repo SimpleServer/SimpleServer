@@ -30,7 +30,7 @@ public class BackupCommand extends AbstractCommand implements PlayerCommand,
   }
 
   public void execute(Player player, String message) {
-    player.addMessage("\u00a77Forcing backup!");
+    player.addMessage("\u00a77" + t.get("Forcing backup!"));
     player.getServer().forceBackup();
   }
 

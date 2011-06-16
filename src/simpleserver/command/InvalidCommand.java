@@ -26,16 +26,21 @@ import simpleserver.Server;
 public class InvalidCommand extends AbstractCommand implements PlayerCommand,
     ServerCommand {
   public InvalidCommand() {
-    super(null, "\u00a7cNo such command!");
+    super(null, "No such command!");
   }
 
   public void execute(Player player, String message) {
     if (!player.getServer().options.contains("alternateJarFile")) {
-      player.addMessage("\u00a7cNo such command " + message);
+      player.addMessage("\u00a7c" + t.get("No such command") + " " + message);
     }
   }
 
   public void execute(Server server, String message) {
     System.out.println("No such command " + message);
+  }
+
+  @Override
+  public void reloadText() {
+    helpText = "\u00a7c" + t.get(commandCode);
   }
 }

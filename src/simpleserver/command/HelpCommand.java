@@ -42,7 +42,7 @@ public class HelpCommand extends AbstractCommand implements PlayerCommand {
       String[] aliases = player.getServer().permissions.getCommandAliases(command.getName());
       if (aliases.length > 0) {
         StringBuffer line = new StringBuffer();
-        line.append("\u00a77Aliases:\u00a7f ");
+        line.append("\u00a77" + t.get("Aliases:") + "\u00a7f ");
         for (String alias : aliases) {
           line.append(commandPrefix());
           line.append(alias);
@@ -52,7 +52,7 @@ public class HelpCommand extends AbstractCommand implements PlayerCommand {
       }
     } else {
       StringBuffer line = new StringBuffer();
-      line.append("\u00a77Available Commands:\u00a7f ");
+      line.append("\u00a77" + t.get("Available Commands:") + "\u00a7f ");
 
       String prefix = commandPrefix();
       for (PlayerCommand command : parser.getPlayerCommands()) {
@@ -68,8 +68,10 @@ public class HelpCommand extends AbstractCommand implements PlayerCommand {
       }
 
       player.addMessage(line.toString());
-      player.addMessage("\u00a77Say " + prefix
-          + "help command for details of a specific command.");
+
+      String msg = String.format(t.get("Say %s command for details of a specific command."),
+                                 prefix + "help");
+      player.addMessage("\u00a77" + msg);
 
       // additional custom help text from helptext.txt
       String[] helplines = player.getServer().helptext.getHelpText().split("\n");

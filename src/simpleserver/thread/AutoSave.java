@@ -77,7 +77,7 @@ public class AutoSave {
           }
           forceSave = false;
 
-          announce(server.l.get("SAVING_MAP"));
+          announce(server.t.get("Saving Map..."));
           server.setSaving(true);
           server.runCommand("save-all", null);
           while (server.isSaving()) {

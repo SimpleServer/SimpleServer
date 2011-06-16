@@ -24,9 +24,8 @@ import simpleserver.Player;
 
 public abstract class PlayerArgCommand extends AbstractCommand implements
     PlayerCommand {
-  protected PlayerArgCommand(String name, String helpText) {
-    super(name, helpText
-        + " (case-insensitive, name prefix works for online players)");
+  protected PlayerArgCommand(String name, String commandCode) {
+    super(name, commandCode);
   }
 
   public void execute(Player player, String message) {
@@ -48,6 +47,17 @@ public abstract class PlayerArgCommand extends AbstractCommand implements
                                             String target);
 
   protected void noTargetSpecified(Player player, String message) {
-    player.addMessage("\u00a7cNo player specified.");
+    player.addMessage("\u00a7c" + t.get("No player specified."));
+  }
+
+  @Override
+  public void reloadText() {
+    if (name != null) {
+      helpText = name + "\u00a7f : " + t.get(commandCode) + " "
+          + t.get("(case-insensitive, name prefix works for online players)");
+    } else {
+      helpText = t.get(commandCode) + " "
+          + t.get("(case-insensitive, name prefix works for online players)");
+    }
   }
 }

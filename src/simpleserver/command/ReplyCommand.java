@@ -25,7 +25,8 @@ import simpleserver.Player;
 public class ReplyCommand extends AbstractCommand implements PlayerCommand {
 
   public ReplyCommand() {
-    super("reply MESSAGE", "Sends a message to the player that last told you something");
+    super("reply MESSAGE",
+          "Sends a message to the player that last told you something");
   }
 
   public void execute(Player player, String message) {
@@ -36,7 +37,7 @@ public class ReplyCommand extends AbstractCommand implements PlayerCommand {
     if (target != null && target.getName() != null) {
       player.execute(TellCommand.class, target.getName() + " " + message);
     } else {
-      player.addMessage("\u00a7cNobody sent you a message yet.");
+      player.addMessage("\u00a7c" + t.get("Nobody sent you a message yet."));
     }
   }
 }

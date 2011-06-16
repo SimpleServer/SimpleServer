@@ -332,7 +332,7 @@ public class Player {
     boolean invalidCommand = command.getName() == null;
 
     if (!invalidCommand && !commandAllowed(command.getName())) {
-      addMessage("\u00a7cInsufficient permission.");
+      addMessage("\u00a7c" + server.t.get("Insufficient permission."));
       return true;
     }
 
@@ -375,11 +375,11 @@ public class Player {
       item = Integer.parseInt(rawItem);
 
       if (item < 0) {
-        addMessage("\u00a7cItem ID must be positive!");
+        addMessage("\u00a7c" + server.t.get("Item ID must be positive!"));
         success = false;
       }
     } catch (NumberFormatException e) {
-      addMessage("\u00a7cItem ID must map to a number!");
+      addMessage("\u00a7c" + server.t.get("Item ID must map to a number!"));
       success = false;
     }
 
@@ -389,17 +389,19 @@ public class Player {
         amount = Integer.parseInt(rawAmount);
 
         if ((amount < 1) || (amount > 1000)) {
-          addMessage("\u00a7cAmount must be within 1-1000!");
+          addMessage("\u00a7c" + server.t.get("Amount must be within 1-1000!"));
           success = false;
         }
       } catch (NumberFormatException e) {
-        addMessage("\u00a7cAmount must be a number!");
+        addMessage("\u00a7c" + server.t.get("Amount must be a number!"));
         success = false;
       }
     }
 
     if (!success) {
-      addMessage("\u00a7cUnable to give " + rawItem);
+      String msg = String.format(server.t.get("Unable to give %s"),
+                                 rawItem);
+      addMessage("\u00a7c" + msg);
       return false;
     }
 

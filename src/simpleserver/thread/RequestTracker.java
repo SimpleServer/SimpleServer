@@ -59,7 +59,7 @@ public class RequestTracker {
     if (count > MAX_REQUESTS) {
       server.adminLog("RequestTracker banned " + ipAddress
           + ":\t Too many requests!");
-      server.banKickIP(ipAddress, "Banned: Too many requests!");
+      server.banKickIP(ipAddress, server.t.get("Banned: Too many requests!"));
     }
   }
 

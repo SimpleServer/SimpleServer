@@ -36,8 +36,10 @@ public class WarpToCommand extends OnlinePlayerArgCommand {
                                       + player.getName() + "\tto\t"
                                       + target.getName());
     } else {
-      player.addMessage("\u00a7cYou and " + target.getName() + " are in different dimensions.");
-      player.addMessage("\u00a7cNo teleport possible!");
+      String msg = String.format(t.get("You and %s are in different dimensions."),
+                                 target.getName());
+      player.addMessage("\u00a7c" + msg);
+      player.addMessage("\u00a7c" + t.get("No teleport possible!"));
     }
   }
 }

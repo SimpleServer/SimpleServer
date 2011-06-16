@@ -21,25 +21,31 @@
 package simpleserver.command;
 
 import simpleserver.CommandParser;
+import simpleserver.lang.Translations;
 
 public abstract class AbstractCommand implements Command {
-  private final String name;
-  private final String helpText;
+  protected final String name;
+  protected final String commandCode;
+  protected String helpText;
   protected CommandParser parser;
+  protected Translations t;
 
-  protected AbstractCommand(String name, String helpText) {
+  protected AbstractCommand(String name, String commandCode) {
+    t = Translations.getInstance();
+
     if (name != null) {
-      this.helpText = name + "\u00a7f : " + helpText;
+      helpText = name + "\u00a7f : " + t.get(commandCode);
 
       int splitIndex = name.indexOf(" ");
       if (splitIndex != -1) {
         name = name.substring(0, splitIndex);
       }
     } else {
-      this.helpText = helpText;
+      helpText = t.get(commandCode);
     }
 
     this.name = name;
+    this.commandCode = commandCode;
   }
 
   public String getName() {
@@ -90,6 +96,14 @@ public abstract class AbstractCommand implements Command {
       return parser.commandPrefix();
     } else {
       return "!";
+    }
+  }
+
+  public void reloadText() {
+    if (name != null) {
+      helpText = name + "\u00a7f : " + t.get(commandCode);
+    } else {
+      helpText = t.get(commandCode);
     }
   }
 

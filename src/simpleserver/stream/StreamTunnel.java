@@ -36,13 +36,14 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import simpleserver.Coordinate;
+import simpleserver.Coordinate.Dimension;
 import simpleserver.Group;
 import simpleserver.Player;
 import simpleserver.Server;
-import simpleserver.Coordinate.Dimension;
 import simpleserver.command.LocalSayCommand;
 import simpleserver.command.PlayerListCommand;
 import simpleserver.config.ChestList.Chest;
+import simpleserver.lang.Translations;
 
 public class StreamTunnel {
   private static final boolean EXPENSIVE_DEBUG_LOGGING = Boolean.getBoolean("EXPENSIVE_DEBUG_LOGGING");
@@ -73,6 +74,8 @@ public class StreamTunnel {
   private volatile long lastRead;
   private volatile boolean run = true;
   private Byte lastPacket;
+
+  private Translations t;
 
   public StreamTunnel(InputStream in, OutputStream out, boolean isServerTunnel,
                       Player player) {
@@ -119,6 +122,8 @@ public class StreamTunnel {
     tunneler.start();
 
     lastRead = System.currentTimeMillis();
+
+    t = Translations.getInstance();
   }
 
   public void stop() {
@@ -219,7 +224,8 @@ public class StreamTunnel {
 
           if (player.isMuted() && !message.startsWith("/")
               && !message.startsWith("!")) {
-            player.addMessage("\u00a7cYou are muted! You may not send messages to all players.");
+            player.addMessage("\u00a7c" +
+                t.get("You are muted! You may not send messages to all players."));
             break;
           }
 
@@ -322,11 +328,11 @@ public class StreamTunnel {
 
           boolean[] perms = server.permissions.getPlayerBlockPermissions(player, coordinate, 0);
           if (!perms[2] && status == 0) {
-            player.addMessage("\u00a7c " + server.l.get("USE_FORBIDDEN"));
+            player.addMessage("\u00a7c " + t.get("You can not use this block here!"));
             break;
           }
           if (!perms[1] && status == 2) {
-            player.addMessage("\u00a7c " + server.l.get("DESTROY_FORBIDDEN"));
+            player.addMessage("\u00a7c " + t.get("You can not destroy this block!"));
             break;
           }
 
@@ -386,9 +392,9 @@ public class StreamTunnel {
           // continue
         } else if ((dropItem != -1 && !perms[0]) || (dropItem == -1 && !perms[2])) {
           if (dropItem == -1) {
-            player.addMessage("\u00a7c " + server.l.get("USE_FORBIDDEN"));
+            player.addMessage("\u00a7c " + t.get("You can not use this block here!"));
           } else {
-            player.addMessage("\u00a7c " + server.l.get("PLACE_FORBIDDEN"));
+            player.addMessage("\u00a7c " + t.get("You can not place this block here!"));
           }
 
           writePacket = false;
@@ -423,7 +429,7 @@ public class StreamTunnel {
           Chest adjacentChest = server.chests.adjacentChest(targetBlock);
 
           if (adjacentChest != null && !adjacentChest.isOpen() && !adjacentChest.ownedBy(player)) {
-            player.addMessage("\u00a7c " + server.l.get("ADJ_CHEST_LOCKED"));
+            player.addMessage("\u00a7c " + t.get("The adjacent chest is locked!"));
             writePacket = false;
             drop = true;
           } else {
@@ -652,7 +658,7 @@ public class StreamTunnel {
               if (player.isAttemptingUnlock()) {
                 server.chests.unlock(player.openedChest());
                 player.setAttemptedAction(null);
-                player.addMessage("\u00a77 " + server.l.get("CHEST_UNLOCKED"));
+                player.addMessage("\u00a77 " + t.get("This chest is no longer locked!"));
                 typeString = "Open Chest";
               } else {
                 typeString = server.chests.chestName(player.openedChest());
@@ -666,7 +672,7 @@ public class StreamTunnel {
             }
 
           } else {
-            player.addMessage("\u00a7c " + server.l.get("CHEST_LOCKED"));
+            player.addMessage("\u00a7c " + t.get("This chest is locked!"));
             in.readByte();
             break;
           }
@@ -822,7 +828,7 @@ public class StreamTunnel {
         server.chests.giveLock(player, coordinate, false, player.nextChestName());
       }
       player.setAttemptedAction(null);
-      player.addMessage("\u00a77This chest is now locked.");
+      player.addMessage("\u00a77" + t.get("This chest is now locked."));
     } else if (!server.chests.isChest(coordinate)) {
       server.chests.addOpenChest(coordinate);
     }

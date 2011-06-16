@@ -63,12 +63,12 @@ public class AutoRestart {
     public void run() {
       while (run) {
         if (needsRestart()) {
-          announce(server.l.get("SERVER_RESTART_60"));
+          announce(server.t.get("Server is restarting in 60 seconds!"));
           try {
             Thread.sleep(30000);
-            announce(server.l.get("SERVER_RESTART_30"));
+            announce(server.t.get("Server is restarting in 30 seconds!"));
             Thread.sleep(27000);
-            announce(server.l.get("SERVER_RESTART_3"));
+            announce(server.t.get("Server is restarting in 3 seconds!"));
             Thread.sleep(3000);
           } catch (InterruptedException e) {
             continue;
