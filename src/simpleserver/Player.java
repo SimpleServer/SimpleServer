@@ -162,6 +162,11 @@ public class Player {
 
     watchdog.setName("PlayerWatchdog-" + name);
     server.connectionLog("player", extsocket, name);
+
+    if (server.numPlayers() == 0) {
+      server.time.set();
+    }
+
     server.playerList.addPlayer(this);
     return true;
   }
@@ -209,12 +214,16 @@ public class Player {
     return !messages.isEmpty();
   }
 
-  public void addMessage(Color color, String format, Object... args) {
-    addMessage(color + String.format(format, args));
+  public void addMessage(Color color, String message) {
+    addMessage(color + message);
   }
 
-  public void addMessage(Color color, String message) {
-    messages.add(color + message);
+  public void addMessage(Color color, String format, Object... args) {
+    addMessage(color, String.format(format, args));
+  }
+
+  public void addMessage(String format, Object... args) {
+    addMessage(String.format(format, args));
   }
 
   public void addMessage(String msg) {

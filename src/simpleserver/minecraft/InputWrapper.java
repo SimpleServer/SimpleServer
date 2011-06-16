@@ -45,7 +45,13 @@ public class InputWrapper implements Wrapper {
   }
 
   public void injectCommand(String command, String arguments) {
-    in.appendLine(command + " " + arguments);
+    String line = command + " " + arguments + "\n";
+    try {
+      out.write(line.getBytes());
+      out.flush();
+    } catch (IOException e) {
+      messageHandler.handleError(e);
+    }
   }
 
   public void stop() {
