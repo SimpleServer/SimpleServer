@@ -20,6 +20,7 @@
  */
 package simpleserver.command;
 
+import simpleserver.Color;
 import simpleserver.Player;
 import simpleserver.Server;
 
@@ -31,11 +32,17 @@ public class ReloadCommand extends AbstractCommand implements PlayerCommand,
 
   public void execute(Player player, String message) {
     player.getServer().loadResources();
-    player.addMessage("\u00a77Resources Reloaded!");
+    if (player.getServer().permissions.loadsuccess) {
+      player.addMessage("\u00a77Resources Reloaded!");
+    } else {
+      player.addMessage(Color.RED, "Error while reloading permissions.xml. See serverLog for detailed information.");
+    }
   }
 
   public void execute(Server server, String message) {
     server.loadResources();
-    System.out.println("Resources Reloaded!");
+    if (server.permissions.loadsuccess) {
+      System.out.println("Resources Reloaded!");
+    }
   }
 }
