@@ -8,8 +8,9 @@
 <!ELEMENT permissions ( commands?, blocks? )>
 <!ELEMENT commands (command+)>
 <!ELEMENT command EMPTY>
-<!ELEMENT blocks (block*)>
+<!ELEMENT blocks (block*, chests?, blocks*)>
 <!ELEMENT block EMPTY>
+<!ELEMENT chests EMPTY>
 
 <!ELEMENT areas (area*)>
 <!ELEMENT area ( permissions?, areas? )>
@@ -45,6 +46,9 @@
 >
 <!ATTLIST block
   id NMTOKEN #REQUIRED
+  allow CDATA #IMPLIED
+>
+<!ATTLIST chests
   allow CDATA #IMPLIED
 >
 <!ATTLIST area

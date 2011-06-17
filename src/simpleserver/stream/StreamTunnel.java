@@ -35,6 +35,7 @@ import java.util.IllegalFormatException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import simpleserver.Color;
 import simpleserver.Coordinate;
 import simpleserver.Group;
 import simpleserver.Player;
@@ -646,8 +647,12 @@ public class StreamTunnel {
         byte id = in.readByte();
         byte invtype = in.readByte();
         String typeString = in.readUTF();
+        byte unknownByte = in.readByte();
         if (invtype == 0) {
-          if (server.chests.canOpen(player, player.openedChest()) || player.isAdmin()) {
+          if (!server.permissions.canOpenChests(player, player.openedChest())) {
+            player.addMessage(Color.RED, "You can't use chests here");
+            break;
+          } else if (server.chests.canOpen(player, player.openedChest()) || player.isAdmin()) {
             if (server.chests.isLocked(player.openedChest())) {
               if (player.isAttemptingUnlock()) {
                 server.chests.unlock(player.openedChest());
@@ -667,7 +672,6 @@ public class StreamTunnel {
 
           } else {
             player.addMessage("\u00a7c " + server.l.get("CHEST_LOCKED"));
-            in.readByte();
             break;
           }
         }
@@ -675,7 +679,7 @@ public class StreamTunnel {
         write(id);
         write(invtype);
         write8(typeString);
-        write(in.readByte());
+        write(unknownByte);
         break;
       case 0x65:
         write(packetId);
