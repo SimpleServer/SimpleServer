@@ -163,6 +163,11 @@ public class Player {
 
     watchdog.setName("PlayerWatchdog-" + name);
     server.connectionLog("player", extsocket, name);
+
+    if (server.numPlayers() == 0) {
+      server.time.set();
+    }
+
     server.playerList.addPlayer(this);
     return true;
   }
@@ -211,11 +216,19 @@ public class Player {
   }
 
   public void addMessage(Color color, String format, Object... args) {
-    addMessage(color + String.format(format, args));
+    addMessage(color, String.format(format, args));
   }
 
   public void addMessage(Color color, String message) {
     addMessage(color + message);
+  }
+
+  public void addMessage(String format, Object... args) {
+    addMessage(String.format(format, args));
+  }
+
+  public void addCaptionedMessage(String caption, String format, Object... args) {
+    addMessage("%s%s: %s%s", Color.GRAY, caption, Color.WHITE, String.format(format, args));
   }
 
   public void addMessage(String msg) {
@@ -232,6 +245,19 @@ public class Player {
 
   public void addTMessage(String msg) {
     addMessage(Translations.getInstance().get(msg));
+  }
+
+  public void addTCaptionedMessage(String caption, String format, boolean translateFormat, Object... args) {
+    if (translateFormat) {
+      addTCaptionedMessage(caption, Translations.getInstance().get(format), args);
+    } else {
+      addTCaptionedMessage(caption, format, args);
+    }
+  }
+
+  public void addTCaptionedMessage(String caption, String format, Object... args) {
+    addMessage("%s%s: %s%s", Color.GRAY, Translations.getInstance().get(caption),
+               Color.WHITE, String.format(format, args));
   }
 
   public String getMessage() {

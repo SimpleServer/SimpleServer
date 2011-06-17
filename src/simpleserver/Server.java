@@ -29,7 +29,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Semaphore;
 
-import simpleserver.command.TimeCommand;
 import simpleserver.config.ChestList;
 import simpleserver.config.GiveAliasList;
 import simpleserver.config.HelpText;
@@ -104,7 +103,7 @@ public class Server {
 
   public Semaphore saveLock = new Semaphore(1);
 
-  private long time;
+  public Time time;
 
   public Server() {
     listener = new Listener();
@@ -357,6 +356,8 @@ public class Server {
     resources.add(giveAliasList = new GiveAliasList());
     resources.add(stats = new Stats());
 
+    time = new Time(this);
+
     systemInput = new SystemInputQueue();
     adminLog = new AdminLog();
     errorLog = new ErrorLog();
@@ -370,7 +371,7 @@ public class Server {
     adminLog.stop();
     errorLog.stop();
     connectionLog.stop();
-    ((TimeCommand) commandParser.getPlayerCommand(TimeCommand.class)).unfreeze();
+    time.unfreeze();
   }
 
   private void startup() {
@@ -409,6 +410,13 @@ public class Server {
     autosave = new AutoSave(this);
     autoRestart = new AutoRestart(this);
     c10t = new AutoRun(this, options.get("c10tArgs"));
+    if (options.contains("freezeTime")) {
+      try {
+        time.freeze(time.parse(options.get("freezeTime")));
+      } catch (Exception e) {
+        System.out.println("[SimpleServer] Warning: freezeTime option is not valid");
+      }
+    }
   }
 
   private void shutdown() {
@@ -518,11 +526,11 @@ public class Server {
   }
 
   public void setTime(long time) {
-    this.time = time;
+    this.time.is(time);
   }
 
   public long time() {
-    return time;
+    return time.get();
   }
 
 }
