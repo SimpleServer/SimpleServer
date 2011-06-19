@@ -652,8 +652,12 @@ public class StreamTunnel {
         byte id = in.readByte();
         byte invtype = in.readByte();
         String typeString = in.readUTF();
+        byte unknownByte = in.readByte();
         if (invtype == 0) {
-          if (server.chests.canOpen(player, player.openedChest()) || player.isAdmin()) {
+          if (!server.permissions.canOpenChests(player, player.openedChest())) {
+            player.addTMessage(Color.RED, "You can't use chests here");
+            break;
+          } else if (server.chests.canOpen(player, player.openedChest()) || player.isAdmin()) {
             if (server.chests.isLocked(player.openedChest())) {
               if (player.isAttemptingUnlock()) {
                 server.chests.unlock(player.openedChest());
@@ -673,7 +677,6 @@ public class StreamTunnel {
 
           } else {
             player.addTMessage(Color.RED, "This chest is locked!");
-            in.readByte();
             break;
           }
         }
@@ -681,7 +684,7 @@ public class StreamTunnel {
         write(id);
         write(invtype);
         write8(typeString);
-        write(in.readByte());
+        write(unknownByte);
         break;
       case 0x65:
         write(packetId);

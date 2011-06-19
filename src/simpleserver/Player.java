@@ -353,6 +353,10 @@ public class Player {
     return z;
   }
 
+  public Coordinate position() {
+    return new Coordinate((int) x, (int) y, (int) z, dimension);
+  }
+
   public void setLocalChat(boolean mode) {
     localChat = mode;
   }
