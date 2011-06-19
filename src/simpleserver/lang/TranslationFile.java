@@ -27,7 +27,7 @@ import simpleserver.Resource;
 import simpleserver.config.SortedProperties;
 
 public class TranslationFile implements Resource {
-  private static final String resourceLocation = "defaults";
+  private static final String resourceLocation = "translations";
   protected final String filename;
   protected SortedProperties options;
 

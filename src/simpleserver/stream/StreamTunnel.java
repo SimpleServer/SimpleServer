@@ -663,12 +663,12 @@ public class StreamTunnel {
                 server.chests.unlock(player.openedChest());
                 player.setAttemptedAction(null);
                 player.addTMessage(Color.RED, "This chest is no longer locked!");
-                typeString = "Open Chest";
+                typeString = Translations.getInstance().get("Open Chest");
               } else {
                 typeString = server.chests.chestName(player.openedChest());
               }
             } else {
-              typeString = "Open Chest";
+              typeString = Translations.getInstance().get("Open Chest");
               if (player.isAttemptLock()) {
                 lockChest(player.openedChest());
                 typeString = player.nextChestName();
