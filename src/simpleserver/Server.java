@@ -29,6 +29,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Semaphore;
 
+import simpleserver.Coordinate.Dimension;
 import simpleserver.bot.Teleporter;
 import simpleserver.config.ChestList;
 import simpleserver.config.GiveAliasList;
@@ -409,7 +410,7 @@ public class Server {
     }
 
     try {
-      new Teleporter(this, "Blubb");
+      new Teleporter(this, "Blubb", new Coordinate(0, 30, 0, Dimension.EARTH)).connect();
     } catch (UnknownHostException e) {
       // TODO Auto-generated catch block
       e.printStackTrace();

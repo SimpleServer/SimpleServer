@@ -18,28 +18,43 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package simpleserver.command;
+package simpleserver.bot;
 
-import java.io.IOException;
-import java.net.UnknownHostException;
+import java.io.File;
 
-import simpleserver.Player;
-import simpleserver.bot.Bot;
+import simpleserver.Coordinate;
+import simpleserver.Server;
+import simpleserver.bot.NBT.NBTDouble;
+import simpleserver.bot.NBT.NBTInt;
+import simpleserver.bot.NBT.NBTList;
+import simpleserver.bot.NBT.NBTag;
 
-public class BotCommand extends AbstractCommand implements PlayerCommand {
-  public BotCommand() {
-    super("bot", "Spawn bot");
+public class PlayerFile {
+  private String path;
+  private NBT nbt;
+
+  public PlayerFile(String name, Server server) {
+    path = server.options.get("levelName") + "/players/" + name + ".dat";
+    File file = new File(path);
+    if (file.exists()) {
+      nbt = new NBT(path);
+    } else {
+      nbt = new NBT(server.options.get("levelName") + "/players/sadimusi.dat");
+    }
+
+    System.out.print(nbt);
   }
 
-  public void execute(Player player, String message) {
-    try {
-      new Bot(player.getServer(), "Blubbi").connect();
-    } catch (UnknownHostException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    } catch (IOException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    }
+  public void setPosition(Coordinate coord) {
+    NBTag pos = nbt.root().find("Pos");
+    ((NBTDouble) ((NBTList) pos).get(0)).set(coord.x());
+    ((NBTDouble) ((NBTList) pos).get(1)).set(coord.y());
+    ((NBTDouble) ((NBTList) pos).get(2)).set(coord.z());
+    ((NBTInt) nbt.root().find("Dimension")).set(coord.dimension().index());
+    System.out.print(nbt);
+  }
+
+  public void save() {
+    nbt.save(path);
   }
 }

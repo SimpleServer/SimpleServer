@@ -21,18 +21,29 @@
 package simpleserver.bot;
 
 import java.io.IOException;
-import java.net.UnknownHostException;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import simpleserver.Coordinate;
 import simpleserver.Server;
 
 public class Teleporter extends Bot {
 
   private Timer timer = new Timer();
+  private Coordinate coordinate;
 
-  public Teleporter(Server server, String name) throws UnknownHostException, IOException {
+  public Teleporter(Server server, String name, Coordinate coordinate) {
     super(server, name);
+    this.coordinate = coordinate;
+    prepare();
+  }
+
+  @Override
+  protected void prepare() {
+    name = name + Math.round(10000 * Math.random());
+    PlayerFile dat = new PlayerFile(name, server);
+    dat.setPosition(coordinate);
+    dat.save();
   }
 
   @Override

@@ -40,7 +40,7 @@ public class Bot {
 
   private static final int VERSION = 13;
 
-  private String name;
+  protected String name;
   protected Server server;
   private boolean connected;
   private boolean expectDisconnect;
@@ -53,9 +53,13 @@ public class Bot {
   private Timer timer;
   ReentrantLock writeLock;
 
-  public Bot(Server server, String name) throws UnknownHostException, IOException {
+  public Bot(Server server, String name) {
     this.name = name;
     this.server = server;
+
+  }
+
+  public void connect() throws UnknownHostException, IOException {
 
     try {
       InetAddress localAddress = InetAddress.getByName(addressFactory.getNextAddress());
@@ -74,6 +78,10 @@ public class Bot {
     timer.schedule(new KeepAlive(), 0, 30 * 1000);
 
     handshake();
+  }
+
+  protected void prepare() {
+
   }
 
   private void handshake() throws IOException {
