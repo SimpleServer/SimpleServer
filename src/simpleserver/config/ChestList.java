@@ -28,8 +28,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import simpleserver.Coordinate;
-import simpleserver.Player;
 import simpleserver.Coordinate.Dimension;
+import simpleserver.Player;
+import simpleserver.lang.Translations;
 
 public class ChestList extends AsciiConfig {
   private final ConcurrentMap<Coordinate, Chest> locations;
@@ -180,7 +181,7 @@ public class ChestList extends AsciiConfig {
         dimension = Dimension.get(tokens[5]);
         name = tokens[6];
       } else {
-        name = (tokens[0].equals("-")) ? "-" : "Locked Chest";
+        name = (tokens[0].equals("-")) ? "-" : Translations.getInstance().get("Locked Chest");
       }
 
       Coordinate coordinate = new Coordinate(x, y, z, dimension);

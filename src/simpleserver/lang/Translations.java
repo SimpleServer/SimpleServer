@@ -73,4 +73,8 @@ public class Translations implements Resource {
   public static Translations getInstance() {
     return TranslationsHolder.INSTANCE;
   }
+
+  public static String t(String key) {
+    return TranslationsHolder.INSTANCE.get(key);
+  }
 }
