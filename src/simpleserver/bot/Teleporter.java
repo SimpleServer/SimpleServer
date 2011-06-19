@@ -22,10 +22,14 @@ package simpleserver.bot;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import simpleserver.Server;
 
 public class Teleporter extends Bot {
+
+  private Timer timer = new Timer();
 
   public Teleporter(Server server, String name) throws UnknownHostException, IOException {
     super(server, name);
@@ -36,13 +40,47 @@ public class Teleporter extends Bot {
     super.ready();
     out.writeByte(3);
     write("Hello World");
+    timer.schedule(new LookAround(), 0, 500);
   }
 
   @Override
   protected void handlePacket(byte packetId) throws IOException {
     switch (packetId) {
+      case 0x3:
+        String msg = readUTF16();
+        if (msg.contains("quit")) {
+          logout();
+          server.stop();
+        }
+        break;
       default:
         super.handlePacket(packetId);
+    }
+  }
+
+  @Override
+  protected void die() {
+    timer.cancel();
+    super.die();
+  }
+
+  private final class LookAround extends TimerTask {
+    private int t = 0;
+
+    @Override
+    public void run() {
+      writeLock.lock();
+      try {
+        out.writeByte(0x0c);
+        out.writeFloat(40 * t++);
+        out.writeFloat((float) (Math.sin(t / 10) * 45));
+        out.writeBoolean(true);
+      } catch (IOException e) {
+        error("LookAround failed");
+      } finally {
+        writeLock.unlock();
+      }
+
     }
   }
 
