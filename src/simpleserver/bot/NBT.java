@@ -21,15 +21,20 @@
 package simpleserver.bot;
 
 import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
 public class NBT {
 
   private DataInputStream in;
+  private DataOutputStream out;
+  private NBTag root;
 
   public NBT(String filename) {
     load(filename);
@@ -38,8 +43,7 @@ public class NBT {
   private void load(String filename) {
     try {
       in = new DataInputStream(new GZIPInputStream(new FileInputStream(filename)));
-      NBTag root = loadTag(false);
-      System.out.println(root);
+      root = loadTag(false);
     } catch (Exception e) {
       e.printStackTrace();
     }
@@ -79,12 +83,38 @@ public class NBT {
     }
   }
 
+  public void save(String filename) {
+    try {
+      out = new DataOutputStream(new GZIPOutputStream(new FileOutputStream(filename)));
+      root.save();
+      out.close();
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+  }
+
+  @Override
+  public String toString() {
+    return root.toString();
+  }
+
   public static void main(String[] args) {
-    new NBT("world/players/sadimusi.dat");
+    NBT nbt = new NBT("world/players/sadimusi.dat");
+    nbt.save("test.nbt");
+    NBT check = new NBT("test.nbt");
+
+    if (nbt.toString().equals(check.toString())) {
+      System.out.println("Success!\n\n" + nbt.toString());
+    } else {
+      System.out.println("FAIL!\n\n" + nbt.toString() + "\ndoes not equal\n\n" + check.toString());
+    }
   }
 
   private abstract class NBTag {
     protected String name;
+    private boolean named;
+
+    protected abstract byte id();
 
     private NBTag(boolean named) throws Exception {
       if (named) {
@@ -92,7 +122,19 @@ public class NBT {
       } else {
         name = "";
       }
+      this.named = named;
       loadValue();
+    }
+
+    public void save() throws IOException {
+      save(true);
+    }
+
+    public void saveValue() throws IOException {
+      if (named) {
+        out.writeShort(name.length());
+        out.writeBytes(name);
+      }
     }
 
     protected void loadValue() throws Exception {
@@ -104,9 +146,21 @@ public class NBT {
     public String toString() {
       return name + " : " + get() + " (" + getClass().getSimpleName() + ")";
     }
+
+    public void save(boolean tagId) throws IOException {
+      if (tagId) {
+        out.writeByte(id());
+      }
+      saveValue();
+    }
   }
 
   private class NBTEnd extends NBTag {
+    @Override
+    protected byte id() {
+      return 0;
+    }
+
     public NBTEnd(boolean named) throws Exception {
       super(named);
     }
@@ -115,9 +169,18 @@ public class NBT {
     protected Object get() {
       return "END";
     }
+
+    @Override
+    public void saveValue() throws IOException {
+    }
   }
 
   private class NBTByte extends NBTag {
+    @Override
+    protected byte id() {
+      return 1;
+    }
+
     protected Byte value;
 
     public NBTByte(boolean named) throws Exception {
@@ -133,9 +196,20 @@ public class NBT {
     protected Object get() {
       return value;
     }
+
+    @Override
+    public void saveValue() throws IOException {
+      super.saveValue();
+      out.writeByte(value);
+    }
   }
 
   private class NBTShort extends NBTag {
+    @Override
+    protected byte id() {
+      return 2;
+    }
+
     protected Short value;
 
     public NBTShort(boolean named) throws Exception {
@@ -151,9 +225,20 @@ public class NBT {
     protected Object get() {
       return value;
     }
+
+    @Override
+    public void saveValue() throws IOException {
+      super.saveValue();
+      out.writeShort(value);
+    }
   }
 
   private class NBTInt extends NBTag {
+    @Override
+    protected byte id() {
+      return 3;
+    }
+
     protected Integer value;
 
     public NBTInt(boolean named) throws Exception {
@@ -169,9 +254,20 @@ public class NBT {
     protected Object get() {
       return value;
     }
+
+    @Override
+    public void saveValue() throws IOException {
+      super.saveValue();
+      out.writeInt(value);
+    }
   }
 
   private class NBTLong extends NBTag {
+    @Override
+    protected byte id() {
+      return 4;
+    }
+
     protected Long value;
 
     public NBTLong(boolean named) throws Exception {
@@ -187,9 +283,20 @@ public class NBT {
     protected Object get() {
       return value;
     }
+
+    @Override
+    public void saveValue() throws IOException {
+      super.saveValue();
+      out.writeLong(value);
+    }
   }
 
   private class NBTFloat extends NBTag {
+    @Override
+    protected byte id() {
+      return 5;
+    }
+
     protected Float value;
 
     public NBTFloat(boolean named) throws Exception {
@@ -205,9 +312,20 @@ public class NBT {
     protected Object get() {
       return value;
     }
+
+    @Override
+    public void saveValue() throws IOException {
+      super.saveValue();
+      out.writeFloat(value);
+    }
   }
 
   private class NBTDouble extends NBTag {
+    @Override
+    protected byte id() {
+      return 6;
+    }
+
     protected Double value;
 
     public NBTDouble(boolean named) throws Exception {
@@ -223,9 +341,20 @@ public class NBT {
     protected Object get() {
       return value;
     }
+
+    @Override
+    public void saveValue() throws IOException {
+      super.saveValue();
+      out.writeDouble(value);
+    }
   }
 
   private class NBTArray extends NBTag {
+    @Override
+    protected byte id() {
+      return 7;
+    }
+
     protected byte[] value;
     int length;
 
@@ -246,9 +375,21 @@ public class NBT {
     protected Object get() {
       return value;
     }
+
+    @Override
+    public void saveValue() throws IOException {
+      super.saveValue();
+      out.writeInt(length);
+      out.write(value);
+    }
   }
 
   private class NBTString extends NBTag {
+    @Override
+    protected byte id() {
+      return 8;
+    }
+
     protected String value;
     short length;
 
@@ -270,9 +411,21 @@ public class NBT {
     protected Object get() {
       return value;
     }
+
+    @Override
+    public void saveValue() throws IOException {
+      super.saveValue();
+      out.writeShort(length);
+      out.writeBytes(value);
+    }
   }
 
   private class NBTList extends NBTag {
+    @Override
+    protected byte id() {
+      return 9;
+    }
+
     byte tagId;
     int length;
     NBTag value[];
@@ -307,9 +460,23 @@ public class NBT {
       return string.toString();
     }
 
+    @Override
+    public void saveValue() throws IOException {
+      super.saveValue();
+      out.writeByte(tagId);
+      out.writeInt(length);
+      for (NBTag tag : value) {
+        tag.save(false);
+      }
+    }
   }
 
   private class NBTCompound extends NBTag {
+    @Override
+    protected byte id() {
+      return 10;
+    }
+
     List<NBTag> value;
 
     public NBTCompound(boolean named) throws Exception {
@@ -321,10 +488,9 @@ public class NBT {
       value = new LinkedList<NBTag>();
       while (true) {
         NBTag tag = loadTag(true);
+        value.add(tag);
         if (tag instanceof NBTEnd) {
           break;
-        } else {
-          value.add(tag);
         }
       }
     }
@@ -343,6 +509,15 @@ public class NBT {
     @Override
     protected Object get() {
       return value;
+    }
+
+    @Override
+    public void saveValue() throws IOException {
+      super.saveValue();
+      out.writeShort(0);
+      for (NBTag tag : value) {
+        tag.save();
+      }
     }
   }
 }
