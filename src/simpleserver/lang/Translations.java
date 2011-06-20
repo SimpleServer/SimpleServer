@@ -27,7 +27,7 @@ public class Translations {
     translation = null;
   }
 
-  public String get(String key) {
+  private String get(String key) {
     if (translation == null) {
       return key;
     } else {

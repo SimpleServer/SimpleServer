@@ -38,7 +38,7 @@ public class TranslationFile {
     filename = translationName + ".json";
     load();
 
-    success = (options != null ? true : false);
+    success = (options != null);
   }
 
   public boolean success() {
@@ -80,7 +80,7 @@ public class TranslationFile {
   }
 
   protected void loadExternal() {
-    File file = new File(filename);
+    File file = new File(resourceLocation + File.separator + filename);
     InputStream stream = null;
 
     try {
