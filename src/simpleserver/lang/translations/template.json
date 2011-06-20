@@ -82,7 +82,7 @@
 "No players specified." : "No players specified.",
 "No rcon command specified." : "No rcon command specified.",
 "No such command!" : "No such command!",
-"No such command" : "No such command %s",
+"No such command %s" : "No such command %s",
 "No teleport possible!" : "No teleport possible!",
 "Nobody is around to hear you." : "Nobody is around to hear you.",
 "Nobody sent you a message yet." : "Nobody sent you a message yet.",
