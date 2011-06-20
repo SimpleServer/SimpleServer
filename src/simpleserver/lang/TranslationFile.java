@@ -20,6 +20,8 @@
  */
 package simpleserver.lang;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -58,6 +60,33 @@ public class TranslationFile {
 
     try {
       stream = getClass().getResourceAsStream(resourceLocation + "/" + filename);
+      byte[] bytes = new byte[stream.available()];
+      stream.read(bytes);
+      options = new JSONObject(new String(bytes, "UTF-8"));
+    } catch (NullPointerException e) {
+      loadExternal();
+    } catch (JSONException e) {
+      System.out.println("[SimpleServer] " + e);
+      System.out.println("[SimpleServer] Could not read " + filename);
+    } catch (IOException e) {
+      System.out.println("[SimpleServer] " + e);
+      System.out.println("[SimpleServer] Could not read " + filename);
+    } finally {
+      if (stream != null) {
+        try {
+          stream.close();
+        } catch (IOException e) {
+        }
+      }
+    }
+  }
+
+  protected void loadExternal() {
+    File file = new File(filename);
+    InputStream stream = null;
+
+    try {
+      stream = new FileInputStream(file);
       byte[] bytes = new byte[stream.available()];
       stream.read(bytes);
       options = new JSONObject(new String(bytes, "UTF-8"));
