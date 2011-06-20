@@ -247,12 +247,9 @@ public class Player {
     addMessage(Translations.getInstance().get(msg));
   }
 
-  public void addTCaptionedMessage(String caption, String format, boolean translateFormat, Object... args) {
-    if (translateFormat) {
-      addTCaptionedMessage(caption, Translations.getInstance().get(format), args);
-    } else {
-      addTCaptionedMessage(caption, format, args);
-    }
+  public void addTCaptionedTMessage(String caption, String format, Object... args) {
+    addMessage("%s%s: %s%s", Color.GRAY, Translations.getInstance().get(caption),
+               Color.WHITE, String.format(Translations.getInstance().get(format), args));
   }
 
   public void addTCaptionedMessage(String caption, String format, Object... args) {

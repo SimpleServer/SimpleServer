@@ -23,60 +23,81 @@ package simpleserver.lang;
 import java.io.IOException;
 import java.io.InputStream;
 
-import simpleserver.Resource;
-import simpleserver.config.SortedProperties;
+import org.json.JSONException;
+import org.json.JSONObject;
 
-public class TranslationFile implements Resource {
+public class TranslationFile {
   private static final String resourceLocation = "translations";
   protected final String filename;
-  protected SortedProperties options;
+  protected JSONObject options;
 
   public TranslationFile(String translationName) {
-    filename = translationName + ".properties";
+    filename = translationName + ".json";
     load();
   }
 
   public boolean contains(String option) {
-    String value = options.getProperty(option);
-    return value != null && value.trim().length() > 0;
+    try {
+      String value = options.getString(option);
+      return value != null && value.trim().length() > 0;
+    } catch (JSONException e) {
+      System.out.println("[SimpleServer] " + e);
+      System.out.println("[SimpleServer] Could not read " + option + " key (" + filename + ")");
+      return false;
+    }
   }
 
   public String get(String key) {
-    return options.getProperty(key);
+    try {
+      return options.getString(key);
+    } catch (JSONException e) {
+      System.out.println("[SimpleServer] " + e);
+      System.out.println("[SimpleServer] Could not read " + key + " key (" + filename + ")");
+      return key;
+    }
   }
 
   public int getInt(String option) {
-    String value = options.getProperty(option);
     try {
-      return Integer.parseInt(value);
-    } catch (NumberFormatException e) {
-      e.printStackTrace();
-      System.out.println("Error: Asked for int value of " + option);
+      return options.getInt(option);
+    } catch (JSONException e) {
+      System.out.println("[SimpleServer] " + e);
+      System.out.println("[SimpleServer] Could not read " + option + " key (" + filename + ")");
       return Integer.MIN_VALUE;
     }
   }
 
   public boolean getBoolean(String option) {
-    return Boolean.parseBoolean(options.getProperty(option));
-  }
-
-  public void save() {
-    return;
+    try {
+      return options.getBoolean(option);
+    } catch (JSONException e) {
+      System.out.println("[SimpleServer] " + e);
+      System.out.println("[SimpleServer] Could not read " + option + " key (" + filename + ")");
+      return false;
+    }
   }
 
   public void load() {
-    options = new SortedProperties();
-    InputStream stream = getClass().getResourceAsStream(resourceLocation + "/"
-                                                        + filename);
+    InputStream stream = null;
+
     try {
-      try {
-        options.load(stream);
-      } finally {
-        stream.close();
-      }
+      stream = getClass().getResourceAsStream(resourceLocation + "/" + filename);
+      byte[] bytes = new byte[stream.available()];
+      stream.read(bytes);
+      options = new JSONObject(new String(bytes, "UTF-8"));
+    } catch (JSONException e) {
+      System.out.println("[SimpleServer] " + e);
+      System.out.println("[SimpleServer] Could not read " + filename);
     } catch (IOException e) {
       System.out.println("[SimpleServer] " + e);
       System.out.println("[SimpleServer] Could not read " + filename);
+    } finally {
+      if (stream != null) {
+        try {
+          stream.close();
+        } catch (IOException e) {
+        }
+      }
     }
   }
 }

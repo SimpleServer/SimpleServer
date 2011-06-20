@@ -50,7 +50,7 @@ public class Translations implements Resource {
       translationName = languageCode;
       return true;
     } else {
-      System.out.println(languageCode + "is an unknown language! Using English (en) instead.");
+      System.out.println(languageCode + " is an unknown language! Using English (en) instead.");
       translationName = "en";
       return false;
     }
