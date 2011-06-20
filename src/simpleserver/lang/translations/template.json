@@ -106,6 +106,7 @@
   "Remove player from server access list" : "Remove player from server access list",
   "Remove the IP address from the ban list" : "Remove the IP address from the ban list",
   "Remove the named player from the ban list" : "Remove the named player from the ban list",
+  "Request accepted!" : "Request accepted!"
   "Requesting %s for a visit..." : "Requesting %s for a visit...",
   "Reread the configuration files from disk" : "Reread the configuration files from disk",
   "Resources Reloaded!" : "Resources Reloaded!",

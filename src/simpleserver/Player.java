@@ -270,7 +270,7 @@ public class Player {
     while (visitreqs.size() > 0) {
       PlayerVisitRequest req = visitreqs.remove();
       if (System.currentTimeMillis() < req.timestamp + 10000 && server.findPlayerExact(req.source.getName()) != null) {
-        req.source.addMessage("\u00a77Request accepted!");
+        req.source.addTMessage(Color.GRAY, "Request accepted!");
         req.source.teleportTo(this);
       }
     }
@@ -381,7 +381,7 @@ public class Player {
     boolean invalidCommand = command.getName() == null;
 
     if (!invalidCommand && !commandAllowed(command.getName())) {
-      addMessage("\u00a7c" + t("Insufficient permission."));
+      addTMessage(Color.RED, "Insufficient permission.");
       return true;
     }
 
@@ -426,11 +426,11 @@ public class Player {
       item = Integer.parseInt(rawItem);
 
       if (item < 0) {
-        addMessage("\u00a7c" + t("Item ID must be positive!"));
+        addTMessage(Color.RED, "Item ID must be positive!");
         success = false;
       }
     } catch (NumberFormatException e) {
-      addMessage("\u00a7c" + t("Item ID must map to a number!"));
+      addTMessage(Color.RED, "Item ID must map to a number!");
       success = false;
     }
 
@@ -440,18 +440,17 @@ public class Player {
         amount = Integer.parseInt(rawAmount);
 
         if ((amount < 1) || (amount > 1000)) {
-          addMessage("\u00a7c" + t("Amount must be within 1-1000!"));
+          addTMessage(Color.RED, "Amount must be within 1-1000!");
           success = false;
         }
       } catch (NumberFormatException e) {
-        addMessage("\u00a7c" + t("Amount must be a number!"));
+        addTMessage(Color.RED, "Amount must be a number!");
         success = false;
       }
     }
 
     if (!success) {
-      String msg = String.format(t("Unable to give %s"), rawItem);
-      addMessage("\u00a7c" + msg);
+      addTMessage(Color.RED, "Unable to give %s", rawItem);
       return false;
     }
 
