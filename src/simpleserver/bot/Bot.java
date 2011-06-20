@@ -53,6 +53,8 @@ public class Bot {
   private Timer timer;
   ReentrantLock writeLock;
 
+  protected BotController controller;
+
   public Bot(Server server, String name) {
     this.name = name;
     this.server = server;
@@ -80,8 +82,8 @@ public class Bot {
     handshake();
   }
 
-  protected void prepare() {
-
+  boolean ninja() {
+    return false;
   }
 
   private void handshake() throws IOException {
@@ -91,7 +93,7 @@ public class Bot {
   }
 
   public void logout() throws IOException {
-    connected = false;
+    die();
     expectDisconnect = true;
     out.writeByte(0xff);
     write("quitting");
@@ -111,9 +113,6 @@ public class Bot {
   }
 
   protected void handlePacket(byte packetId) throws IOException {
-    /*if (packetId != 0x21 && packetId != 0x1f) {
-      System.out.println(Integer.toHexString(packetId));
-    }*/
     switch (packetId) {
       case 0x2:
         readUTF16();
@@ -485,9 +484,8 @@ public class Bot {
   protected void die() {
     timer.cancel();
     connected = false;
-    try {
-      socket.close();
-    } catch (IOException e) {
+    if (controller != null) {
+      controller.remove(this);
     }
   }
 
@@ -496,6 +494,10 @@ public class Bot {
     if (!expectDisconnect) {
       System.out.print("[SimpleServer] Bot " + name + " died (" + reason + ")");
     }
+  }
+
+  public void setController(BotController controller) {
+    this.controller = controller;
   }
 
   private final class Tunneler extends Thread {

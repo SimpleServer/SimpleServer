@@ -52,6 +52,7 @@ public class StreamTunnel {
   private static final byte BLOCK_DESTROYED_STATUS = 2;
   private static final Pattern MESSAGE_PATTERN = Pattern.compile("^<([^>]+)> (.*)$");
   private static final Pattern COLOR_PATTERN = Pattern.compile("\u00a7[0-9a-f]");
+  private static final Pattern JOIN_PATTERN = Pattern.compile("§.(\\d|\\w)* (joined|left) the game.");
   private static final String CONSOLE_CHAT_PATTERN = "\\(CONSOLE:.*\\)";
   private static final int MESSAGE_SIZE = 60;
   private static final int MAXIMUM_MESSAGE_SIZE = 119;
@@ -172,8 +173,11 @@ public class StreamTunnel {
         break;
       case 0x03: // Chat Message
         String message = readUTF16();
-        if (isServerTunnel && message.matches("§.Teleporter\\d{1,10} (joined|left) the game.")) {
-          break;
+        Matcher joinMatcher = JOIN_PATTERN.matcher(message);
+        if (isServerTunnel && joinMatcher.find()) {
+          if (server.bots.ninja(joinMatcher.group(1))) {
+            break;
+          }
         } else if (isServerTunnel && server.options.getBoolean("useMsgFormats")) {
           Matcher colorMatcher = COLOR_PATTERN.matcher(message);
           String cleanMessage = colorMatcher.replaceAll("");
@@ -485,7 +489,7 @@ public class StreamTunnel {
       case 0x14: // Named Entity Spawn
         int eid = in.readInt();
         name = readUTF16();
-        if (!name.matches("Teleporter\\d{1,8}")) {
+        if (!server.bots.ninja(name)) {
           write(packetId);
           write(eid);
           write(name);

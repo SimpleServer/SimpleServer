@@ -23,8 +23,10 @@ package simpleserver.bot;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.zip.GZIPInputStream;
@@ -40,20 +42,28 @@ public class NBT {
   protected NBTCompound root;
 
   public NBT(String filename) {
-    load(filename);
+    try {
+      load(new FileInputStream(filename));
+    } catch (FileNotFoundException e) {
+      e.printStackTrace();
+    }
   }
 
   public NBT() {
     root = new NBTCompound(null);
   }
 
+  public NBT(InputStream input) {
+    load(input);
+  }
+
   NBTCompound root() {
     return root;
   }
 
-  private void load(String filename) {
+  private void load(InputStream input) {
     try {
-      in = new DataInputStream(new GZIPInputStream(new FileInputStream(filename)));
+      in = new DataInputStream(new GZIPInputStream(input));
       root = (NBTCompound) loadTag(false);
     } catch (Exception e) {
       e.printStackTrace();

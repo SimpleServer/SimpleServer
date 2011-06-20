@@ -29,6 +29,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Semaphore;
 
+import simpleserver.bot.BotController;
 import simpleserver.config.ChestList;
 import simpleserver.config.GiveAliasList;
 import simpleserver.config.HelpText;
@@ -104,6 +105,7 @@ public class Server {
   public Semaphore saveLock = new Semaphore(1);
 
   public Time time;
+  public BotController bots;
 
   public Server() {
     listener = new Listener();
@@ -346,6 +348,7 @@ public class Server {
     resources.add(stats = new Stats());
 
     time = new Time(this);
+    bots = new BotController(this);
 
     systemInput = new SystemInputQueue();
     adminLog = new AdminLog();
@@ -356,6 +359,7 @@ public class Server {
   }
 
   private void cleanup() {
+    bots.cleanup();
     systemInput.stop();
     adminLog.stop();
     errorLog.stop();

@@ -41,7 +41,6 @@ public class Teleporter extends Bot {
     prepare();
   }
 
-  @Override
   protected void prepare() {
     dat = new PlayerFile(name, server);
     dat.setPosition(coordinate);
@@ -51,7 +50,6 @@ public class Teleporter extends Bot {
   @Override
   protected void ready() throws IOException {
     super.ready();
-    timer.schedule(new LookAround(), 0, 500);
     server.runCommand("tp", player.getName() + " " + name);
     timer.schedule(new Logout(), 3000);
   }
@@ -68,27 +66,16 @@ public class Teleporter extends Bot {
   protected void die() {
     timer.cancel();
     super.die();
-    dat.unlink();
+    if (controller != null) {
+      controller.trash(dat.file());
+    } else {
+      dat.file().delete();
+    }
   }
 
-  private final class LookAround extends TimerTask {
-    private int t = 0;
-
-    @Override
-    public void run() {
-      writeLock.lock();
-      try {
-        out.writeByte(0x0c);
-        out.writeFloat(40 * t++);
-        out.writeFloat((float) (Math.sin(t / 10) * 45));
-        out.writeBoolean(true);
-      } catch (IOException e) {
-        error("LookAround failed");
-      } finally {
-        writeLock.unlock();
-      }
-
-    }
+  @Override
+  boolean ninja() {
+    return true;
   }
 
   private final class Logout extends TimerTask {

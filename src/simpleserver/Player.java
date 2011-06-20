@@ -29,6 +29,7 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import simpleserver.Coordinate.Dimension;
+import simpleserver.bot.Teleporter;
 import simpleserver.command.ExternalCommand;
 import simpleserver.command.PlayerCommand;
 import simpleserver.stream.StreamTunnel;
@@ -647,6 +648,10 @@ public class Player {
 
   public Dimension getDimension() {
     return dimension;
+  }
+
+  public boolean teleport(Coordinate coordinate) {
+    return server.bots.connect(new Teleporter(this, coordinate));
   }
 
 }

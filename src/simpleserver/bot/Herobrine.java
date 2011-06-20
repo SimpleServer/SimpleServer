@@ -20,42 +20,63 @@
  */
 package simpleserver.bot;
 
-import java.io.File;
+import java.io.IOException;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import simpleserver.Coordinate;
-import simpleserver.Server;
-import simpleserver.bot.NBT.NBTDouble;
-import simpleserver.bot.NBT.NBTInt;
-import simpleserver.bot.NBT.NBTList;
-import simpleserver.bot.NBT.NBTag;
+import simpleserver.Player;
 
-public class PlayerFile {
-  private String path;
-  private NBT nbt;
+public class Herobrine extends Bot {
 
-  public PlayerFile(String name, Server server) {
-    path = server.options.get("levelName") + "/players/" + name + ".dat";
-    File file = new File(path);
-    if (file.exists()) {
-      nbt = new NBT(path);
-    } else {
-      nbt = new NBT(getClass().getResourceAsStream("template.dat"));
+  private Timer timer = new Timer();
+
+  public Herobrine(Player player, Coordinate coordinate) {
+    super(player.getServer(), "Herobrine");
+  }
+
+  @Override
+  protected void ready() throws IOException {
+    super.ready();
+    timer.schedule(new LookAround(), 0, 500);
+  }
+
+  @Override
+  protected void handlePacket(byte packetId) throws IOException {
+    switch (packetId) {
+      case 0x3:
+        if (readUTF16().equals("quit")) {
+          logout();
+        }
+      default:
+        super.handlePacket(packetId);
     }
   }
 
-  public void setPosition(Coordinate coord) {
-    NBTag pos = nbt.root().find("Pos");
-    ((NBTDouble) ((NBTList) pos).get(0)).set(coord.x());
-    ((NBTDouble) ((NBTList) pos).get(1)).set(coord.y());
-    ((NBTDouble) ((NBTList) pos).get(2)).set(coord.z());
-    ((NBTInt) nbt.root().find("Dimension")).set(coord.dimension().index());
+  @Override
+  protected void die() {
+    timer.cancel();
+    super.die();
   }
 
-  public void save() {
-    nbt.save(path);
+  private final class LookAround extends TimerTask {
+    private int t = 0;
+
+    @Override
+    public void run() {
+      writeLock.lock();
+      try {
+        out.writeByte(0x0c);
+        out.writeFloat(40 * t++);
+        out.writeFloat((float) (Math.sin(t / 10) * 45));
+        out.writeBoolean(true);
+      } catch (IOException e) {
+        error("LookAround failed");
+      } finally {
+        writeLock.unlock();
+      }
+
+    }
   }
 
-  public File file() {
-    return new File(path);
-  }
 }

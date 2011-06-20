@@ -20,13 +20,10 @@
  */
 package simpleserver.command;
 
-import java.io.IOException;
-import java.net.UnknownHostException;
-
+import simpleserver.Color;
 import simpleserver.Coordinate;
 import simpleserver.Player;
 import simpleserver.Coordinate.Dimension;
-import simpleserver.bot.Teleporter;
 
 public class BotCommand extends AbstractCommand implements PlayerCommand {
   public BotCommand() {
@@ -34,14 +31,8 @@ public class BotCommand extends AbstractCommand implements PlayerCommand {
   }
 
   public void execute(Player player, String message) {
-    try {
-      new Teleporter(player, new Coordinate(0, 20, 0, Dimension.EARTH)).connect();
-    } catch (UnknownHostException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    } catch (IOException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
+    if (!player.teleport(new Coordinate(0, 20, 0, Dimension.EARTH))) {
+      player.addMessage(Color.RED, "Teleport failed");
     }
   }
 }
