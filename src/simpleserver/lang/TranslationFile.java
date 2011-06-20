@@ -30,21 +30,17 @@ public class TranslationFile {
   private static final String resourceLocation = "translations";
   protected final String filename;
   protected JSONObject options;
+  private final boolean success;
 
   public TranslationFile(String translationName) {
     filename = translationName + ".json";
     load();
+
+    success = (options != null ? true : false);
   }
 
-  public boolean contains(String option) {
-    try {
-      String value = options.getString(option);
-      return value != null && value.trim().length() > 0;
-    } catch (JSONException e) {
-      System.out.println("[SimpleServer] " + e);
-      System.out.println("[SimpleServer] Could not read " + option + " key (" + filename + ")");
-      return false;
-    }
+  public boolean success() {
+    return success;
   }
 
   public String get(String key) {
@@ -57,26 +53,6 @@ public class TranslationFile {
     }
   }
 
-  public int getInt(String option) {
-    try {
-      return options.getInt(option);
-    } catch (JSONException e) {
-      System.out.println("[SimpleServer] " + e);
-      System.out.println("[SimpleServer] Could not read " + option + " key (" + filename + ")");
-      return Integer.MIN_VALUE;
-    }
-  }
-
-  public boolean getBoolean(String option) {
-    try {
-      return options.getBoolean(option);
-    } catch (JSONException e) {
-      System.out.println("[SimpleServer] " + e);
-      System.out.println("[SimpleServer] Could not read " + option + " key (" + filename + ")");
-      return false;
-    }
-  }
-
   public void load() {
     InputStream stream = null;
 
@@ -85,6 +61,9 @@ public class TranslationFile {
       byte[] bytes = new byte[stream.available()];
       stream.read(bytes);
       options = new JSONObject(new String(bytes, "UTF-8"));
+    } catch (NullPointerException e) {
+      System.out.println("[SimpleServer] " + e);
+      System.out.println("[SimpleServer] Could not find " + filename);
     } catch (JSONException e) {
       System.out.println("[SimpleServer] " + e);
       System.out.println("[SimpleServer] Could not read " + filename);

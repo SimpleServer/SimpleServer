@@ -20,45 +20,43 @@
  */
 package simpleserver.lang;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import simpleserver.Resource;
 
 public class Translations implements Resource {
-  protected String translationName;
-  private final Map<String, TranslationFile> translations;
+  private TranslationFile translation;
 
   private Translations() {
-    translationName = "en";
-
-    translations = new HashMap<String, TranslationFile>();
-    translations.put("template", new TranslationFile("template"));
+    translation = null;
   }
 
   public String get(String key) {
-    if (translationName.equals("en")) {
+    if (translation == null) {
       return key;
     } else {
-      return translations.get(translationName).get(key);
+      return translation.get(key);
     }
   }
 
   public boolean setLanguage(String languageCode) {
-    if (translations.get(languageCode) != null ||
-        languageCode.equals("en")) {
-      translationName = languageCode;
+    if (languageCode.equals("en")) {
+      translation = null;
       return true;
     } else {
-      System.out.println(languageCode + " is an unknown language! Using English (en) instead.");
-      translationName = "en";
-      return false;
+      translation = new TranslationFile(languageCode);
+
+      if (translation.success()) {
+        return true;
+      } else {
+        System.out.println("There's a problem with language '" + languageCode + "'! Using English ('en') instead.");
+        translation = null;
+        return false;
+      }
     }
   }
 
   public void load() {
-    for (String key : translations.keySet()) {
-      translations.get(key).load();
+    if (translation != null) {
+      translation.load();
     }
   }
 
