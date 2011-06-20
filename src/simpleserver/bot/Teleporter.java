@@ -25,23 +25,25 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import simpleserver.Coordinate;
-import simpleserver.Server;
+import simpleserver.Player;
 
 public class Teleporter extends Bot {
 
   private Timer timer = new Timer();
   private Coordinate coordinate;
+  private Player player;
+  private PlayerFile dat;
 
-  public Teleporter(Server server, String name, Coordinate coordinate) {
-    super(server, name);
+  public Teleporter(Player player, Coordinate coordinate) {
+    super(player.getServer(), "Teleporter" + Math.round(100000 * Math.random()));
     this.coordinate = coordinate;
+    this.player = player;
     prepare();
   }
 
   @Override
   protected void prepare() {
-    name = name + Math.round(10000 * Math.random());
-    PlayerFile dat = new PlayerFile(name, server);
+    dat = new PlayerFile(name, server);
     dat.setPosition(coordinate);
     dat.save();
   }
@@ -49,21 +51,14 @@ public class Teleporter extends Bot {
   @Override
   protected void ready() throws IOException {
     super.ready();
-    out.writeByte(3);
-    write("Hello World");
     timer.schedule(new LookAround(), 0, 500);
+    server.runCommand("tp", player.getName() + " " + name);
+    timer.schedule(new Logout(), 3000);
   }
 
   @Override
   protected void handlePacket(byte packetId) throws IOException {
     switch (packetId) {
-      case 0x3:
-        String msg = readUTF16();
-        if (msg.contains("quit")) {
-          logout();
-          server.stop();
-        }
-        break;
       default:
         super.handlePacket(packetId);
     }
@@ -73,6 +68,7 @@ public class Teleporter extends Bot {
   protected void die() {
     timer.cancel();
     super.die();
+    dat.unlink();
   }
 
   private final class LookAround extends TimerTask {
@@ -88,6 +84,21 @@ public class Teleporter extends Bot {
         out.writeBoolean(true);
       } catch (IOException e) {
         error("LookAround failed");
+      } finally {
+        writeLock.unlock();
+      }
+
+    }
+  }
+
+  private final class Logout extends TimerTask {
+    @Override
+    public void run() {
+      writeLock.lock();
+      try {
+        logout();
+      } catch (IOException e) {
+        error("Logout failed");
       } finally {
         writeLock.unlock();
       }

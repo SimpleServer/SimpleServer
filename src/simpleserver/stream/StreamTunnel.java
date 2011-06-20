@@ -172,8 +172,9 @@ public class StreamTunnel {
         break;
       case 0x03: // Chat Message
         String message = readUTF16();
-        if (isServerTunnel && server.options.getBoolean("useMsgFormats")) {
-
+        if (isServerTunnel && message.matches("§.Teleporter\\d{1,10} (joined|left) the game.")) {
+          break;
+        } else if (isServerTunnel && server.options.getBoolean("useMsgFormats")) {
           Matcher colorMatcher = COLOR_PATTERN.matcher(message);
           String cleanMessage = colorMatcher.replaceAll("");
 
@@ -482,10 +483,16 @@ public class StreamTunnel {
         write(in.readByte());
         break;
       case 0x14: // Named Entity Spawn
-        write(packetId);
-        write(in.readInt());
-        write(readUTF16());
-        copyNBytes(16);
+        int eid = in.readInt();
+        name = readUTF16();
+        if (!name.matches("Teleporter\\d{1,8}")) {
+          write(packetId);
+          write(eid);
+          write(name);
+          copyNBytes(16);
+        } else {
+          skipNBytes(16);
+        }
         break;
       case 0x15: // Pickup spawn
         write(packetId);

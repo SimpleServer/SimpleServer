@@ -23,8 +23,10 @@ package simpleserver.command;
 import java.io.IOException;
 import java.net.UnknownHostException;
 
+import simpleserver.Coordinate;
 import simpleserver.Player;
-import simpleserver.bot.Bot;
+import simpleserver.Coordinate.Dimension;
+import simpleserver.bot.Teleporter;
 
 public class BotCommand extends AbstractCommand implements PlayerCommand {
   public BotCommand() {
@@ -33,7 +35,7 @@ public class BotCommand extends AbstractCommand implements PlayerCommand {
 
   public void execute(Player player, String message) {
     try {
-      new Bot(player.getServer(), "Blubbi").connect();
+      new Teleporter(player, new Coordinate(0, 20, 0, Dimension.EARTH)).connect();
     } catch (UnknownHostException e) {
       // TODO Auto-generated catch block
       e.printStackTrace();

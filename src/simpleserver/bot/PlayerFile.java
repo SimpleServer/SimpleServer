@@ -41,8 +41,6 @@ public class PlayerFile {
     } else {
       nbt = new NBT(server.options.get("levelName") + "/players/sadimusi.dat");
     }
-
-    System.out.print(nbt);
   }
 
   public void setPosition(Coordinate coord) {
@@ -51,10 +49,14 @@ public class PlayerFile {
     ((NBTDouble) ((NBTList) pos).get(1)).set(coord.y());
     ((NBTDouble) ((NBTList) pos).get(2)).set(coord.z());
     ((NBTInt) nbt.root().find("Dimension")).set(coord.dimension().index());
-    System.out.print(nbt);
   }
 
   public void save() {
     nbt.save(path);
+  }
+
+  public void unlink() {
+    File file = new File(path);
+    file.delete();
   }
 }

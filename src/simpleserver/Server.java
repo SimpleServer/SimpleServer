@@ -29,8 +29,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Semaphore;
 
-import simpleserver.Coordinate.Dimension;
-import simpleserver.bot.Teleporter;
 import simpleserver.config.ChestList;
 import simpleserver.config.GiveAliasList;
 import simpleserver.config.HelpText;
@@ -407,16 +405,6 @@ public class Server {
       } catch (Exception e) {
         System.out.println("[SimpleServer] Warning: freezeTime option is not valid");
       }
-    }
-
-    try {
-      new Teleporter(this, "Blubb", new Coordinate(0, 30, 0, Dimension.EARTH)).connect();
-    } catch (UnknownHostException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    } catch (IOException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
     }
   }
 
