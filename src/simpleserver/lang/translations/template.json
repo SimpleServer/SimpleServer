@@ -95,6 +95,7 @@
   "Player %s has been banned! (%s)" : "Player %s has been banned! (%s)",
   "Player %s has been IP banned!" : "Player %s has been IP banned!",
   "Player %s has been kicked! (%s)" : "Player %s has been kicked! (%s)",
+  "Player %s has been muted!" : "Player %s has been muted!"
   "Player %s has been unmuted!" : "Player %s has been unmuted!",
   "Player %s was unwhitelisted!" : "Player %s was unwhitelisted!",
   "Player %s was whitelisted!" : "Player %s was whitelisted!",

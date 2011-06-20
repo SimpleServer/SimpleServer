@@ -20,6 +20,7 @@
  */
 package simpleserver.command;
 
+import static simpleserver.lang.Translations.t;
 import simpleserver.Player;
 import simpleserver.Server;
 
@@ -34,7 +35,7 @@ public class MuteCommand extends PlayerArgCommand {
     server.mutelist.addName(name);
 
     server.adminLog("Admin " + player.getName() + " muted player:\t " + name);
-    String msg = String.format("Player %s has been muted!", name);
+    String msg = String.format(t("Player %s has been muted!"), name);
     server.runCommand("say", msg);
   }
 }
