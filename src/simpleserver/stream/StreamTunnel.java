@@ -773,6 +773,7 @@ public class StreamTunnel {
         copyNBytes(5);
         break;
       case (byte) 0xe6: // ModLoaderMP by SDK
+        write(packetId);
         write(in.readInt()); // mod
         write(in.readInt()); // packet id
         copyNBytes(write(in.readInt()) * 4); // ints
