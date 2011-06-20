@@ -17,7 +17,6 @@ Features (See CHANGES for updates):
    automatically ban the IP.
  * RCON and experimental telnet access.
  * Optional automated saving, backups, restarts, and mapping.
- * Message translation support (language.properties)
  * Locked chests.  Each player can lock as many chests as he wants.
    Other non-admins cannot access or destroy the chest.
  * Automatically makes space for members with higher group IDs.
@@ -33,6 +32,7 @@ Features (See CHANGES for updates):
  * Muting players from global chat (mute-list.txt).
  * Rules listing (rules.txt).
  * Optional member whitelist (white-list.txt).
+ * Selectable language packages for all in-game notifications.
 See simpleserver.properties for general configuration.
 
 Console Commands:

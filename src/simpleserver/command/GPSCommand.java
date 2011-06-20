@@ -20,6 +20,7 @@
  */
 package simpleserver.command;
 
+import static simpleserver.lang.Translations.t;
 import simpleserver.Color;
 import simpleserver.Player;
 
@@ -30,11 +31,11 @@ public class GPSCommand extends OnlinePlayerArgCommand {
 
   @Override
   protected void executeWithTarget(Player player, String message, Player target) {
-    String name = t.get("Your");
+    String name = t("Your");
     if (target == null) {
       target = player;
     } else {
-      name = String.format(t.get("%s's"), target.getName());
+      name = String.format(t("%s's"), target.getName());
     }
 
     player.addTMessage(Color.GRAY,

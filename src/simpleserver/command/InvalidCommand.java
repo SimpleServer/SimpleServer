@@ -20,6 +20,7 @@
  */
 package simpleserver.command;
 
+import static simpleserver.lang.Translations.t;
 import simpleserver.Color;
 import simpleserver.Player;
 import simpleserver.Server;
@@ -42,6 +43,6 @@ public class InvalidCommand extends AbstractCommand implements PlayerCommand,
 
   @Override
   public void reloadText() {
-    helpText = "\u00a7c" + t.get(commandCode);
+    helpText = "\u00a7c" + t(commandCode);
   }
 }

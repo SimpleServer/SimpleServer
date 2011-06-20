@@ -20,6 +20,8 @@
  */
 package simpleserver.thread;
 
+import static simpleserver.lang.Translations.t;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -59,7 +61,7 @@ public class RequestTracker {
     if (count > MAX_REQUESTS) {
       server.adminLog("RequestTracker banned " + ipAddress
           + ":\t Too many requests!");
-      server.banKickIP(ipAddress, server.t.get("Banned: Too many requests!"));
+      server.banKickIP(ipAddress, t("Banned: Too many requests!"));
     }
   }
 

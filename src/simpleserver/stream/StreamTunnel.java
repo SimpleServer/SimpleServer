@@ -20,6 +20,8 @@
  */
 package simpleserver.stream;
 
+import static simpleserver.lang.Translations.t;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.DataInput;
@@ -44,7 +46,6 @@ import simpleserver.Server;
 import simpleserver.command.LocalSayCommand;
 import simpleserver.command.PlayerListCommand;
 import simpleserver.config.ChestList.Chest;
-import simpleserver.lang.Translations;
 
 public class StreamTunnel {
   private static final boolean EXPENSIVE_DEBUG_LOGGING = Boolean.getBoolean("EXPENSIVE_DEBUG_LOGGING");
@@ -75,8 +76,6 @@ public class StreamTunnel {
   private volatile long lastRead;
   private volatile boolean run = true;
   private Byte lastPacket;
-
-  private Translations t;
 
   public StreamTunnel(InputStream in, OutputStream out, boolean isServerTunnel,
                       Player player) {
@@ -123,8 +122,6 @@ public class StreamTunnel {
     tunneler.start();
 
     lastRead = System.currentTimeMillis();
-
-    t = Translations.getInstance();
   }
 
   public void stop() {
@@ -663,12 +660,12 @@ public class StreamTunnel {
                 server.chests.unlock(player.openedChest());
                 player.setAttemptedAction(null);
                 player.addTMessage(Color.RED, "This chest is no longer locked!");
-                typeString = Translations.getInstance().get("Open Chest");
+                typeString = t("Open Chest");
               } else {
                 typeString = server.chests.chestName(player.openedChest());
               }
             } else {
-              typeString = Translations.getInstance().get("Open Chest");
+              typeString = t("Open Chest");
               if (player.isAttemptLock()) {
                 lockChest(player.openedChest());
                 typeString = player.nextChestName();

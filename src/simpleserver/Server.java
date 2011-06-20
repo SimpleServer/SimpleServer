@@ -20,6 +20,8 @@
  */
 package simpleserver;
 
+import static simpleserver.lang.Translations.t;
+
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
@@ -64,7 +66,6 @@ public class Server {
   private List<String> outputLog = new LinkedList<String>();
 
   public Options options;
-  public Translations t;
   public MOTD motd;
   public KitList kits;
   public ChestList chests;
@@ -180,7 +181,7 @@ public class Server {
   }
 
   public void banKickIP(String ipAddress) {
-    banKickIP(ipAddress, t.get("Banned!"));
+    banKickIP(ipAddress, t("Banned!"));
   }
 
   public void banKick(String name, String msg) {
@@ -195,7 +196,7 @@ public class Server {
   }
 
   public void banKick(String name) {
-    banKick(name, t.get("Banned!"));
+    banKick(name, t("Banned!"));
   }
 
   public void kick(String name, String reason) {
@@ -214,7 +215,7 @@ public class Server {
       // without player relogin
     }
 
-    if (!t.setLanguage(options.get("serverLanguage"))) {
+    if (!Translations.getInstance().setLanguage(options.get("serverLanguage"))) {
       options.set("serverLanguage", "en");
       options.save();
     }
@@ -328,9 +329,9 @@ public class Server {
   }
 
   private void kickAllPlayers() {
-    String message = t.get("Server shutting down!");
+    String message = t("Server shutting down!");
     if (restart) {
-      message = t.get("Server restarting!");
+      message = t("Server restarting!");
     }
 
     for (Player player : playerList.getArray()) {
@@ -343,7 +344,6 @@ public class Server {
 
     resources.add(permissions = new PermissionConfig(this));
     resources.add(options = new Options());
-    resources.add(t = Translations.getInstance());
     resources.add(robots = new RobotList());
     resources.add(chests = new ChestList());
     resources.add(motd = new MOTD());

@@ -20,6 +20,8 @@
  */
 package simpleserver;
 
+import static simpleserver.lang.Translations.t;
+
 import java.io.IOException;
 import java.net.BindException;
 import java.net.InetAddress;
@@ -31,7 +33,6 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import simpleserver.Coordinate.Dimension;
 import simpleserver.command.ExternalCommand;
 import simpleserver.command.PlayerCommand;
-import simpleserver.lang.Translations;
 import simpleserver.stream.StreamTunnel;
 
 public class Player {
@@ -236,24 +237,24 @@ public class Player {
   }
 
   public void addTMessage(Color color, String format, Object... args) {
-    addMessage(color + String.format(Translations.getInstance().get(format), args));
+    addMessage(color + String.format(t(format), args));
   }
 
   public void addTMessage(Color color, String message) {
-    addMessage(color + Translations.getInstance().get(message));
+    addMessage(color + t(message));
   }
 
   public void addTMessage(String msg) {
-    addMessage(Translations.getInstance().get(msg));
+    addMessage(t(msg));
   }
 
   public void addTCaptionedTMessage(String caption, String format, Object... args) {
-    addMessage("%s%s: %s%s", Color.GRAY, Translations.getInstance().get(caption),
-               Color.WHITE, String.format(Translations.getInstance().get(format), args));
+    addMessage("%s%s: %s%s", Color.GRAY, t(caption),
+               Color.WHITE, String.format(t(format), args));
   }
 
   public void addTCaptionedMessage(String caption, String format, Object... args) {
-    addMessage("%s%s: %s%s", Color.GRAY, Translations.getInstance().get(caption),
+    addMessage("%s%s: %s%s", Color.GRAY, t(caption),
                Color.WHITE, String.format(format, args));
   }
 
@@ -380,7 +381,7 @@ public class Player {
     boolean invalidCommand = command.getName() == null;
 
     if (!invalidCommand && !commandAllowed(command.getName())) {
-      addMessage("\u00a7c" + server.t.get("Insufficient permission."));
+      addMessage("\u00a7c" + t("Insufficient permission."));
       return true;
     }
 
@@ -425,11 +426,11 @@ public class Player {
       item = Integer.parseInt(rawItem);
 
       if (item < 0) {
-        addMessage("\u00a7c" + server.t.get("Item ID must be positive!"));
+        addMessage("\u00a7c" + t("Item ID must be positive!"));
         success = false;
       }
     } catch (NumberFormatException e) {
-      addMessage("\u00a7c" + server.t.get("Item ID must map to a number!"));
+      addMessage("\u00a7c" + t("Item ID must map to a number!"));
       success = false;
     }
 
@@ -439,18 +440,17 @@ public class Player {
         amount = Integer.parseInt(rawAmount);
 
         if ((amount < 1) || (amount > 1000)) {
-          addMessage("\u00a7c" + server.t.get("Amount must be within 1-1000!"));
+          addMessage("\u00a7c" + t("Amount must be within 1-1000!"));
           success = false;
         }
       } catch (NumberFormatException e) {
-        addMessage("\u00a7c" + server.t.get("Amount must be a number!"));
+        addMessage("\u00a7c" + t("Amount must be a number!"));
         success = false;
       }
     }
 
     if (!success) {
-      String msg = String.format(server.t.get("Unable to give %s"),
-                                 rawItem);
+      String msg = String.format(t("Unable to give %s"), rawItem);
       addMessage("\u00a7c" + msg);
       return false;
     }

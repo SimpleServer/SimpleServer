@@ -20,9 +20,9 @@
  */
 package simpleserver.command;
 
+import static simpleserver.lang.Translations.t;
 import simpleserver.Server;
 import simpleserver.Time;
-import simpleserver.lang.Translations;
 
 public abstract class TimeCommand extends AbstractCommand {
   public TimeCommand() {
@@ -30,7 +30,7 @@ public abstract class TimeCommand extends AbstractCommand {
   }
 
   private void usage() {
-    info(Translations.getInstance().get("Usage:") + " " + commandPrefix() +
+    info(t("Usage:") + " " + commandPrefix() +
          "time 0-23999|day|night|unfreeze [freeze]");
   }
 

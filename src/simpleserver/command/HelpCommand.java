@@ -20,6 +20,7 @@
  */
 package simpleserver.command;
 
+import static simpleserver.lang.Translations.t;
 import simpleserver.Color;
 import simpleserver.Player;
 
@@ -43,7 +44,7 @@ public class HelpCommand extends AbstractCommand implements PlayerCommand {
       String[] aliases = player.getServer().permissions.getCommandAliases(command.getName());
       if (aliases.length > 0) {
         StringBuffer line = new StringBuffer();
-        line.append("\u00a77" + t.get("Aliases:") + "\u00a7f ");
+        line.append("\u00a77" + t("Aliases:") + "\u00a7f ");
         for (String alias : aliases) {
           line.append(commandPrefix());
           line.append(alias);
@@ -53,7 +54,7 @@ public class HelpCommand extends AbstractCommand implements PlayerCommand {
       }
     } else {
       StringBuffer line = new StringBuffer();
-      line.append("\u00a77" + t.get("Available Commands:") + "\u00a7f ");
+      line.append("\u00a77" + t("Available Commands:") + "\u00a7f ");
 
       String prefix = commandPrefix();
       for (PlayerCommand command : parser.getPlayerCommands()) {

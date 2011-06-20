@@ -20,6 +20,7 @@
  */
 package simpleserver.command;
 
+import static simpleserver.lang.Translations.t;
 import simpleserver.Player;
 import simpleserver.Server;
 
@@ -34,7 +35,7 @@ public class UnmuteCommand extends PlayerArgCommand {
     server.mutelist.removeName(name);
 
     server.adminLog("Admin " + player.getName() + " unmuted player:\t " + name);
-    String msg = String.format(t.get("Player %s has been unmuted!"), name);
+    String msg = String.format(t("Player %s has been unmuted!"), name);
     server.runCommand("say", msg);
   }
 }

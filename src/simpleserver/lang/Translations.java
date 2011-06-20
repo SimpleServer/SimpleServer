@@ -20,9 +20,7 @@
  */
 package simpleserver.lang;
 
-import simpleserver.Resource;
-
-public class Translations implements Resource {
+public class Translations {
   private TranslationFile translation;
 
   private Translations() {
@@ -47,7 +45,7 @@ public class Translations implements Resource {
       if (translation.success()) {
         return true;
       } else {
-        System.out.println("There's a problem with language '" + languageCode + "'! Using English ('en') instead.");
+        System.out.println("There's a problem with language '" + languageCode + "'! Using English (en) instead.");
         translation = null;
         return false;
       }
@@ -58,10 +56,6 @@ public class Translations implements Resource {
     if (translation != null) {
       translation.load();
     }
-  }
-
-  public void save() {
-    return;
   }
 
   private static class TranslationsHolder {

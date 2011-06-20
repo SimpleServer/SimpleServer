@@ -20,6 +20,7 @@
  */
 package simpleserver.command;
 
+import static simpleserver.lang.Translations.t;
 import simpleserver.Color;
 import simpleserver.Player;
 import simpleserver.Server;
@@ -34,7 +35,7 @@ public class BanCommand extends PlayerArgCommand {
     Server server = player.getServer();
     String reason = extractArgument(message, 1);
     if (reason == null) {
-      reason = t.get("Banned by admin.");
+      reason = t("Banned by admin.");
     }
 
     server.runCommand("ban", target);
@@ -43,7 +44,7 @@ public class BanCommand extends PlayerArgCommand {
     server.adminLog("User " + player.getName() + " banned player:\t " + target +
         "\t(Banned by admin.)");
 
-    String msg = String.format(t.get("Player %s has been banned! (%s)"),
+    String msg = String.format(t("Player %s has been banned! (%s)"),
                                target, reason);
     server.runCommand("say", msg);
   }

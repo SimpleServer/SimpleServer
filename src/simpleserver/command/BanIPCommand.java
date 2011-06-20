@@ -20,6 +20,7 @@
  */
 package simpleserver.command;
 
+import static simpleserver.lang.Translations.t;
 import simpleserver.Color;
 import simpleserver.Player;
 import simpleserver.Server;
@@ -42,8 +43,8 @@ public class BanIPCommand extends AbstractCommand implements PlayerCommand {
             + arguments[0]);
       } else {
         server.ipBans.addBan(p.getIPAddress());
-        server.kick(p.getName(), t.get("IP Banned!"));
-        String msg = String.format(t.get("Player %s has been IP banned!"),
+        server.kick(p.getName(), t("IP Banned!"));
+        String msg = String.format(t("Player %s has been IP banned!"),
                                    p.getName());
         server.runCommand("say", msg);
         server.adminLog("User " + player.getName() + " banned ip:\t "

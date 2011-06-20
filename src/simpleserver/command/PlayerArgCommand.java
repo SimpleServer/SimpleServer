@@ -20,6 +20,7 @@
  */
 package simpleserver.command;
 
+import static simpleserver.lang.Translations.t;
 import simpleserver.Color;
 import simpleserver.Player;
 
@@ -54,11 +55,11 @@ public abstract class PlayerArgCommand extends AbstractCommand implements
   @Override
   public void reloadText() {
     if (name != null) {
-      helpText = name + "\u00a7f : " + t.get(commandCode) + " "
-          + t.get("(case-insensitive, name prefix works for online players)");
+      helpText = name + "\u00a7f : " + t(commandCode) + " "
+          + t("(case-insensitive, name prefix works for online players)");
     } else {
-      helpText = t.get(commandCode) + " "
-          + t.get("(case-insensitive, name prefix works for online players)");
+      helpText = t(commandCode) + " "
+          + t("(case-insensitive, name prefix works for online players)");
     }
   }
 }

@@ -20,6 +20,8 @@
  */
 package simpleserver.config;
 
+import static simpleserver.lang.Translations.t;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -30,7 +32,6 @@ import java.util.concurrent.ConcurrentMap;
 import simpleserver.Coordinate;
 import simpleserver.Coordinate.Dimension;
 import simpleserver.Player;
-import simpleserver.lang.Translations;
 
 public class ChestList extends AsciiConfig {
   private final ConcurrentMap<Coordinate, Chest> locations;
@@ -181,7 +182,7 @@ public class ChestList extends AsciiConfig {
         dimension = Dimension.get(tokens[5]);
         name = tokens[6];
       } else {
-        name = (tokens[0].equals("-")) ? "-" : Translations.getInstance().get("Locked Chest");
+        name = (tokens[0].equals("-")) ? "-" : t("Locked Chest");
       }
 
       Coordinate coordinate = new Coordinate(x, y, z, dimension);

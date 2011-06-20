@@ -20,6 +20,7 @@
  */
 package simpleserver.command;
 
+import static simpleserver.lang.Translations.t;
 import simpleserver.Color;
 import simpleserver.Player;
 
@@ -32,13 +33,13 @@ public class KickCommand extends OnlinePlayerArgCommand {
   protected void executeWithTarget(Player player, String message, Player target) {
     String reason = extractArgument(message, 1);
     if (reason == null) {
-      reason = t.get("Kicked by admin.");
+      reason = t("Kicked by admin.");
     }
 
     target.kick(reason);
     player.getServer().adminLog("Admin " + player.getName() + " kicked player:\t " +
         target.getName() + "\t(" + reason + ")");
-    String msg = String.format(t.get("Player %s has been kicked! (%s)"),
+    String msg = String.format(t("Player %s has been kicked! (%s)"),
                                target.getName(), reason);
     player.getServer().runCommand("say", msg);
   }

@@ -49,8 +49,6 @@ public class TranslationFile {
     try {
       return options.getString(key);
     } catch (JSONException e) {
-      System.out.println("[SimpleServer] " + e);
-      System.out.println("[SimpleServer] Could not read " + key + " key (" + filename + ")");
       return key;
     }
   }
