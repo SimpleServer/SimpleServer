@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.concurrent.Semaphore;
 
 import simpleserver.bot.BotController;
+import simpleserver.bot.Herobrine;
 import simpleserver.config.ChestList;
 import simpleserver.config.GiveAliasList;
 import simpleserver.config.HelpText;
@@ -359,7 +360,6 @@ public class Server {
   }
 
   private void cleanup() {
-    bots.cleanup();
     systemInput.stop();
     adminLog.stop();
     errorLog.stop();
@@ -410,11 +410,15 @@ public class Server {
         System.out.println("[SimpleServer] Warning: freezeTime option is not valid");
       }
     }
+
+    bots.connect(new Herobrine(this));
   }
 
   private void shutdown() {
     System.out.println("[SimpleServer] Stopping Server...");
     save = false;
+
+    bots.cleanup();
 
     if (!saveLock.tryAcquire()) {
       System.out.println("[SimpleServer] Server is currently Backing Up/Saving...");

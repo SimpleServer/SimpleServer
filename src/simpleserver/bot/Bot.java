@@ -33,6 +33,7 @@ import java.util.TimerTask;
 import java.util.concurrent.locks.ReentrantLock;
 
 import simpleserver.Server;
+import simpleserver.Coordinate.Dimension;
 import simpleserver.Player.LocalAddressFactory;
 
 public class Bot {
@@ -44,21 +45,26 @@ public class Bot {
   protected Server server;
   private boolean connected;
   private boolean expectDisconnect;
-  private boolean ready;
+  protected boolean ready;
 
   private Socket socket;
-  private DataInputStream in;
+  protected DataInputStream in;
   protected DataOutputStream out;
 
   private Timer timer;
   ReentrantLock writeLock;
+  protected Position position;
 
   protected BotController controller;
+
+  private byte lastPacket;
+
+  private short health;
 
   public Bot(Server server, String name) {
     this.name = name;
     this.server = server;
-
+    position = new Position();
   }
 
   public void connect() throws UnknownHostException, IOException {
@@ -86,10 +92,15 @@ public class Bot {
     return false;
   }
 
+  protected void positionUpdate(double x, double y, double z) throws IOException {
+  }
+
   private void handshake() throws IOException {
+    writeLock.lock();
     out.writeByte(2);
     write(name);
     out.flush();
+    writeLock.unlock();
   }
 
   public void logout() throws IOException {
@@ -101,15 +112,45 @@ public class Bot {
   }
 
   protected void login() throws IOException {
+    writeLock.lock();
     out.writeByte(1);
     out.writeInt(VERSION);
     write(name);
     out.writeLong(0);
     out.writeByte(0);
+    writeLock.unlock();
+  }
+
+  private void respawn() throws IOException {
+    writeLock.lock();
+    out.writeByte(9);
+    out.writeByte(position.dimension.index());
+    writeLock.unlock();
   }
 
   protected void ready() throws IOException {
     ready = true;
+  }
+
+  protected void walk(double d) {
+    double heading = position.yaw * Math.PI / 180;
+    position.x -= Math.sin(heading) * d;
+    position.z += Math.cos(heading) * d;
+  }
+
+  protected void ascend(double d) {
+    position.y += d;
+    position.stance += d;
+
+    if (position.stance - position.y > 1.6 || position.stance - position.y < 0.15) {
+      position.stance = position.y + 0.5;
+    }
+  }
+
+  protected void sendPosition() throws IOException {
+    writeLock.lock();
+    position.send(out);
+    writeLock.unlock();
   }
 
   protected void handlePacket(byte packetId) throws IOException {
@@ -122,18 +163,21 @@ public class Bot {
         in.readInt();
         readUTF16();
         in.readLong();
-        in.readByte();
+        position.dimension = Dimension.get(in.readByte());
         break;
       case 0x0d: // Player Position & Look
-        out.writeByte(packetId);
-        out.writeDouble(in.readDouble());
+        double x = in.readDouble();
         double stance = in.readDouble();
-        out.writeDouble(in.readDouble());
-        out.writeDouble(stance);
-        out.writeDouble(in.readDouble());
-        out.writeFloat(in.readFloat());
-        out.writeFloat(in.readFloat());
-        out.writeBoolean(in.readBoolean());
+        double y = in.readDouble();
+        double z = in.readDouble();
+        float yaw = in.readFloat();
+        float pitch = in.readFloat();
+        boolean onGround = in.readBoolean();
+        positionUpdate(x, y, z);
+        position.updatePosition(x, y, z, stance);
+        position.updateLook(yaw, pitch);
+        position.updateGround(onGround);
+        sendPosition();
         if (!ready) {
           ready();
         }
@@ -167,10 +211,13 @@ public class Bot {
         in.readBoolean();
         break;
       case 0x08: // Update Health
-        readNBytes(2);
+        health = in.readShort();
+        if (health <= 0) {
+          respawn();
+        }
         break;
       case 0x09: // Respawn
-        in.readByte();
+        position.dimension = Dimension.get(in.readByte());
         break;
       case 0x0a: // Player
         in.readByte();
@@ -409,8 +456,10 @@ public class Bot {
         }
         break;
       default:
-        error("Unable to handle packet 0x" + Integer.toHexString(packetId));
+        error("Unable to handle packet 0x" + Integer.toHexString(packetId)
+              + " after 0x" + Integer.toHexString(lastPacket));
     }
+    lastPacket = packetId;
   }
 
   private void readUnknownBlob() throws IOException {
@@ -504,14 +553,11 @@ public class Bot {
     @Override
     public void run() {
       while (connected) {
-        writeLock.lock();
         try {
           handlePacket(in.readByte());
           out.flush();
         } catch (IOException e) {
           error("Soket closed");
-        } finally {
-          writeLock.unlock();
         }
       }
     }
@@ -530,6 +576,66 @@ public class Bot {
           writeLock.unlock();
         }
       }
+    }
+  }
+
+  protected final class Position {
+    private double x;
+    private double y;
+    private double z;
+    private double stance;
+    private Dimension dimension;
+    private float yaw;
+    private float pitch;
+    private boolean onGround;
+
+    public Position() {
+      dimension = Dimension.EARTH;
+      onGround = true;
+    }
+
+    public void updatePosition(double x, double y, double z, double stance) {
+      this.x = x;
+      this.y = y;
+      this.z = z;
+      this.stance = stance;
+    }
+
+    public void updateLook(float yaw, float pitch) {
+      this.yaw = yaw;
+      this.pitch = pitch;
+    }
+
+    public void updateDimension(Dimension dimension) {
+      this.dimension = dimension;
+    }
+
+    public void updateGround(boolean onGround) {
+      this.onGround = onGround;
+    }
+
+    public void send(DataOutputStream out) throws IOException {
+      out.writeByte(0x0d);
+      out.writeDouble(x);
+      out.writeDouble(y);
+      out.writeDouble(stance);
+      out.writeDouble(z);
+      out.writeFloat(yaw);
+      out.writeFloat(pitch);
+      out.writeBoolean(onGround);
+      out.flush();
+    }
+
+    public double x() {
+      return x;
+    }
+
+    public double y() {
+      return y;
+    }
+
+    public double z() {
+      return z;
     }
   }
 }

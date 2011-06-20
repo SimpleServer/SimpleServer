@@ -33,11 +33,19 @@ public class Teleporter extends Bot {
   private Coordinate coordinate;
   private Player player;
   private PlayerFile dat;
+  private float yaw;
+  private float pitch;
 
   public Teleporter(Player player, Coordinate coordinate) {
+    this(player, coordinate, 0, 0);
+  }
+
+  public Teleporter(Player player, Coordinate coordinate, float yaw, float pitch) {
     super(player.getServer(), "Teleporter" + Math.round(100000 * Math.random()));
     this.coordinate = coordinate;
     this.player = player;
+    this.yaw = yaw;
+    this.pitch = pitch;
     prepare();
   }
 
@@ -57,6 +65,22 @@ public class Teleporter extends Bot {
   @Override
   protected void handlePacket(byte packetId) throws IOException {
     switch (packetId) {
+      case 0x0d: // Player Position & Look
+        out.writeByte(packetId);
+        out.writeDouble(in.readDouble());
+        double stance = in.readDouble();
+        out.writeDouble(in.readDouble());
+        out.writeDouble(stance);
+        out.writeDouble(in.readDouble());
+        in.readFloat();
+        in.readFloat();
+        out.writeFloat(yaw);
+        out.writeFloat(pitch);
+        out.writeBoolean(in.readBoolean());
+        if (!ready) {
+          ready();
+        }
+        break;
       default:
         super.handlePacket(packetId);
     }

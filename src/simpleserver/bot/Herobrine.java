@@ -24,30 +24,30 @@ import java.io.IOException;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import simpleserver.Coordinate;
-import simpleserver.Player;
+import simpleserver.Server;
 
 public class Herobrine extends Bot {
 
   private Timer timer = new Timer();
 
-  public Herobrine(Player player, Coordinate coordinate) {
-    super(player.getServer(), "Herobrine");
+  public Herobrine(Server server) {
+    super(server, "Herobrine");
   }
 
   @Override
   protected void ready() throws IOException {
     super.ready();
-    timer.schedule(new LookAround(), 0, 500);
+    timer.schedule(new LookAround(), 0, 100);
   }
 
   @Override
   protected void handlePacket(byte packetId) throws IOException {
     switch (packetId) {
       case 0x3:
-        if (readUTF16().equals("quit")) {
+        if (readUTF16().contains("quit")) {
           logout();
         }
+        break;
       default:
         super.handlePacket(packetId);
     }
@@ -60,23 +60,23 @@ public class Herobrine extends Bot {
   }
 
   private final class LookAround extends TimerTask {
-    private int t = 0;
+    private float t = 0;
+    private float vt = 0;
 
     @Override
     public void run() {
-      writeLock.lock();
       try {
-        out.writeByte(0x0c);
-        out.writeFloat(40 * t++);
-        out.writeFloat((float) (Math.sin(t / 10) * 45));
-        out.writeBoolean(true);
+        position.updateLook(t, 0);
+        walk(0.1);
+        vt += Math.random() - 0.5;
+        t += vt;
+        if (vt > 3 || vt < -3) {
+          vt = 0;
+        }
+        sendPosition();
       } catch (IOException e) {
         error("LookAround failed");
-      } finally {
-        writeLock.unlock();
       }
-
     }
   }
-
 }

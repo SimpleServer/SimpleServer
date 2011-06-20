@@ -654,4 +654,7 @@ public class Player {
     return server.bots.connect(new Teleporter(this, coordinate));
   }
 
+  public boolean teleport(Coordinate coordinate, float yaw, float pitch) {
+    return server.bots.connect(new Teleporter(this, coordinate, yaw, pitch));
+  }
 }

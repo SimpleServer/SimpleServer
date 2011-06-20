@@ -31,7 +31,7 @@ public class BotCommand extends AbstractCommand implements PlayerCommand {
   }
 
   public void execute(Player player, String message) {
-    if (!player.teleport(new Coordinate(0, 20, 0, Dimension.EARTH))) {
+    if (!player.teleport(new Coordinate(0, 20, 0, Dimension.EARTH), 0, -90)) {
       player.addMessage(Color.RED, "Teleport failed");
     }
   }
