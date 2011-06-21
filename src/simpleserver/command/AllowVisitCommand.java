@@ -24,7 +24,7 @@ import simpleserver.Player;
 
 public class AllowVisitCommand extends AbstractCommand implements PlayerCommand {
   public AllowVisitCommand() {
-    super("ok PLAYER", "Show the name of current area");
+    super("ok PLAYER", "Agree a visit request");
   }
 
   public void execute(Player player, String message) {
