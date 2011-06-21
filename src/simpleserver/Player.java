@@ -237,7 +237,7 @@ public class Player {
   }
 
   public void addTMessage(Color color, String format, Object... args) {
-    addMessage(color + String.format(t(format), args));
+    addMessage(color + t(format, args));
   }
 
   public void addTMessage(Color color, String message) {
@@ -249,8 +249,7 @@ public class Player {
   }
 
   public void addTCaptionedTMessage(String caption, String format, Object... args) {
-    addMessage("%s%s: %s%s", Color.GRAY, t(caption),
-               Color.WHITE, String.format(t(format), args));
+    addMessage("%s%s: %s%s", Color.GRAY, t(caption), Color.WHITE, t(format, args));
   }
 
   public void addTCaptionedMessage(String caption, String format, Object... args) {

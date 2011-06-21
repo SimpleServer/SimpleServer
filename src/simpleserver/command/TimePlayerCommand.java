@@ -59,7 +59,7 @@ public class TimePlayerCommand extends TimeCommand implements PlayerCommand {
 
   @Override
   protected void tError(String message, Object... args) {
-    error(String.format(t(message), args));
+    error(t(message, args));
   }
 
   @Override

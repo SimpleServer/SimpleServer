@@ -69,4 +69,8 @@ public class Translations {
   public static String t(String key) {
     return TranslationsHolder.INSTANCE.get(key);
   }
+
+  public static String t(String key, Object... args) {
+    return String.format(t(key), args);
+  }
 }

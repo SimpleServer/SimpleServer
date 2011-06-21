@@ -35,7 +35,7 @@ public class GPSCommand extends OnlinePlayerArgCommand {
     if (target == null) {
       target = player;
     } else {
-      name = String.format(t("%s's"), target.getName());
+      name = t("%s's", target.getName());
     }
 
     player.addTMessage(Color.GRAY,
