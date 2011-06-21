@@ -90,7 +90,7 @@
   "Nobody sent you a message yet." : "Nobody sent you a message yet.",
   "Only modes %s and %s allowed!" : "Only modes %s and %s allowed!",
   "Open Chest" : "Open Chest",
-  "Optional 2nd argument must be freeze!" : "Optional 2nd argument must be freeze!",
+  "Optional 2nd argument must be %s!" : "Optional 2nd argument must be %s!",
   "Over all you've been online for %s hours and %s minutes." : "Over all you've been online for %s hours and %s minutes.",
   "Player %s has been banned! (%s)" : "Player %s has been banned! (%s)",
   "Player %s has been IP banned!" : "Player %s has been IP banned!",

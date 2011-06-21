@@ -58,6 +58,11 @@ public class TimePlayerCommand extends TimeCommand implements PlayerCommand {
   }
 
   @Override
+  protected void tError(String message, Object... args) {
+    error(String.format(t(message), args));
+  }
+
+  @Override
   protected void tInfo(String message) {
     info(t(message));
   }

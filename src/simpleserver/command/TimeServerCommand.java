@@ -47,6 +47,11 @@ public class TimeServerCommand extends TimeCommand implements ServerCommand {
   }
 
   @Override
+  protected void tError(String message, Object... args) {
+    error(String.format(message, args));
+  }
+
+  @Override
   protected void tInfo(String message) {
     info(message);
   }

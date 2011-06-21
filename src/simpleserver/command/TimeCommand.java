@@ -88,7 +88,7 @@ public abstract class TimeCommand extends AbstractCommand {
           time.freeze(value);
           tInfo("Time frozen");
         } else {
-          tError("Optional 2nd argument must be freeze!");
+          tError("Optional 2nd argument must be %s!", "freeze");
         }
       }
     }
@@ -97,6 +97,8 @@ public abstract class TimeCommand extends AbstractCommand {
   protected abstract void error(String message);
 
   protected abstract void tError(String message);
+
+  protected abstract void tError(String message, Object... args);
 
   protected abstract void info(String message);
 
