@@ -20,10 +20,11 @@
  */
 package simpleserver.lang;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.InputStreamReader;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -54,13 +55,18 @@ public class TranslationFile {
   }
 
   public void load() {
-    InputStream stream = null;
+    BufferedReader reader = null;
 
     try {
-      stream = getClass().getResourceAsStream(resourceLocation + "/" + filename);
-      byte[] bytes = new byte[stream.available()];
-      stream.read(bytes);
-      options = new JSONObject(new String(bytes, "UTF-8"));
+      reader = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream(resourceLocation + "/" + filename), "UTF-8"));
+
+      String contents = "";
+      String currentLine;
+      while ((currentLine = reader.readLine()) != null) {
+        contents = contents + currentLine;
+      }
+
+      options = new JSONObject(contents);
     } catch (NullPointerException e) {
       loadExternal();
     } catch (JSONException e) {
@@ -70,9 +76,9 @@ public class TranslationFile {
       System.out.println("[SimpleServer] " + e);
       System.out.println("[SimpleServer] Could not read " + filename);
     } finally {
-      if (stream != null) {
+      if (reader != null) {
         try {
-          stream.close();
+          reader.close();
         } catch (IOException e) {
         }
       }
@@ -81,16 +87,21 @@ public class TranslationFile {
 
   protected void loadExternal() {
     File file = new File(resourceLocation + File.separator + filename);
-    InputStream stream = null;
+    BufferedReader reader = null;
 
     try {
-      stream = new FileInputStream(file);
-      byte[] bytes = new byte[stream.available()];
-      stream.read(bytes);
-      options = new JSONObject(new String(bytes, "UTF-8"));
+      reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), "UTF-8"));
+
+      String contents = "";
+      String currentLine;
+      while ((currentLine = reader.readLine()) != null) {
+        contents = contents + currentLine;
+      }
+
+      options = new JSONObject(contents);
     } catch (NullPointerException e) {
       System.out.println("[SimpleServer] " + e);
-      System.out.println("[SimpleServer] Could not find " + filename);
+      System.out.println("[SimpleServer] Could not read " + filename);
     } catch (JSONException e) {
       System.out.println("[SimpleServer] " + e);
       System.out.println("[SimpleServer] Could not read " + filename);
@@ -98,9 +109,9 @@ public class TranslationFile {
       System.out.println("[SimpleServer] " + e);
       System.out.println("[SimpleServer] Could not read " + filename);
     } finally {
-      if (stream != null) {
+      if (reader != null) {
         try {
-          stream.close();
+          reader.close();
         } catch (IOException e) {
         }
       }

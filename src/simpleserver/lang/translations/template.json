@@ -95,7 +95,7 @@
   "Player %s has been banned! (%s)" : "Player %s has been banned! (%s)",
   "Player %s has been IP banned!" : "Player %s has been IP banned!",
   "Player %s has been kicked! (%s)" : "Player %s has been kicked! (%s)",
-  "Player %s has been muted!" : "Player %s has been muted!"
+  "Player %s has been muted!" : "Player %s has been muted!",
   "Player %s has been unmuted!" : "Player %s has been unmuted!",
   "Player %s was unwhitelisted!" : "Player %s was unwhitelisted!",
   "Player %s was whitelisted!" : "Player %s was whitelisted!",
@@ -107,7 +107,7 @@
   "Remove player from server access list" : "Remove player from server access list",
   "Remove the IP address from the ban list" : "Remove the IP address from the ban list",
   "Remove the named player from the ban list" : "Remove the named player from the ban list",
-  "Request accepted!" : "Request accepted!"
+  "Request accepted!" : "Request accepted!",
   "Requesting %s for a visit..." : "Requesting %s for a visit...",
   "Reread the configuration files from disk" : "Reread the configuration files from disk",
   "Resources Reloaded!" : "Resources Reloaded!",
