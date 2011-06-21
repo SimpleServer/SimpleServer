@@ -47,10 +47,11 @@ Added commands:
 In-game Commands:
 Commands are based on rank.  Say /help in game for a list of currently
 accessible commands.
-  /area -- Show current area
+  /area -- Show the name of current area
   /backup -- Backup the map
-  /banip IPADDRESS -- Kick and ban players with this IP
   /ban PLAYER [REASON] -- Kick and ban the named player
+  /banip IPADDRESS -- Kick and ban players with this IP
+  /external -- External command
   /give ITEM [AMOUNT] -- Spawn items for yourself
   /giveplayer PLAYER ITEM [AMOUNT] -- Spawn items for another player
   /gps [PLAYER] -- Display block coordinates of named player or yourself
@@ -61,31 +62,32 @@ accessible commands.
   /kit [KIT] -- Display all kits or give yourself the named kit
   /listips -- Display the name and IP of each connected player
   /local MESSAGE -- Send a chat message to nearby players
-  /localtoggle -- toggle localchat mode
-  /lock -- Prepare to create your locked chest
+  /localtoggle [on|off] -- Toggle local chat mode
+  /lock [name|list] -- Create or list locked chests
   /motd -- Display the message of the day
   /mute PLAYER -- Block the named player from normal chat
-  /myarea [start|end|save|unsave] -- Create a private area
-  /mystats -- Show own statistics
-  /ok -- Response to the /visit command to allow a teleport
+  /myarea [start|end|save|unsave|rename] -- Manage your personal area
+  /mystats -- Display your statistics
+  /ok PLAYER -- Teleport to the player if he agrees with ok
   /rcon COMMAND ARGUMENTS... -- Execute a command on the server console
   /reload -- Reread the configuration files from disk
-  /reply MESSAGE -- Send message to the player who last sent you one
+  /reply MESSAGE -- Sends a message to the player that last told you something
   /restart -- Stop the minecraft server and start it again
   /rules -- Display the server rules
   /save -- Store configuration to disk and force a map save
+  /servertime -- Display the real-world time of the server
   /setgroup PLAYER GROUP -- Set the group ID of the named player
+  /setipgroup IP|Player -- Set the group ID of an IP address
   /stop -- Shutdown the entire server
   /teleport PLAYER1 PLAYER2 -- Teleport the first player to the second
   /tell PLAYER MESSAGE... -- Send a message to the named player
-  /time [0-23999 or day|night] [freeze|unfreeze] -- Set or freeze arbitrary time of day
-  /servertime -- Display the real-world time of the server
-  /unbanip IPADDRESS -- Remove the IP address from the ban list
+  /time [set] [number|day|night|unfreeze] [freeze] -- Set or freeze time
   /unban PLAYER -- Remove the named player from the ban list
-  /unlock -- Unlock your locked chest (if you have one) for others to access
+  /unbanip IPADDRESS -- Remove the IP address from the ban list
+  /unlock [name] -- Unlocks locked chests
   /unmute PLAYER -- Allow the named player to use normal chat again
   /unwhitelist PLAYER -- Remove player from server access list
-  /visit PLAYER -- Ask a player for permission to be teleported to him
+  /visit PLAYER -- Teleport to the player if he agrees with ok
   /warpmeto PLAYER -- Teleport to the named player
   /warptome PLAYER -- Teleport the named player to you
   /whitelist PLAYER -- Add player to server access list
