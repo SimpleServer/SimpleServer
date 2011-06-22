@@ -39,10 +39,10 @@ import java.util.regex.Pattern;
 
 import simpleserver.Color;
 import simpleserver.Coordinate;
-import simpleserver.Coordinate.Dimension;
 import simpleserver.Group;
 import simpleserver.Player;
 import simpleserver.Server;
+import simpleserver.Coordinate.Dimension;
 import simpleserver.command.LocalSayCommand;
 import simpleserver.command.PlayerListCommand;
 import simpleserver.config.ChestList.Chest;
@@ -829,7 +829,7 @@ public class StreamTunnel {
         server.chests.giveLock(player, coordinate, false, player.nextChestName());
       }
       player.setAttemptedAction(null);
-      player.addTMessage(Color.RED, "This chest is now locked.");
+      player.addTMessage(Color.GRAY, "This chest is now locked.");
     } else if (!server.chests.isChest(coordinate)) {
       server.chests.addOpenChest(coordinate);
     }
