@@ -35,10 +35,9 @@ public class TellCommand extends OnlinePlayerArgCommand implements
   protected void executeWithTarget(Player player, String message, Player target) {
     String chat = extractArgument(message, 1);
     if (chat != null) {
-      String formattedChat = "\u00a77" + player.getName() + " -> "
-          + target.getName() + ":\u00a7f " + chat;
-      player.addMessage(formattedChat);
-      target.addMessage(formattedChat);
+      String caption = player.getName() + " -> " + target.getName();
+      player.addCaptionedMessage(caption, chat);
+      target.addCaptionedMessage(caption, chat);
 
       target.setReply(player);
     } else {

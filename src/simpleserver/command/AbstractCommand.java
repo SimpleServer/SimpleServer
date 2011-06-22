@@ -21,6 +21,7 @@
 package simpleserver.command;
 
 import static simpleserver.lang.Translations.t;
+import simpleserver.Color;
 import simpleserver.CommandParser;
 
 public abstract class AbstractCommand implements Command {
@@ -31,7 +32,7 @@ public abstract class AbstractCommand implements Command {
 
   protected AbstractCommand(String name, String commandCode) {
     if (name != null) {
-      helpText = name + "\u00a7f : " + t(commandCode);
+      helpText = name + Color.WHITE + " : " + t(commandCode);
 
       int splitIndex = name.indexOf(" ");
       if (splitIndex != -1) {
@@ -51,7 +52,7 @@ public abstract class AbstractCommand implements Command {
 
   public String getHelpText(String prefix) {
     if (name != null) {
-      return "\u00a72" + prefix + helpText;
+      return Color.DARK_GREEN + prefix + helpText;
     } else {
       return helpText;
     }
@@ -98,7 +99,7 @@ public abstract class AbstractCommand implements Command {
 
   public void reloadText() {
     if (name != null) {
-      helpText = name + "\u00a7f : " + t(commandCode);
+      helpText = name + Color.WHITE + " : " + t(commandCode);
     } else {
       helpText = t(commandCode);
     }

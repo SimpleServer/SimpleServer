@@ -43,6 +43,6 @@ public class InvalidCommand extends AbstractCommand implements PlayerCommand,
 
   @Override
   public void reloadText() {
-    helpText = "\u00a7c" + t(commandCode);
+    helpText = Color.RED + t(commandCode);
   }
 }

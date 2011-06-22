@@ -39,10 +39,10 @@ import java.util.regex.Pattern;
 
 import simpleserver.Color;
 import simpleserver.Coordinate;
+import simpleserver.Coordinate.Dimension;
 import simpleserver.Group;
 import simpleserver.Player;
 import simpleserver.Server;
-import simpleserver.Coordinate.Dimension;
 import simpleserver.command.LocalSayCommand;
 import simpleserver.command.PlayerListCommand;
 import simpleserver.config.ChestList.Chest;
@@ -53,7 +53,7 @@ public class StreamTunnel {
   private static final int BUFFER_SIZE = 1024;
   private static final byte BLOCK_DESTROYED_STATUS = 2;
   private static final Pattern MESSAGE_PATTERN = Pattern.compile("^<([^>]+)> (.*)$");
-  private static final Pattern COLOR_PATTERN = Pattern.compile("\u00a7[0-9a-f]");
+  private static final Pattern COLOR_PATTERN = Pattern.compile("§[0-9a-f]");
   private static final String CONSOLE_CHAT_PATTERN = "\\(CONSOLE:.*\\)";
   private static final int MESSAGE_SIZE = 60;
   private static final int MAXIMUM_MESSAGE_SIZE = 119;
@@ -975,7 +975,7 @@ public class StreamTunnel {
 
   private String getLastColorCode(String message) {
     String colorCode = "";
-    int lastIndex = message.lastIndexOf('\u00a7');
+    int lastIndex = message.lastIndexOf('§');
     if (lastIndex != -1 && lastIndex + 1 < message.length()) {
       colorCode = message.substring(lastIndex, lastIndex + 2);
     }
@@ -995,7 +995,7 @@ public class StreamTunnel {
         end++;
       }
 
-      if (message.charAt(end) == '\u00a7') {
+      if (message.charAt(end) == '§') {
         end--;
       }
 
@@ -1003,7 +1003,11 @@ public class StreamTunnel {
       sendMessagePacket(firstPart);
       sendMessage(getLastColorCode(firstPart) + message.substring(end));
     } else {
-      sendMessagePacket(message);
+      int end = message.length();
+      if (message.charAt(end - 1) == '§') {
+        end--;
+      }
+      sendMessagePacket(message.substring(0, end));
     }
   }
 

@@ -258,12 +258,11 @@ public class Server {
   }
 
   public int localChat(Player player, String msg) {
-    String chat = "\u00a77" + player.getName() + " says:\u00a7f " + msg;
     int localPlayers = 0;
     int radius = options.getInt("localChatRadius");
     for (Player friend : playerList.getArray()) {
       if (friend.distanceTo(player) < radius) {
-        friend.addMessage(chat);
+        friend.addCaptionedMessage(t("%s says", player.getName()), msg);
         if (player != friend) {
           localPlayers++;
         }
