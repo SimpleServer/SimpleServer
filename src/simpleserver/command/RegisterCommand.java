@@ -21,91 +21,90 @@
 package simpleserver.command;
 
 import simpleserver.Authenticator;
+import simpleserver.Color;
 import simpleserver.Player;
 
-public class PasswdCommand extends AbstractCommand implements PlayerCommand {
+public class RegisterCommand extends AbstractCommand implements PlayerCommand {
 
-  public PasswdCommand() {
-    super("passwd [OLD PASSWORD] NEW_PASSWORD NEW_PASSWORD", "Set or change password for CustAuth.");
+  public RegisterCommand() {
+    super("register [OLD PASSWORD] NEW_PASSWORD NEW_PASSWORD", "Set or change password for CustAuth.");
   }
 
   public void execute(Player player, String message) {
-    
+
     Authenticator auth = player.getServer().authenticator;
-    if(!auth.allowRegistration()){
-      player.addMessage("\u00a7cPasswd failed! CustAuth registration currently not allowed.");
+    if (!auth.allowRegistration()) {
+      player.addTMessage(Color.RED, "Registration failed! CustAuth registration currently not allowed.");
       return;
     }
-    
+
     String[] arguments = extractArguments(message);
-    if(arguments.length == 2){
+    if (arguments.length == 2) {
       // registration
       registration(player, arguments, auth);
-    } else if(arguments.length == 3){
+    } else if (arguments.length == 3) {
       // password change
       changePassword(player, arguments, auth);
-    } else{
-      player.addMessage("\u00a7cWrong number of arguments!");
+    } else {
+      player.addTMessage(Color.RED, "Wrong number of arguments!");
     }
   }
 
-    
-
-  private void changePassword(Player player, String[] arguments, Authenticator auth){
+  private void changePassword(Player player, String[] arguments, Authenticator auth) {
     String oldPw = arguments[0];
     String newPw1 = arguments[1];
     String newPw2 = arguments[2];
-    
-    if(!auth.isRegistered(player.getName())){
-      player.addMessage("\u00a7cYou are not registered yet!");
+
+    if (!auth.isRegistered(player.getName())) {
+      player.addTMessage(Color.RED, "You are not registered yet!");
       return;
     }
-    
+
     /*if(player.usedAuthenticator()){
-      player.addMessage("\u00a7cYou are not allowed to change your password since you used CustAuth for login!");
+      player.addTMessage(Color.RED, "You are not allowed to change your password since you used CustAuth for login!");
       return;
     }*/
-    
-    if(checkPasswordFormat(player, newPw1)){
-      if(newPw1.equals(newPw2)){
-        
-        if(auth.changePassword(player, oldPw, newPw1)){
-          player.addMessage("\u00a77Passwords successfully changed!");
-        } else{
-          player.addMessage("\u00a7cYour old password seems incorrect!");
+
+    if (checkPasswordFormat(player, newPw1)) {
+      if (newPw1.equals(newPw2)) {
+
+        if (auth.changePassword(player, oldPw, newPw1)) {
+          player.addTMessage(Color.GRAY, "Passwords successfully changed!");
+        } else {
+          player.addTMessage(Color.RED, "Your old password seems incorrect!");
         }
-      } else{
-        player.addMessage("\u00a7cNew passwords do not match!");
+      } else {
+        player.addTMessage(Color.RED, "New passwords do not match!");
       }
     }
-    
-    
+
   }
-  
-  private void registration(Player player, String[] arguments, Authenticator auth){
+
+  private void registration(Player player, String[] arguments, Authenticator auth) {
     String newPw1 = arguments[0];
     String newPw2 = arguments[1];
-    
-    if(auth.isRegistered(player.getName())){
-      player.addMessage("\u00a7cYou are already registered!");
+
+    if (auth.isRegistered(player.getName())) {
+      player.addTMessage(Color.RED, "You are already registered!");
       return;
     }
-    
-    if(checkPasswordFormat(player, newPw1)){
-      if(newPw1.equals(newPw2)){
-        
+
+    if (checkPasswordFormat(player, newPw1)) {
+      if (newPw1.equals(newPw2)) {
+
         auth.register(player, newPw1);
-        player.addMessage("\u00a77Registration successful!");
-      } else{
-        player.addMessage("\u00a7cNew passwords do not match!");
+        player.addTMessage(Color.GRAY, "Registration successful!");
+      } else {
+        player.addTMessage(Color.RED, "New passwords do not match!");
       }
     }
   }
 
-  private boolean checkPasswordFormat(Player player, String pw){
+  private boolean checkPasswordFormat(Player player, String pw) {
     boolean r = (pw.length() >= 4 && pw.length() <= 10);
-    if(!r)
-      player.addMessage("\u00a7cThe password must contain 4 to 10 characters.");
+    if (!r) {
+      player.addTMessage(Color.RED, "The password must contain 4 to 10 characters.");
+    }
     return r;
   }
 }

@@ -21,6 +21,7 @@
 package simpleserver.command;
 
 import simpleserver.Authenticator;
+import simpleserver.Color;
 import simpleserver.Player;
 
 public class LoginCommand extends AbstractCommand implements PlayerCommand {
@@ -30,40 +31,40 @@ public class LoginCommand extends AbstractCommand implements PlayerCommand {
   }
 
   public void execute(Player player, String message) {
-    
+
     Authenticator auth = player.getServer().authenticator;
-    if(!auth.allowLogin()){
-      player.addMessage("\u00a7cLogin failed! CustAuth login currently not allowed.");
+    if (!auth.allowLogin()) {
+      player.addTMessage(Color.RED, "Login failed! CustAuth login currently not allowed.");
       return;
     }
 
-    String[] arguments = extractArguments(message);    
+    String[] arguments = extractArguments(message);
 
-    if(arguments.length != 2){
-      player.addMessage("\u00a7cWrong number of arguments!");
+    if (arguments.length != 2) {
+      player.addTMessage(Color.RED, "Wrong number of arguments!");
       return;
     }
 
     String userName = arguments[0];
     String password = arguments[1];
-    
-    if(player.getServer().playerList.findPlayerExact(userName) != null){
-      player.addMessage("\u00a7cLogin failed! Player already in server.");
+
+    if (player.getServer().playerList.findPlayerExact(userName) != null) {
+      player.addTMessage(Color.RED, "Login failed! Player already in server.");
       return;
     }
 
-    if(auth.isRegistered(userName)){
-      if(auth.login(player, userName, password)){
-        player.addMessage("\u00a77Login successfull!");
-        player.addMessage("\u00a77Please reconnect to the server within " +Authenticator.REQUEST_EXPIRATION+ " seconds to complete the CustAuth process.");
+    if (auth.isRegistered(userName)) {
+      if (auth.login(player, userName, password)) {
+        player.addTMessage(Color.GRAY, "Login successfull!");
+        player.addTMessage(Color.GRAY, "Please reconnect to the server within " + Authenticator.REQUEST_EXPIRATION + " seconds to complete the CustAuth process.");
         player.setUsedAuthenticator(true);
-      } else{
-        player.addMessage("\u00a7cLogin failed! Password missmatch.");
+      } else {
+        player.addTMessage(Color.RED, "Login failed! Password missmatch.");
       }
-      
-    } else{
-      player.addMessage("\u00a7cYou are not registered!");
-      player.addMessage("\u00a7cUse the " +commandPrefix()+ "passwd command to register.");
+
+    } else {
+      player.addTMessage(Color.RED, "You are not registered!");
+      player.addTMessage(Color.RED, "Use the %s command to register.", (commandPrefix() + "register"));
       return;
     }
   }

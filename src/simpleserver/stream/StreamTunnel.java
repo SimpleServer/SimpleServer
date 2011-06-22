@@ -44,7 +44,6 @@ import simpleserver.Coordinate.Dimension;
 import simpleserver.Group;
 import simpleserver.Player;
 import simpleserver.Server;
-import simpleserver.Coordinate.Dimension;
 import simpleserver.command.LocalSayCommand;
 import simpleserver.command.PlayerListCommand;
 import simpleserver.config.ChestList.Chest;
@@ -180,6 +179,21 @@ public class StreamTunnel {
         if (server.options.getBoolean("custAuth")) {
           if (!isServerTunnel) {
 
+            if (!name.equals("Player")) {
+              if (!server.authenticator.isMinecraftUp) {
+                // maybe still logged in for security join as Player
+                server.authenticator.updateMinecraftState();
+                if (!server.authenticator.isMinecraftUp) {
+                  // kick("Please restart your client and use offline mode to join.");
+                  nameSet = player.setName("Player");
+                } else {
+                  nameSet = player.setName(name);
+                }
+              } else {
+                nameSet = player.setName(name);
+              }
+            }
+
             if (name.equals("Player")) {
               // is not logged in to minecraft.net
 
@@ -194,23 +208,10 @@ public class StreamTunnel {
                 name = server.authenticator.getFreeGuestName(player.getIPAddress());
                 nameSet = player.setName(name);
               }
-            } else {
-              if (!server.authenticator.isMinecraftUp) {
-                // this is impossible without name spoofing -> kick? or should
-                // onlineMode be attracted?
-                server.authenticator.updateMinecraftState();
-                if (!server.authenticator.isMinecraftUp) {
-                  kick("Please restart your client and use offline mode to join.");
-                } else {
-                  nameSet = player.setName(name);
-                }
-              } else {
-                nameSet = player.setName(name);
-              }
             }
-          } else {
+
+          } else { // isServerTunnel
             // send '-' if no authentication needed and hash if minecraft.net
-            // auth
             if (!server.authenticator.isMinecraftUp || !server.options.getBoolean("onlineMode")) {
               name = "-";
             } else {
