@@ -26,6 +26,7 @@ import java.util.TimerTask;
 
 import simpleserver.Coordinate;
 import simpleserver.Player;
+import simpleserver.nbt.PlayerFile;
 
 public class Teleporter extends Bot {
 

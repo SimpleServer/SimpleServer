@@ -18,20 +18,46 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package simpleserver.command;
+package simpleserver.nbt;
 
-import simpleserver.Player;
-import simpleserver.bot.Giver;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 
-public class BotCommand extends AbstractCommand implements PlayerCommand {
-  public BotCommand() {
-    super("bot", "Spawn bot");
+public class NBTArray extends NBTag {
+  private byte[] value;
+  private int length;
+
+  NBTArray(DataInputStream in, boolean named) throws Exception {
+    super(in, named);
   }
 
-  public void execute(Player player, String message) {
-    /* if (!player.teleport(new Coordinate(0, 20, 0, Dimension.EARTH), 0, -90)) {
-       player.addMessage(Color.RED, "Teleport failed");
-     }*/
-    new Giver(player.getServer());
+  @Override
+  protected byte id() {
+    return 7;
+  }
+
+  @Override
+  byte[] get() {
+    return value;
+  }
+
+  byte get(int index) {
+    return value[index];
+  }
+
+  @Override
+  protected void loadValue(DataInputStream in) throws IOException {
+    length = in.readInt();
+    value = new byte[length];
+    for (int i = 0; i < length; i++) {
+      value[i] = in.readByte();
+    }
+  }
+
+  @Override
+  protected void saveValue(DataOutputStream out) throws IOException {
+    out.writeInt(length);
+    out.write(value);
   }
 }

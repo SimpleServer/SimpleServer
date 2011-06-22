@@ -18,44 +18,40 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package simpleserver.bot;
+package simpleserver.nbt;
 
-import java.io.File;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 
-import simpleserver.Coordinate;
-import simpleserver.Server;
-import simpleserver.bot.NBT.NBTDouble;
-import simpleserver.bot.NBT.NBTInt;
-import simpleserver.bot.NBT.NBTList;
-import simpleserver.bot.NBT.NBTag;
+public class NBTDouble extends NBTag {
+  private Double value;
 
-public class PlayerFile {
-  private String path;
-  private NBT nbt;
-
-  public PlayerFile(String name, Server server) {
-    path = server.options.get("levelName") + File.separator + "players" + File.separator + name + ".dat";
-    File file = new File(path);
-    if (file.exists()) {
-      nbt = new NBT(path);
-    } else {
-      nbt = new NBT(getClass().getResourceAsStream("template.dat"));
-    }
+  NBTDouble(DataInputStream in, boolean named) throws Exception {
+    super(in, named);
   }
 
-  public void setPosition(Coordinate coord) {
-    NBTag pos = nbt.root().find("Pos");
-    ((NBTDouble) ((NBTList) pos).get(0)).set(coord.x());
-    ((NBTDouble) ((NBTList) pos).get(1)).set(coord.y());
-    ((NBTDouble) ((NBTList) pos).get(2)).set(coord.z());
-    ((NBTInt) nbt.root().find("Dimension")).set(coord.dimension().index());
+  void set(double value) {
+    this.value = value;
   }
 
-  public void save() {
-    nbt.save(path);
+  @Override
+  protected byte id() {
+    return 6;
   }
 
-  public File file() {
-    return new File(path);
+  @Override
+  Double get() {
+    return value;
+  }
+
+  @Override
+  protected void loadValue(DataInputStream in) throws IOException {
+    value = in.readDouble();
+  }
+
+  @Override
+  protected void saveValue(DataOutputStream out) throws IOException {
+    out.writeDouble(value);
   }
 }

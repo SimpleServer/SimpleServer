@@ -18,20 +18,45 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package simpleserver.command;
+package simpleserver.nbt;
 
-import simpleserver.Player;
-import simpleserver.bot.Giver;
+import java.io.File;
+import java.io.FileNotFoundException;
 
-public class BotCommand extends AbstractCommand implements PlayerCommand {
-  public BotCommand() {
-    super("bot", "Spawn bot");
+import simpleserver.Coordinate;
+import simpleserver.Server;
+
+public class PlayerFile {
+  private String path;
+  private NBT nbt;
+
+  public PlayerFile(String name, Server server) {
+    path = server.options.get("levelName") + File.separator + "players" + File.separator + name + ".dat";
+    try {
+      nbt = new NBT(path);
+    } catch (FileNotFoundException e) {
+      nbt = new NBT(getClass().getResourceAsStream("template.dat"));
+    }
   }
 
-  public void execute(Player player, String message) {
-    /* if (!player.teleport(new Coordinate(0, 20, 0, Dimension.EARTH), 0, -90)) {
-       player.addMessage(Color.RED, "Teleport failed");
-     }*/
-    new Giver(player.getServer());
+  public void setPosition(Coordinate coord) {
+    NBTag pos = nbt.root().get("Pos");
+    ((NBTDouble) ((NBTList) pos).get(0)).set(coord.x());
+    ((NBTDouble) ((NBTList) pos).get(1)).set(coord.y());
+    ((NBTDouble) ((NBTList) pos).get(2)).set(coord.z());
+    ((NBTInt) nbt.root().get("Dimension")).set(coord.dimension().index());
+  }
+
+  public void save() {
+    nbt.save(path);
+  }
+
+  public File file() {
+    return new File(path);
+  }
+
+  @Override
+  public String toString() {
+    return nbt.toString();
   }
 }

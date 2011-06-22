@@ -40,6 +40,18 @@
       <zipfileset excludes="META-INF/**" src="lib/slf4j-nop-1.6.1.jar"/>
     </jar>
   </target>
+	
+ <target name="nbt" depends="clean">
+    <mkdir dir="release" />
+    <jar destfile="release/NBT.jar">
+      <manifest>
+        <attribute name="Main-Class" value="simpleserver.nbt.NBT"/>
+        <attribute name="Class-Path" value="."/>
+      </manifest>
+
+      <fileset dir="bin" includes="simpleserver/nbt/*"/>
+    </jar>
+  </target>
 
   <target name="create-release-zip" depends="create-release-jar">
     <zip destfile="release/SimpleServer.zip">
