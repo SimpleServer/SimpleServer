@@ -348,6 +348,30 @@ public class PermissionConfig extends AbstractConfig {
     return groups.build();
   }
 
+  public boolean canOpenChests(Player player, Coordinate coordinate) {
+    boolean allowed = true;
+    String pathpart = "/permissions/blocks/";
+
+    String permstr = config.getString(pathpart + "chests/@allow");
+    if (permstr != null && !permstr.equals("")) {
+      allowed = includesPlayer(permstr, player);
+    }
+
+    String xpath = getAreanodeForCoordinate(coordinate);
+    String[] areas = getAllAreasFromAreaXPath(xpath);
+
+    for (String area : areas) {
+      String areapath = "//area[@name='" + area + "']";
+
+      permstr = config.getString(areapath + pathpart + "chests/@allow");
+      if (permstr != null && !permstr.equals("")) {
+        allowed = includesPlayer(permstr, player);
+      }
+    }
+
+    return allowed;
+  }
+
   // replacement for BlockList.playerAllowed
   // return: [place, destroy, use, take]
   public boolean[] getPlayerBlockPermissions(Player player, Coordinate blockCoord, int bID) {
@@ -662,6 +686,7 @@ public class PermissionConfig extends AbstractConfig {
     config.addProperty(path + "[1]/permissions/blocks @allowDestroy", ";" + name);
     config.addProperty(path + "[1]/permissions/blocks @allowUse", ";" + name);
     config.addProperty(path + "[1]/permissions/blocks @allowTake", ";" + name);
+    config.addProperty(path + "[1]/permissions/blocks chests@allow", ";" + name);
 
     save();
   }
@@ -703,9 +728,17 @@ public class PermissionConfig extends AbstractConfig {
     return !config.getString("/areas/area[@owner='" + escape(name) + "']/@owner", "").equals("");
   }
 
+  public boolean commandShouldBeExecuted(String cmd) {
+    String val = config.getString("/permissions/commands/command[@name='" + escape(cmd) + "']/@forward", "");
+    if (val.equals("only")) {
+      return false;
+    }
+    return true;
+  }
+
   public boolean commandShouldPassThroughToMod(String cmd) {
     String val = config.getString("/permissions/commands/command[@name='" + escape(cmd) + "']/@forward", "");
-    if (val.equals("true")) {
+    if (val.equals("true") || val.equals("only")) {
       return true;
     }
     return false;

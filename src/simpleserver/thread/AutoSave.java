@@ -20,6 +20,7 @@
  */
 package simpleserver.thread;
 
+import static simpleserver.lang.Translations.t;
 import simpleserver.Server;
 
 public class AutoSave {
@@ -77,7 +78,7 @@ public class AutoSave {
           }
           forceSave = false;
 
-          announce(server.l.get("SAVING_MAP"));
+          announce(t("Saving Map..."));
           server.setSaving(true);
           server.runCommand("save-all", null);
           while (server.isSaving()) {

@@ -20,6 +20,8 @@
  */
 package simpleserver.stream;
 
+import static simpleserver.lang.Translations.t;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.DataInput;
@@ -36,11 +38,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import simpleserver.Authenticator.LoginRequest;
+import simpleserver.Color;
 import simpleserver.Coordinate;
 import simpleserver.Coordinate.Dimension;
 import simpleserver.Group;
 import simpleserver.Player;
 import simpleserver.Server;
+import simpleserver.Coordinate.Dimension;
 import simpleserver.command.LocalSayCommand;
 import simpleserver.command.PlayerListCommand;
 import simpleserver.config.ChestList.Chest;
@@ -278,7 +282,7 @@ public class StreamTunnel {
 
           if (player.isMuted() && !message.startsWith("/")
               && !message.startsWith("!")) {
-            player.addMessage("\u00a7cYou are muted! You may not send messages to all players.");
+            player.addTMessage(Color.RED, "You are muted! You may not send messages to all players.");
             break;
           }
 
@@ -381,11 +385,11 @@ public class StreamTunnel {
 
           boolean[] perms = server.permissions.getPlayerBlockPermissions(player, coordinate, 0);
           if (!perms[2] && status == 0) {
-            player.addMessage("\u00a7c " + server.l.get("USE_FORBIDDEN"));
+            player.addTMessage(Color.RED, "You can not use this block here!");
             break;
           }
           if (!perms[1] && status == 2) {
-            player.addMessage("\u00a7c " + server.l.get("DESTROY_FORBIDDEN"));
+            player.addTMessage(Color.RED, "You can not destroy this block!");
             break;
           }
 
@@ -445,9 +449,9 @@ public class StreamTunnel {
           // continue
         } else if ((dropItem != -1 && !perms[0]) || (dropItem == -1 && !perms[2])) {
           if (dropItem == -1) {
-            player.addMessage("\u00a7c " + server.l.get("USE_FORBIDDEN"));
+            player.addTMessage(Color.RED, "You can not use this block here!");
           } else {
-            player.addMessage("\u00a7c " + server.l.get("PLACE_FORBIDDEN"));
+            player.addTMessage(Color.RED, "You can not place this block here!");
           }
 
           writePacket = false;
@@ -482,7 +486,7 @@ public class StreamTunnel {
           Chest adjacentChest = server.chests.adjacentChest(targetBlock);
 
           if (adjacentChest != null && !adjacentChest.isOpen() && !adjacentChest.ownedBy(player)) {
-            player.addMessage("\u00a7c " + server.l.get("ADJ_CHEST_LOCKED"));
+            player.addTMessage(Color.RED, "The adjacent chest is locked!");
             writePacket = false;
             drop = true;
           } else {
@@ -705,19 +709,23 @@ public class StreamTunnel {
         byte id = in.readByte();
         byte invtype = in.readByte();
         String typeString = in.readUTF();
+        byte unknownByte = in.readByte();
         if (invtype == 0) {
-          if (server.chests.canOpen(player, player.openedChest()) || player.isAdmin()) {
+          if (!server.permissions.canOpenChests(player, player.openedChest())) {
+            player.addTMessage(Color.RED, "You can't use chests here");
+            break;
+          } else if (server.chests.canOpen(player, player.openedChest()) || player.isAdmin()) {
             if (server.chests.isLocked(player.openedChest())) {
               if (player.isAttemptingUnlock()) {
                 server.chests.unlock(player.openedChest());
                 player.setAttemptedAction(null);
-                player.addMessage("\u00a77 " + server.l.get("CHEST_UNLOCKED"));
-                typeString = "Open Chest";
+                player.addTMessage(Color.RED, "This chest is no longer locked!");
+                typeString = t("Open Chest");
               } else {
                 typeString = server.chests.chestName(player.openedChest());
               }
             } else {
-              typeString = "Open Chest";
+              typeString = t("Open Chest");
               if (player.isAttemptLock()) {
                 lockChest(player.openedChest());
                 typeString = player.nextChestName();
@@ -725,8 +733,7 @@ public class StreamTunnel {
             }
 
           } else {
-            player.addMessage("\u00a7c " + server.l.get("CHEST_LOCKED"));
-            in.readByte();
+            player.addTMessage(Color.RED, "This chest is locked!");
             break;
           }
         }
@@ -734,7 +741,7 @@ public class StreamTunnel {
         write(id);
         write(invtype);
         write8(typeString);
-        write(in.readByte());
+        write(unknownByte);
         break;
       case 0x65:
         write(packetId);
@@ -823,6 +830,7 @@ public class StreamTunnel {
         copyNBytes(5);
         break;
       case (byte) 0xe6: // ModLoaderMP by SDK
+        write(packetId);
         write(in.readInt()); // mod
         write(in.readInt()); // packet id
         copyNBytes(write(in.readInt()) * 4); // ints
@@ -881,7 +889,7 @@ public class StreamTunnel {
         server.chests.giveLock(player, coordinate, false, player.nextChestName());
       }
       player.setAttemptedAction(null);
-      player.addMessage("\u00a77This chest is now locked.");
+      player.addTMessage(Color.GRAY, "This chest is now locked.");
     } else if (!server.chests.isChest(coordinate)) {
       server.chests.addOpenChest(coordinate);
     }

@@ -20,130 +20,91 @@
  */
 package simpleserver.command;
 
-import java.util.Timer;
-import java.util.TimerTask;
-
-import simpleserver.Player;
+import static simpleserver.lang.Translations.t;
 import simpleserver.Server;
+import simpleserver.Time;
 
-public class TimeCommand extends AbstractCommand implements PlayerCommand {
-  private static final int DELAY_NIGHT = 7 * 60 * 1000;
-  private static final int DELAY_DAY = 10 * 60 * 1000;
-  private static final int DELAY = 5 * 1000;
-  private static final int DAY = 0;
-  private static final int NIGHT = 13800;
-
-  private boolean frozen = false;
-  private Player player;
-  private Server server;
-  private Timer timer;
-
+public abstract class TimeCommand extends AbstractCommand {
   public TimeCommand() {
-    super("time number|day|night|unfreeze [freeze]",
-          "Set or freeze time");
-  }
-
-  public void execute(Player player, String message) {
-    server = player.getServer();
-    this.player = player;
-
-    String[] arguments = extractArguments(message);
-
-    if (arguments.length == 0) {
-      usage();
-    } else if (arguments.length >= 1) {
-      String argument = arguments[0];
-      int time = 0;
-      if (argument.equals("day")) {
-        time = DAY;
-      } else if (argument.equals("night")) {
-        time = NIGHT;
-      } else if (argument.equals("set") || argument.equals("add")) {
-        player.addMessage("§cThis is not the standard time command.");
-        usage();
-        return;
-      } else if (argument.equals("unfreeze")) {
-        unfreeze();
-        return;
-      } else {
-        try {
-          time = Integer.parseInt(argument);
-        } catch (NumberFormatException e) {
-          player.addMessage("\u00a7cInvalid argument!");
-          usage();
-          return;
-        }
-        if (time < 0 || time > 23999) {
-          player.addMessage("\u00a7cTime must be either a value in the range 0-23999 or day/night!");
-          return;
-        }
-      }
-
-      unfreeze();
-
-      if (arguments.length < 2) {
-        setTime(time);
-      }
-
-      if (arguments.length >= 2) {
-        argument = arguments[1];
-
-        if (argument.equals("freeze")) {
-          freeze(time);
-        } else {
-          player.addMessage("\u00a7cOptional 2nd argument must be freeze!");
-        }
-      }
-    }
+    super("time [set] [number|day|night|unfreeze] [freeze]", "Set or freeze time");
   }
 
   private void usage() {
-    player.addMessage("§7Usage: " + commandPrefix() + "time 0-23999|day|night|unfreeze [freeze]");
+    info(t("Usage:") + " " + commandPrefix() +
+         "time 0-23999|day|night|unfreeze [freeze]");
   }
 
-  private void setTime(int time) {
-    long servertime = server.time();
-    server.runCommand("time", "add " + (24000 - servertime % 24000 + time));
-  }
+  public void execute(Server server, String message) {
+    Time time = server.time;
+    String[] arguments = extractArguments(message);
 
-  public void unfreeze() {
-    if (frozen && timer != null) {
-      timer.cancel();
-      frozen = false;
-
-      player.addMessage("\u00a77Time unfrozen");
-    }
-  }
-
-  private void freeze(int time) {
-    if (!frozen) {
-      frozen = true;
-      timer = new Timer();
-      int delay = DELAY;
-      if (time == DAY) {
-        delay = DELAY_DAY;
-      } else if (time == NIGHT) {
-        delay = DELAY_NIGHT;
+    if (arguments.length == 0) {
+      long servertime = time.get();
+      long realtime = (servertime + 6000) % 24000;
+      tCaptionedInfo("Current time", "%d:%d (%d)", realtime / 1000,
+                     (realtime % 1000) * 6 / 100, servertime % 24000);
+    } else if (arguments.length >= 1) {
+      int arg = 0;
+      if (arguments[arg].equals("set")) {
+        arg++;
       }
-      timer.schedule(new TimeFreezer(this, time), 0, delay);
+      String argument = arguments[arg];
+      long value;
 
-      player.addMessage("\u00a77Time frozen");
+      if (argument.equals("add")) {
+        tError("This is not the standard time command.");
+        usage();
+        return;
+      } else if (argument.equals("unfreeze")) {
+        time.unfreeze();
+        tInfo("Time unfrozen");
+        return;
+      } else if (argument.equals("freeze")) {
+        time.freeze();
+        tInfo("Time frozen");
+        return;
+      } else {
+        try {
+          value = time.parse(argument);
+        } catch (NumberFormatException e) {
+          tError("Invalid argument!");
+          usage();
+          return;
+        }
+      }
+
+      arg++;
+      if (time.unfreeze()) {
+        tInfo("Time unfrozen");
+      }
+
+      if (arguments.length <= arg) {
+        time.set(value);
+        tInfo("Time set");
+      } else {
+        argument = arguments[arg];
+
+        if (argument.equals("freeze")) {
+          time.freeze(value);
+          tInfo("Time frozen");
+        } else {
+          tError("Optional 2nd argument must be %s!", "freeze");
+        }
+      }
     }
   }
 
-  private class TimeFreezer extends TimerTask {
+  protected abstract void error(String message);
 
-    private TimeCommand parent;
-    private int freezetime;
+  protected abstract void tError(String message);
 
-    public TimeFreezer(TimeCommand parent, int time) {
-      this.parent = parent;
-      freezetime = time;
-    }
+  protected abstract void tError(String message, Object... args);
 
-    @Override
-    public void run() {
-      parent.setTime(freezetime);
-    }
-  }
+  protected abstract void info(String message);
+
+  protected abstract void tInfo(String message);
+
+  protected abstract void captionedInfo(String caption, String message, Object... args);
+
+  protected abstract void tCaptionedInfo(String caption, String message, Object... args);
 }

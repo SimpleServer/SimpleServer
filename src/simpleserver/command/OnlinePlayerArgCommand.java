@@ -20,19 +20,21 @@
  */
 package simpleserver.command;
 
+import static simpleserver.lang.Translations.t;
+import simpleserver.Color;
 import simpleserver.Player;
 
 public abstract class OnlinePlayerArgCommand extends AbstractCommand implements
     PlayerCommand {
   private final boolean playerOptional;
 
-  protected OnlinePlayerArgCommand(String name, String helpText) {
-    this(name, helpText, false);
+  protected OnlinePlayerArgCommand(String name, String commandCode) {
+    this(name, commandCode, false);
   }
 
-  protected OnlinePlayerArgCommand(String name, String helpText,
+  protected OnlinePlayerArgCommand(String name, String commandCode,
                                    boolean playerOptional) {
-    super(name, helpText + " (case-insensitive, name prefix works)");
+    super(name, commandCode);
 
     this.playerOptional = playerOptional;
   }
@@ -43,7 +45,7 @@ public abstract class OnlinePlayerArgCommand extends AbstractCommand implements
     if (arguments.length > 0) {
       Player target = player.getServer().findPlayer(arguments[0]);
       if (target == null) {
-        player.addMessage("\u00a7cPlayer not online (" + arguments[0] + ")");
+        player.addTMessage(Color.RED, "Player not online (%s)", arguments[0]);
       } else {
         executeWithTarget(player, message, target);
       }
@@ -60,6 +62,17 @@ public abstract class OnlinePlayerArgCommand extends AbstractCommand implements
                                             Player target);
 
   protected void noTargetSpecified(Player player, String message) {
-    player.addMessage("\u00a7cNo player specified.");
+    player.addTMessage(Color.RED, "No player specified.");
+  }
+
+  @Override
+  public void reloadText() {
+    if (name != null) {
+      helpText = name + "\u00a7f : " + t(commandCode) + " "
+          + t("(case-insensitive, name prefix works for online players)");
+    } else {
+      helpText = t(commandCode) + " "
+          + t("(case-insensitive, name prefix works for online players)");
+    }
   }
 }

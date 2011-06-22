@@ -20,6 +20,8 @@
  */
 package simpleserver;
 
+import static simpleserver.lang.Translations.t;
+
 import java.io.IOException;
 import java.net.BindException;
 import java.net.InetAddress;
@@ -166,6 +168,11 @@ public class Player {
 
     watchdog.setName("PlayerWatchdog-" + name);
     server.connectionLog("player", extsocket, name);
+
+    if (server.numPlayers() == 0) {
+      server.time.set();
+    }
+
     server.playerList.addPlayer(this);
     return true;
   }
@@ -221,15 +228,44 @@ public class Player {
   }
 
   public void addMessage(Color color, String format, Object... args) {
-    addMessage(color + String.format(format, args));
+    addMessage(color, String.format(format, args));
   }
 
   public void addMessage(Color color, String message) {
-    messages.add(color + message);
+    addMessage(color + message);
+  }
+
+  public void addMessage(String format, Object... args) {
+    addMessage(String.format(format, args));
+  }
+
+  public void addCaptionedMessage(String caption, String format, Object... args) {
+    addMessage("%s%s: %s%s", Color.GRAY, caption, Color.WHITE, String.format(format, args));
   }
 
   public void addMessage(String msg) {
     messages.add(msg);
+  }
+
+  public void addTMessage(Color color, String format, Object... args) {
+    addMessage(color + t(format, args));
+  }
+
+  public void addTMessage(Color color, String message) {
+    addMessage(color + t(message));
+  }
+
+  public void addTMessage(String msg) {
+    addMessage(t(msg));
+  }
+
+  public void addTCaptionedTMessage(String caption, String format, Object... args) {
+    addMessage("%s%s: %s%s", Color.GRAY, t(caption), Color.WHITE, t(format, args));
+  }
+
+  public void addTCaptionedMessage(String caption, String format, Object... args) {
+    addMessage("%s%s: %s%s", Color.GRAY, t(caption),
+               Color.WHITE, String.format(format, args));
   }
 
   public String getMessage() {
@@ -244,7 +280,7 @@ public class Player {
     while (visitreqs.size() > 0) {
       PlayerVisitRequest req = visitreqs.remove();
       if (System.currentTimeMillis() < req.timestamp + 10000 && server.findPlayerExact(req.source.getName()) != null) {
-        req.source.addMessage("\u00a77Request accepted!");
+        req.source.addTMessage(Color.GRAY, "Request accepted!");
         req.source.teleportTo(this);
       }
     }
@@ -340,6 +376,10 @@ public class Player {
     return z;
   }
 
+  public Coordinate position() {
+    return new Coordinate((int) x, (int) y, (int) z, dimension);
+  }
+
   public void setLocalChat(boolean mode) {
     localChat = mode;
   }
@@ -364,11 +404,13 @@ public class Player {
     boolean invalidCommand = command.getName() == null;
 
     if (!invalidCommand && !commandAllowed(command.getName())) {
-      addMessage("\u00a7cInsufficient permission.");
+      addTMessage(Color.RED, "Insufficient permission.");
       return true;
     }
 
-    command.execute(this, message);
+    if (server.permissions.commandShouldBeExecuted(command.getName())) {
+      command.execute(this, message);
+    }
     lastCommand = message;
 
     return !((server.permissions.commandShouldPassThroughToMod(command.getName())
@@ -407,11 +449,11 @@ public class Player {
       item = Integer.parseInt(rawItem);
 
       if (item < 0) {
-        addMessage("\u00a7cItem ID must be positive!");
+        addTMessage(Color.RED, "Item ID must be positive!");
         success = false;
       }
     } catch (NumberFormatException e) {
-      addMessage("\u00a7cItem ID must map to a number!");
+      addTMessage(Color.RED, "Item ID must map to a number!");
       success = false;
     }
 
@@ -421,17 +463,17 @@ public class Player {
         amount = Integer.parseInt(rawAmount);
 
         if ((amount < 1) || (amount > 1000)) {
-          addMessage("\u00a7cAmount must be within 1-1000!");
+          addTMessage(Color.RED, "Amount must be within 1-1000!");
           success = false;
         }
       } catch (NumberFormatException e) {
-        addMessage("\u00a7cAmount must be a number!");
+        addTMessage(Color.RED, "Amount must be a number!");
         success = false;
       }
     }
 
     if (!success) {
-      addMessage("\u00a7cUnable to give " + rawItem);
+      addTMessage(Color.RED, "Unable to give %s", rawItem);
       return false;
     }
 

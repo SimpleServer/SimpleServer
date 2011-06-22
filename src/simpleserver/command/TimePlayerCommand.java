@@ -20,23 +20,50 @@
  */
 package simpleserver.command;
 
+import static simpleserver.lang.Translations.t;
 import simpleserver.Color;
 import simpleserver.Player;
-import simpleserver.Server;
 
-public class BackupCommand extends AbstractCommand implements PlayerCommand,
-    ServerCommand {
-  public BackupCommand() {
-    super("backup", "Backup the map");
+public class TimePlayerCommand extends TimeCommand implements PlayerCommand {
+  private Player player;
+
+  public synchronized void execute(Player player, String message) {
+    this.player = player;
+    execute(player.getServer(), message);
   }
 
-  public void execute(Player player, String message) {
-    player.addTMessage(Color.GRAY, "Forcing backup!");
-    player.getServer().forceBackup();
+  @Override
+  protected void captionedInfo(String caption, String message, Object... args) {
+    player.addCaptionedMessage(caption, message, args);
   }
 
-  public void execute(Server server, String message) {
-    System.out.println("Forcing backup!");
-    server.forceBackup();
+  @Override
+  protected void error(String message) {
+    player.addMessage(Color.RED, message);
+  }
+
+  @Override
+  protected void info(String message) {
+    player.addMessage(Color.GRAY, message);
+  }
+
+  @Override
+  protected void tCaptionedInfo(String caption, String message, Object... args) {
+    captionedInfo(t(caption), message, args);
+  }
+
+  @Override
+  protected void tError(String message) {
+    error(t(message));
+  }
+
+  @Override
+  protected void tError(String message, Object... args) {
+    error(t(message, args));
+  }
+
+  @Override
+  protected void tInfo(String message) {
+    info(t(message));
   }
 }

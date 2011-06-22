@@ -20,6 +20,8 @@
  */
 package simpleserver.thread;
 
+import static simpleserver.lang.Translations.t;
+
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -72,7 +74,7 @@ public class AutoBackup {
     if (server.options.getBoolean("announceBackup")) {
       System.out.println("[SimpleServer] Backing up server...");
     }
-    announce(server.l.get("BACKING_UP"));
+    announce(t("Backing up..."));
     server.runCommand("save-off", null);
 
     File copy;
@@ -85,7 +87,7 @@ public class AutoBackup {
       deleteRecursively(TEMP_DIRECTORY);
     }
     purgeOldBackups();
-    announce(server.l.get("BACKUP_COMPLETE"));
+    announce(t("Backup Complete!"));
   }
 
   public void announce(String message) {
@@ -241,7 +243,7 @@ public class AutoBackup {
           forceBackup = false;
 
           if (server.options.getBoolean("announceSave")) {
-            server.runCommand("say", server.l.get("SAVING_MAP"));
+            server.runCommand("say", t("Saving Map..."));
           }
           server.setSaving(true);
           server.runCommand("save-all", null);

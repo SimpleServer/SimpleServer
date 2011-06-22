@@ -20,6 +20,7 @@
  */
 package simpleserver.command;
 
+import simpleserver.Color;
 import simpleserver.Player;
 
 public class UnbanIPCommand extends AbstractCommand implements PlayerCommand {
@@ -33,12 +34,11 @@ public class UnbanIPCommand extends AbstractCommand implements PlayerCommand {
     if (arguments.length >= 1) {
       player.getServer().ipBans.removeBan(arguments[0]);
 
-      player.getServer().adminLog("User " + player.getName()
-                                      + " unbanned ip:\t " + arguments[0]);
-      player.addMessage("\u00a77IP Address " + arguments[0]
-          + " has been unbanned!");
+      player.getServer().adminLog("User " + player.getName() +
+                                  " unbanned IP:\t " + arguments[0]);
+      player.addTMessage(Color.GRAY, "IP Address %s has been unbanned.", arguments[0]);
     } else {
-      player.addMessage("\u00a7cNo IP specified.");
+      player.addTMessage(Color.RED, "No IP specified.");
     }
   }
 }

@@ -33,6 +33,5 @@ public class ExternalCommand extends AbstractCommand implements PlayerCommand {
   }
 
   public void execute(Player player, String message) {
-
   }
 }

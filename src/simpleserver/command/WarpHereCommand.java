@@ -20,6 +20,7 @@
  */
 package simpleserver.command;
 
+import simpleserver.Color;
 import simpleserver.Player;
 
 public class WarpHereCommand extends OnlinePlayerArgCommand {
@@ -36,8 +37,8 @@ public class WarpHereCommand extends OnlinePlayerArgCommand {
                                       + target.getName() + "\tto\t"
                                       + player.getName());
     } else {
-      player.addMessage("\u00a7cYou and " + target.getName() + " are in different dimensions.");
-      player.addMessage("\u00a7cNo teleport possible!");
+      player.addTMessage(Color.RED, "You and %s are in different dimensions.", target.getName());
+      player.addTMessage(Color.RED, "No teleport possible!");
     }
   }
 }

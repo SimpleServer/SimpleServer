@@ -18,10 +18,41 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package simpleserver.options;
+package simpleserver.command;
 
-public class Language extends AbstractOptions {
-  public Language() {
-    super("language.properties");
+public class TimeServerCommand extends TimeCommand implements ServerCommand {
+  @Override
+  protected void captionedInfo(String caption, String message, Object... args) {
+    System.out.println("[SimpleServer] " + caption + ": " + String.format(message, args));
+  }
+
+  @Override
+  protected void error(String message) {
+    System.out.println("[SimpleServer] Error: " + message);
+  }
+
+  @Override
+  protected void info(String message) {
+    System.out.println("[SimpleServer] " + message);
+  }
+
+  @Override
+  protected void tCaptionedInfo(String caption, String message, Object... args) {
+    captionedInfo(caption, message, args);
+  }
+
+  @Override
+  protected void tError(String message) {
+    error(message);
+  }
+
+  @Override
+  protected void tError(String message, Object... args) {
+    error(String.format(message, args));
+  }
+
+  @Override
+  protected void tInfo(String message) {
+    info(message);
   }
 }

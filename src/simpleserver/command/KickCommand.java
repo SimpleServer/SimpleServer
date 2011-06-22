@@ -20,6 +20,8 @@
  */
 package simpleserver.command;
 
+import static simpleserver.lang.Translations.t;
+import simpleserver.Color;
 import simpleserver.Player;
 
 public class KickCommand extends OnlinePlayerArgCommand {
@@ -31,20 +33,18 @@ public class KickCommand extends OnlinePlayerArgCommand {
   protected void executeWithTarget(Player player, String message, Player target) {
     String reason = extractArgument(message, 1);
     if (reason == null) {
-      reason = "Kicked by admin.";
+      reason = t("Kicked by admin.");
     }
 
     target.kick(reason);
-    player.getServer().adminLog("Admin " + player.getName()
-                                    + " kicked player:\t " + target.getName()
-                                    + "\t(" + reason + ")");
-    player.getServer().runCommand("say",
-                                  "Player " + target.getName()
-                                      + " has been kicked! (" + reason + ")");
+    player.getServer().adminLog("Admin " + player.getName() + " kicked player:\t " +
+        target.getName() + "\t(" + reason + ")");
+    String msg = t("Player %s has been kicked! (%s)", target.getName(), reason);
+    player.getServer().runCommand("say", msg);
   }
 
   @Override
   protected void noTargetSpecified(Player player, String message) {
-    player.addMessage("\u00a7cNo player or reason specified.");
+    player.addTMessage(Color.RED, "No player or reason specified.");
   }
 }

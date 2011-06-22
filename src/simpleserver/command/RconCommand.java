@@ -20,12 +20,12 @@
  */
 package simpleserver.command;
 
+import simpleserver.Color;
 import simpleserver.Player;
 
 public class RconCommand extends AbstractCommand implements PlayerCommand {
   public RconCommand() {
-    super("rcon COMMAND ARGUMENTS...",
-          "Execute a command on the server console");
+    super("rcon COMMAND ARGUMENTS...", "Execute a command on the server console");
   }
 
   public void execute(Player player, String message) {
@@ -36,7 +36,7 @@ public class RconCommand extends AbstractCommand implements PlayerCommand {
       player.getServer().adminLog("User " + player.getName() + " used rcon:\t"
                                       + arguments[0] + "\t" + commandArguments);
     } else {
-      player.addMessage("\u00a7cNo rcon command specified.");
+      player.addTMessage(Color.RED, "No rcon command specified.");
     }
   }
 }

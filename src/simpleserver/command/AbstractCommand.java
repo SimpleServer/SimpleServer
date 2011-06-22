@@ -20,26 +20,29 @@
  */
 package simpleserver.command;
 
+import static simpleserver.lang.Translations.t;
 import simpleserver.CommandParser;
 
 public abstract class AbstractCommand implements Command {
-  private final String name;
-  private final String helpText;
+  protected final String name;
+  protected final String commandCode;
+  protected String helpText;
   protected CommandParser parser;
 
-  protected AbstractCommand(String name, String helpText) {
+  protected AbstractCommand(String name, String commandCode) {
     if (name != null) {
-      this.helpText = name + "\u00a7f : " + helpText;
+      helpText = name + "\u00a7f : " + t(commandCode);
 
       int splitIndex = name.indexOf(" ");
       if (splitIndex != -1) {
         name = name.substring(0, splitIndex);
       }
     } else {
-      this.helpText = helpText;
+      helpText = t(commandCode);
     }
 
     this.name = name;
+    this.commandCode = commandCode;
   }
 
   public String getName() {
@@ -90,6 +93,14 @@ public abstract class AbstractCommand implements Command {
       return parser.commandPrefix();
     } else {
       return "!";
+    }
+  }
+
+  public void reloadText() {
+    if (name != null) {
+      helpText = name + "\u00a7f : " + t(commandCode);
+    } else {
+      helpText = t(commandCode);
     }
   }
 

@@ -1,7 +1,11 @@
 == 8.2 ==
  * added ModLoaderMP support
+ * added global and area-based chest usage permission
  * added announceRestart, announceSave options
+ * added forward=only possibility for commands
+ * changed time command to support with vanilla syntax
  * fixed !myarea unsave
+ * fixed kits with amount being multiple of 64
 
 == 8.1 ==
  * Update for Minecraft Beta 1.6
