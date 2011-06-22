@@ -37,7 +37,7 @@ public class Herobrine extends Bot {
   @Override
   protected void ready() throws IOException {
     super.ready();
-    timer.schedule(new LookAround(), 0, 100);
+    timer.schedule(new GhostWalk(), 0, 100);
   }
 
   @Override
@@ -59,7 +59,7 @@ public class Herobrine extends Bot {
     super.die();
   }
 
-  private final class LookAround extends TimerTask {
+  private final class GhostWalk extends TimerTask {
     private float t = 0;
     private float vt = 0;
 
@@ -73,9 +73,13 @@ public class Herobrine extends Bot {
         if (vt > 3 || vt < -3) {
           vt = 0;
         }
-        sendPosition();
+        writeLock.lock();
+        if (!dead) {
+          sendPosition();
+        }
+        writeLock.unlock();
       } catch (IOException e) {
-        error("LookAround failed");
+        error("GhostWalk failed");
       }
     }
   }

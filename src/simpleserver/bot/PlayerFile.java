@@ -34,7 +34,7 @@ public class PlayerFile {
   private NBT nbt;
 
   public PlayerFile(String name, Server server) {
-    path = server.options.get("levelName") + "/players/" + name + ".dat";
+    path = server.options.get("levelName") + File.separator + "players" + File.separator + name + ".dat";
     File file = new File(path);
     if (file.exists()) {
       nbt = new NBT(path);

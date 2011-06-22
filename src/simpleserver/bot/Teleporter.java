@@ -58,6 +58,8 @@ public class Teleporter extends Bot {
   @Override
   protected void ready() throws IOException {
     super.ready();
+    position.updateLook(yaw, pitch);
+    sendPosition();
     server.runCommand("tp", player.getName() + " " + name);
     timer.schedule(new Logout(), 3000);
   }
@@ -65,22 +67,6 @@ public class Teleporter extends Bot {
   @Override
   protected void handlePacket(byte packetId) throws IOException {
     switch (packetId) {
-      case 0x0d: // Player Position & Look
-        out.writeByte(packetId);
-        out.writeDouble(in.readDouble());
-        double stance = in.readDouble();
-        out.writeDouble(in.readDouble());
-        out.writeDouble(stance);
-        out.writeDouble(in.readDouble());
-        in.readFloat();
-        in.readFloat();
-        out.writeFloat(yaw);
-        out.writeFloat(pitch);
-        out.writeBoolean(in.readBoolean());
-        if (!ready) {
-          ready();
-        }
-        break;
       default:
         super.handlePacket(packetId);
     }
@@ -90,11 +76,6 @@ public class Teleporter extends Bot {
   protected void die() {
     timer.cancel();
     super.die();
-    if (controller != null) {
-      controller.trash(dat.file());
-    } else {
-      dat.file().delete();
-    }
   }
 
   @Override

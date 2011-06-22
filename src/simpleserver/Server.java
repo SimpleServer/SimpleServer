@@ -30,7 +30,6 @@ import java.util.List;
 import java.util.concurrent.Semaphore;
 
 import simpleserver.bot.BotController;
-import simpleserver.bot.Herobrine;
 import simpleserver.config.ChestList;
 import simpleserver.config.GiveAliasList;
 import simpleserver.config.HelpText;
@@ -365,6 +364,7 @@ public class Server {
     errorLog.stop();
     connectionLog.stop();
     time.unfreeze();
+    bots.cleanup();
   }
 
   private void startup() {
@@ -411,14 +411,14 @@ public class Server {
       }
     }
 
-    bots.connect(new Herobrine(this));
+    bots.ready();
   }
 
   private void shutdown() {
     System.out.println("[SimpleServer] Stopping Server...");
     save = false;
 
-    bots.cleanup();
+    bots.stop();
 
     if (!saveLock.tryAcquire()) {
       System.out.println("[SimpleServer] Server is currently Backing Up/Saving...");

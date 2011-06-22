@@ -22,10 +22,14 @@ package simpleserver.bot;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import simpleserver.Server;
 
@@ -33,6 +37,7 @@ public class BotController {
   private Server server;
   private Map<String, Bot> bots;
   private List<File> garbage;
+  private Timer timer;
 
   public BotController(Server server) {
     this.server = server;
@@ -54,11 +59,33 @@ public class BotController {
 
   }
 
+  public void ready() {
+    spawnAt(Calendar.APRIL, 1);
+    spawnAt(Calendar.JUNE, 1);
+    spawnAt(Calendar.OCTOBER, 31);
+  }
+
+  public void spawnAt(int spawnMonth, int spawnDay) {
+    Calendar now = new GregorianCalendar();
+    Calendar spawn = new GregorianCalendar(now.get(Calendar.YEAR), spawnMonth, spawnDay);
+    int month = now.get(Calendar.MONTH);
+    int day = now.get(Calendar.DAY_OF_MONTH);
+    if (month == spawnMonth && day == spawnDay) {
+      connect(new Herobrine(server));
+    } else if (spawn.compareTo(now) > 0) {
+      now.set(Calendar.DAY_OF_MONTH, day + 5);
+      if (spawn.compareTo(now) < 0) {
+        timer = new Timer();
+        timer.schedule(new HerobrineSpawner(), spawn.getTime());
+      }
+    }
+  }
+
   void remove(Bot bot) {
     bots.remove(bot.name);
   }
 
-  public void cleanup() {
+  public void stop() {
     for (Bot bot : bots.values()) {
       try {
         bot.logout();
@@ -66,6 +93,12 @@ public class BotController {
         System.out.println("[SimpleServer] Couldn't stop bot <" + bot.name + "> (" + bot.getClass().getSimpleName() + ")");
       }
     }
+    if (timer != null) {
+      timer.cancel();
+    }
+  }
+
+  public void cleanup() {
     for (File file : garbage) {
       file.delete();
     }
@@ -82,6 +115,13 @@ public class BotController {
 
   void trash(File file) {
     garbage.add(file);
+  }
+
+  private class HerobrineSpawner extends TimerTask {
+    @Override
+    public void run() {
+      connect(new Herobrine(server));
+    }
   }
 
 }

@@ -24,6 +24,7 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
@@ -46,6 +47,7 @@ public class Bot {
   private boolean connected;
   private boolean expectDisconnect;
   protected boolean ready;
+  protected boolean dead;
 
   private Socket socket;
   protected DataInputStream in;
@@ -54,11 +56,8 @@ public class Bot {
   private Timer timer;
   ReentrantLock writeLock;
   protected Position position;
-
   protected BotController controller;
-
   private byte lastPacket;
-
   private short health;
 
   public Bot(Server server, String name) {
@@ -92,7 +91,7 @@ public class Bot {
     return false;
   }
 
-  protected void positionUpdate(double x, double y, double z) throws IOException {
+  protected void positionUpdate() throws IOException {
   }
 
   private void handshake() throws IOException {
@@ -153,6 +152,10 @@ public class Bot {
     writeLock.unlock();
   }
 
+  protected boolean trashdat() {
+    return true;
+  }
+
   protected void handlePacket(byte packetId) throws IOException {
     switch (packetId) {
       case 0x2:
@@ -173,14 +176,27 @@ public class Bot {
         float yaw = in.readFloat();
         float pitch = in.readFloat();
         boolean onGround = in.readBoolean();
-        positionUpdate(x, y, z);
         position.updatePosition(x, y, z, stance);
         position.updateLook(yaw, pitch);
         position.updateGround(onGround);
-        sendPosition();
         if (!ready) {
+          sendPosition();
           ready();
+        } else if (dead) {
+          sendPosition();
+          dead = false;
         }
+        positionUpdate();
+        break;
+      case 0x0b: // Player Position
+        double x2 = in.readDouble();
+        double stance2 = in.readDouble();
+        double y2 = in.readDouble();
+        double z2 = in.readDouble();
+        boolean onGround2 = in.readBoolean();
+        position.updatePosition(x2, y2, z2, stance2);
+        position.updateGround(onGround2);
+        positionUpdate();
         break;
       case (byte) 0xff: // Disconnect/Kick
         String reason = readUTF16();
@@ -213,6 +229,7 @@ public class Bot {
       case 0x08: // Update Health
         health = in.readShort();
         if (health <= 0) {
+          dead = true;
           respawn();
         }
         break;
@@ -221,9 +238,6 @@ public class Bot {
         break;
       case 0x0a: // Player
         in.readByte();
-        break;
-      case 0x0b: // Player Position
-        readNBytes(33);
         break;
       case 0x0c: // Player Look
         readNBytes(9);
@@ -536,6 +550,14 @@ public class Bot {
     if (controller != null) {
       controller.remove(this);
     }
+    if (trashdat()) {
+      File dat = new File(server.options.get("levelName") + File.separator + "players" + File.separator + name + ".dat");
+      if (controller != null) {
+        controller.trash(dat);
+      } else {
+        dat.delete();
+      }
+    }
   }
 
   protected void error(String reason) {
@@ -636,6 +658,14 @@ public class Bot {
 
     public double z() {
       return z;
+    }
+
+    public double stance() {
+      return stance;
+    }
+
+    public float yaw() {
+      return yaw;
     }
   }
 }
