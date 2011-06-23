@@ -22,7 +22,7 @@ package simpleserver.nbt;
 
 import java.io.DataInputStream;
 
-public enum NBTag {
+public enum NBT {
   END(NBTEnd.class),
   BYTE(NBTByte.class),
   SHORT(NBTShort.class),
@@ -35,9 +35,9 @@ public enum NBTag {
   LIST(NBTList.class),
   COMPOUND(NBTCompound.class);
 
-  private Class<? extends AbstractNBTag> c;
+  private Class<? extends NBTag> c;
 
-  NBTag(Class<? extends AbstractNBTag> c) {
+  NBT(Class<? extends NBTag> c) {
     this.c = c;
   }
 
@@ -45,11 +45,11 @@ public enum NBTag {
     return (byte) ordinal();
   }
 
-  protected static AbstractNBTag loadTag(DataInputStream in, boolean named) throws Exception {
+  protected static NBTag loadTag(DataInputStream in, boolean named) throws Exception {
     return loadTag(in, named, in.readByte());
   }
 
-  protected static AbstractNBTag loadTag(DataInputStream in, boolean named, byte type) throws Exception {
+  protected static NBTag loadTag(DataInputStream in, boolean named, byte type) throws Exception {
     if (type < 0 || type > 10) {
       throw new Exception("Unknown NBT type");
     }

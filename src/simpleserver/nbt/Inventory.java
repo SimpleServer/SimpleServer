@@ -52,7 +52,7 @@ public class Inventory {
   }
 
   public NBTList<NBTCompound> nbt() {
-    NBTList<NBTCompound> list = new NBTList<NBTCompound>("Inventory", NBTag.COMPOUND);
+    NBTList<NBTCompound> list = new NBTList<NBTCompound>("Inventory", NBT.COMPOUND);
     for (byte slot : slots.keySet()) {
       NBTCompound tag = slots.get(slot).compound();
       tag.put(new NBTByte("Slot", slot));

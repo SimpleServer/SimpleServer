@@ -24,7 +24,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-public class NBTDouble extends AbstractNBTag {
+public class NBTDouble extends NBTag {
   private Double value;
 
   NBTDouble(DataInputStream in, Boolean named) throws Exception {

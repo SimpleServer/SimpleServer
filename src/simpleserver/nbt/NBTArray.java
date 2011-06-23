@@ -24,7 +24,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-public class NBTArray extends AbstractNBTag {
+public class NBTArray extends NBTag {
   private byte[] value;
 
   NBTArray(DataInputStream in, Boolean named) throws Exception {

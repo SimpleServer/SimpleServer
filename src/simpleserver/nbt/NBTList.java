@@ -26,7 +26,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class NBTList<T extends AbstractNBTag> extends AbstractNBTag {
+public class NBTList<T extends NBTag> extends NBTag {
   private ArrayList<T> value;
   private byte tagId;
 
@@ -39,7 +39,7 @@ public class NBTList<T extends AbstractNBTag> extends AbstractNBTag {
     value = new ArrayList<T>();
   }
 
-  public NBTList(NBTag tag) {
+  public NBTList(NBT tag) {
     this(tag.id());
   }
 
@@ -49,7 +49,7 @@ public class NBTList<T extends AbstractNBTag> extends AbstractNBTag {
     value = new ArrayList<T>();
   }
 
-  public NBTList(String name, NBTag tag) {
+  public NBTList(String name, NBT tag) {
     this(name, tag.id());
   }
 
@@ -110,8 +110,8 @@ public class NBTList<T extends AbstractNBTag> extends AbstractNBTag {
   }
 
   @SuppressWarnings("unchecked")
-  public NBTList<AbstractNBTag> getList(int index) {
-    return (NBTList<AbstractNBTag>) value.get(index);
+  public NBTList<NBTag> getList(int index) {
+    return (NBTList<NBTag>) value.get(index);
   }
 
   public NBTCompound getCompound(int index) {
@@ -125,7 +125,7 @@ public class NBTList<T extends AbstractNBTag> extends AbstractNBTag {
     int length = in.readInt();
     value = new ArrayList<T>(length);
     for (int i = 0; i < length; i++) {
-      value.add((T) NBTag.loadTag(in, false, tagId));
+      value.add((T) NBT.loadTag(in, false, tagId));
     }
   }
 
@@ -133,7 +133,7 @@ public class NBTList<T extends AbstractNBTag> extends AbstractNBTag {
   protected void saveValue(DataOutputStream out) throws IOException {
     out.writeByte(tagId);
     out.writeInt(size());
-    for (AbstractNBTag tag : value) {
+    for (NBTag tag : value) {
       tag.save(out, false);
     }
   }
@@ -142,7 +142,7 @@ public class NBTList<T extends AbstractNBTag> extends AbstractNBTag {
   protected String valueToString(int level) {
     StringBuilder string = new StringBuilder();
     string.append("[\n");
-    for (AbstractNBTag tag : value) {
+    for (NBTag tag : value) {
       string.append(tag.toString(level + 1) + "\n");
     }
     string.append(indent(level));

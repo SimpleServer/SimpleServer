@@ -29,19 +29,19 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-public class NBT {
+public class NBTFile {
 
   private NBTCompound root;
 
-  NBT() {
+  NBTFile() {
     root = new NBTCompound("");
   }
 
-  NBT(String filename) throws FileNotFoundException {
+  NBTFile(String filename) throws FileNotFoundException {
     this(new FileInputStream(filename));
   }
 
-  NBT(InputStream input) {
+  NBTFile(InputStream input) {
     load(input);
   }
 
@@ -51,7 +51,7 @@ public class NBT {
 
   private void load(InputStream input) {
     try {
-      root = AbstractNBTag.load(new DataInputStream(input));
+      root = NBTag.load(new DataInputStream(input));
     } catch (Exception e) {
       e.printStackTrace();
     }
@@ -79,10 +79,10 @@ public class NBT {
   public static void main(String[] args) {
     try {
       if (args.length >= 2 && args[0].equals("raw")) {
-        System.out.println(new NBT(args[1]));
+        System.out.println(new NBTFile(args[1]));
       } else if (args.length >= 1) {
 
-        System.out.println(new GZipNBT(args[0]));
+        System.out.println(new GZipNBTFile(args[0]));
 
       } else {
         System.out.println("Usage: java -jar NBT.jar [raw] <file>");

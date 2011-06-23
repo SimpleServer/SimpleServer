@@ -28,7 +28,7 @@ import simpleserver.Server;
 
 public class PlayerFile {
   private String filename;
-  private NBT nbt;
+  private NBTFile nbt;
 
   public PlayerFile(String name, Server server) {
     this(server.options.get("levelName") + File.separator + "players" + File.separator + name + ".dat");
@@ -37,10 +37,10 @@ public class PlayerFile {
   public PlayerFile(String filename) {
     this.filename = filename;
     try {
-      nbt = new GZipNBT(filename);
+      nbt = new GZipNBTFile(filename);
     } catch (Exception e) {
       try {
-        nbt = new GZipNBT(getClass().getResourceAsStream("template.dat"));
+        nbt = new GZipNBTFile(getClass().getResourceAsStream("template.dat"));
       } catch (IOException e1) {
 
       }
@@ -48,7 +48,7 @@ public class PlayerFile {
   }
 
   public void setPosition(Coordinate coord) {
-    NBTList<NBTDouble> pos = new NBTList<NBTDouble>("Pos", NBTag.DOUBLE);
+    NBTList<NBTDouble> pos = new NBTList<NBTDouble>("Pos", NBT.DOUBLE);
 
     pos.add(new NBTDouble(coord.x()));
     pos.add(new NBTDouble(coord.y()));

@@ -24,7 +24,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-public class NBTInt extends AbstractNBTag {
+public class NBTInt extends NBTag {
   private Integer value;
 
   NBTInt(DataInputStream in, Boolean named) throws Exception {

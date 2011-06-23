@@ -29,12 +29,12 @@ import java.io.OutputStream;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
-public class GZipNBT extends NBT {
-  GZipNBT(String filename) throws IOException {
+public class GZipNBTFile extends NBTFile {
+  GZipNBTFile(String filename) throws IOException {
     super(new GZIPInputStream(new FileInputStream(filename)));
   }
 
-  public GZipNBT(InputStream in) throws IOException {
+  public GZipNBTFile(InputStream in) throws IOException {
     super(new GZIPInputStream(in));
   }
 

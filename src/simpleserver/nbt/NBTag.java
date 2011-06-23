@@ -24,11 +24,11 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-abstract class AbstractNBTag {
+abstract class NBTag {
   protected NBTString name;
   protected boolean named;
 
-  protected AbstractNBTag(DataInputStream in, boolean named) throws Exception {
+  protected NBTag(DataInputStream in, boolean named) throws Exception {
     if (named) {
       name = new NBTString(in, false);
     }
@@ -36,11 +36,11 @@ abstract class AbstractNBTag {
     loadValue(in);
   }
 
-  protected AbstractNBTag() {
+  protected NBTag() {
     named = false;
   }
 
-  protected AbstractNBTag(String name) {
+  protected NBTag(String name) {
     this.name = new NBTString(name);
     named = true;
   }
@@ -100,7 +100,7 @@ abstract class AbstractNBTag {
   }
 
   static NBTCompound load(DataInputStream in) throws Exception {
-    AbstractNBTag root = NBTag.loadTag(in, true);
+    NBTag root = NBT.loadTag(in, true);
     if (!(root instanceof NBTCompound)) {
       throw new Exception("NBT stream has the wrong format");
     }

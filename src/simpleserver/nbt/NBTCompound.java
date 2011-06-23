@@ -25,8 +25,8 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
 
-public class NBTCompound extends AbstractNBTag {
-  private HashMap<String, AbstractNBTag> value;
+public class NBTCompound extends NBTag {
+  private HashMap<String, NBTag> value;
 
   NBTCompound(DataInputStream in, Boolean named) throws Exception {
     super(in, named);
@@ -34,11 +34,11 @@ public class NBTCompound extends AbstractNBTag {
 
   public NBTCompound(String name) {
     super(name);
-    value = new HashMap<String, AbstractNBTag>();
+    value = new HashMap<String, NBTag>();
   }
 
   public NBTCompound() {
-    value = new HashMap<String, AbstractNBTag>();
+    value = new HashMap<String, NBTag>();
   }
 
   @Override
@@ -47,7 +47,7 @@ public class NBTCompound extends AbstractNBTag {
   }
 
   @Override
-  HashMap<String, AbstractNBTag> get() {
+  HashMap<String, NBTag> get() {
     return value;
   }
 
@@ -55,11 +55,11 @@ public class NBTCompound extends AbstractNBTag {
     return value.containsKey(name);
   }
 
-  public AbstractNBTag get(String name) {
+  public NBTag get(String name) {
     return value.get(name);
   }
 
-  public void put(AbstractNBTag tag) {
+  public void put(NBTag tag) {
     value.put(tag.name.get(), tag);
   }
 
@@ -100,8 +100,8 @@ public class NBTCompound extends AbstractNBTag {
   }
 
   @SuppressWarnings("unchecked")
-  public NBTList<AbstractNBTag> getList(String name) {
-    return (NBTList<AbstractNBTag>) value.get(name);
+  public NBTList<NBTag> getList(String name) {
+    return (NBTList<NBTag>) value.get(name);
   }
 
   public NBTCompound getCompound(String name) {
@@ -110,9 +110,9 @@ public class NBTCompound extends AbstractNBTag {
 
   @Override
   protected void loadValue(DataInputStream in) throws Exception {
-    value = new HashMap<String, AbstractNBTag>();
+    value = new HashMap<String, NBTag>();
     while (true) {
-      AbstractNBTag tag = NBTag.loadTag(in, true);
+      NBTag tag = NBT.loadTag(in, true);
       if (tag instanceof NBTEnd) {
         break;
       }
@@ -122,7 +122,7 @@ public class NBTCompound extends AbstractNBTag {
 
   @Override
   protected void saveValue(DataOutputStream out) throws IOException {
-    for (AbstractNBTag tag : value.values()) {
+    for (NBTag tag : value.values()) {
       tag.save(out);
     }
     new NBTEnd().save(out);
@@ -132,7 +132,7 @@ public class NBTCompound extends AbstractNBTag {
   protected String valueToString(int level) {
     StringBuilder string = new StringBuilder();
     string.append("{\n");
-    for (AbstractNBTag tag : value.values()) {
+    for (NBTag tag : value.values()) {
       string.append(tag.toString(level + 1) + "\n");
     }
     string.append(indent(level));

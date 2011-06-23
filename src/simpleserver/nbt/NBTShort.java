@@ -24,7 +24,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-public class NBTShort extends AbstractNBTag {
+public class NBTShort extends NBTag {
   private Short value;
 
   NBTShort(DataInputStream in, Boolean named) throws Exception {

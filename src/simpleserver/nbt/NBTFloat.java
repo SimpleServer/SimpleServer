@@ -24,7 +24,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-public class NBTFloat extends AbstractNBTag {
+public class NBTFloat extends NBTag {
   private Float value;
 
   NBTFloat(DataInputStream in, Boolean named) throws Exception {
