@@ -21,43 +21,89 @@
 package simpleserver.nbt;
 
 import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 
-public enum NBTag {
-  END(NBTEnd.class),
-  BYTE(NBTByte.class),
-  SHORT(NBTShort.class),
-  INT(NBTInt.class),
-  LONG(NBTLong.class),
-  FLOAT(NBTFloat.class),
-  DOUBLE(NBTDouble.class),
-  ARRAY(NBTArray.class),
-  STRING(NBTString.class),
-  LIST(NBTList.class),
-  COMPOUND(NBTCompound.class);
+abstract class AbstractNBTag {
+  protected NBTString name;
+  protected boolean named;
 
-  private Class<? extends AbstractNBTag> c;
-
-  NBTag(Class<? extends AbstractNBTag> c) {
-    this.c = c;
-  }
-
-  public byte id() {
-    return (byte) ordinal();
-  }
-
-  protected static AbstractNBTag loadTag(DataInputStream in, boolean named) throws Exception {
-    return loadTag(in, named, in.readByte());
-  }
-
-  protected static AbstractNBTag loadTag(DataInputStream in, boolean named, byte type) throws Exception {
-    if (type < 0 || type > 10) {
-      throw new Exception("Unknown NBT type");
+  protected AbstractNBTag(DataInputStream in, boolean named) throws Exception {
+    if (named) {
+      name = new NBTString(in, false);
     }
-    try {
-      return values()[type].c.getDeclaredConstructor(DataInputStream.class, Boolean.class).newInstance(in, named);
-    } catch (Exception e) {
-      throw new Exception("Something went horribly wrong: " + e.getMessage());
-    }
+    this.named = named;
+    loadValue(in);
   }
 
+  protected AbstractNBTag() {
+    named = false;
+  }
+
+  protected AbstractNBTag(String name) {
+    this.name = new NBTString(name);
+    named = true;
+  }
+
+  protected abstract byte id();
+
+  abstract Object get();
+
+  void save(DataOutputStream out) throws IOException {
+    save(out, true);
+  }
+
+  protected void save(DataOutputStream out, boolean tagId) throws IOException {
+    if (tagId) {
+      out.writeByte(id());
+    }
+    if (named) {
+      name.save(out, false);
+    }
+    saveValue(out);
+  }
+
+  protected void saveValue(DataOutputStream out) throws IOException {
+  }
+
+  protected void loadValue(DataInputStream in) throws Exception {
+  }
+
+  protected String toString(int level) {
+    StringBuilder builder = indent(level);
+    if (named && name.get().length() > 0) {
+      builder.append(name.get());
+      builder.append(": ");
+    }
+    builder.append(valueToString(level));
+    builder.append(" (");
+    builder.append(getClass().getSimpleName());
+    builder.append(")");
+    return builder.toString();
+  }
+
+  @Override
+  public String toString() {
+    return toString(0);
+  }
+
+  protected String valueToString(int level) {
+    return get().toString();
+  }
+
+  protected static StringBuilder indent(int level) {
+    StringBuilder builder = new StringBuilder();
+    for (int i = 0; i < level; i++) {
+      builder.append("  ");
+    }
+    return builder;
+  }
+
+  static NBTCompound load(DataInputStream in) throws Exception {
+    AbstractNBTag root = NBTag.loadTag(in, true);
+    if (!(root instanceof NBTCompound)) {
+      throw new Exception("NBT stream has the wrong format");
+    }
+    return (NBTCompound) root;
+  }
 }

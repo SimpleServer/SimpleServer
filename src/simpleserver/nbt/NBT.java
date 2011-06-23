@@ -21,76 +21,42 @@
 package simpleserver.nbt;
 
 import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 
-public class NBT {
+public enum NBTag {
+  END(NBTEnd.class),
+  BYTE(NBTByte.class),
+  SHORT(NBTShort.class),
+  INT(NBTInt.class),
+  LONG(NBTLong.class),
+  FLOAT(NBTFloat.class),
+  DOUBLE(NBTDouble.class),
+  ARRAY(NBTArray.class),
+  STRING(NBTString.class),
+  LIST(NBTList.class),
+  COMPOUND(NBTCompound.class);
 
-  private NBTCompound root;
+  private Class<? extends AbstractNBTag> c;
 
-  NBT() {
-    root = new NBTCompound("");
+  NBTag(Class<? extends AbstractNBTag> c) {
+    this.c = c;
   }
 
-  NBT(String filename) throws FileNotFoundException {
-    this(new FileInputStream(filename));
+  public byte id() {
+    return (byte) ordinal();
   }
 
-  NBT(InputStream input) {
-    load(input);
+  protected static AbstractNBTag loadTag(DataInputStream in, boolean named) throws Exception {
+    return loadTag(in, named, in.readByte());
   }
 
-  NBTCompound root() {
-    return root;
-  }
-
-  private void load(InputStream input) {
-    try {
-      root = AbstractNBTag.load(new DataInputStream(input));
-    } catch (Exception e) {
-      e.printStackTrace();
+  protected static AbstractNBTag loadTag(DataInputStream in, boolean named, byte type) throws Exception {
+    if (type < 0 || type > 10) {
+      throw new Exception("Unknown NBT type");
     }
-  }
-
-  public void save(String filename) {
     try {
-      DataOutputStream out = new DataOutputStream(getOutputStream(filename));
-      root.save(out);
-      out.close();
+      return values()[type].c.getDeclaredConstructor(DataInputStream.class, Boolean.class).newInstance(in, named);
     } catch (Exception e) {
-      e.printStackTrace();
-    }
-  }
-
-  protected OutputStream getOutputStream(String filename) throws FileNotFoundException, IOException {
-    return new FileOutputStream(filename);
-  }
-
-  @Override
-  public String toString() {
-    return root.toString();
-  }
-
-  public static void main(String[] args) {
-    try {
-      if (args.length >= 2 && args[0].equals("raw")) {
-        System.out.println(new NBT(args[1]));
-      } else if (args.length >= 1) {
-
-        System.out.println(new GZipNBT(args[0]));
-
-      } else {
-        System.out.println("Usage: java -jar NBT.jar [raw] <file>");
-      }
-    } catch (FileNotFoundException e) {
-      System.out.println("Error: No such file or dictionary");
-    } catch (IOException e) {
-      System.out.println("Error: File is not in GZIP format");
+      throw new Exception("Something went horribly wrong: " + e.getMessage());
     }
   }
 
