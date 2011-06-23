@@ -95,8 +95,9 @@ public class NBTCompound extends AbstractNBTag {
     return (NBTString) value.get(name);
   }
 
-  public NBTList getList(String name) {
-    return (NBTList) value.get(name);
+  @SuppressWarnings("unchecked")
+  public NBTList<AbstractNBTag> getList(String name) {
+    return (NBTList<AbstractNBTag>) value.get(name);
   }
 
   public NBTCompound getCompound(String name) {

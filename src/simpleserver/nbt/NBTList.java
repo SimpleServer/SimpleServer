@@ -26,8 +26,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class NBTList extends AbstractNBTag {
-  private ArrayList<AbstractNBTag> value;
+public class NBTList<T extends AbstractNBTag> extends AbstractNBTag {
+  private ArrayList<T> value;
   private byte tagId;
 
   NBTList(DataInputStream in, Boolean named) throws Exception {
@@ -36,7 +36,7 @@ public class NBTList extends AbstractNBTag {
 
   public NBTList(byte tagId) {
     this.tagId = tagId;
-    value = new ArrayList<AbstractNBTag>();
+    value = new ArrayList<T>();
   }
 
   public NBTList(NBTag tag) {
@@ -46,7 +46,7 @@ public class NBTList extends AbstractNBTag {
   public NBTList(String name, byte tagId) {
     super(name);
     this.tagId = tagId;
-    value = new ArrayList<AbstractNBTag>();
+    value = new ArrayList<T>();
   }
 
   public NBTList(String name, NBTag tag) {
@@ -59,7 +59,7 @@ public class NBTList extends AbstractNBTag {
   }
 
   @Override
-  List<AbstractNBTag> get() {
+  List<T> get() {
     return value;
   }
 
@@ -67,14 +67,13 @@ public class NBTList extends AbstractNBTag {
     return value.size();
   }
 
-  public void add(AbstractNBTag tag) throws Exception {
-    if (tagId != tag.id()) {
-      throw new Exception("Only tags with id " + tagId + " are allowed in this list");
+  public void add(T tag) {
+    if (tagId == tag.id()) {
+      value.add(tag);
     }
-    value.add(tag);
   }
 
-  public AbstractNBTag get(int index) {
+  public T get(int index) {
     return value.get(index);
   }
 
@@ -110,21 +109,23 @@ public class NBTList extends AbstractNBTag {
     return (NBTString) value.get(index);
   }
 
-  public NBTList getList(int index) {
-    return (NBTList) value.get(index);
+  @SuppressWarnings("unchecked")
+  public NBTList<AbstractNBTag> getList(int index) {
+    return (NBTList<AbstractNBTag>) value.get(index);
   }
 
   public NBTCompound getCompound(int index) {
     return (NBTCompound) value.get(index);
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   protected void loadValue(DataInputStream in) throws Exception {
     tagId = in.readByte();
     int length = in.readInt();
-    value = new ArrayList<AbstractNBTag>(length);
+    value = new ArrayList<T>(length);
     for (int i = 0; i < length; i++) {
-      value.add(NBTag.loadTag(in, false, tagId));
+      value.add((T) NBTag.loadTag(in, false, tagId));
     }
   }
 

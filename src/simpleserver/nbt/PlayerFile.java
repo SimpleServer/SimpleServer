@@ -44,15 +44,11 @@ public class PlayerFile {
   }
 
   public void setPosition(Coordinate coord) {
-    NBTList pos = new NBTList("Pos", NBTag.DOUBLE);
-    try {
-      pos.add(new NBTDouble(coord.x()));
-      pos.add(new NBTDouble(coord.y()));
-      pos.add(new NBTDouble(coord.z()));
-    } catch (Exception e) {
-      // This should never fail
-      e.printStackTrace();
-    }
+    NBTList<NBTDouble> pos = new NBTList<NBTDouble>("Pos", NBTag.DOUBLE);
+
+    pos.add(new NBTDouble(coord.x()));
+    pos.add(new NBTDouble(coord.y()));
+    pos.add(new NBTDouble(coord.z()));
 
     nbt.root().put(pos);
     nbt.root().put(new NBTInt("Dimension", coord.dimension().index()));
