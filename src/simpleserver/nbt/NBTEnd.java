@@ -22,7 +22,7 @@ package simpleserver.nbt;
 
 import java.io.DataInputStream;
 
-class NBTEnd extends NBTag {
+class NBTEnd extends AbstractNBTag {
 
   @Override
   protected byte id() {
@@ -31,6 +31,10 @@ class NBTEnd extends NBTag {
 
   public NBTEnd(DataInputStream in) throws Exception {
     super(in, false);
+  }
+
+  public NBTEnd(DataInputStream in, Boolean named) throws Exception {
+    this(in);
   }
 
   public NBTEnd() {

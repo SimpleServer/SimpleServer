@@ -25,13 +25,16 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
 
-public class NBTCompound extends NBTag {
-  private HashMap<String, NBTag> value;
-  private byte tagId;
-  private int length;
+public class NBTCompound extends AbstractNBTag {
+  private HashMap<String, AbstractNBTag> value;
 
-  NBTCompound(DataInputStream in, boolean named) throws Exception {
+  NBTCompound(DataInputStream in, Boolean named) throws Exception {
     super(in, named);
+  }
+
+  public NBTCompound(String name) {
+    super(name);
+    value = new HashMap<String, AbstractNBTag>();
   }
 
   @Override
@@ -40,19 +43,71 @@ public class NBTCompound extends NBTag {
   }
 
   @Override
-  HashMap<String, NBTag> get() {
+  HashMap<String, AbstractNBTag> get() {
     return value;
   }
 
-  NBTag get(String name) {
+  public boolean containsKey(String name) {
+    return value.containsKey(name);
+  }
+
+  public AbstractNBTag get(String name) {
     return value.get(name);
+  }
+
+  public void put(AbstractNBTag tag) {
+    value.put(tag.name.get(), tag);
+  }
+
+  public void remove(String name) {
+    value.remove(name);
+  }
+
+  public NBTByte getByte(String name) {
+    return (NBTByte) value.get(name);
+  }
+
+  public NBTShort getShort(String name) {
+    return (NBTShort) value.get(name);
+  }
+
+  public NBTInt getInt(String name) {
+    return (NBTInt) value.get(name);
+  }
+
+  public NBTLong getLong(String name) {
+    return (NBTLong) value.get(name);
+  }
+
+  public NBTFloat getFloat(String name) {
+    return (NBTFloat) value.get(name);
+  }
+
+  public NBTDouble getDouble(String name) {
+    return (NBTDouble) value.get(name);
+  }
+
+  public NBTArray getArray(String name) {
+    return (NBTArray) value.get(name);
+  }
+
+  public NBTString getString(String name) {
+    return (NBTString) value.get(name);
+  }
+
+  public NBTList getList(String name) {
+    return (NBTList) value.get(name);
+  }
+
+  public NBTCompound getCompound(String name) {
+    return (NBTCompound) value.get(name);
   }
 
   @Override
   protected void loadValue(DataInputStream in) throws Exception {
-    value = new HashMap<String, NBTag>();
+    value = new HashMap<String, AbstractNBTag>();
     while (true) {
-      NBTag tag = loadTag(in, true);
+      AbstractNBTag tag = NBTag.loadTag(in, true);
       if (tag instanceof NBTEnd) {
         break;
       }
@@ -62,7 +117,7 @@ public class NBTCompound extends NBTag {
 
   @Override
   protected void saveValue(DataOutputStream out) throws IOException {
-    for (NBTag tag : value.values()) {
+    for (AbstractNBTag tag : value.values()) {
       tag.save(out);
     }
     new NBTEnd().save(out);
@@ -72,7 +127,7 @@ public class NBTCompound extends NBTag {
   protected String valueToString(int level) {
     StringBuilder string = new StringBuilder();
     string.append("{\n");
-    for (NBTag tag : value.values()) {
+    for (AbstractNBTag tag : value.values()) {
       string.append(tag.toString(level + 1) + "\n");
     }
     string.append(indent(level));

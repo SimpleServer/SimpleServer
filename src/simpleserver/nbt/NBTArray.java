@@ -24,11 +24,10 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-public class NBTArray extends NBTag {
+public class NBTArray extends AbstractNBTag {
   private byte[] value;
-  private int length;
 
-  NBTArray(DataInputStream in, boolean named) throws Exception {
+  NBTArray(DataInputStream in, Boolean named) throws Exception {
     super(in, named);
   }
 
@@ -46,9 +45,17 @@ public class NBTArray extends NBTag {
     return value[index];
   }
 
+  public void set(byte[] value) {
+    this.value = value;
+  }
+
+  public void set(int index, byte value) {
+    this.value[index] = value;
+  }
+
   @Override
   protected void loadValue(DataInputStream in) throws IOException {
-    length = in.readInt();
+    int length = in.readInt();
     value = new byte[length];
     for (int i = 0; i < length; i++) {
       value[i] = in.readByte();
@@ -57,7 +64,23 @@ public class NBTArray extends NBTag {
 
   @Override
   protected void saveValue(DataOutputStream out) throws IOException {
-    out.writeInt(length);
+    out.writeInt(value.length);
     out.write(value);
+  }
+
+  @Override
+  protected String valueToString(int level) {
+    StringBuilder string = new StringBuilder();
+    for (byte b : value) {
+      if ((b & 0xf0) == 0) {
+        string.append("0");
+      }
+      string.append(Integer.toHexString(b));
+      string.append(" ");
+    }
+    if (string.length() > 0) {
+      string.deleteCharAt(string.length() - 1);
+    }
+    return string.toString();
   }
 }

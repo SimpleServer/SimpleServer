@@ -24,12 +24,20 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-public class NBTString extends NBTag {
+public class NBTString extends AbstractNBTag {
   private String value;
-  private int length;
 
-  NBTString(DataInputStream in, boolean named) throws Exception {
+  NBTString(DataInputStream in, Boolean named) throws Exception {
     super(in, named);
+  }
+
+  public NBTString(String value) {
+    set(value);
+  }
+
+  public NBTString(String name, String value) {
+    super(name);
+    set(value);
   }
 
   @Override
@@ -38,13 +46,17 @@ public class NBTString extends NBTag {
   }
 
   @Override
-  protected String get() {
+  public String get() {
     return value;
+  }
+
+  public void set(String value) {
+    this.value = value;
   }
 
   @Override
   protected void loadValue(DataInputStream in) throws IOException {
-    length = in.readShort();
+    int length = in.readShort();
     byte[] bytes = new byte[length];
     for (int i = 0; i < length; i++) {
       bytes[i] = in.readByte();
@@ -54,7 +66,7 @@ public class NBTString extends NBTag {
 
   @Override
   protected void saveValue(DataOutputStream out) throws IOException {
-    out.writeShort(length);
+    out.writeShort(value.length());
     out.writeBytes(value);
   }
 }

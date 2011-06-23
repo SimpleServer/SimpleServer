@@ -20,27 +20,21 @@
  */
 package simpleserver.nbt;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
-public class NBTRoot extends NBTCompound {
-
-  NBTRoot(DataInputStream in) throws Exception {
-    super(in, false);
+public class GZipNBT extends NBT {
+  GZipNBT(String filename) throws IOException {
+    super(new GZIPInputStream(new FileInputStream(filename)));
   }
 
   @Override
-  protected void loadValue(DataInputStream in) throws Exception {
-    in.readByte();
-    in.readShort();
-    super.loadValue(in);
+  protected OutputStream getOutputStream(String filename) throws FileNotFoundException, IOException {
+    return new GZIPOutputStream(new FileOutputStream(filename));
   }
-
-  @Override
-  protected void saveValue(DataOutputStream out) throws IOException {
-    out.writeShort(0);
-    super.saveValue(out);
-  }
-
 }

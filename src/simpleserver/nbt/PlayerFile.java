@@ -27,32 +27,43 @@ import simpleserver.Coordinate;
 import simpleserver.Server;
 
 public class PlayerFile {
-  private String path;
+  private String filename;
   private NBT nbt;
 
   public PlayerFile(String name, Server server) {
-    path = server.options.get("levelName") + File.separator + "players" + File.separator + name + ".dat";
+    this(server.options.get("levelName") + File.separator + "players" + File.separator + name + ".dat");
+  }
+
+  public PlayerFile(String filename) {
+    this.filename = filename;
     try {
-      nbt = new NBT(path);
+      nbt = new NBT(filename);
     } catch (FileNotFoundException e) {
       nbt = new NBT(getClass().getResourceAsStream("template.dat"));
     }
   }
 
   public void setPosition(Coordinate coord) {
-    NBTag pos = nbt.root().get("Pos");
-    ((NBTDouble) ((NBTList) pos).get(0)).set(coord.x());
-    ((NBTDouble) ((NBTList) pos).get(1)).set(coord.y());
-    ((NBTDouble) ((NBTList) pos).get(2)).set(coord.z());
-    ((NBTInt) nbt.root().get("Dimension")).set(coord.dimension().index());
+    NBTList pos = new NBTList("Pos", NBTag.DOUBLE);
+    try {
+      pos.add(new NBTDouble(coord.x()));
+      pos.add(new NBTDouble(coord.y()));
+      pos.add(new NBTDouble(coord.z()));
+    } catch (Exception e) {
+      // This should never fail
+      e.printStackTrace();
+    }
+
+    nbt.root().put(pos);
+    nbt.root().put(new NBTInt("Dimension", coord.dimension().index()));
   }
 
   public void save() {
-    nbt.save(path);
+    nbt.save(filename);
   }
 
   public File file() {
-    return new File(path);
+    return new File(filename);
   }
 
   @Override

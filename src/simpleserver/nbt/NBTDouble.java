@@ -24,15 +24,20 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-public class NBTDouble extends NBTag {
+public class NBTDouble extends AbstractNBTag {
   private Double value;
 
-  NBTDouble(DataInputStream in, boolean named) throws Exception {
+  NBTDouble(DataInputStream in, Boolean named) throws Exception {
     super(in, named);
   }
 
-  void set(double value) {
-    this.value = value;
+  public NBTDouble(double value) {
+    set(value);
+  }
+
+  public NBTDouble(String name, double value) {
+    super(name);
+    set(value);
   }
 
   @Override
@@ -41,8 +46,12 @@ public class NBTDouble extends NBTag {
   }
 
   @Override
-  Double get() {
+  public Double get() {
     return value;
+  }
+
+  public void set(double value) {
+    this.value = value;
   }
 
   @Override

@@ -25,16 +25,16 @@ import java.io.DataOutputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
-import java.util.zip.GZIPInputStream;
-import java.util.zip.GZIPOutputStream;
+import java.io.OutputStream;
 
 public class NBT {
 
-  private NBTRoot root;
+  private NBTCompound root;
 
   NBT() {
-
+    root = new NBTCompound("");
   }
 
   NBT(String filename) throws FileNotFoundException {
@@ -51,7 +51,7 @@ public class NBT {
 
   private void load(InputStream input) {
     try {
-      root = new NBTRoot(new DataInputStream(new GZIPInputStream(input)));
+      root = AbstractNBTag.load(new DataInputStream(input));
     } catch (Exception e) {
       e.printStackTrace();
     }
@@ -59,12 +59,16 @@ public class NBT {
 
   public void save(String filename) {
     try {
-      DataOutputStream out = new DataOutputStream(new GZIPOutputStream(new FileOutputStream(filename)));
+      DataOutputStream out = new DataOutputStream(getOutputStream(filename));
       root.save(out);
       out.close();
     } catch (Exception e) {
       e.printStackTrace();
     }
+  }
+
+  protected OutputStream getOutputStream(String filename) throws FileNotFoundException, IOException {
+    return new FileOutputStream(filename);
   }
 
   @Override
@@ -73,14 +77,20 @@ public class NBT {
   }
 
   public static void main(String[] args) {
-    if (args.length >= 1) {
-      try {
-        System.out.println(new NBT(args[0]));
-      } catch (FileNotFoundException e) {
-        System.out.println("Error: No such file or dictionary");
+    try {
+      if (args.length >= 2 && args[0].equals("raw")) {
+        System.out.println(new NBT(args[1]));
+      } else if (args.length >= 1) {
+
+        System.out.println(new GZipNBT(args[0]));
+
+      } else {
+        System.out.println("Usage: java -jar NBT.jar [raw] <file>");
       }
-    } else {
-      System.out.println("Usage: java -jar NBT.jar file");
+    } catch (FileNotFoundException e) {
+      System.out.println("Error: No such file or dictionary");
+    } catch (IOException e) {
+      System.out.println("Error: File is not in GZIP format");
     }
   }
 

@@ -21,108 +21,43 @@
 package simpleserver.nbt;
 
 import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
 
-public abstract class NBTag {
-  protected NBTString name;
-  protected boolean named;
+public enum NBTag {
+  END(NBTEnd.class),
+  BYTE(NBTByte.class),
+  SHORT(NBTShort.class),
+  INT(NBTInt.class),
+  LONG(NBTLong.class),
+  FLOAT(NBTFloat.class),
+  DOUBLE(NBTDouble.class),
+  ARRAY(NBTArray.class),
+  STRING(NBTString.class),
+  LIST(NBTList.class),
+  COMPOUND(NBTCompound.class);
 
-  NBTag(DataInputStream in, boolean named) throws Exception {
-    if (named) {
-      name = new NBTString(in, false);
-    }
-    this.named = named;
-    loadValue(in);
+  private Class<? extends AbstractNBTag> c;
+
+  NBTag(Class<? extends AbstractNBTag> c) {
+    this.c = c;
   }
 
-  NBTag() {
+  public byte id() {
+    return (byte) ordinal();
   }
 
-  protected abstract byte id();
-
-  abstract Object get();
-
-  void save(DataOutputStream out) throws IOException {
-    save(out, true);
-  }
-
-  protected void save(DataOutputStream out, boolean tagId) throws IOException {
-    if (tagId) {
-      out.writeByte(id());
-    }
-    if (named) {
-      name.save(out, false);
-    }
-    saveValue(out);
-  }
-
-  protected void saveValue(DataOutputStream out) throws IOException {
-  }
-
-  protected void loadValue(DataInputStream in) throws Exception {
-  }
-
-  protected String toString(int level) {
-    StringBuilder builder = indent(level);
-    if (named) {
-      builder.append(name.get());
-      builder.append(": ");
-    }
-    builder.append(valueToString(level));
-    builder.append(" (");
-    builder.append(getClass().getSimpleName());
-    builder.append(")");
-    return builder.toString();
-  }
-
-  @Override
-  public String toString() {
-    return toString(0);
-  }
-
-  protected String valueToString(int level) {
-    return get().toString();
-  }
-
-  protected static StringBuilder indent(int level) {
-    StringBuilder builder = new StringBuilder();
-    for (int i = 0; i < level; i++) {
-      builder.append("  ");
-    }
-    return builder;
-  }
-
-  protected static NBTag loadTag(DataInputStream in, boolean named) throws Exception {
+  protected static AbstractNBTag loadTag(DataInputStream in, boolean named) throws Exception {
     return loadTag(in, named, in.readByte());
   }
 
-  protected static NBTag loadTag(DataInputStream in, boolean named, byte type) throws Exception {
-    switch (type) {
-      case 0:
-        return new NBTEnd(in);
-      case 1:
-        return new NBTByte(in, named);
-      case 2:
-        return new NBTShort(in, named);
-      case 3:
-        return new NBTInt(in, named);
-      case 4:
-        return new NBTLong(in, named);
-      case 5:
-        return new NBTFloat(in, named);
-      case 6:
-        return new NBTDouble(in, named);
-      case 7:
-        return new NBTArray(in, named);
-      case 8:
-        return new NBTString(in, named);
-      case 9:
-        return new NBTList(in, named);
-      case 10:
-        return new NBTCompound(in, named);
-      default:
-        throw new Exception("Unknown NBT type");
+  protected static AbstractNBTag loadTag(DataInputStream in, boolean named, byte type) throws Exception {
+    if (type < 0 || type > 10) {
+      throw new Exception("Unknown NBT type");
+    }
+    try {
+      return values()[type].c.getDeclaredConstructor(DataInputStream.class, Boolean.class).newInstance(in, named);
+    } catch (Exception e) {
+      throw new Exception("Something went horribly wrong: " + e.getMessage());
     }
   }
+
 }

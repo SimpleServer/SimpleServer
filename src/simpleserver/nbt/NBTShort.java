@@ -24,11 +24,20 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-public class NBTShort extends NBTag {
+public class NBTShort extends AbstractNBTag {
   private Short value;
 
-  NBTShort(DataInputStream in, boolean named) throws Exception {
+  NBTShort(DataInputStream in, Boolean named) throws Exception {
     super(in, named);
+  }
+
+  public NBTShort(short value) {
+    set(value);
+  }
+
+  public NBTShort(String name, short value) {
+    super(name);
+    set(value);
   }
 
   @Override
@@ -37,8 +46,12 @@ public class NBTShort extends NBTag {
   }
 
   @Override
-  Short get() {
+  public Short get() {
     return value;
+  }
+
+  public void set(short value) {
+    this.value = value;
   }
 
   @Override

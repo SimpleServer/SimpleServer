@@ -24,11 +24,20 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-public class NBTFloat extends NBTag {
+public class NBTFloat extends AbstractNBTag {
   private Float value;
 
-  NBTFloat(DataInputStream in, boolean named) throws Exception {
+  NBTFloat(DataInputStream in, Boolean named) throws Exception {
     super(in, named);
+  }
+
+  public NBTFloat(float value) {
+    set(value);
+  }
+
+  public NBTFloat(String name, float value) {
+    super(name);
+    set(value);
   }
 
   @Override
@@ -37,8 +46,12 @@ public class NBTFloat extends NBTag {
   }
 
   @Override
-  Float get() {
+  public Float get() {
     return value;
+  }
+
+  public void set(float value) {
+    this.value = value;
   }
 
   @Override

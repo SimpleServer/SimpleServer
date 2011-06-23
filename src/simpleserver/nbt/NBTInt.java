@@ -24,15 +24,20 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-public class NBTInt extends NBTag {
+public class NBTInt extends AbstractNBTag {
   private Integer value;
 
-  NBTInt(DataInputStream in, boolean named) throws Exception {
+  NBTInt(DataInputStream in, Boolean named) throws Exception {
     super(in, named);
   }
 
-  void set(int value) {
-    this.value = value;
+  public NBTInt(int value) {
+    set(value);
+  }
+
+  public NBTInt(String name, int value) {
+    super(name);
+    set(value);
   }
 
   @Override
@@ -41,8 +46,12 @@ public class NBTInt extends NBTag {
   }
 
   @Override
-  Integer get() {
+  public Integer get() {
     return value;
+  }
+
+  public void set(int value) {
+    this.value = value;
   }
 
   @Override

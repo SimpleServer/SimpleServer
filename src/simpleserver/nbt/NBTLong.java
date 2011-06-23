@@ -24,11 +24,20 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-public class NBTLong extends NBTag {
+public class NBTLong extends AbstractNBTag {
   private Long value;
 
-  NBTLong(DataInputStream in, boolean named) throws Exception {
+  NBTLong(DataInputStream in, Boolean named) throws Exception {
     super(in, named);
+  }
+
+  public NBTLong(long value) {
+    set(value);
+  }
+
+  public NBTLong(String name, long value) {
+    super(name);
+    set(value);
   }
 
   @Override
@@ -37,8 +46,12 @@ public class NBTLong extends NBTag {
   }
 
   @Override
-  Long get() {
+  public Long get() {
     return value;
+  }
+
+  public void set(long value) {
+    this.value = value;
   }
 
   @Override

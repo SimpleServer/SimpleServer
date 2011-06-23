@@ -24,11 +24,20 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-public class NBTByte extends NBTag {
+public class NBTByte extends AbstractNBTag {
   private Byte value;
 
-  NBTByte(DataInputStream in, boolean named) throws Exception {
+  NBTByte(DataInputStream in, Boolean named) throws Exception {
     super(in, named);
+  }
+
+  public NBTByte(byte value) {
+    set(value);
+  }
+
+  public NBTByte(String name, byte value) {
+    super(name);
+    set(value);
   }
 
   @Override
@@ -37,8 +46,12 @@ public class NBTByte extends NBTag {
   }
 
   @Override
-  Byte get() {
+  public Byte get() {
     return value;
+  }
+
+  public void set(byte value) {
+    this.value = value;
   }
 
   @Override
@@ -49,5 +62,10 @@ public class NBTByte extends NBTag {
   @Override
   protected void saveValue(DataOutputStream out) throws IOException {
     out.writeByte(value);
+  }
+
+  @Override
+  protected String valueToString(int level) {
+    return String.format("0x%2x", get());
   }
 }
