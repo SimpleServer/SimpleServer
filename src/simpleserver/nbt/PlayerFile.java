@@ -21,7 +21,7 @@
 package simpleserver.nbt;
 
 import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.IOException;
 
 import simpleserver.Coordinate;
 import simpleserver.Server;
@@ -37,9 +37,13 @@ public class PlayerFile {
   public PlayerFile(String filename) {
     this.filename = filename;
     try {
-      nbt = new NBT(filename);
-    } catch (FileNotFoundException e) {
-      nbt = new NBT(getClass().getResourceAsStream("template.dat"));
+      nbt = new GZipNBT(filename);
+    } catch (Exception e) {
+      try {
+        nbt = new GZipNBT(getClass().getResourceAsStream("template.dat"));
+      } catch (IOException e1) {
+
+      }
     }
   }
 
@@ -52,6 +56,10 @@ public class PlayerFile {
 
     nbt.root().put(pos);
     nbt.root().put(new NBTInt("Dimension", coord.dimension().index()));
+  }
+
+  public void setInventory(Inventory inv) {
+    nbt.root().put(inv.nbt());
   }
 
   public void save() {

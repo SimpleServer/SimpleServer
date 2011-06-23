@@ -66,6 +66,6 @@ public class NBTByte extends AbstractNBTag {
 
   @Override
   protected String valueToString(int level) {
-    return String.format("0x%2x", get());
+    return String.format("0x%02x", get());
   }
 }

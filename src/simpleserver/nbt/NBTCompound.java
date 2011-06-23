@@ -37,6 +37,10 @@ public class NBTCompound extends AbstractNBTag {
     value = new HashMap<String, AbstractNBTag>();
   }
 
+  public NBTCompound() {
+    value = new HashMap<String, AbstractNBTag>();
+  }
+
   @Override
   protected byte id() {
     return 10;

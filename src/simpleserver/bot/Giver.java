@@ -21,20 +21,22 @@
 package simpleserver.bot;
 
 import simpleserver.Server;
+import simpleserver.nbt.Inventory;
 import simpleserver.nbt.PlayerFile;
 
 public class Giver extends Bot {
 
-  private PlayerFile dat;
-
   public Giver(Server server) {
-    super(server, "Giver");// + Math.round(100000 * Math.random()));
+    super(server, "Giver" + Math.round(100000 * Math.random()));
     prepare();
   }
 
   protected void prepare() {
-    dat = new PlayerFile(name, server);
-    System.out.println(dat);
+    PlayerFile dat = new PlayerFile(name, server);
+    Inventory inv = new Inventory();
+    inv.add(1, 10);
+    inv.add(1, 10, 5);
+    dat.setInventory(inv);
     dat.save();
   }
 
