@@ -58,6 +58,13 @@ public class PlayerFile {
     nbt.root().put(new NBTInt("Dimension", coord.dimension().index()));
   }
 
+  public void setLook(float yaw, float pitch) {
+    NBTList<NBTFloat> look = new NBTList<NBTFloat>("Rotation", NBT.FLOAT);
+    look.add(new NBTFloat(yaw));
+    look.add(new NBTFloat(pitch));
+    nbt.root().put(look);
+  }
+
   public void setInventory(Inventory inv) {
     nbt.root().put(inv.nbt());
   }

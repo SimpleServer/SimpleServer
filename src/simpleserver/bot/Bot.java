@@ -66,7 +66,7 @@ public class Bot {
     position = new Position();
   }
 
-  public void connect() throws UnknownHostException, IOException {
+  void connect() throws UnknownHostException, IOException {
 
     try {
       InetAddress localAddress = InetAddress.getByName(addressFactory.getNextAddress());

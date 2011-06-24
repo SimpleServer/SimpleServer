@@ -53,14 +53,13 @@ public class Teleporter extends Bot {
   protected void prepare() {
     dat = new PlayerFile(name, server);
     dat.setPosition(coordinate);
+    dat.setLook(yaw, pitch);
     dat.save();
   }
 
   @Override
   protected void ready() throws IOException {
     super.ready();
-    position.updateLook(yaw, pitch);
-    sendPosition();
     server.runCommand("tp", player.getName() + " " + name);
     timer.schedule(new Logout(), 3000);
   }

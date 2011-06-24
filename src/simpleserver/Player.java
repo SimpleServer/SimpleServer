@@ -54,6 +54,7 @@ public class Player {
   private boolean godMode = false;
   private String kickMsg = null;
   private double x, y, z;
+  private float yaw, pitch;
   private Dimension dimension;
   private int group = 0;
   private int entityId = 0;
@@ -189,6 +190,11 @@ public class Player {
     this.x = x;
     this.y = y;
     this.z = z;
+  }
+
+  public void updateLook(float yaw, float pitch) {
+    this.yaw = yaw;
+    this.pitch = pitch;
   }
 
   public boolean isAttemptLock() {
@@ -330,6 +336,14 @@ public class Player {
 
   public Coordinate position() {
     return new Coordinate((int) x, (int) y, (int) z, dimension);
+  }
+
+  public float yaw() {
+    return yaw;
+  }
+
+  public float pitch() {
+    return pitch;
   }
 
   public void setLocalChat(boolean mode) {

@@ -306,15 +306,18 @@ public class StreamTunnel {
       case 0x0b: // Player Position
         write(packetId);
         copyPlayerLocation();
+        copyNBytes(1);
         break;
       case 0x0c: // Player Look
         write(packetId);
-        copyNBytes(9);
+        copyPlayerLook();
+        copyNBytes(1);
         break;
       case 0x0d: // Player Position & Look
         write(packetId);
         copyPlayerLocation();
-        copyNBytes(8);
+        copyPlayerLook();
+        copyNBytes(1);
         break;
       case 0x0e: // Player Digging
         if (!isServerTunnel) {
@@ -857,9 +860,23 @@ public class StreamTunnel {
       write(y);
       write(stance);
       write(z);
-      copyNBytes(1);
     } else {
-      copyNBytes(33);
+      copyNBytes(32);
+    }
+  }
+
+  private void copyPlayerLook() throws IOException {
+    if (!isServerTunnel) {
+      motionCounter++;
+    }
+    if (!isServerTunnel && motionCounter % 8 == 0) {
+      float yaw = in.readFloat();
+      float pitch = in.readFloat();
+      player.updateLook(yaw, pitch);
+      write(yaw);
+      write(pitch);
+    } else {
+      copyNBytes(8);
     }
   }
 

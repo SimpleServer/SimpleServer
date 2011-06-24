@@ -62,17 +62,7 @@ public class Inventory {
   }
 
   private byte bestSlot() {
-    for (byte i = 36; i <= 44; i++) {
-      if (free(i)) {
-        return i;
-      }
-    }
-    for (byte i = 9; i <= 35; i++) {
-      if (free(i)) {
-        return i;
-      }
-    }
-    for (byte i = 1; i <= 8; i++) {
+    for (byte i = 0; i <= 44; i++) {
       if (free(i)) {
         return i;
       }

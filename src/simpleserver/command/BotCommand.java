@@ -29,9 +29,14 @@ public class BotCommand extends AbstractCommand implements PlayerCommand {
   }
 
   public void execute(Player player, String message) {
-    /* if (!player.teleport(new Coordinate(0, 20, 0, Dimension.EARTH), 0, -90)) {
-       player.addMessage(Color.RED, "Teleport failed");
-     }*/
-    new Giver(player.getServer());
+
+    Giver bot = new Giver(player);
+    bot.add(35, 1, 1);
+    bot.add(35, 2, 2);
+    bot.add(35, 3, 3);
+    bot.add(35, 4, 4);
+    bot.add(35, 5, 5);
+    bot.add(35, 6, 6);
+    player.getServer().bots.connect(bot);
   }
 }

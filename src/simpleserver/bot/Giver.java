@@ -20,24 +20,80 @@
  */
 package simpleserver.bot;
 
-import simpleserver.Server;
+import java.io.IOException;
+import java.net.UnknownHostException;
+
+import simpleserver.Player;
 import simpleserver.nbt.Inventory;
 import simpleserver.nbt.PlayerFile;
 
 public class Giver extends Bot {
 
-  public Giver(Server server) {
-    super(server, "Giver" + Math.round(100000 * Math.random()));
-    prepare();
+  private Inventory inv;
+  private int[] counts;
+  private Player player;
+  int slot;
+
+  public Giver(Player player) {
+    super(player.getServer(), "Giver" + Math.round(100000 * Math.random()));
+    inv = new Inventory();
+    counts = new int[9];
+    slot = 0;
+    this.player = player;
   }
 
-  protected void prepare() {
+  @Override
+  void connect() throws UnknownHostException, IOException {
     PlayerFile dat = new PlayerFile(name, server);
-    Inventory inv = new Inventory();
-    inv.add(1, 10);
-    inv.add(1, 10, 5);
     dat.setInventory(inv);
+    dat.setPosition(player.position());
+    dat.setLook(player.yaw(), player.pitch());
     dat.save();
+    super.connect();
+  }
+
+  public void add(int id, int count, int damage) {
+    if (slot < 9) {
+      inv.add(id, count, damage);
+      counts[slot++] = count;
+    }
+  }
+
+  @Override
+  protected boolean ninja() {
+    return true;
+  }
+
+  @Override
+  protected void handlePacket(byte packetId) throws IOException {
+    switch (packetId) {
+      case 0x68:
+        drop();
+      default:
+        super.handlePacket(packetId);
+    }
+  }
+
+  protected void drop() throws IOException {
+    super.ready();
+    writeLock.lock();
+    for (int i = 0; i < 9; i++) {
+      if (counts[i] > 0) {
+        out.writeByte(0x10);
+        out.writeShort(i);
+        for (int j = 0; j < counts[i]; j++) {
+          out.writeByte(0x0e);
+          out.writeByte(0x4);
+          out.writeInt(0);
+          out.writeByte(0);
+          out.writeInt(0);
+          out.writeByte(0);
+        }
+      }
+      out.flush();
+    }
+    writeLock.unlock();
+    logout();
   }
 
 }
