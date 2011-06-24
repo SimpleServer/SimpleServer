@@ -52,6 +52,7 @@ import simpleserver.options.Options;
 import simpleserver.rcon.RconServer;
 import simpleserver.telnet.TelnetServer;
 import simpleserver.thread.AutoBackup;
+import simpleserver.thread.AutoFreeSpaceChecker;
 import simpleserver.thread.AutoRestart;
 import simpleserver.thread.AutoRun;
 import simpleserver.thread.AutoSave;
@@ -93,6 +94,7 @@ public class Server {
   private RconServer rconServer;
   private TelnetServer telnetServer;
   private AutoRun c10t;
+  private AutoFreeSpaceChecker autoSpaceCheck;
   private AutoBackup autoBackup;
   private AutoSave autosave;
   private AutoRestart autoRestart;
@@ -405,6 +407,7 @@ public class Server {
     if (options.getBoolean("enableRcon")) {
       rconServer = new RconServer(this);
     }
+    autoSpaceCheck = new AutoFreeSpaceChecker();
     autoBackup = new AutoBackup(this);
     autosave = new AutoSave(this);
     autoRestart = new AutoRestart(this);
@@ -441,6 +444,7 @@ public class Server {
     if (rconServer != null) {
       rconServer.stop();
     }
+    autoSpaceCheck.cleanup();
     autoBackup.stop();
     autosave.stop();
     autoRestart.stop();
