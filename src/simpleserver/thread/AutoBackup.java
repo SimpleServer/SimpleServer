@@ -130,9 +130,15 @@ public class AutoBackup {
 
   private File makeTemporaryCopy() throws IOException {
     TEMP_DIRECTORY.mkdir();
-    File backup = new File(TEMP_DIRECTORY, String.format(NAME_FORMAT,
-                                                         new Date()));
+
+    File backup = new File(TEMP_DIRECTORY, String.format(NAME_FORMAT, new Date()));
     copyRecursively(new File(server.options.get("levelName")), backup);
+
+    File configBackup = new File(backup, "config");
+    copyRecursively(new File("simpleserver"), configBackup);
+    copyRecursively(new File("simpleserver.properties"),
+                    new File(configBackup, "simpleserver.properties"));
+
     return backup;
   }
 
