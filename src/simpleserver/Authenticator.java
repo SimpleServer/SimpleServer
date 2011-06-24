@@ -79,13 +79,16 @@ public class Authenticator {
   }
 
   /***** PERMISSIONS *****/
+  public boolean useCustAuth(Player player) {
+    return (server.options.getBoolean("onlineMode") && isMinecraftUp && !player.isGuest() && !player.usedAuthenticator());
+  }
 
   public boolean allowLogin() {
-    return server.options.getBoolean("custAuth") && (!isMinecraftUp || !server.options.getBoolean("onlineMode"));
+    return server.options.getBoolean("custAuth");
   }
 
   public boolean allowRegistration() {
-    return server.options.getBoolean("custAuth") && (isMinecraftUp || !server.options.getBoolean("onlineMode"));
+    return server.options.getBoolean("custAuth");
   }
 
   /***** REGISTRATION *****/
@@ -128,6 +131,9 @@ public class Authenticator {
   /***** LOGIN REQUEST VALIDATION / COMPLETE LOGIN *****/
 
   public LoginRequest getLoginRequest(String IP) {
+    if (!allowLogin()) {
+      return null;
+    }
     ListIterator<LoginRequest> requests = loginRequests.listIterator();
     LoginRequest res = null;
 
@@ -160,6 +166,7 @@ public class Authenticator {
         } else {
           player.addTMessage(Color.GRAY, "Custom Authentication remembered.");
           player.setUsedAuthenticator(true);
+          player.setGuest(false);
         }
 
         return player.setName(req.playerName);
@@ -168,7 +175,7 @@ public class Authenticator {
       if (req.isValid()) {
         player.addTMessage(Color.GRAY, "Custom Authentication successfully completed.");
         player.setUsedAuthenticator(true);
-
+        player.setGuest(false);
         return player.setName(req.playerName);
       } else {
         player.addTMessage(Color.RED, "Your custom Authentication expired. Please try again.");
@@ -214,6 +221,7 @@ public class Authenticator {
 
   public void releaseGuestName(String name) {
     freeGuestNumbers.offer(extractGuestNumber(name));
+    // delete name.dat or set to empty
   }
 
   private int extractGuestNumber(String guestName) {
@@ -334,5 +342,31 @@ public class Authenticator {
     public void run() {
       parent.updateMinecraftState();
     }
+  }
+
+  /**
+   * @param player
+   * @return if login-bantime is over
+   */
+  public boolean loginBanTimeOver(Player player) {
+    // TODO Auto-generated method stub
+    return true;
+  }
+
+  /**
+   * @param player
+   */
+  public void banLogin(Player player) {
+    // TODO Auto-generated method stub
+
+  }
+
+  /**
+   * @param player
+   * @return
+   */
+  public Object banTimeEnd(Player player) {
+    // TODO Auto-generated method stub
+    return null;
   }
 }

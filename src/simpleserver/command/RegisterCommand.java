@@ -37,6 +37,10 @@ public class RegisterCommand extends AbstractCommand implements PlayerCommand {
       player.addTMessage(Color.RED, "Registration failed! CustAuth registration currently not allowed.");
       return;
     }
+    if (player.isGuest()) {
+      player.addTMessage(Color.RED, "You cannot use the CustAuth registration if you are a Guest on the Server.");
+      return;
+    }
 
     String[] arguments = extractArguments(message);
     if (arguments.length == 2) {
@@ -59,11 +63,6 @@ public class RegisterCommand extends AbstractCommand implements PlayerCommand {
       player.addTMessage(Color.RED, "You are not registered yet!");
       return;
     }
-
-    /*if(player.usedAuthenticator()){
-      player.addTMessage(Color.RED, "You are not allowed to change your password since you used CustAuth for login!");
-      return;
-    }*/
 
     if (checkPasswordFormat(player, newPw1)) {
       if (newPw1.equals(newPw2)) {

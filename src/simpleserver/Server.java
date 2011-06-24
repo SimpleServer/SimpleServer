@@ -104,6 +104,8 @@ public class Server {
   private AutoRestart autoRestart;
   public RequestTracker requestTracker;
 
+  public long mapSeed;
+
   private boolean run = true;
   private boolean restart = false;
   private boolean save = false;
@@ -545,6 +547,17 @@ public class Server {
 
   public long time() {
     return time.get();
+  }
+
+  public void setMapSeed(long seed) {
+    if (mapSeed != seed) {
+      mapSeed = seed;
+      System.out.println("[MAP SEED] " + mapSeed);
+    }
+  }
+
+  public long getMapSeed() {
+    return mapSeed;
   }
 
 }

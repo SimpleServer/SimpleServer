@@ -152,20 +152,20 @@ public class StreamTunnel {
       case 0x01: // Login Request/Response
         write(packetId);
         if (isServerTunnel) {
-          if (server.options.getBoolean("custAuth")
-              && server.options.getBoolean("onlineMode")
+          if (server.authenticator.useCustAuth(player)
               && !server.authenticator.onlineAuthenticate(player)) {
-            player.kick("[CustAuth] Failed to login: User not premium");
+            player.kick("[CustAuth] Failed to login 2: User not premium");
+            break;
           }
-          player.setEntityId(in.readInt());
-          write(player.getEntityId());
+          player.setEntityId(write(in.readInt()));
           write(readUTF16());
+          server.setMapSeed(write(in.readLong()));
         } else {
           write(in.readInt());
-          readUTF16();
+          readUTF16(); // and throw away
           write(player.getName());
+          write(in.readLong());
         }
-        write(in.readLong());
         dimension = in.readByte();
         if (isServerTunnel) {
           player.setDimension(Dimension.get(dimension));
@@ -176,54 +176,27 @@ public class StreamTunnel {
         String name = readUTF16();
         boolean nameSet = false;
 
-        if (server.options.getBoolean("custAuth")) {
-          if (!isServerTunnel) {
-
-            if (!name.equals("Player")) {
-              if (!server.authenticator.isMinecraftUp) {
-                // maybe still logged in for security join as Player
-                server.authenticator.updateMinecraftState();
-                if (!server.authenticator.isMinecraftUp) {
-                  // kick("Please restart your client and use offline mode to join.");
-                  nameSet = player.setName("Player");
-                } else {
-                  nameSet = player.setName(name);
-                }
-              } else {
-                nameSet = player.setName(name);
-              }
-            }
-
-            if (name.equals("Player")) {
-              // is not logged in to minecraft.net
-
-              LoginRequest req = server.authenticator.getLoginRequest(player.getIPAddress());
-              if (req != null) {
-                name = req.playerName;
-                nameSet = server.authenticator.completeLogin(req, player);
-              }
-
-              if (req == null || nameSet == false) {
-                player.setGuest(true);
-                name = server.authenticator.getFreeGuestName(player.getIPAddress());
-                nameSet = player.setName(name);
-              }
-            }
-
-          } else { // isServerTunnel
-            // send '-' if no authentication needed and hash if minecraft.net
-            if (!server.authenticator.isMinecraftUp || !server.options.getBoolean("onlineMode")) {
-              name = "-";
-            } else {
-              name = player.getConnectionHash();
-            }
+        if (isServerTunnel) {
+          if (!server.authenticator.useCustAuth(player)) {
+            name = "-";
+          } else {
+            name = player.getConnectionHash();
           }
         } else {
-          if (name.equals("Player")) {
-            player.setGuest(true);
-            name = server.authenticator.getFreeGuestName(player.getIPAddress());
+          if (name.equals("Player") || !server.authenticator.isMinecraftUp) {
+
+            LoginRequest req = server.authenticator.getLoginRequest(player.getIPAddress());
+            if (req != null) {
+              name = req.playerName;
+              nameSet = server.authenticator.completeLogin(req, player);
+            } else {
+              name = server.authenticator.getFreeGuestName(player.getIPAddress());
+              nameSet = player.setName(name);
+              player.setGuest(true);
+            }
+          } else {
+            nameSet = player.setName(name);
           }
-          nameSet = player.setName(name);
         }
 
         if (isServerTunnel || nameSet) {

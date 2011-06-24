@@ -33,8 +33,7 @@ public class LoginCommand extends AbstractCommand implements PlayerCommand {
   public void execute(Player player, String message) {
 
     Authenticator auth = player.getServer().authenticator;
-    if (!auth.allowLogin()) {
-      player.addTMessage(Color.RED, "Login failed! CustAuth login currently not allowed.");
+    if (!allowUse(player, auth)) {
       return;
     }
 
@@ -54,18 +53,34 @@ public class LoginCommand extends AbstractCommand implements PlayerCommand {
     }
 
     if (auth.isRegistered(userName)) {
-      if (auth.login(player, userName, password)) {
-        player.addTMessage(Color.GRAY, "Login successfull!");
-        player.addTMessage(Color.GRAY, "Please reconnect to the server within " + Authenticator.REQUEST_EXPIRATION + " seconds to complete the CustAuth process.");
-        player.setUsedAuthenticator(true);
+      if (auth.loginBanTimeOver(player)) {
+        if (auth.login(player, userName, password)) {
+          player.addTMessage(Color.GRAY, "Login successfull!");
+          player.addTMessage(Color.GRAY, "Please reconnect to the server within %s seconds to complete the CustAuth process.", Authenticator.REQUEST_EXPIRATION);
+          player.setUsedAuthenticator(true);
+        } else {
+          player.addTMessage(Color.RED, "Login failed! Password missmatch.");
+          auth.banLogin(player);
+        }
       } else {
-        player.addTMessage(Color.RED, "Login failed! Password missmatch.");
+        player.addTMessage(Color.RED, "Login currently not allowed. Try again in %s seconds", auth.banTimeEnd(player));
       }
-
     } else {
       player.addTMessage(Color.RED, "You are not registered!");
       player.addTMessage(Color.RED, "Use the %s command to register.", (commandPrefix() + "register"));
       return;
     }
+  }
+
+  private boolean allowUse(Player player, Authenticator auth) {
+    if (!auth.allowLogin()) {
+      player.addTMessage(Color.RED, "Login failed! CustAuth login currently not allowed.");
+      return false;
+    }
+    if (!player.isGuest()) {
+      player.addTMessage(Color.RED, "You can only use CustAuth login if you're a guest.");
+      return false;
+    }
+    return true;
   }
 }
