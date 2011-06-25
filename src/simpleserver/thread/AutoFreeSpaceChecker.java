@@ -48,39 +48,55 @@ public class AutoFreeSpaceChecker {
 
   public void check() {
     try {
-      while (FileSystemUtils.freeSpaceKb() < 50 * 1024) {
-        File[] files = BACKUP_DIRECTORY.listFiles(new FileFilter() {
-          public boolean accept(File file) {
-            return file.isFile() && file.getPath().contains(".zip");
-          }
-        });
+      long freeSpaceKb = FileSystemUtils.freeSpaceKb();
+      if (freeSpaceKb < 50 * 1024) {
+        System.out.println("[SimpleServer] Warning: You have only " +
+                           Math.round(freeSpaceKb / 1024) +
+                           " MB free space in this drive!");
+        System.out.println("[SimpleServer] Trying to delete old backups...");
 
-        long firstCreatedTime = Long.MAX_VALUE;
-        File firstCreatedFile = null;
-        for (File file : files) {
-          DateFormat format = new SimpleDateFormat("yyyy-MM-dd-HH-mm");
-          GregorianCalendar cal = new GregorianCalendar();
-          Date fileTime;
-          try {
-            fileTime = format.parse(file.getName().split(".zip")[0]);
-          } catch (ParseException e) {
-            continue;
-          }
-          cal.setTime(fileTime);
+        int filesDeleted = 0;
+        while (FileSystemUtils.freeSpaceKb() < 50 * 1024) {
+          File[] files = BACKUP_DIRECTORY.listFiles(new FileFilter() {
+            public boolean accept(File file) {
+              return file.isFile() && file.getPath().contains(".zip");
+            }
+          });
 
-          if (cal.getTimeInMillis() < firstCreatedTime) {
-            firstCreatedFile = file;
-            firstCreatedTime = cal.getTimeInMillis();
+          long firstCreatedTime = Long.MAX_VALUE;
+          File firstCreatedFile = null;
+          for (File file : files) {
+            DateFormat format = new SimpleDateFormat("yyyy-MM-dd-HH-mm");
+            GregorianCalendar cal = new GregorianCalendar();
+            Date fileTime;
+            try {
+              fileTime = format.parse(file.getName().split(".zip")[0]);
+            } catch (ParseException e) {
+              continue;
+            }
+            cal.setTime(fileTime);
+
+            if (cal.getTimeInMillis() < firstCreatedTime) {
+              firstCreatedFile = file;
+              firstCreatedTime = cal.getTimeInMillis();
+            }
+          }
+
+          if (firstCreatedFile != null) {
+            System.out.println("[SimpleServer] Deleting: " + firstCreatedFile.getPath());
+            firstCreatedFile.delete();
+            filesDeleted++;
+          } else {
+            System.out.println("[SimpleServer] No backups found...");
+            return;
           }
         }
 
-        if (firstCreatedFile != null) {
-          firstCreatedFile.delete();
-        } else {
-          break;
-        }
+        System.out.println("[SimpleServer] Deleted " + filesDeleted + " backup archives.");
       }
     } catch (IOException e) {
+      System.out.println("[SimpleServer] " + e);
+      System.out.println("[SimpleServer] Free Space Checker Failed!");
     }
   }
 
