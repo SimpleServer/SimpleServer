@@ -32,31 +32,40 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import org.apache.commons.io.FileSystemUtils;
+import org.apache.commons.io.FileUtils;
+
+import simpleserver.Server;
 
 public class AutoFreeSpaceChecker {
   private static final File BACKUP_DIRECTORY = new File("backups");
   private static final int period = 5 * 60 * 1000;
 
   private final Timer timer;
+  private final Server server;
 
-  public AutoFreeSpaceChecker() {
+  public AutoFreeSpaceChecker(Server server) {
     check();
 
     timer = new Timer();
     timer.schedule(new Checker(), 0, period);
+
+    this.server = server;
   }
 
   public void check() {
     try {
+      long worldSize = FileUtils.sizeOfDirectory(new File(server.options.get("levelName")));
+      long worldSizeKb = Math.round(worldSize / 1024);
+
       long freeSpaceKb = FileSystemUtils.freeSpaceKb();
-      if (freeSpaceKb < 50 * 1024) {
+      if (freeSpaceKb < worldSizeKb * 2) {
         System.out.println("[SimpleServer] Warning: You have only " +
                            Math.round(freeSpaceKb / 1024) +
                            " MB free space in this drive!");
         System.out.println("[SimpleServer] Trying to delete old backups...");
 
         int filesDeleted = 0;
-        while (FileSystemUtils.freeSpaceKb() < 50 * 1024) {
+        while (FileSystemUtils.freeSpaceKb() < worldSizeKb * 2) {
           File[] files = BACKUP_DIRECTORY.listFiles(new FileFilter() {
             public boolean accept(File file) {
               return file.isFile() && file.getPath().contains(".zip");

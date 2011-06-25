@@ -407,7 +407,7 @@ public class Server {
     if (options.getBoolean("enableRcon")) {
       rconServer = new RconServer(this);
     }
-    autoSpaceCheck = new AutoFreeSpaceChecker();
+    autoSpaceCheck = new AutoFreeSpaceChecker(this);
     autoBackup = new AutoBackup(this);
     autosave = new AutoSave(this);
     autoRestart = new AutoRestart(this);
