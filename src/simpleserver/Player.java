@@ -339,8 +339,9 @@ public class Player {
   }
 
   public boolean isAdmin() {
-    if (groupObject != null)
+    if (groupObject != null) {
       return groupObject.isAdmin();
+    }
     return false;
   }
 
@@ -389,8 +390,9 @@ public class Player {
   }
 
   public boolean parseCommand(String message) {
-    if (closed)
+    if (closed) {
       return true;
+    }
 
     // Repeat last command
     if (message.equals(server.getCommandParser().commandPrefix() + "!")) {
@@ -398,8 +400,9 @@ public class Player {
     }
 
     PlayerCommand command = server.getCommandParser().getPlayerCommand(message);
-    if (command == null)
+    if (command == null) {
       return false;
+    }
 
     boolean invalidCommand = command.getName() == null;
 
@@ -535,15 +538,14 @@ public class Player {
     }
 
     if (name != null) {
+      server.authenticator.unbanLogin(this);
       if (usedAuthenticator) {
         if (guest) {
           server.authenticator.releaseGuestName(name);
-        }
-        else {
+        } else {
           server.authenticator.rememberAuthentication(name, getIPAddress());
         }
-      }
-      else if (guest) {
+      } else if (guest) {
         server.authenticator.rememberGuest(name, getIPAddress());
       }
 
@@ -616,8 +618,9 @@ public class Player {
     private static Boolean canCycle = null;
 
     private synchronized String getNextAddress() {
-      if (!canCycle())
+      if (!canCycle()) {
         return "127.0.0.1";
+      }
 
       if (octets[2] >= 255) {
         if (octets[1] >= 255) {

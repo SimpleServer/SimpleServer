@@ -29,6 +29,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.ListIterator;
 import java.util.PriorityQueue;
@@ -44,7 +45,7 @@ public class Authenticator {
   public static final int REQUEST_EXPIRATION = 60;
   private static final int REMEMBER_TIME = REQUEST_EXPIRATION;
 
-  private static final int MAX_GUEST_PLAYERS = 20;
+  private static final short MAX_GUEST_PLAYERS = 50;
   private static final String GUEST_PREFIX = t("Player");
 
   private final Server server;
@@ -54,16 +55,17 @@ public class Authenticator {
   private URL minecraftNet;
   private Timer timer;
 
-  private LinkedList<LoginRequest> loginRequests = new LinkedList<LoginRequest>();
+  private LinkedList<AuthRequest> authRequests = new LinkedList<AuthRequest>();
   // private LindedList<Guests>
-  private PriorityQueue<Integer> freeGuestNumbers = new PriorityQueue<Integer>(MAX_GUEST_PLAYERS);
+  private Hashtable<String, loginBan> loginBans = new Hashtable<String, loginBan>();
+  private PriorityQueue<Short> freeGuestNumbers = new PriorityQueue<Short>(MAX_GUEST_PLAYERS);
 
-  public Authenticator(Server simpleserver) {
-    server = simpleserver;
+  public Authenticator(Server se) {
+    server = se;
     auths = server.auths;
 
-    for (int i = 0; i < MAX_GUEST_PLAYERS; i++) {
-      freeGuestNumbers.offer(i + 1);
+    for (int i = 0; i < MAX_GUEST_PLAYERS;) {
+      freeGuestNumbers.offer((short) ++i);
     }
 
     try {
@@ -72,15 +74,19 @@ public class Authenticator {
       e1.printStackTrace();
     }
 
-    if (server.options.getBoolean("onlineMode")) {
+    if (useCustAuth()) {
       timer = new Timer();
       timer.schedule(new MinecraftOnlineChecker(this), 0, REFRESH_TIME * 1000);
     }
   }
 
   /***** PERMISSIONS *****/
+  public boolean useCustAuth() {
+    return server.options.getBoolean("onlineMode") && isMinecraftUp;
+  }
+
   public boolean useCustAuth(Player player) {
-    return (server.options.getBoolean("onlineMode") && isMinecraftUp && !player.isGuest() && !player.usedAuthenticator());
+    return useCustAuth() && !player.isGuest() && !player.usedAuthenticator();
   }
 
   public boolean allowLogin() {
@@ -121,24 +127,24 @@ public class Authenticator {
   }
 
   private void addLoginRequest(String playerName, String IP) {
-    loginRequests.add(new LoginRequest(playerName, IP));
+    authRequests.add(new AuthRequest(playerName, IP));
   }
 
   public void rememberAuthentication(String playerName, String IP) {
-    loginRequests.add(new LoginRequest(playerName, IP, false));
+    authRequests.add(new AuthRequest(playerName, IP, false));
   }
 
   /***** LOGIN REQUEST VALIDATION / COMPLETE LOGIN *****/
 
-  public LoginRequest getLoginRequest(String IP) {
+  public AuthRequest getAuthRequest(String IP) {
     if (!allowLogin()) {
       return null;
     }
-    ListIterator<LoginRequest> requests = loginRequests.listIterator();
-    LoginRequest res = null;
+    ListIterator<AuthRequest> requests = authRequests.listIterator();
+    AuthRequest res = null;
 
     while (requests.hasNext()) {
-      LoginRequest current = requests.next();
+      AuthRequest current = requests.next();
       if (current.IP.equals(IP)) {
         res = current;
         if (current.isGuest) {
@@ -155,7 +161,7 @@ public class Authenticator {
     return res;
   }
 
-  public boolean completeLogin(LoginRequest req, Player player) {
+  public boolean completeLogin(AuthRequest req, Player player) {
     // used custAuth or is remembered
 
     if (req.remember) {
@@ -186,9 +192,9 @@ public class Authenticator {
   }
 
   private void cleanLoginRequests() {
-    ListIterator<LoginRequest> requests = loginRequests.listIterator();
+    ListIterator<AuthRequest> requests = authRequests.listIterator();
     while (requests.hasNext()) {
-      LoginRequest current = requests.next();
+      AuthRequest current = requests.next();
       if (current.isValid()) {
         break;
       }
@@ -202,9 +208,9 @@ public class Authenticator {
 
   /***** GUEST NAMES *****/
 
-  public String getFreeGuestName(String IP) {
+  public synchronized String getFreeGuestName(String IP) {
     String name = null;
-    LoginRequest req = getLoginRequest(IP);
+    AuthRequest req = getAuthRequest(IP);
     if (req != null && req.isValid() && server.playerList.findPlayerExact(req.playerName) != null) {
       return req.playerName;
     } else {
@@ -216,50 +222,45 @@ public class Authenticator {
   }
 
   public void rememberGuest(String playerName, String IP) {
-    loginRequests.add(new LoginRequest(playerName, IP, true));
+    authRequests.add(new AuthRequest(playerName, IP, true));
   }
 
-  public void releaseGuestName(String name) {
+  public synchronized void releaseGuestName(String name) {
     freeGuestNumbers.offer(extractGuestNumber(name));
     // delete name.dat or set to empty
   }
 
-  private int extractGuestNumber(String guestName) {
-    return Integer.parseInt(guestName.substring(GUEST_PREFIX.length()));
+  private short extractGuestNumber(String guestName) {
+    return Short.parseShort(guestName.substring(GUEST_PREFIX.length()));
   }
 
-  private String buildGuestName(int guestNumber) {
+  private String buildGuestName(short guestNumber) {
     return GUEST_PREFIX + guestNumber;
   }
 
   /***** MINECRAFT.NET AUTHENTICATION *****/
 
   public boolean onlineAuthenticate(Player player) {
-    if (!server.options.getBoolean("custAuth") || !server.options.getBoolean("onlineMode")) {
-      return true;
-    }
-    if (!isMinecraftUp) {
+    if (useCustAuth()) {
       return true;
     }
 
     boolean result = false;
     // Send a GET request to minecraft.net
+
+    String urlStr = MINECRAFT_AUTH_URL + String.format("?user=%s&serverId=%s", player.getName(), player.getConnectionHash());
     try {
-
-      String urlStr = MINECRAFT_AUTH_URL + "?user=" + player.getName() + "&serverId=" + player.getConnectionHash();
-
       URL url = new URL(urlStr);
       URLConnection conn = url.openConnection();
 
       BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-
       result = (in.readLine().equals("YES")) ? true : false;
-      // System.out.println("onlineAuthentcation: " + result);
-
       in.close();
+
+    } catch (MalformedURLException e) {
+      System.out.println("[CustAuth] Malformed URL: " + urlStr);
     } catch (Exception e) {
       // seems to be down
-      e.printStackTrace();
       updateMinecraftState();
     }
 
@@ -273,7 +274,6 @@ public class Authenticator {
 
     try {
       HttpURLConnection mc = (HttpURLConnection) minecraftNet.openConnection();
-
       if (mc.getResponseCode() != 200) {
         isMinecraftUp = false;
       } else {
@@ -300,24 +300,24 @@ public class Authenticator {
   }
 
   @Override
-  protected void finalize() {
+  public void finalize() {
     timer.cancel();
   }
 
-  public class LoginRequest {
+  public class AuthRequest {
     public String playerName;
     public String IP;
     public long expirationTime;
     public boolean remember = false;
     public boolean isGuest = false;
 
-    public LoginRequest(String playerName, String IP) {
+    public AuthRequest(String playerName, String IP) {
       this.playerName = playerName;
       this.IP = IP;
       expirationTime = System.currentTimeMillis() + (REQUEST_EXPIRATION * 1000);
     }
 
-    public LoginRequest(String playerName, String IP, boolean isGuest) {
+    public AuthRequest(String playerName, String IP, boolean isGuest) {
       this.playerName = playerName;
       this.IP = IP;
       expirationTime = System.currentTimeMillis() + (REMEMBER_TIME * 1000);
@@ -344,29 +344,54 @@ public class Authenticator {
     }
   }
 
-  /**
-   * @param player
-   * @return if login-bantime is over
-   */
+  /***** LOGIN BAN *****/
   public boolean loginBanTimeOver(Player player) {
-    // TODO Auto-generated method stub
-    return true;
+    return !loginBans.containsKey(player.getName()) ||
+        loginBans.get(player.getName()).isBanOver();
   }
 
-  /**
-   * @param player
-   */
   public void banLogin(Player player) {
-    // TODO Auto-generated method stub
-
+    if (loginBans.containsKey(player.getName())) {
+      loginBans.get(player.getName()).increaseLevel();
+    } else {
+      loginBans.put(player.getName(), new loginBan());
+    }
   }
 
-  /**
-   * @param player
-   * @return
-   */
-  public Object banTimeEnd(Player player) {
-    // TODO Auto-generated method stub
-    return null;
+  public void unbanLogin(Player player) {
+    loginBans.remove(player.getName());
+  }
+
+  public int leftBanTime(Player player) {
+    return loginBans.get(player.getName()).getLeftBanTime();
+  }
+
+  static class loginBan {
+    int banLevel = 0;
+    long endTime;
+
+    public loginBan() {
+      increaseLevel();
+    }
+
+    public void increaseLevel() {
+      setEndTime(++banLevel);
+    }
+
+    private void setEndTime(int level) {
+      endTime = System.currentTimeMillis() + 1000 * banTime(level);
+    }
+
+    public int getLeftBanTime() {
+      return (int) (endTime - System.currentTimeMillis()) / 1000;
+    }
+
+    public boolean isBanOver() {
+      return (getLeftBanTime() <= 0);
+    }
+
+    public static int banTime(int level) {
+      return (int) Math.pow(2, level) / 10;
+    }
   }
 }

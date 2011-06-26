@@ -52,23 +52,25 @@ public class LoginCommand extends AbstractCommand implements PlayerCommand {
       return;
     }
 
-    if (auth.isRegistered(userName)) {
-      if (auth.loginBanTimeOver(player)) {
-        if (auth.login(player, userName, password)) {
-          player.addTMessage(Color.GRAY, "Login successfull!");
-          player.addTMessage(Color.GRAY, "Please reconnect to the server within %s seconds to complete the CustAuth process.", Authenticator.REQUEST_EXPIRATION);
-          player.setUsedAuthenticator(true);
-        } else {
-          player.addTMessage(Color.RED, "Login failed! Password missmatch.");
-          auth.banLogin(player);
-        }
-      } else {
-        player.addTMessage(Color.RED, "Login currently not allowed. Try again in %s seconds", auth.banTimeEnd(player));
-      }
-    } else {
+    if (!auth.isRegistered(userName)) {
       player.addTMessage(Color.RED, "You are not registered!");
       player.addTMessage(Color.RED, "Use the %s command to register.", (commandPrefix() + "register"));
       return;
+    }
+
+    if (!auth.loginBanTimeOver(player)) {
+      player.addTMessage(Color.RED, "You've to wait %s seconds before another try to login.", auth.leftBanTime(player));
+      return;
+    }
+
+    if (auth.login(player, userName, password)) {
+      player.addTMessage(Color.GRAY, "Login successfull!");
+      player.addTMessage(Color.GRAY, "Please reconnect to the server within %s seconds to complete the CustAuth process.", Authenticator.REQUEST_EXPIRATION);
+      player.setUsedAuthenticator(true);
+      auth.unbanLogin(player);
+    } else {
+      player.addTMessage(Color.RED, "Login failed! Password missmatch.");
+      auth.banLogin(player);
     }
   }
 
@@ -78,7 +80,7 @@ public class LoginCommand extends AbstractCommand implements PlayerCommand {
       return false;
     }
     if (!player.isGuest()) {
-      player.addTMessage(Color.RED, "You can only use CustAuth login if you're a guest.");
+      player.addTMessage(Color.RED, "You can only use CustAuth login if you're in offline mode.");
       return false;
     }
     return true;

@@ -37,7 +37,7 @@ import java.util.IllegalFormatException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import simpleserver.Authenticator.LoginRequest;
+import simpleserver.Authenticator.AuthRequest;
 import simpleserver.Color;
 import simpleserver.Coordinate;
 import simpleserver.Coordinate.Dimension;
@@ -185,11 +185,12 @@ public class StreamTunnel {
         } else {
           if (name.equals("Player") || !server.authenticator.isMinecraftUp) {
 
-            LoginRequest req = server.authenticator.getLoginRequest(player.getIPAddress());
+            AuthRequest req = server.authenticator.getAuthRequest(player.getIPAddress());
             if (req != null) {
               name = req.playerName;
               nameSet = server.authenticator.completeLogin(req, player);
-            } else {
+            }
+            if (req == null || !nameSet) {
               name = server.authenticator.getFreeGuestName(player.getIPAddress());
               nameSet = player.setName(name);
               player.setGuest(true);
