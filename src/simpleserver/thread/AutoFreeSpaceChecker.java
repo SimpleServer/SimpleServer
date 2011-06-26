@@ -44,7 +44,7 @@ public class AutoFreeSpaceChecker {
   private final Server server;
 
   public AutoFreeSpaceChecker(Server server) {
-    check();
+    check(false);
 
     timer = new Timer();
     timer.schedule(new Checker(), 0, period);
@@ -52,20 +52,24 @@ public class AutoFreeSpaceChecker {
     this.server = server;
   }
 
-  public void check() {
+  public void check(boolean beforeBackup) {
     try {
-      long worldSize = FileUtils.sizeOfDirectory(new File(server.options.get("levelName")));
-      long worldSizeKb = Math.round(worldSize / 1024);
+      long neededSizeKb;
+      if (beforeBackup) {
+        neededSizeKb = Math.round(FileUtils.sizeOfDirectory(new File(server.options.get("levelName"))) / 1024) * 2;
+      } else {
+        neededSizeKb = 50 * 1024;
+      }
 
       long freeSpaceKb = FileSystemUtils.freeSpaceKb();
-      if (freeSpaceKb < worldSizeKb * 2) {
+      if (freeSpaceKb < neededSizeKb) {
         System.out.println("[SimpleServer] Warning: You have only " +
                            Math.round(freeSpaceKb / 1024) +
                            " MB free space in this drive!");
         System.out.println("[SimpleServer] Trying to delete old backups...");
 
         int filesDeleted = 0;
-        while (FileSystemUtils.freeSpaceKb() < worldSizeKb * 2) {
+        while (FileSystemUtils.freeSpaceKb() < neededSizeKb) {
           File[] files = BACKUP_DIRECTORY.listFiles(new FileFilter() {
             public boolean accept(File file) {
               return file.isFile() && file.getPath().contains(".zip");
@@ -120,7 +124,7 @@ public class AutoFreeSpaceChecker {
 
     @Override
     public void run() {
-      check();
+      check(false);
     }
   }
 }

@@ -248,6 +248,8 @@ public class AutoBackup {
           }
           forceBackup = false;
 
+          server.autoSpaceCheck.check(true);
+
           if (server.options.getBoolean("announceSave")) {
             server.runCommand("say", t("Saving Map..."));
           }

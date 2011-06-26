@@ -94,7 +94,7 @@ public class Server {
   private RconServer rconServer;
   private TelnetServer telnetServer;
   private AutoRun c10t;
-  private AutoFreeSpaceChecker autoSpaceCheck;
+  public AutoFreeSpaceChecker autoSpaceCheck;
   private AutoBackup autoBackup;
   private AutoSave autosave;
   private AutoRestart autoRestart;
