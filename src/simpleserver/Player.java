@@ -31,6 +31,7 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import simpleserver.Coordinate.Dimension;
+import simpleserver.bot.Teleporter;
 import simpleserver.command.ExternalCommand;
 import simpleserver.command.PlayerCommand;
 import simpleserver.stream.StreamTunnel;
@@ -54,7 +55,7 @@ public class Player {
   private boolean instantDestroy = false;
   private boolean godMode = false;
   private String kickMsg = null;
-  private double x, y, z;
+  public Position position;
   private Dimension dimension;
   private int group = 0;
   private int entityId = 0;
@@ -81,6 +82,7 @@ public class Player {
 
   public Player(Socket inc, Server parent) {
     connected = System.currentTimeMillis();
+    position = new Position();
     server = parent;
     extsocket = inc;
     if (server.isRobot(getIPAddress())) {
@@ -178,18 +180,11 @@ public class Player {
   }
 
   public double distanceTo(Player player) {
-    return Math.sqrt(Math.pow(x - player.x, 2) + Math.pow(y - player.y, 2)
-        + Math.pow(z - player.z, 2));
+    return Math.sqrt(Math.pow(x() - player.x(), 2) + Math.pow(y() - player.y(), 2) + Math.pow(z() - player.z(), 2));
   }
 
   public long getConnectedAt() {
     return connected;
-  }
-
-  public void updateLocation(double x, double y, double z, double stance) {
-    this.x = x;
-    this.y = y;
-    this.z = z;
   }
 
   public boolean isAttemptLock() {
@@ -338,20 +333,28 @@ public class Player {
     return extsocket.getInetAddress().getHostAddress();
   }
 
-  public double getX() {
-    return x;
+  public double x() {
+    return position.x;
   }
 
-  public double getY() {
-    return y;
+  public double y() {
+    return position.y;
   }
 
-  public double getZ() {
-    return z;
+  public double z() {
+    return position.z;
   }
 
   public Coordinate position() {
-    return new Coordinate((int) x, (int) y, (int) z, dimension);
+    return position.coordinate();
+  }
+
+  public float yaw() {
+    return position.yaw;
+  }
+
+  public float pitch() {
+    return position.pitch;
   }
 
   public void setLocalChat(boolean mode) {
@@ -576,11 +579,11 @@ public class Player {
     }
   }
 
-  private static final class LocalAddressFactory {
+  public static final class LocalAddressFactory {
     private static final int[] octets = { 0, 0, 1 };
     private static Boolean canCycle = null;
 
-    private synchronized String getNextAddress() {
+    public synchronized String getNextAddress() {
       if (!canCycle()) {
         return "127.0.0.1";
       }
@@ -673,4 +676,11 @@ public class Player {
     return dimension;
   }
 
+  public boolean teleport(Coordinate coordinate) throws IOException {
+    return server.bots.connect(new Teleporter(this, coordinate));
+  }
+
+  public boolean teleport(Position position) throws IOException {
+    return server.bots.connect(new Teleporter(this, position));
+  }
 }

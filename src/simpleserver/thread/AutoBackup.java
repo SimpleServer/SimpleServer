@@ -24,12 +24,17 @@ import static simpleserver.lang.Translations.t;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -105,26 +110,14 @@ public class AutoBackup {
   }
 
   private long lastBackupAge() {
-    BACKUP_DIRECTORY.mkdir();
-
-    long newest = 0;
-    for (File file : BACKUP_DIRECTORY.listFiles()) {
-      long modified = file.lastModified();
-      if (modified > newest) {
-        newest = modified;
-      }
-    }
-    return System.currentTimeMillis() - newest;
+    return age(newestBackup());
   }
 
   private void purgeOldBackups() {
-    BACKUP_DIRECTORY.mkdir();
-    long maxAge = MILLISECONDS_PER_HOUR
-        * server.options.getInt("keepBackupHours");
-    for (File file : BACKUP_DIRECTORY.listFiles()) {
-      if (System.currentTimeMillis() - file.lastModified() > maxAge) {
-        deleteRecursively(file);
-      }
+    long maxAge = MILLISECONDS_PER_HOUR * server.options.getInt("keepBackupHours");
+    File file;
+    while (age(file = oldestBackup()) > maxAge) {
+      deleteRecursively(file);
     }
   }
 
@@ -234,6 +227,56 @@ public class AutoBackup {
       }
     }
     path.delete();
+  }
+
+  public static File newestBackup() {
+    return getBackup(false);
+  }
+
+  public static File oldestBackup() {
+    return getBackup(true);
+  }
+
+  private static File getBackup(boolean old) {
+    BACKUP_DIRECTORY.mkdir();
+    File[] files = BACKUP_DIRECTORY.listFiles(new FileFilter() {
+      public boolean accept(File file) {
+        return file.isFile() && file.getPath().contains(".zip");
+      }
+    });
+    long firstCreatedTime = old ? Long.MAX_VALUE : 0;
+    File firstCreatedFile = null;
+    for (File file : files) {
+      long date;
+      try {
+        date = date(file);
+      } catch (ParseException e) {
+        continue;
+      }
+
+      if ((old && date < firstCreatedTime) || (!old && date > firstCreatedTime)) {
+        firstCreatedFile = file;
+        firstCreatedTime = date;
+      }
+    }
+    return firstCreatedFile;
+  }
+
+  private static long date(File file) throws ParseException {
+    DateFormat format = new SimpleDateFormat("yyyy-MM-dd-HH-mm");
+    GregorianCalendar cal = new GregorianCalendar();
+    Date fileTime;
+    fileTime = format.parse(file.getName().split(".zip")[0]);
+    cal.setTime(fileTime);
+    return cal.getTimeInMillis();
+  }
+
+  private static long age(File file) {
+    try {
+      return System.currentTimeMillis() - date(file);
+    } catch (ParseException e) {
+      return System.currentTimeMillis() - file.lastModified();
+    }
   }
 
   private final class Archiver extends Thread {

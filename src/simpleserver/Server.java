@@ -31,8 +31,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Semaphore;
 
+import simpleserver.bot.BotController;
 import simpleserver.config.ChestList;
 import simpleserver.config.GiveAliasList;
+import simpleserver.config.GlobalData;
 import simpleserver.config.HelpText;
 import simpleserver.config.IPBanList;
 import simpleserver.config.KitList;
@@ -77,6 +79,7 @@ public class Server {
   public MuteList mutelist;
   public GiveAliasList giveAliasList;
   public Stats stats;
+  public GlobalData data;
   private RobotList robots;
 
   public PermissionConfig permissions;
@@ -107,6 +110,7 @@ public class Server {
   public Semaphore saveLock = new Semaphore(1);
 
   public Time time;
+  public BotController bots;
 
   public Server() {
     listener = new Listener();
@@ -356,8 +360,10 @@ public class Server {
     resources.add(mutelist = new MuteList());
     resources.add(giveAliasList = new GiveAliasList());
     resources.add(stats = new Stats());
+    resources.add(data = new GlobalData());
 
     time = new Time(this);
+    bots = new BotController(this);
 
     systemInput = new SystemInputQueue();
     adminLog = new AdminLog();
@@ -373,6 +379,7 @@ public class Server {
     errorLog.stop();
     connectionLog.stop();
     time.unfreeze();
+    bots.cleanup();
   }
 
   private void startup() {
@@ -419,11 +426,15 @@ public class Server {
         System.out.println("[SimpleServer] Warning: freezeTime option is not valid");
       }
     }
+
+    bots.ready();
   }
 
   private void shutdown() {
     System.out.println("[SimpleServer] Stopping Server...");
     save = false;
+
+    bots.stop();
 
     if (!saveLock.tryAcquire()) {
       System.out.println("[SimpleServer] Server is currently Backing Up/Saving...");

@@ -21,13 +21,7 @@
 package simpleserver.thread;
 
 import java.io.File;
-import java.io.FileFilter;
 import java.io.IOException;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -70,30 +64,7 @@ public class AutoFreeSpaceChecker {
 
         int filesDeleted = 0;
         while (FileSystemUtils.freeSpaceKb() < neededSizeKb) {
-          File[] files = BACKUP_DIRECTORY.listFiles(new FileFilter() {
-            public boolean accept(File file) {
-              return file.isFile() && file.getPath().contains(".zip");
-            }
-          });
-
-          long firstCreatedTime = Long.MAX_VALUE;
-          File firstCreatedFile = null;
-          for (File file : files) {
-            DateFormat format = new SimpleDateFormat("yyyy-MM-dd-HH-mm");
-            GregorianCalendar cal = new GregorianCalendar();
-            Date fileTime;
-            try {
-              fileTime = format.parse(file.getName().split(".zip")[0]);
-            } catch (ParseException e) {
-              continue;
-            }
-            cal.setTime(fileTime);
-
-            if (cal.getTimeInMillis() < firstCreatedTime) {
-              firstCreatedFile = file;
-              firstCreatedTime = cal.getTimeInMillis();
-            }
-          }
+          File firstCreatedFile = AutoBackup.oldestBackup();
 
           if (firstCreatedFile != null) {
             System.out.println("[SimpleServer] Deleting: " + firstCreatedFile.getPath());

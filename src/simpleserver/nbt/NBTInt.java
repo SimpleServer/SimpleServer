@@ -18,30 +18,49 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package simpleserver.command;
+package simpleserver.nbt;
 
-import static simpleserver.lang.Translations.t;
-import simpleserver.Color;
-import simpleserver.Player;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 
-public class GPSCommand extends OnlinePlayerArgCommand {
-  public GPSCommand() {
-    super("gps [PLAYER]", "Display block coordinates of named player or yourself", true);
+public class NBTInt extends NBTag {
+  private Integer value;
+
+  NBTInt(DataInputStream in, Boolean named) throws Exception {
+    super(in, named);
+  }
+
+  public NBTInt(int value) {
+    set(value);
+  }
+
+  public NBTInt(String name, int value) {
+    super(name);
+    set(value);
   }
 
   @Override
-  protected void executeWithTarget(Player player, String message, Player target) {
-    String name = t("Your");
-    if (target == null) {
-      target = player;
-    } else {
-      name = t("%s's", target.getName());
-    }
+  protected byte id() {
+    return 3;
+  }
 
-    player.addTMessage(Color.GRAY,
-                       "%s Latitude: %s %d %s Longitude: %s %d %s Altitude: %s %d %s Dimension: %s %s",
-                       name, Color.WHITE, (int) target.x(), Color.GRAY, Color.WHITE,
-                       (int) target.z(), Color.GRAY, Color.WHITE, (int) target.y(), Color.GRAY,
-                       Color.WHITE, target.getDimension());
+  @Override
+  public Integer get() {
+    return value;
+  }
+
+  public void set(int value) {
+    this.value = value;
+  }
+
+  @Override
+  protected void loadValue(DataInputStream in) throws IOException {
+    value = in.readInt();
+  }
+
+  @Override
+  protected void saveValue(DataOutputStream out) throws IOException {
+    out.writeInt(value);
   }
 }

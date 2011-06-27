@@ -18,30 +18,46 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package simpleserver.command;
+package simpleserver.nbt;
 
-import static simpleserver.lang.Translations.t;
-import simpleserver.Color;
-import simpleserver.Player;
+import java.io.DataInputStream;
 
-public class GPSCommand extends OnlinePlayerArgCommand {
-  public GPSCommand() {
-    super("gps [PLAYER]", "Display block coordinates of named player or yourself", true);
+public enum NBT {
+  END(NBTEnd.class),
+  BYTE(NBTByte.class),
+  SHORT(NBTShort.class),
+  INT(NBTInt.class),
+  LONG(NBTLong.class),
+  FLOAT(NBTFloat.class),
+  DOUBLE(NBTDouble.class),
+  ARRAY(NBTArray.class),
+  STRING(NBTString.class),
+  LIST(NBTList.class),
+  COMPOUND(NBTCompound.class);
+
+  private Class<? extends NBTag> c;
+
+  NBT(Class<? extends NBTag> c) {
+    this.c = c;
   }
 
-  @Override
-  protected void executeWithTarget(Player player, String message, Player target) {
-    String name = t("Your");
-    if (target == null) {
-      target = player;
-    } else {
-      name = t("%s's", target.getName());
+  public byte id() {
+    return (byte) ordinal();
+  }
+
+  protected static NBTag loadTag(DataInputStream in, boolean named) throws Exception {
+    return loadTag(in, named, in.readByte());
+  }
+
+  protected static NBTag loadTag(DataInputStream in, boolean named, byte type) throws Exception {
+    if (type < 0 || type > 10) {
+      throw new Exception("Unknown NBT type");
     }
-
-    player.addTMessage(Color.GRAY,
-                       "%s Latitude: %s %d %s Longitude: %s %d %s Altitude: %s %d %s Dimension: %s %s",
-                       name, Color.WHITE, (int) target.x(), Color.GRAY, Color.WHITE,
-                       (int) target.z(), Color.GRAY, Color.WHITE, (int) target.y(), Color.GRAY,
-                       Color.WHITE, target.getDimension());
+    try {
+      return values()[type].c.getDeclaredConstructor(DataInputStream.class, Boolean.class).newInstance(in, named);
+    } catch (Exception e) {
+      throw new Exception("Something went horribly wrong: " + e.getMessage());
+    }
   }
+
 }

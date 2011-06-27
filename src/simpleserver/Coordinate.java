@@ -138,6 +138,10 @@ public class Coordinate {
       return super.toString().equals(name.toUpperCase());
     }
 
+    public byte index() {
+      return index;
+    }
+
     public static Dimension get(byte index) {
       for (Dimension dim : Dimension.values()) {
         if (dim.index == index) {

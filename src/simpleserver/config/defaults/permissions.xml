@@ -70,6 +70,7 @@
       <command name="unmute" allow="3-5" />
       <command name="unwhitelist" allow="3-5" />
       <command name="visit" allow="-" />
+      <command name="warp" allow="3-5" />
       <command name="warpmeto" allow="3-5" />
       <command name="warptome" allow="3-5" />
       <command name="whitelist" allow="3-5" />

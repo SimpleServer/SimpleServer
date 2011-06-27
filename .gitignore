@@ -30,3 +30,4 @@
 *.BACKUP.*
 *.LOCAL.*
 *.class
+/translations/

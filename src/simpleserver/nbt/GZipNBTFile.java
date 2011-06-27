@@ -18,30 +18,32 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package simpleserver.command;
+package simpleserver.nbt;
 
-import static simpleserver.lang.Translations.t;
-import simpleserver.Color;
-import simpleserver.Player;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
-public class GPSCommand extends OnlinePlayerArgCommand {
-  public GPSCommand() {
-    super("gps [PLAYER]", "Display block coordinates of named player or yourself", true);
+public class GZipNBTFile extends NBTFile {
+  public GZipNBTFile(String filename) throws Exception {
+    super(new GZIPInputStream(new FileInputStream(filename)));
+  }
+
+  public GZipNBTFile(InputStream in) throws Exception {
+    super(new GZIPInputStream(in));
+  }
+
+  public GZipNBTFile() {
+    super();
   }
 
   @Override
-  protected void executeWithTarget(Player player, String message, Player target) {
-    String name = t("Your");
-    if (target == null) {
-      target = player;
-    } else {
-      name = t("%s's", target.getName());
-    }
-
-    player.addTMessage(Color.GRAY,
-                       "%s Latitude: %s %d %s Longitude: %s %d %s Altitude: %s %d %s Dimension: %s %s",
-                       name, Color.WHITE, (int) target.x(), Color.GRAY, Color.WHITE,
-                       (int) target.z(), Color.GRAY, Color.WHITE, (int) target.y(), Color.GRAY,
-                       Color.WHITE, target.getDimension());
+  protected OutputStream getOutputStream(String filename) throws FileNotFoundException, IOException {
+    return new GZIPOutputStream(new FileOutputStream(filename));
   }
 }
