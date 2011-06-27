@@ -20,6 +20,7 @@
  */
 package simpleserver.command;
 
+import simpleserver.Color;
 import simpleserver.Player;
 
 public class InstantDestroyCommand extends AbstractCommand implements
@@ -31,9 +32,9 @@ public class InstantDestroyCommand extends AbstractCommand implements
   public void execute(Player player, String message) {
     player.toggleInstantDestroy();
     if (player.instantDestroyEnabled()) {
-      player.addMessage("\u00a77Instant destroy Enabled!");
+      player.addTMessage(Color.WHITE, "Instant destroy Enabled!");
     } else {
-      player.addMessage("\u00a77Instant destroy Disabled!");
+      player.addTMessage(Color.WHITE, "Instant destroy Disabled!");
     }
   }
 }

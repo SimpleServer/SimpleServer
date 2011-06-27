@@ -20,6 +20,7 @@
  */
 package simpleserver.command;
 
+import simpleserver.Color;
 import simpleserver.Player;
 
 public class VisitCommand extends OnlinePlayerArgCommand {
@@ -30,22 +31,21 @@ public class VisitCommand extends OnlinePlayerArgCommand {
   @Override
   protected void executeWithTarget(Player player, String message, Player target) {
     if (player.getName().equals(target.getName())) {
-      player.addMessage("\u00a7cYou can not visit yourself!");
+      player.addTMessage(Color.RED, "You can not visit yourself!");
       return;
     }
 
     if (player.getDimension() == target.getDimension()) {
-      player.addMessage("\u00a77Requesting " + target.getName() + " for a visit...");
-      player.addMessage("\u00a77If nothing happens within 10 seconds, your request is denied.");
+      player.addTMessage(Color.GRAY, "Requesting %s for a visit...", target.getName());
+      player.addTMessage(Color.GRAY, "If nothing happens within 10 seconds, your request is denied.");
 
-      target.addMessage("\u00a7c" + player.getName() + " would like to visit you. If you agree,");
-      target.addMessage("\u00a7cissue the command " + commandPrefix() + "ok within 10 seconds.");
+      target.addTMessage(Color.GRAY, "%s would like to visit you. If you agree,", player.getName());
+      target.addTMessage(Color.GRAY, "issue the command %s within 10 seconds.", commandPrefix() + "ok");
 
       target.addVisitRequest(player);
     } else {
-      player.addMessage("\u00a7cYou and " + target.getName() + " are in different dimensions.");
-      player.addMessage("\u00a7cNo teleport possible!");
+      player.addTMessage(Color.RED, "You and %s are in different dimensions.", target.getName());
+      player.addTMessage(Color.RED, "No teleport possible!");
     }
-
   }
 }

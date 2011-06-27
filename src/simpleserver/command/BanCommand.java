@@ -20,6 +20,8 @@
  */
 package simpleserver.command;
 
+import static simpleserver.lang.Translations.t;
+import simpleserver.Color;
 import simpleserver.Player;
 import simpleserver.Server;
 
@@ -28,25 +30,37 @@ public class BanCommand extends PlayerArgCommand {
     super("ban PLAYER [REASON]", "Kick and ban the named player");
   }
 
+  protected boolean allowed(Player player, String target) {
+    Server server = player.getServer();
+    if (server.permissions.getNameGroup(target) >= player.getGroupId()) {
+      player.addTMessage(Color.RED, "You cannot ban players that are in your group or higher!");
+      return false;
+    }
+    return true;
+  }
+
   @Override
   protected void executeWithTarget(Player player, String message, String target) {
-    Server server = player.getServer();
-    String reason = extractArgument(message, 1);
-    if (reason == null) {
-      reason = "Banned by admin.";
+    if (allowed(player, target)) {
+      Server server = player.getServer();
+      String reason = extractArgument(message, 1);
+      if (reason == null) {
+        reason = t("Banned by admin.");
+      }
+
+      server.runCommand("ban", target);
+      server.kick(target, reason);
+
+      server.adminLog("User " + player.getName() + " banned player:\t " + target +
+          "\t(Banned by admin.)");
+
+      String msg = t("Player %s has been banned! (%s)", target, reason);
+      server.runCommand("say", msg);
     }
-
-    server.runCommand("ban", target);
-    server.kick(target, reason);
-
-    server.adminLog("User " + player.getName() + " banned player:\t " + target
-        + "\t(" + reason + ")");
-    server.runCommand("say", "Player " + target + " has been banned! ("
-        + reason + ")");
   }
 
   @Override
   protected void noTargetSpecified(Player player, String message) {
-    player.addMessage("\u00a7cNo player or reason specified.");
+    player.addTMessage(Color.RED, "No player or reason specified.");
   }
 }

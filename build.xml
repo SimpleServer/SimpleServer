@@ -27,6 +27,7 @@
       <fileset dir="bin"/>
       <zipfileset excludes="META-INF/**" src="lib/commons-collections-3.2.1.jar"/>
       <zipfileset excludes="META-INF/**" src="lib/commons-configuration-1.6.jar"/>
+      <zipfileset excludes="META-INF/**" src="lib/commons-io-2.0.1.jar"/>
       <zipfileset excludes="META-INF/**" src="lib/commons-jxpath-1.3.jar"/>
       <zipfileset excludes="META-INF/**" src="lib/commons-lang-2.6.jar"/>
       <zipfileset excludes="META-INF/**" src="lib/commons-logging-1.1.1.jar"/>
@@ -35,6 +36,7 @@
       <zipfileset excludes="META-INF/**" src="lib/httpclient-4.1.jar"/>
       <zipfileset excludes="META-INF/**" src="lib/httpcore-4.1.jar"/>
       <zipfileset excludes="META-INF/**" src="lib/javassist-3.8.0.GA.jar"/>
+      <zipfileset excludes="META-INF/**" src="lib/json-java.jar"/>
       <zipfileset excludes="META-INF/**" src="lib/reflections-0.9.5-RC2.jar"/>
       <zipfileset excludes="META-INF/**" src="lib/slf4j-api-1.6.1.jar"/>
       <zipfileset excludes="META-INF/**" src="lib/slf4j-nop-1.6.1.jar"/>

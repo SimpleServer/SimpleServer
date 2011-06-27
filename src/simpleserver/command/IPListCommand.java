@@ -20,6 +20,7 @@
  */
 package simpleserver.command;
 
+import simpleserver.Color;
 import simpleserver.Player;
 import simpleserver.Server;
 
@@ -30,7 +31,7 @@ public class IPListCommand extends AbstractCommand implements PlayerCommand,
   }
 
   public void execute(Player player, String message) {
-    player.addMessage("\u00a77IP Addresses:");
+    player.addTMessage(Color.GRAY, "IP Addresses:");
     for (Player friend : player.getServer().playerList.getArray()) {
       player.addMessage(friend.getName() + " " + friend.getIPAddress());
     }

@@ -20,6 +20,7 @@
  */
 package simpleserver.command;
 
+import static simpleserver.lang.Translations.t;
 import simpleserver.Color;
 import simpleserver.Player;
 
@@ -29,6 +30,11 @@ public class TimePlayerCommand extends TimeCommand implements PlayerCommand {
   public synchronized void execute(Player player, String message) {
     this.player = player;
     execute(player.getServer(), message);
+  }
+
+  @Override
+  protected void captionedInfo(String caption, String message, Object... args) {
+    player.addCaptionedMessage(caption, message, args);
   }
 
   @Override
@@ -42,7 +48,22 @@ public class TimePlayerCommand extends TimeCommand implements PlayerCommand {
   }
 
   @Override
-  protected void captionedInfo(String caption, String message, Object... args) {
-    player.addCaptionedMessage(caption, message, args);
+  protected void tCaptionedInfo(String caption, String message, Object... args) {
+    captionedInfo(t(caption), message, args);
+  }
+
+  @Override
+  protected void tError(String message) {
+    error(t(message));
+  }
+
+  @Override
+  protected void tError(String message, Object... args) {
+    error(t(message, args));
+  }
+
+  @Override
+  protected void tInfo(String message) {
+    info(t(message));
   }
 }

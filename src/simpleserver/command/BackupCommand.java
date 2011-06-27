@@ -20,6 +20,7 @@
  */
 package simpleserver.command;
 
+import simpleserver.Color;
 import simpleserver.Player;
 import simpleserver.Server;
 
@@ -30,7 +31,7 @@ public class BackupCommand extends AbstractCommand implements PlayerCommand,
   }
 
   public void execute(Player player, String message) {
-    player.addMessage("\u00a77Forcing backup!");
+    player.addTMessage(Color.GRAY, "Forcing backup!");
     player.getServer().forceBackup();
   }
 

@@ -20,6 +20,7 @@
  */
 package simpleserver.minecraft;
 
+import static simpleserver.lang.Translations.t;
 import simpleserver.Server;
 import simpleserver.command.InvalidCommand;
 import simpleserver.command.ServerCommand;
@@ -85,7 +86,7 @@ public class MessageHandler {
     } else if (line.contains("[INFO] CONSOLE: Save complete.") || line.contains("[INFO] Save complete.")) {
       server.setSaving(false);
       if (server.options.getBoolean("announceBackup")) {
-        server.runCommand("say", server.l.get("SAVE_COMPLETE"));
+        server.runCommand("say", t("Save Complete!"));
       }
     } else if (line.contains("[SEVERE] Unexpected exception")) {
       handleError(new Exception(line));

@@ -20,7 +20,7 @@
  */
 package simpleserver.command;
 
-import simpleserver.Color;
+import static simpleserver.lang.Translations.t;
 import simpleserver.Player;
 import simpleserver.Server;
 
@@ -31,11 +31,11 @@ public class PlayerListCommand extends AbstractCommand implements PlayerCommand 
 
   public void execute(Player player, String message) {
     Server server = player.getServer();
-    String list = "Connected Players (%s): %s";
+    StringBuilder list = new StringBuilder();
     for (Player friend : server.playerList.getArray()) {
-      list += friend.getName() + ", ";
+      list.append(friend.getName() + ", ");
     }
-    list = list.substring(0, list.length() - 2); // remove trailing ", "
-    player.addMessage(Color.GRAY, list, server.numPlayers(), Color.WHITE);
+    list.delete(list.length() - 2, list.length());
+    player.addCaptionedMessage(t("Connected Players (%s)", server.numPlayers()), list.toString());
   }
 }

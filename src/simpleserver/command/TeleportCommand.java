@@ -20,12 +20,14 @@
  */
 package simpleserver.command;
 
+import simpleserver.Color;
 import simpleserver.Player;
 import simpleserver.Server;
 
 public class TeleportCommand extends OnlinePlayerArgCommand {
   public TeleportCommand() {
-    super("teleport PLAYER1 PLAYER2", "Teleport the first player to the second");
+    super("teleport PLAYER1 PLAYER2",
+          "Teleport the first player to the second");
   }
 
   @Override
@@ -36,28 +38,29 @@ public class TeleportCommand extends OnlinePlayerArgCommand {
     if (arguments.length > 1) {
       Player target2 = server.findPlayer(arguments[1]);
       if (target2 == null) {
-        player.addMessage("\u00a7cPlayer not online (" + arguments[1] + ")");
+        player.addTMessage(Color.RED, "Player not online (%s)", arguments[1]);
       } else {
         if (target1.getDimension() == target2.getDimension()) {
           target1.teleportTo(target2);
 
-          player.addMessage("\u00a77Teleported " + target1.getName() + " to "
-              + target2.getName() + "!");
+          player.addTMessage(Color.GRAY, "Teleported %s to %s!",
+                             target1.getName(), target2.getName());
           server.adminLog("User " + player.getName() + " teleported:\t "
-              + target1.getName() + "\tto\t" + target2.getName());
+                          + target1.getName() + "\tto\t" + target2.getName());
         } else {
-          player.addMessage("\u00a7cUser " + target1.getName() + " and "
-                            + target2.getName() + " are in different dimensions.");
-          player.addMessage("\u00a7cNo teleport possible!");
+          player.addTMessage(Color.RED, "Players %s and %s are in different dimensions.",
+                             target1.getName(),
+                             target2.getName());
+          player.addTMessage(Color.RED, "No teleport possible!");
         }
       }
     } else {
-      player.addMessage("\u00a7cMust specify two players.");
+      player.addTMessage(Color.RED, "Must specify two players.");
     }
   }
 
   @Override
   protected void noTargetSpecified(Player player, String message) {
-    player.addMessage("\u00a7cNo players specified.");
+    player.addTMessage(Color.RED, "No players specified.");
   }
 }

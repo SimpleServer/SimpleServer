@@ -20,6 +20,7 @@
  */
 package simpleserver.command;
 
+import simpleserver.Color;
 import simpleserver.Player;
 
 public class GodModeCommand extends AbstractCommand implements PlayerCommand {
@@ -30,9 +31,9 @@ public class GodModeCommand extends AbstractCommand implements PlayerCommand {
   public void execute(Player player, String message) {
     player.toggleGodMode();
     if (player.godModeEnabled()) {
-      player.addMessage("\u00a77God-Mode Enabled!");
+      player.addTMessage(Color.GRAY, "God-Mode Enabled!");
     } else {
-      player.addMessage("\u00a77God-Mode Disabled!");
+      player.addTMessage(Color.GRAY, "God-Mode Disabled!");
     }
   }
 }

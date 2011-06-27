@@ -6,6 +6,7 @@
 /logs/
 /simpleserver/
 /tmp/
+/translations/
 /world*/
 /*\.debug
 /*\.log*

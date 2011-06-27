@@ -80,7 +80,6 @@ public class KitList extends PropertiesConfig {
 
   public void listKits(Player player) {
     StringBuilder kitList = new StringBuilder();
-    kitList.append("\u00a77Allowed kits: \u00a7f");
     for (String name : kits.keySet()) {
       Kit kit = kits.get(name);
       if (server.permissions.includesPlayer(kit.groups, player)) {
@@ -88,8 +87,7 @@ public class KitList extends PropertiesConfig {
         kitList.append(", ");
       }
     }
-
-    player.addMessage(kitList.substring(0, kitList.length() - 2));
+    player.addTCaptionedMessage("Allowed kits", kitList.substring(0, kitList.length() - 2));
   }
 
   @Override

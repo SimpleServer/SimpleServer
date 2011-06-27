@@ -20,13 +20,18 @@
  */
 package simpleserver.command;
 
+import static simpleserver.lang.Translations.t;
 import simpleserver.Server;
 import simpleserver.Time;
 
 public abstract class TimeCommand extends AbstractCommand {
   public TimeCommand() {
-    super("time [set] [number|day|night|unfreeze] [freeze]",
-          "Set or freeze time");
+    super("time [set] [number|day|night|unfreeze] [freeze]", "Set or freeze time");
+  }
+
+  private void usage() {
+    info(t("Usage:") + " " + commandPrefix() +
+         "time 0-23999|day|night|unfreeze [freeze]");
   }
 
   public void execute(Server server, String message) {
@@ -36,7 +41,8 @@ public abstract class TimeCommand extends AbstractCommand {
     if (arguments.length == 0) {
       long servertime = time.get();
       long realtime = (servertime + 6000) % 24000;
-      captionedInfo("Current time", "%d:%d (%d)", realtime / 1000, (realtime % 1000) * 6 / 100, servertime % 24000);
+      tCaptionedInfo("Current time", "%d:%d (%d)", realtime / 1000,
+                     (realtime % 1000) * 6 / 100, servertime % 24000);
     } else if (arguments.length >= 1) {
       int arg = 0;
       if (arguments[arg].equals("set")) {
@@ -46,22 +52,22 @@ public abstract class TimeCommand extends AbstractCommand {
       long value;
 
       if (argument.equals("add")) {
-        error("This is not the standard time command.");
+        tError("This is not the standard time command.");
         usage();
         return;
       } else if (argument.equals("unfreeze")) {
         time.unfreeze();
-        info("Time unfrozen");
+        tInfo("Time unfrozen");
         return;
       } else if (argument.equals("freeze")) {
         time.freeze();
-        info("Time frozen");
+        tInfo("Time frozen");
         return;
       } else {
         try {
           value = time.parse(argument);
         } catch (NumberFormatException e) {
-          error("Invalid argument!");
+          tError("Invalid argument!");
           usage();
           return;
         }
@@ -69,20 +75,20 @@ public abstract class TimeCommand extends AbstractCommand {
 
       arg++;
       if (time.unfreeze()) {
-        info("Time unfrozen");
+        tInfo("Time unfrozen");
       }
 
       if (arguments.length <= arg) {
         time.set(value);
-        info("Time set");
+        tInfo("Time set");
       } else {
         argument = arguments[arg];
 
         if (argument.equals("freeze")) {
           time.freeze(value);
-          info("Time frozen");
+          tInfo("Time frozen");
         } else {
-          error("Optional 2nd argument must be freeze!");
+          tError("Optional 2nd argument must be %s!", "freeze");
         }
       }
     }
@@ -90,12 +96,15 @@ public abstract class TimeCommand extends AbstractCommand {
 
   protected abstract void error(String message);
 
+  protected abstract void tError(String message);
+
+  protected abstract void tError(String message, Object... args);
+
   protected abstract void info(String message);
+
+  protected abstract void tInfo(String message);
 
   protected abstract void captionedInfo(String caption, String message, Object... args);
 
-  private void usage() {
-    info("Usage: " + commandPrefix() + "time [set] [0-23999|day|night|unfreeze] [freeze]");
-  }
-
+  protected abstract void tCaptionedInfo(String caption, String message, Object... args);
 }

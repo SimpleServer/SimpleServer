@@ -33,9 +33,10 @@ public class ReloadCommand extends AbstractCommand implements PlayerCommand,
   public void execute(Player player, String message) {
     player.getServer().loadResources();
     if (player.getServer().permissions.loadsuccess) {
-      player.addMessage("\u00a77Resources Reloaded!");
+      player.addTMessage(Color.GRAY, "Resources Reloaded!");
     } else {
-      player.addMessage(Color.RED, "Error while reloading permissions.xml. See serverLog for detailed information.");
+      player.addTMessage(Color.RED, "Error while reloading %s. See %s for detailed information.",
+                         "permissions.xml", "server.log");
     }
   }
 

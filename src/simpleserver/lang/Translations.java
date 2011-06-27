@@ -18,36 +18,59 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package simpleserver.command;
+package simpleserver.lang;
 
-import java.util.List;
+public class Translations {
+  private TranslationFile translation;
 
-import simpleserver.Color;
-import simpleserver.Player;
-import simpleserver.Player.Action;
-import simpleserver.config.ChestList.Chest;
-
-public class UnlockCommand extends AbstractCommand implements PlayerCommand {
-  public UnlockCommand() {
-    super("unlock [name]", "Unlocks locked chests");
+  private Translations() {
+    translation = null;
   }
 
-  public void execute(Player player, String message) {
-    String name = extractArgument(message);
-    if (name == null) {
-      player.setAttemptedAction(Action.Unlock);
-      player.addTMessage(Color.GRAY, "The next chest you open will get unlocked.");
+  private String get(String key) {
+    if (translation == null) {
+      return key;
     } else {
-      List<Chest> chests = player.getServer().chests.getChestsByName(name);
-      for (Chest chest : chests) {
-        chest.unlock();
-      }
-      player.getServer().chests.save();
-      if (chests.size() > 1) {
-        player.addTMessage(Color.GRAY, "%d chests have been unlocked!", chests.size());
+      return translation.get(key);
+    }
+  }
+
+  public boolean setLanguage(String languageCode) {
+    if (languageCode.equals("en")) {
+      translation = null;
+      return true;
+    } else {
+      translation = new TranslationFile(languageCode);
+
+      if (translation.success()) {
+        return true;
       } else {
-        player.addTMessage(Color.GRAY, "The chest has been unlocked!");
+        System.out.println("There's a problem with language '" + languageCode + "'! Using English (en) instead.");
+        translation = null;
+        return false;
       }
     }
+  }
+
+  public void load() {
+    if (translation != null) {
+      translation.load();
+    }
+  }
+
+  private static class TranslationsHolder {
+    public static final Translations INSTANCE = new Translations();
+  }
+
+  public static Translations getInstance() {
+    return TranslationsHolder.INSTANCE;
+  }
+
+  public static String t(String key) {
+    return TranslationsHolder.INSTANCE.get(key);
+  }
+
+  public static String t(String key, Object... args) {
+    return String.format(t(key), args);
   }
 }

@@ -20,6 +20,7 @@
  */
 package simpleserver.command;
 
+import simpleserver.Color;
 import simpleserver.Player;
 
 public class HelpCommand extends AbstractCommand implements PlayerCommand {
@@ -42,17 +43,15 @@ public class HelpCommand extends AbstractCommand implements PlayerCommand {
       String[] aliases = player.getServer().permissions.getCommandAliases(command.getName());
       if (aliases.length > 0) {
         StringBuffer line = new StringBuffer();
-        line.append("\u00a77Aliases:\u00a7f ");
         for (String alias : aliases) {
           line.append(commandPrefix());
           line.append(alias);
           line.append(" ");
         }
-        player.addMessage(line.toString());
+        player.addTCaptionedMessage("Aliases", line.toString());
       }
     } else {
       StringBuffer line = new StringBuffer();
-      line.append("\u00a77Available Commands:\u00a7f ");
 
       String prefix = commandPrefix();
       for (PlayerCommand command : parser.getPlayerCommands()) {
@@ -67,15 +66,16 @@ public class HelpCommand extends AbstractCommand implements PlayerCommand {
         line.append(" ");
       }
 
-      player.addMessage(line.toString());
-      player.addMessage("\u00a77Say " + prefix
-          + "help command for details of a specific command.");
+      player.addTCaptionedMessage("Available Commands", line.toString());
+
+      player.addTMessage(Color.GRAY, "Say %s command for details of a specific command.",
+                         prefix + "help");
 
       // additional custom help text from helptext.txt
       String[] helplines = player.getServer().helptext.getHelpText().split("\n");
       player.addMessage(" ");
       for (String l : helplines) {
-        player.addMessage("\u00a7f" + l);
+        player.addMessage(Color.WHITE, l);
       }
     }
   }

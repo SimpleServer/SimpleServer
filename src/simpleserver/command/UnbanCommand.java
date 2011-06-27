@@ -20,6 +20,7 @@
  */
 package simpleserver.command;
 
+import simpleserver.Color;
 import simpleserver.Player;
 
 public class UnbanCommand extends PlayerArgCommand {
@@ -33,6 +34,6 @@ public class UnbanCommand extends PlayerArgCommand {
 
     player.getServer().adminLog("User " + player.getName()
                                     + " unbanned player:\t " + name);
-    player.addMessage("\u00a77Unbanned " + name + "!");
+    player.addTMessage(Color.GRAY, "Unbanned %s!", name);
   }
 }

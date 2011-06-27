@@ -20,32 +20,33 @@
  */
 package simpleserver.command;
 
+import simpleserver.Color;
 import simpleserver.Player;
 
 public class TellCommand extends OnlinePlayerArgCommand implements
     PlayerCommand {
 
   public TellCommand() {
-    super("tell PLAYER MESSAGE...", "Send a message to the named player");
+    super("tell PLAYER MESSAGE...",
+          "Send a message to the named player");
   }
 
   @Override
   protected void executeWithTarget(Player player, String message, Player target) {
     String chat = extractArgument(message, 1);
     if (chat != null) {
-      String formattedChat = "\u00a77" + player.getName() + " -> "
-          + target.getName() + ":\u00a7f " + chat;
-      player.addMessage(formattedChat);
-      target.addMessage(formattedChat);
+      String caption = player.getName() + " -> " + target.getName();
+      player.addCaptionedMessage(caption, chat);
+      target.addCaptionedMessage(caption, chat);
 
       target.setReply(player);
     } else {
-      player.addMessage("\u00a7cPlease supply a message.");
+      player.addTMessage(Color.RED, "Please supply a message.");
     }
   }
 
   @Override
   protected void noTargetSpecified(Player player, String message) {
-    player.addMessage("\u00a7cNo player or message specified.");
+    player.addTMessage(Color.RED, "No player or message specified.");
   }
 }

@@ -20,13 +20,14 @@
  */
 package simpleserver.command;
 
+import static simpleserver.lang.Translations.t;
+import simpleserver.Color;
 import simpleserver.Player;
 
 public abstract class PlayerArgCommand extends AbstractCommand implements
     PlayerCommand {
-  protected PlayerArgCommand(String name, String helpText) {
-    super(name, helpText
-        + " (case-insensitive, name prefix works for online players)");
+  protected PlayerArgCommand(String name, String commandCode) {
+    super(name, commandCode);
   }
 
   public void execute(Player player, String message) {
@@ -48,6 +49,17 @@ public abstract class PlayerArgCommand extends AbstractCommand implements
                                             String target);
 
   protected void noTargetSpecified(Player player, String message) {
-    player.addMessage("\u00a7cNo player specified.");
+    player.addTMessage(Color.RED, "No player specified.");
+  }
+
+  @Override
+  public void reloadText() {
+    if (name != null) {
+      helpText = name + Color.WHITE + " : " + t(commandCode) + " "
+          + t("(case-insensitive, name prefix works for online players)");
+    } else {
+      helpText = t(commandCode) + " "
+          + t("(case-insensitive, name prefix works for online players)");
+    }
   }
 }

@@ -20,6 +20,8 @@
  */
 package simpleserver.thread;
 
+import static simpleserver.lang.Translations.t;
+
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -72,7 +74,7 @@ public class AutoBackup {
     if (server.options.getBoolean("announceBackup")) {
       System.out.println("[SimpleServer] Backing up server...");
     }
-    announce(server.l.get("BACKING_UP"));
+    announce(t("Backing up..."));
     server.runCommand("save-off", null);
 
     File copy;
@@ -85,7 +87,7 @@ public class AutoBackup {
       deleteRecursively(TEMP_DIRECTORY);
     }
     purgeOldBackups();
-    announce(server.l.get("BACKUP_COMPLETE"));
+    announce(t("Backup Complete!"));
   }
 
   public void announce(String message) {
@@ -128,9 +130,15 @@ public class AutoBackup {
 
   private File makeTemporaryCopy() throws IOException {
     TEMP_DIRECTORY.mkdir();
-    File backup = new File(TEMP_DIRECTORY, String.format(NAME_FORMAT,
-                                                         new Date()));
+
+    File backup = new File(TEMP_DIRECTORY, String.format(NAME_FORMAT, new Date()));
     copyRecursively(new File(server.options.get("levelName")), backup);
+
+    File configBackup = new File(backup, "config");
+    copyRecursively(new File("simpleserver"), configBackup);
+    copyRecursively(new File("simpleserver.properties"),
+                    new File(configBackup, "simpleserver.properties"));
+
     return backup;
   }
 
@@ -240,8 +248,10 @@ public class AutoBackup {
           }
           forceBackup = false;
 
+          server.autoSpaceCheck.check(true);
+
           if (server.options.getBoolean("announceSave")) {
-            server.runCommand("say", server.l.get("SAVING_MAP"));
+            server.runCommand("say", t("Saving Map..."));
           }
           server.setSaving(true);
           server.runCommand("save-all", null);

@@ -20,26 +20,28 @@
  */
 package simpleserver.command;
 
+import simpleserver.Color;
 import simpleserver.Player;
 import simpleserver.Server;
 
 public class SetGroupCommand extends PlayerArgCommand {
   public SetGroupCommand() {
-    super("setgroup PLAYER GROUP", "Set the group ID of the named player");
+    super("setgroup PLAYER GROUP",
+          "Set the group ID of the named player");
   }
 
-  public SetGroupCommand(String name, String description) {
-    super(name, description);
+  public SetGroupCommand(String name, String commandCode) {
+    super(name, commandCode);
   }
 
   protected boolean allowed(Player player, int group, String target) {
     Server server = player.getServer();
     if (player.getGroupId() <= server.permissions.getNameGroup(target)) {
-      player.addMessage("\u00a7cYou cannot set the group of this user!");
+      player.addTMessage(Color.RED, "You cannot set the group of this user!");
       return false;
     }
     if (group >= player.getGroupId()) {
-      player.addMessage("\u00a7cYou cannot promote to your group or higher!");
+      player.addTMessage(Color.RED, "You cannot promote to your group or higher!");
       return false;
     }
     return true;
@@ -51,13 +53,13 @@ public class SetGroupCommand extends PlayerArgCommand {
     int group;
 
     if (arguments.length < 2) {
-      player.addMessage("\u00a7cYou must specify a group!");
+      player.addTMessage(Color.RED, "You must specify a group!");
       return;
     }
     try {
       group = Integer.parseInt(arguments[1]);
     } catch (NumberFormatException e) {
-      player.addMessage("\u00a7cGroup must be a number!");
+      player.addTMessage(Color.RED, "Group must be a number!");
       return;
     }
 
@@ -70,8 +72,8 @@ public class SetGroupCommand extends PlayerArgCommand {
     Server server = player.getServer();
     server.permissions.setPlayerGroup(target, group);
 
-    player.addMessage("\u00a77Player " + target + "'s group was set to "
-        + group + "!");
+    player.addTMessage(Color.GRAY, "Player %s's group was set to %s!",
+                       target, new Integer(group).toString());
     server.adminLog("User " + player.getName() + " set player's group:\t "
         + target + "\t(" + group + ")");
   }

@@ -20,6 +20,8 @@
  */
 package simpleserver.thread;
 
+import static simpleserver.lang.Translations.t;
+
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -86,7 +88,7 @@ public class AutoRun {
           } catch (InterruptedException e) {
             continue;
           }
-          server.runCommand("say", "Mapping Server!");
+          server.runCommand("say", t("Mapping Server!"));
           server.runCommand("save-off", null);
 
           lastRun = System.currentTimeMillis();
@@ -95,7 +97,7 @@ public class AutoRun {
             try {
               process = Runtime.getRuntime().exec(command);
             } catch (IOException e) {
-              server.runCommand("say", "Mapping Failed!");
+              server.runCommand("say", t("Mapping Failed!"));
               System.out.println("[SimpleServer] " + e);
               System.out.println("[SimpleServer] Cron Failed! Bad Command!");
               server.errorLog(e, "AutoRun Failure");
@@ -120,9 +122,9 @@ public class AutoRun {
             if (exitCode < 0) {
               System.out.println("[SimpleServer] c10t Failed! Exited with code "
                   + exitCode + "!");
-              server.runCommand("say", "Mapping Failed!");
+              server.runCommand("say", t("Mapping Failed!"));
             } else {
-              server.runCommand("say", "Mapping Complete!");
+              server.runCommand("say", t("Mapping Complete!"));
             }
           } finally {
             server.runCommand("save-on", null);

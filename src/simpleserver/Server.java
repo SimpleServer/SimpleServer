@@ -20,6 +20,8 @@
  */
 package simpleserver;
 
+import static simpleserver.lang.Translations.t;
+
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
@@ -42,15 +44,16 @@ import simpleserver.config.RobotList;
 import simpleserver.config.Rules;
 import simpleserver.config.Stats;
 import simpleserver.config.WhiteList;
+import simpleserver.lang.Translations;
 import simpleserver.log.AdminLog;
 import simpleserver.log.ConnectionLog;
 import simpleserver.log.ErrorLog;
 import simpleserver.minecraft.MinecraftWrapper;
-import simpleserver.options.Language;
 import simpleserver.options.Options;
 import simpleserver.rcon.RconServer;
 import simpleserver.telnet.TelnetServer;
 import simpleserver.thread.AutoBackup;
+import simpleserver.thread.AutoFreeSpaceChecker;
 import simpleserver.thread.AutoRestart;
 import simpleserver.thread.AutoRun;
 import simpleserver.thread.AutoSave;
@@ -64,7 +67,6 @@ public class Server {
   private ServerSocket socket;
   private List<String> outputLog = new LinkedList<String>();
 
-  public Language l;
   public Options options;
   public MOTD motd;
   public KitList kits;
@@ -93,6 +95,7 @@ public class Server {
   private RconServer rconServer;
   private TelnetServer telnetServer;
   private AutoRun c10t;
+  public AutoFreeSpaceChecker autoSpaceCheck;
   private AutoBackup autoBackup;
   private AutoSave autosave;
   private AutoRestart autoRestart;
@@ -145,6 +148,10 @@ public class Server {
     robots.removeRobotPort(port);
   }
 
+  public List<Resource> getResources() {
+    return resources;
+  }
+
   public Integer[] getRobotPorts() {
     if (robots != null) {
       return robots.getRobotPorts();
@@ -178,7 +185,7 @@ public class Server {
   }
 
   public void banKickIP(String ipAddress) {
-    banKickIP(ipAddress, "Banned!");
+    banKickIP(ipAddress, t("Banned!"));
   }
 
   public void banKick(String name, String msg) {
@@ -193,7 +200,7 @@ public class Server {
   }
 
   public void banKick(String name) {
-    banKick(name, "Banned!");
+    banKick(name, t("Banned!"));
   }
 
   public void kick(String name, String reason) {
@@ -211,6 +218,13 @@ public class Server {
       playerList.updatePlayerGroups(); // reflect changes of permission.xml
       // without player relogin
     }
+
+    if (!Translations.getInstance().setLanguage(options.get("serverLanguage"))) {
+      options.set("serverLanguage", "en");
+      options.save();
+    }
+
+    commandParser.reload();
   }
 
   public void saveResources() {
@@ -248,12 +262,11 @@ public class Server {
   }
 
   public int localChat(Player player, String msg) {
-    String chat = "\u00a77" + player.getName() + " says:\u00a7f " + msg;
     int localPlayers = 0;
     int radius = options.getInt("localChatRadius");
     for (Player friend : playerList.getArray()) {
       if (friend.distanceTo(player) < radius) {
-        friend.addMessage(chat);
+        friend.addCaptionedMessage(t("%s says", player.getName()), msg);
         if (player != friend) {
           localPlayers++;
         }
@@ -319,9 +332,9 @@ public class Server {
   }
 
   private void kickAllPlayers() {
-    String message = "Server shutting down!";
+    String message = t("Server shutting down!");
     if (restart) {
-      message = "Server restarting!";
+      message = t("Server restarting!");
     }
 
     for (Player player : playerList.getArray()) {
@@ -333,7 +346,6 @@ public class Server {
     resources = new LinkedList<Resource>();
 
     resources.add(permissions = new PermissionConfig(this));
-    resources.add(l = new Language());
     resources.add(options = new Options());
     resources.add(robots = new RobotList());
     resources.add(chests = new ChestList());
@@ -399,6 +411,7 @@ public class Server {
     if (options.getBoolean("enableRcon")) {
       rconServer = new RconServer(this);
     }
+    autoSpaceCheck = new AutoFreeSpaceChecker(this);
     autoBackup = new AutoBackup(this);
     autosave = new AutoSave(this);
     autoRestart = new AutoRestart(this);
@@ -439,6 +452,7 @@ public class Server {
     if (rconServer != null) {
       rconServer.stop();
     }
+    autoSpaceCheck.cleanup();
     autoBackup.stop();
     autosave.stop();
     autoRestart.stop();
