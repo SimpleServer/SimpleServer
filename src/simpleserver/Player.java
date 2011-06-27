@@ -391,7 +391,8 @@ public class Player {
 
     return !((server.permissions.commandShouldPassThroughToMod(command.getName())
             || server.options.getBoolean("forwardAllCommands")
-            || invalidCommand || command instanceof ExternalCommand) && server.options.contains("alternateJarFile"));
+            || invalidCommand || command instanceof ExternalCommand)
+            && server.options.contains("alternateJarFile") && getGroup().getForwardsCommands());
   }
 
   public void execute(Class<? extends PlayerCommand> c) {

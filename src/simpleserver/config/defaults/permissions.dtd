@@ -21,6 +21,7 @@
   color NMTOKEN #IMPLIED
   showTitle NMTOKEN #IMPLIED
   ignoreChestlocks NMTOKEN #IMPLIED
+  forwardUnknownCommands NMTOKEN #IMPLIED
 >
 <!ATTLIST player
   name NMTOKEN #REQUIRED

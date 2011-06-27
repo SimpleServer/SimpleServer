@@ -6,12 +6,12 @@
 
   <groups>
   <!-- Groups must have distinct integer ids -->
-    <group id="0" name="Guest" color="f" showTitle="true" ignoreChestlocks="false" />
-    <group id="1" name="Player" color="f" showTitle="false" ignoreChestlocks="false" />
-    <group id="2" name="Trusted" color="9" showTitle="false" ignoreChestlocks="false" />
-    <group id="3" name="Mod" color="9" showTitle="true" ignoreChestlocks="true" />
-    <group id="4" name="Admin" color="2" showTitle="true" ignoreChestlocks="true" />
-    <group id="5" name="Owner" color="3" showTitle="true" ignoreChestlocks="true" />
+    <group id="0" name="Guest" color="f" showTitle="true" ignoreChestlocks="false" forwardUnknownCommands="false" />
+    <group id="1" name="Player" color="f" showTitle="false" ignoreChestlocks="false" forwardUnknownCommands="true" />
+    <group id="2" name="Trusted" color="9" showTitle="false" ignoreChestlocks="false" forwardUnknownCommands="true" />
+    <group id="3" name="Mod" color="9" showTitle="true" ignoreChestlocks="true" forwardUnknownCommands="true" />
+    <group id="4" name="Admin" color="2" showTitle="true" ignoreChestlocks="true" forwardUnknownCommands="true" />
+    <group id="5" name="Owner" color="3" showTitle="true" ignoreChestlocks="true" forwardUnknownCommands="true" />
   </groups>
 
   <members>

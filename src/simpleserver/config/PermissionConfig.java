@@ -163,6 +163,7 @@ public class PermissionConfig extends AbstractConfig {
     String showtitle = config.getString(pathpart + "showTitle", "");
     String isadmin = config.getString(pathpart + "ignoreChestlocks", "");
     String color = config.getString(pathpart + "color", "");
+    String forwardsCommands = config.getString(pathpart + "forwardUnknownCommands", "");
 
     /* set defaults for missing attributes */
     if (name.equals("")) {
@@ -177,8 +178,11 @@ public class PermissionConfig extends AbstractConfig {
     if (isadmin.equals("")) {
       isadmin = "false";
     }
+    if (forwardsCommands.equals("")) {
+      forwardsCommands = "true";
+    }
 
-    return new Group(name, Boolean.valueOf(showtitle), Boolean.valueOf(isadmin), color);
+    return new Group(name, Boolean.valueOf(showtitle), Boolean.valueOf(isadmin), color, Boolean.valueOf(forwardsCommands));
   }
 
   private int getIPGroup(String ipAddress) {
@@ -345,6 +349,10 @@ public class PermissionConfig extends AbstractConfig {
     }
 
     return groups.build();
+  }
+
+  public boolean forwardsUnknownCommands(Player player) {
+    return player.getGroup().getForwardsCommands();
   }
 
   public boolean canOpenChests(Player player, Coordinate coordinate) {
