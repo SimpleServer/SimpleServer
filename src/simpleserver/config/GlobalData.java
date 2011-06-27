@@ -29,7 +29,10 @@ import java.util.zip.ZipFile;
 
 import simpleserver.Resource;
 import simpleserver.nbt.GZipNBTFile;
-import simpleserver.thread.AutoFreeSpaceChecker;
+import simpleserver.nbt.NBT;
+import simpleserver.nbt.NBTCompound;
+import simpleserver.nbt.NBTList;
+import simpleserver.thread.AutoBackup;
 
 public class GlobalData implements Resource {
   private final static String FILENAME = "simpleserver.dat";
@@ -39,6 +42,11 @@ public class GlobalData implements Resource {
   private final static String BACKUP_PATH = BACKUP_FOLDER + File.separator + FILENAME;
 
   private GZipNBTFile nbt;
+  public Warp warp;
+
+  public GlobalData() {
+    warp = new Warp();
+  }
 
   public void load() {
     try {
@@ -50,7 +58,7 @@ public class GlobalData implements Resource {
       System.out.println("[WARNING] simpleserver.dat is corrupt. Loading from latest backup...");
       ZipFile file = null;
       try {
-        File backup = AutoFreeSpaceChecker.newestBackup();
+        File backup = AutoBackup.newestBackup();
         file = new ZipFile(backup);
         Enumeration<? extends ZipEntry> entries = file.entries();
         while (entries.hasMoreElements()) {
@@ -76,6 +84,8 @@ public class GlobalData implements Resource {
         }
       }
     }
+
+    warp.load();
   }
 
   public void save() {
@@ -83,6 +93,19 @@ public class GlobalData implements Resource {
       nbt.save(PATH);
     } catch (IOException e) {
       System.out.println("[ERROR] Writing simpleserver.dat failed");
+    }
+  }
+
+  public class Warp {
+    private NBTList<NBTCompound> node;
+
+    public void load() {
+      if (nbt.root().containsKey("warp") && nbt.root().getList("warp").type() == NBT.COMPOUND) {
+        node = nbt.root().getList("warp").cast();
+      } else {
+        node = new NBTList<NBTCompound>("warp", NBT.COMPOUND);
+        nbt.root().put(node);
+      }
     }
   }
 }

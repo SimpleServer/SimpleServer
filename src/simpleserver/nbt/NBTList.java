@@ -67,6 +67,15 @@ public class NBTList<T extends NBTag> extends NBTag {
     return value.size();
   }
 
+  public NBT type() {
+    return NBT.values()[tagId];
+  }
+
+  @SuppressWarnings( { "unchecked", "hiding" })
+  public <T extends NBTag> T cast() {
+    return (T) this;
+  }
+
   public void add(T tag) {
     if (tagId == tag.id()) {
       value.add(tag);

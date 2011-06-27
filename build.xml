@@ -47,7 +47,7 @@
     <mkdir dir="release" />
     <jar destfile="release/NBT.jar">
       <manifest>
-        <attribute name="Main-Class" value="simpleserver.nbt.NBT"/>
+        <attribute name="Main-Class" value="simpleserver.nbt.NBTFile"/>
         <attribute name="Class-Path" value="."/>
       </manifest>
 
