@@ -33,6 +33,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.locks.ReentrantLock;
 
+import simpleserver.Position;
 import simpleserver.Server;
 import simpleserver.Coordinate.Dimension;
 import simpleserver.Player.LocalAddressFactory;
@@ -598,74 +599,6 @@ public class Bot {
           writeLock.unlock();
         }
       }
-    }
-  }
-
-  protected final class Position {
-    private double x;
-    private double y;
-    private double z;
-    private double stance;
-    private Dimension dimension;
-    private float yaw;
-    private float pitch;
-    private boolean onGround;
-
-    public Position() {
-      dimension = Dimension.EARTH;
-      onGround = true;
-    }
-
-    public void updatePosition(double x, double y, double z, double stance) {
-      this.x = x;
-      this.y = y;
-      this.z = z;
-      this.stance = stance;
-    }
-
-    public void updateLook(float yaw, float pitch) {
-      this.yaw = yaw;
-      this.pitch = pitch;
-    }
-
-    public void updateDimension(Dimension dimension) {
-      this.dimension = dimension;
-    }
-
-    public void updateGround(boolean onGround) {
-      this.onGround = onGround;
-    }
-
-    public void send(DataOutputStream out) throws IOException {
-      out.writeByte(0x0d);
-      out.writeDouble(x);
-      out.writeDouble(y);
-      out.writeDouble(stance);
-      out.writeDouble(z);
-      out.writeFloat(yaw);
-      out.writeFloat(pitch);
-      out.writeBoolean(onGround);
-      out.flush();
-    }
-
-    public double x() {
-      return x;
-    }
-
-    public double y() {
-      return y;
-    }
-
-    public double z() {
-      return z;
-    }
-
-    public double stance() {
-      return stance;
-    }
-
-    public float yaw() {
-      return yaw;
     }
   }
 }

@@ -24,14 +24,18 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Enumeration;
+import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+import simpleserver.Position;
 import simpleserver.Resource;
+import simpleserver.Coordinate.Dimension;
 import simpleserver.nbt.GZipNBTFile;
 import simpleserver.nbt.NBT;
 import simpleserver.nbt.NBTCompound;
-import simpleserver.nbt.NBTList;
+import simpleserver.nbt.NBTDouble;
+import simpleserver.nbt.NBTFloat;
 import simpleserver.thread.AutoBackup;
 
 public class GlobalData implements Resource {
@@ -97,13 +101,45 @@ public class GlobalData implements Resource {
   }
 
   public class Warp {
-    private NBTList<NBTCompound> node;
+    private NBTCompound node;
 
-    public void load() {
+    public Set<String> names() {
+      return node.names();
+    }
+
+    public Position get(String name) {
+      if (!node.containsKey(name)) {
+        return null;
+      }
+      NBTCompound p = node.getCompound(name);
+      double x = p.getDouble("x").get();
+      double y = p.getDouble("y").get();
+      double z = p.getDouble("z").get();
+      Dimension dim = Dimension.get(p.getByte("Dimension").get());
+      float yaw = p.getFloat("yaw").get();
+      float pitch = p.getFloat("pitch").get();
+      return new Position(x, y, z, dim, yaw, pitch);
+    }
+
+    public void set(String name, Position pos) {
+      NBTCompound p = new NBTCompound(name);
+      p.put(new NBTDouble("x", pos.x));
+      p.put(new NBTDouble("y", pos.y));
+      p.put(new NBTDouble("z", pos.z));
+      p.put(new NBTDouble("Dimension", pos.dimension.index()));
+      p.put(new NBTFloat("yaw", pos.yaw));
+      p.put(new NBTFloat("pitch", pos.pitch));
+    }
+
+    public void remove(String name) {
+      node.remove(name);
+    }
+
+    private void load() {
       if (nbt.root().containsKey("warp") && nbt.root().getList("warp").type() == NBT.COMPOUND) {
-        node = nbt.root().getList("warp").cast();
+        node = nbt.root().getCompound("warp");
       } else {
-        node = new NBTList<NBTCompound>("warp", NBT.COMPOUND);
+        node = new NBTCompound("warp");
         nbt.root().put(node);
       }
     }

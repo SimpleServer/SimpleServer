@@ -24,6 +24,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Set;
 
 public class NBTCompound extends NBTag {
   private HashMap<String, NBTag> value;
@@ -49,6 +50,14 @@ public class NBTCompound extends NBTag {
   @Override
   HashMap<String, NBTag> get() {
     return value;
+  }
+
+  public int size() {
+    return value.size();
+  }
+
+  public Set<String> names() {
+    return value.keySet();
   }
 
   public boolean containsKey(String name) {
