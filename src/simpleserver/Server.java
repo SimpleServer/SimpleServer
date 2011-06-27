@@ -34,6 +34,7 @@ import java.util.concurrent.Semaphore;
 import simpleserver.bot.BotController;
 import simpleserver.config.ChestList;
 import simpleserver.config.GiveAliasList;
+import simpleserver.config.GlobalData;
 import simpleserver.config.HelpText;
 import simpleserver.config.IPBanList;
 import simpleserver.config.KitList;
@@ -78,6 +79,7 @@ public class Server {
   public MuteList mutelist;
   public GiveAliasList giveAliasList;
   public Stats stats;
+  public GlobalData data;
   private RobotList robots;
 
   public PermissionConfig permissions;
@@ -358,6 +360,7 @@ public class Server {
     resources.add(mutelist = new MuteList());
     resources.add(giveAliasList = new GiveAliasList());
     resources.add(stats = new Stats());
+    resources.add(data = new GlobalData());
 
     time = new Time(this);
     bots = new BotController(this);

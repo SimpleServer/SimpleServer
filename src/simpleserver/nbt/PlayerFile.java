@@ -41,7 +41,7 @@ public class PlayerFile {
     } catch (Exception e) {
       try {
         nbt = new GZipNBTFile(getClass().getResourceAsStream("template.dat"));
-      } catch (IOException e1) {
+      } catch (Exception e1) {
 
       }
     }
@@ -69,7 +69,7 @@ public class PlayerFile {
     nbt.root().put(inv.nbt());
   }
 
-  public void save() {
+  public void save() throws IOException {
     nbt.save(filename);
   }
 

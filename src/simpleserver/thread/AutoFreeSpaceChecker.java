@@ -70,30 +70,7 @@ public class AutoFreeSpaceChecker {
 
         int filesDeleted = 0;
         while (FileSystemUtils.freeSpaceKb() < neededSizeKb) {
-          File[] files = BACKUP_DIRECTORY.listFiles(new FileFilter() {
-            public boolean accept(File file) {
-              return file.isFile() && file.getPath().contains(".zip");
-            }
-          });
-
-          long firstCreatedTime = Long.MAX_VALUE;
-          File firstCreatedFile = null;
-          for (File file : files) {
-            DateFormat format = new SimpleDateFormat("yyyy-MM-dd-HH-mm");
-            GregorianCalendar cal = new GregorianCalendar();
-            Date fileTime;
-            try {
-              fileTime = format.parse(file.getName().split(".zip")[0]);
-            } catch (ParseException e) {
-              continue;
-            }
-            cal.setTime(fileTime);
-
-            if (cal.getTimeInMillis() < firstCreatedTime) {
-              firstCreatedFile = file;
-              firstCreatedTime = cal.getTimeInMillis();
-            }
-          }
+          File firstCreatedFile = oldestBackup();
 
           if (firstCreatedFile != null) {
             System.out.println("[SimpleServer] Deleting: " + firstCreatedFile.getPath());
@@ -111,6 +88,41 @@ public class AutoFreeSpaceChecker {
       System.out.println("[SimpleServer] " + e);
       System.out.println("[SimpleServer] Free Space Checker Failed!");
     }
+  }
+
+  public static File newestBackup() {
+    return getBackup(false);
+  }
+
+  public static File oldestBackup() {
+    return getBackup(true);
+  }
+
+  private static File getBackup(boolean old) {
+    File[] files = BACKUP_DIRECTORY.listFiles(new FileFilter() {
+      public boolean accept(File file) {
+        return file.isFile() && file.getPath().contains(".zip");
+      }
+    });
+    long firstCreatedTime = old ? Long.MAX_VALUE : 0;
+    File firstCreatedFile = null;
+    for (File file : files) {
+      DateFormat format = new SimpleDateFormat("yyyy-MM-dd-HH-mm");
+      GregorianCalendar cal = new GregorianCalendar();
+      Date fileTime;
+      try {
+        fileTime = format.parse(file.getName().split(".zip")[0]);
+      } catch (ParseException e) {
+        continue;
+      }
+      cal.setTime(fileTime);
+
+      if ((old && cal.getTimeInMillis() < firstCreatedTime) || (!old && cal.getTimeInMillis() > firstCreatedTime)) {
+        firstCreatedFile = file;
+        firstCreatedTime = cal.getTimeInMillis();
+      }
+    }
+    return firstCreatedFile;
   }
 
   public void cleanup() {

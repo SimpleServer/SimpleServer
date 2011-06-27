@@ -30,12 +30,16 @@ import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
 public class GZipNBTFile extends NBTFile {
-  GZipNBTFile(String filename) throws IOException {
+  public GZipNBTFile(String filename) throws Exception {
     super(new GZIPInputStream(new FileInputStream(filename)));
   }
 
-  public GZipNBTFile(InputStream in) throws IOException {
+  public GZipNBTFile(InputStream in) throws Exception {
     super(new GZIPInputStream(in));
+  }
+
+  public GZipNBTFile() {
+    super();
   }
 
   @Override

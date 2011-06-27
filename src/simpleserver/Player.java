@@ -687,11 +687,11 @@ public class Player {
     return dimension;
   }
 
-  public boolean teleport(Coordinate coordinate) {
+  public boolean teleport(Coordinate coordinate) throws IOException {
     return server.bots.connect(new Teleporter(this, coordinate));
   }
 
-  public boolean teleport(Coordinate coordinate, float yaw, float pitch) {
+  public boolean teleport(Coordinate coordinate, float yaw, float pitch) throws IOException {
     return server.bots.connect(new Teleporter(this, coordinate, yaw, pitch));
   }
 }

@@ -33,38 +33,30 @@ public class NBTFile {
 
   private NBTCompound root;
 
-  NBTFile() {
+  public NBTFile() {
     root = new NBTCompound("");
   }
 
-  NBTFile(String filename) throws FileNotFoundException {
+  public NBTFile(String filename) throws Exception {
     this(new FileInputStream(filename));
   }
 
-  NBTFile(InputStream input) {
+  public NBTFile(InputStream input) throws Exception {
     load(input);
   }
 
-  NBTCompound root() {
+  public NBTCompound root() {
     return root;
   }
 
-  private void load(InputStream input) {
-    try {
-      root = NBTag.load(new DataInputStream(input));
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
+  private void load(InputStream input) throws Exception {
+    root = NBTag.load(new DataInputStream(input));
   }
 
-  public void save(String filename) {
-    try {
-      DataOutputStream out = new DataOutputStream(getOutputStream(filename));
-      root.save(out);
-      out.close();
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
+  public void save(String filename) throws IOException {
+    DataOutputStream out = new DataOutputStream(getOutputStream(filename));
+    root.save(out);
+    out.close();
   }
 
   protected OutputStream getOutputStream(String filename) throws FileNotFoundException, IOException {
@@ -91,6 +83,8 @@ public class NBTFile {
       System.out.println("Error: No such file or dictionary");
     } catch (IOException e) {
       System.out.println("Error: File is not in GZIP format");
+    } catch (Exception e) {
+      System.out.println("Error: " + e.getMessage());
     }
   }
 

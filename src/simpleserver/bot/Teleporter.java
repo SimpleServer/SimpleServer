@@ -37,11 +37,11 @@ public class Teleporter extends Bot {
   private float yaw;
   private float pitch;
 
-  public Teleporter(Player player, Coordinate coordinate) {
+  public Teleporter(Player player, Coordinate coordinate) throws IOException {
     this(player, coordinate, 0, 0);
   }
 
-  public Teleporter(Player player, Coordinate coordinate, float yaw, float pitch) {
+  public Teleporter(Player player, Coordinate coordinate, float yaw, float pitch) throws IOException {
     super(player.getServer(), "Teleporter" + Math.round(100000 * Math.random()));
     this.coordinate = coordinate;
     this.player = player;
@@ -50,7 +50,7 @@ public class Teleporter extends Bot {
     prepare();
   }
 
-  protected void prepare() {
+  protected void prepare() throws IOException {
     dat = new PlayerFile(name, server);
     dat.setPosition(coordinate);
     dat.setLook(yaw, pitch);
