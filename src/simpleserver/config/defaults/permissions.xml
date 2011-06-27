@@ -91,15 +91,17 @@
      but should not overlap (on the same nesting level), because
      only the first matching area would be found and used.
      Areas must have distinct names (for identification) and have start
-     and end coordinates. Coordinates must be written as "x,z" or "x,z,y"
-     if at least one coordinate has no given y value, the area is declared
-     on any height (0-127).
+     and end coordinates. Coordinates must be written as "x,z" or "x,y,z"
+     or "x,z;Dimension" or "x,y,z;Dimension" if at least one coordinate
+     has no given y value, the area is declared on any height (0-127).
+     Dimension must be either Earth or Nether. If there is no Dimension
+     value, Earth will be chosen.
      Deeper area permissions override permissions of the parent area,
      disallow overrides allow for the same area.
 
 	   Example:
 
-    <area name="OuterA" start="0,0" end="19,19">
+    <area name="OuterA" start="0,0,0;Earth" end="19,19,19;Earth">
       <permissions>
         <blocks allowPlace="5" allowDestroy="5" />
         <commands>
@@ -110,7 +112,7 @@
         <area name="InnerA" start="5,5" end="10,10" />
       </areas>
     </area>
-    <area name="OuterB" start="0,20" end="20,40" />
+    <area name="OuterB" start="0,20;Nether" end="20,40;Nether" />
   -->
 
   </areas>
