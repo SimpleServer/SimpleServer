@@ -26,34 +26,30 @@ import java.util.TimerTask;
 
 import simpleserver.Coordinate;
 import simpleserver.Player;
+import simpleserver.Position;
 import simpleserver.nbt.PlayerFile;
 
 public class Teleporter extends Bot {
 
   private Timer timer = new Timer();
-  private Coordinate coordinate;
+  private Position position;
   private Player player;
   private PlayerFile dat;
-  private float yaw;
-  private float pitch;
 
   public Teleporter(Player player, Coordinate coordinate) throws IOException {
-    this(player, coordinate, 0, 0);
+    this(player, new Position(coordinate));
   }
 
-  public Teleporter(Player player, Coordinate coordinate, float yaw, float pitch) throws IOException {
+  public Teleporter(Player player, Position position) throws IOException {
     super(player.getServer(), "Teleporter" + Math.round(100000 * Math.random()));
-    this.coordinate = coordinate;
     this.player = player;
-    this.yaw = yaw;
-    this.pitch = pitch;
+    this.position = position;
     prepare();
   }
 
   protected void prepare() throws IOException {
     dat = new PlayerFile(name, server);
-    dat.setPosition(coordinate);
-    dat.setLook(yaw, pitch);
+    dat.setPosition(position);
     dat.save();
   }
 

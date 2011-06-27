@@ -54,6 +54,10 @@ public class Position {
     onGround = true;
   }
 
+  public Position(Coordinate coordinate) {
+    this(coordinate.x(), coordinate.y(), coordinate.z(), coordinate.dimension());
+  }
+
   public void updatePosition(double x, double y, double z, double stance) {
     this.x = x;
     this.y = y;
@@ -86,6 +90,10 @@ public class Position {
     out.flush();
   }
 
+  public Coordinate coordinate() {
+    return new Coordinate((int) x, (int) y, (int) z, dimension);
+  }
+
   public double x() {
     return x;
   }
@@ -108,5 +116,9 @@ public class Position {
 
   public float yaw() {
     return yaw;
+  }
+
+  public Position copy() {
+    return new Position(x, y, z, dimension, yaw, pitch);
   }
 }

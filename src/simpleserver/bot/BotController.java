@@ -25,9 +25,11 @@ import java.io.IOException;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -36,12 +38,14 @@ import simpleserver.Server;
 public class BotController {
   private Server server;
   private Map<String, Bot> bots;
+  private Set<String> deadNinjas;
   private List<File> garbage;
   private Timer timer;
 
   public BotController(Server server) {
     this.server = server;
     bots = new HashMap<String, Bot>();
+    deadNinjas = new HashSet<String>();
     garbage = new LinkedList<File>();
   }
 
@@ -83,6 +87,9 @@ public class BotController {
 
   void remove(Bot bot) {
     bots.remove(bot.name);
+    if (bot.ninja()) {
+      deadNinjas.add(bot.name);
+    }
   }
 
   public void stop() {
@@ -107,7 +114,7 @@ public class BotController {
   public boolean ninja(String name) {
     Bot bot = bots.get(name);
     if (bot == null) {
-      return false;
+      return deadNinjas.contains(name);
     } else {
       return bot.ninja();
     }

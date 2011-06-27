@@ -21,6 +21,9 @@
 package simpleserver.command;
 
 import static simpleserver.lang.Translations.t;
+
+import java.util.List;
+
 import simpleserver.Color;
 import simpleserver.CommandParser;
 
@@ -95,6 +98,23 @@ public abstract class AbstractCommand implements Command {
     } else {
       return "!";
     }
+  }
+
+  protected static String join(List<String> list) {
+    return join(list, "");
+  }
+
+  protected static String join(List<String> list, String prefix) {
+    StringBuilder string = new StringBuilder();
+    for (String part : list) {
+      string.append(prefix);
+      string.append(part);
+      string.append(", ");
+    }
+    if (string.length() > 0) {
+      string.delete(string.length() - 2, string.length() - 1);
+    }
+    return string.toString();
   }
 
   public void reloadText() {

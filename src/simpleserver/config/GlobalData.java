@@ -32,7 +32,7 @@ import simpleserver.Position;
 import simpleserver.Resource;
 import simpleserver.Coordinate.Dimension;
 import simpleserver.nbt.GZipNBTFile;
-import simpleserver.nbt.NBT;
+import simpleserver.nbt.NBTByte;
 import simpleserver.nbt.NBTCompound;
 import simpleserver.nbt.NBTDouble;
 import simpleserver.nbt.NBTFloat;
@@ -107,6 +107,10 @@ public class GlobalData implements Resource {
       return node.names();
     }
 
+    public boolean contains(String name) {
+      return node.containsKey(name);
+    }
+
     public Position get(String name) {
       if (!node.containsKey(name)) {
         return null;
@@ -126,9 +130,10 @@ public class GlobalData implements Resource {
       p.put(new NBTDouble("x", pos.x));
       p.put(new NBTDouble("y", pos.y));
       p.put(new NBTDouble("z", pos.z));
-      p.put(new NBTDouble("Dimension", pos.dimension.index()));
+      p.put(new NBTByte("Dimension", pos.dimension.index()));
       p.put(new NBTFloat("yaw", pos.yaw));
       p.put(new NBTFloat("pitch", pos.pitch));
+      node.put(p);
     }
 
     public void remove(String name) {
@@ -136,7 +141,7 @@ public class GlobalData implements Resource {
     }
 
     private void load() {
-      if (nbt.root().containsKey("warp") && nbt.root().getList("warp").type() == NBT.COMPOUND) {
+      if (nbt.root().containsKey("warp")) {
         node = nbt.root().getCompound("warp");
       } else {
         node = new NBTCompound("warp");

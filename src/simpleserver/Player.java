@@ -55,8 +55,7 @@ public class Player {
   private boolean instantDestroy = false;
   private boolean godMode = false;
   private String kickMsg = null;
-  private double x, y, z;
-  private float yaw, pitch;
+  public Position position;
   private Dimension dimension;
   private int group = 0;
   private int entityId = 0;
@@ -83,6 +82,7 @@ public class Player {
 
   public Player(Socket inc, Server parent) {
     connected = System.currentTimeMillis();
+    position = new Position();
     server = parent;
     extsocket = inc;
     if (server.isRobot(getIPAddress())) {
@@ -180,23 +180,11 @@ public class Player {
   }
 
   public double distanceTo(Player player) {
-    return Math.sqrt(Math.pow(x - player.x, 2) + Math.pow(y - player.y, 2)
-        + Math.pow(z - player.z, 2));
+    return Math.sqrt(Math.pow(x() - player.x(), 2) + Math.pow(y() - player.y(), 2) + Math.pow(z() - player.z(), 2));
   }
 
   public long getConnectedAt() {
     return connected;
-  }
-
-  public void updateLocation(double x, double y, double z, double stance) {
-    this.x = x;
-    this.y = y;
-    this.z = z;
-  }
-
-  public void updateLook(float yaw, float pitch) {
-    this.yaw = yaw;
-    this.pitch = pitch;
   }
 
   public boolean isAttemptLock() {
@@ -345,28 +333,28 @@ public class Player {
     return extsocket.getInetAddress().getHostAddress();
   }
 
-  public double getX() {
-    return x;
+  public double x() {
+    return position.x;
   }
 
-  public double getY() {
-    return y;
+  public double y() {
+    return position.y;
   }
 
-  public double getZ() {
-    return z;
+  public double z() {
+    return position.z;
   }
 
   public Coordinate position() {
-    return new Coordinate((int) x, (int) y, (int) z, dimension);
+    return position.coordinate();
   }
 
   public float yaw() {
-    return yaw;
+    return position.yaw;
   }
 
   public float pitch() {
-    return pitch;
+    return position.pitch;
   }
 
   public void setLocalChat(boolean mode) {
@@ -691,7 +679,7 @@ public class Player {
     return server.bots.connect(new Teleporter(this, coordinate));
   }
 
-  public boolean teleport(Coordinate coordinate, float yaw, float pitch) throws IOException {
-    return server.bots.connect(new Teleporter(this, coordinate, yaw, pitch));
+  public boolean teleport(Position position) throws IOException {
+    return server.bots.connect(new Teleporter(this, position));
   }
 }

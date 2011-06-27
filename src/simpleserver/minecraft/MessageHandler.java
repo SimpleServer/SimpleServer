@@ -21,12 +21,18 @@
 package simpleserver.minecraft;
 
 import static simpleserver.lang.Translations.t;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import simpleserver.Server;
 import simpleserver.command.InvalidCommand;
 import simpleserver.command.ServerCommand;
 
 public class MessageHandler {
   private final Server server;
+  private final static Pattern DISCONNECT = Pattern.compile(".*\\[INFO\\] (.*) lost connection:.*");
+  private final static Pattern CONNECT = Pattern.compile(".*\\[INFO\\] (.*) \\[.*\\] logged in with entity id \\d+ at .*");
 
   private boolean loaded = false;
 
@@ -92,6 +98,20 @@ public class MessageHandler {
       handleError(new Exception(line));
     } else if (line.matches("^>+$")) {
       return;
+    } else {
+      Matcher connect = CONNECT.matcher(line);
+      if (connect.find()) {
+        if (server.bots.ninja(connect.group(1))) {
+          return;
+        }
+      } else {
+        Matcher disconnect = DISCONNECT.matcher(line);
+        if (disconnect.find()) {
+          if (server.bots.ninja(disconnect.group(1))) {
+            return;
+          }
+        }
+      }
     }
 
     server.addOutputLine(line);

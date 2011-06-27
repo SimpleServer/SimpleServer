@@ -24,7 +24,9 @@ import java.io.File;
 import java.io.IOException;
 
 import simpleserver.Coordinate;
+import simpleserver.Position;
 import simpleserver.Server;
+import simpleserver.Coordinate.Dimension;
 
 public class PlayerFile {
   private String filename;
@@ -48,14 +50,23 @@ public class PlayerFile {
   }
 
   public void setPosition(Coordinate coord) {
+    setPosition(coord.x(), coord.y(), coord.z(), coord.dimension());
+  }
+
+  public void setPosition(Position position) {
+    setPosition(position.x, position.y, position.z, position.dimension);
+    setLook(position.yaw, position.pitch);
+  }
+
+  public void setPosition(double x, double y, double z, Dimension dimension) {
     NBTList<NBTDouble> pos = new NBTList<NBTDouble>("Pos", NBT.DOUBLE);
 
-    pos.add(new NBTDouble(coord.x()));
-    pos.add(new NBTDouble(coord.y()));
-    pos.add(new NBTDouble(coord.z()));
+    pos.add(new NBTDouble(x));
+    pos.add(new NBTDouble(y));
+    pos.add(new NBTDouble(z));
 
     nbt.root().put(pos);
-    nbt.root().put(new NBTInt("Dimension", coord.dimension().index()));
+    nbt.root().put(new NBTInt("Dimension", dimension.index()));
   }
 
   public void setLook(float yaw, float pitch) {

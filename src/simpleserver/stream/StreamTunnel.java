@@ -39,10 +39,10 @@ import java.util.regex.Pattern;
 
 import simpleserver.Color;
 import simpleserver.Coordinate;
-import simpleserver.Coordinate.Dimension;
 import simpleserver.Group;
 import simpleserver.Player;
 import simpleserver.Server;
+import simpleserver.Coordinate.Dimension;
 import simpleserver.command.LocalSayCommand;
 import simpleserver.command.PlayerListCommand;
 import simpleserver.config.ChestList.Chest;
@@ -71,7 +71,6 @@ public class StreamTunnel {
   private StreamDumper inputDumper;
   private StreamDumper outputDumper;
 
-  private int motionCounter = 0;
   private boolean inGame = false;
 
   private volatile long lastRead;
@@ -850,37 +849,23 @@ public class StreamTunnel {
   }
 
   private void copyPlayerLocation() throws IOException {
-    if (!isServerTunnel) {
-      motionCounter++;
-    }
-    if (!isServerTunnel && motionCounter % 8 == 0) {
-      double x = in.readDouble();
-      double y = in.readDouble();
-      double stance = in.readDouble();
-      double z = in.readDouble();
-      player.updateLocation(x, y, z, stance);
-      write(x);
-      write(y);
-      write(stance);
-      write(z);
-    } else {
-      copyNBytes(32);
-    }
+    double x = in.readDouble();
+    double y = in.readDouble();
+    double stance = in.readDouble();
+    double z = in.readDouble();
+    player.position.updatePosition(x, y, z, stance);
+    write(x);
+    write(y);
+    write(stance);
+    write(z);
   }
 
   private void copyPlayerLook() throws IOException {
-    if (!isServerTunnel) {
-      motionCounter++;
-    }
-    if (!isServerTunnel && motionCounter % 8 == 0) {
-      float yaw = in.readFloat();
-      float pitch = in.readFloat();
-      player.updateLook(yaw, pitch);
-      write(yaw);
-      write(pitch);
-    } else {
-      copyNBytes(8);
-    }
+    float yaw = in.readFloat();
+    float pitch = in.readFloat();
+    player.position.updateLook(yaw, pitch);
+    write(yaw);
+    write(pitch);
   }
 
   private void copyUnknownBlob() throws IOException {
