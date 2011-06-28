@@ -67,12 +67,9 @@ public class WarpCommand extends AbstractCommand implements PlayerCommand {
         return;
       }
       try {
-        if (!player.teleport(player.getServer().data.warp.get(command))) {
-          throw new Exception();
-        }
+        player.teleport(player.getServer().data.warp.get(command));
       } catch (Exception e) {
         player.addTMessage(Color.RED, "Teleporting failed.");
-        e.printStackTrace();
       }
     }
   }

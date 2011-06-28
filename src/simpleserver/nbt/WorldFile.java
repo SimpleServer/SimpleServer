@@ -18,21 +18,37 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package simpleserver.command;
+package simpleserver.nbt;
 
-import simpleserver.Color;
-import simpleserver.Player;
+import java.io.File;
 
-public class SpawnCommand extends AbstractCommand implements PlayerCommand {
-  public SpawnCommand() {
-    super("spawn", "Teleport to spawn");
+import simpleserver.Coordinate;
+import simpleserver.Coordinate.Dimension;
+
+public class WorldFile {
+  private String filename;
+  private NBTCompound data;
+
+  public WorldFile(String world) {
+    filename = world + File.separator + "level.dat";
+    try {
+      NBTFile nbt = new GZipNBTFile(filename);
+      data = nbt.root().getCompound("Data");
+    } catch (Exception e) {
+      System.out.println("[SimpleServer] Can't read level.dat");
+    }
   }
 
-  public void execute(Player player, String message) {
+  public Coordinate spawnPoint() {
+    int x, y, z;
     try {
-      player.teleport(player.getServer().world.spawnPoint());
+      x = data.getInt("SpawnX").get();
+      y = data.getInt("SpawnY").get();
+      z = data.getInt("SpawnZ").get();
     } catch (Exception e) {
-      player.addTMessage(Color.RED, "Teleporting failed.");
+      x = z = 0;
+      y = 62;
     }
+    return new Coordinate(x, y, z, Dimension.EARTH);
   }
 }

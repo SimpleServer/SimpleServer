@@ -49,7 +49,7 @@ public class BotController {
     garbage = new LinkedList<File>();
   }
 
-  public boolean connect(Bot bot) {
+  public void connect(Bot bot) throws ConnectException {
     bots.put(bot.name, bot);
     bot.setController(this);
     try {
@@ -57,9 +57,8 @@ public class BotController {
     } catch (Exception e) {
       remove(bot);
       System.out.println("[SimpleServer] Couldn't start bot <" + bot.name + "> (" + bot.getClass().getSimpleName() + ")");
-      return false;
+      throw new ConnectException();
     }
-    return true;
 
   }
 
@@ -75,7 +74,10 @@ public class BotController {
     int month = now.get(Calendar.MONTH);
     int day = now.get(Calendar.DAY_OF_MONTH);
     if (month == spawnMonth && day == spawnDay) {
-      connect(new Herobrine(server));
+      try {
+        connect(new Herobrine(server));
+      } catch (ConnectException e) {
+      }
     } else if (spawn.compareTo(now) > 0) {
       now.set(Calendar.DAY_OF_MONTH, day + 5);
       if (spawn.compareTo(now) < 0) {
@@ -127,8 +129,15 @@ public class BotController {
   private class HerobrineSpawner extends TimerTask {
     @Override
     public void run() {
-      connect(new Herobrine(server));
+      try {
+        connect(new Herobrine(server));
+      } catch (ConnectException e) {
+      }
     }
+  }
+
+  public class ConnectException extends Exception {
+    private static final long serialVersionUID = -1681088703496510233L;
   }
 
 }

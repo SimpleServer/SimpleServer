@@ -36,10 +36,6 @@ public class Teleporter extends Bot {
   private Player player;
   private PlayerFile dat;
 
-  public Teleporter(Player player) throws IOException {
-    this(player, (Position) null);
-  }
-
   public Teleporter(Player player, Coordinate coordinate) throws IOException {
     this(player, new Position(coordinate));
   }
@@ -53,9 +49,7 @@ public class Teleporter extends Bot {
 
   protected void prepare() throws IOException {
     dat = new PlayerFile(name, server);
-    if (position != null) {
-      dat.setPosition(position);
-    }
+    dat.setPosition(position);
     dat.save();
   }
 

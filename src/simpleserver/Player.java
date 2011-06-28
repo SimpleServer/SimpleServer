@@ -32,6 +32,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import simpleserver.Coordinate.Dimension;
 import simpleserver.bot.Teleporter;
+import simpleserver.bot.BotController.ConnectException;
 import simpleserver.command.ExternalCommand;
 import simpleserver.command.PlayerCommand;
 import simpleserver.stream.StreamTunnel;
@@ -676,15 +677,11 @@ public class Player {
     return dimension;
   }
 
-  public boolean teleport(Coordinate coordinate) throws IOException {
-    return server.bots.connect(new Teleporter(this, coordinate));
+  public void teleport(Coordinate coordinate) throws IOException, ConnectException {
+    server.bots.connect(new Teleporter(this, coordinate));
   }
 
-  public boolean teleport(Position position) throws IOException {
-    return server.bots.connect(new Teleporter(this, position));
-  }
-
-  public boolean teleportToSpawn() throws IOException {
-    return server.bots.connect(new Teleporter(this));
+  public void teleport(Position position) throws IOException, ConnectException {
+    server.bots.connect(new Teleporter(this, position));
   }
 }

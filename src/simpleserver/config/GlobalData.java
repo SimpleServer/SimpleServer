@@ -142,11 +142,15 @@ public class GlobalData implements Resource {
 
     private void load() {
       if (nbt.root().containsKey("warp")) {
-        node = nbt.root().getCompound("warp");
-      } else {
-        node = new NBTCompound("warp");
-        nbt.root().put(node);
+        try {
+          node = nbt.root().getCompound("warp");
+          return;
+        } catch (Exception e) {
+          System.out.println("[WARNING] Warp list is corrupt. Replacing it with empty list...");
+        }
       }
+      node = new NBTCompound("warp");
+      nbt.root().put(node);
     }
   }
 }

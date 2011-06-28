@@ -50,6 +50,7 @@ import simpleserver.log.AdminLog;
 import simpleserver.log.ConnectionLog;
 import simpleserver.log.ErrorLog;
 import simpleserver.minecraft.MinecraftWrapper;
+import simpleserver.nbt.WorldFile;
 import simpleserver.options.Options;
 import simpleserver.rcon.RconServer;
 import simpleserver.telnet.TelnetServer;
@@ -111,6 +112,7 @@ public class Server {
 
   public Time time;
   public BotController bots;
+  public WorldFile world;
 
   public Server() {
     listener = new Listener();
@@ -414,6 +416,7 @@ public class Server {
     if (options.getBoolean("enableRcon")) {
       rconServer = new RconServer(this);
     }
+    world = new WorldFile(options.get("levelName"));
     autoSpaceCheck = new AutoFreeSpaceChecker(this);
     autoBackup = new AutoBackup(this);
     autosave = new AutoSave(this);

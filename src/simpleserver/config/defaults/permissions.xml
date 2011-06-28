@@ -60,7 +60,7 @@
       <command name="servertime" allow="0+" />
       <command name="setgroup" allow="4,5" />
       <command name="setipgroup" allow="4,5" />
-      <command name="spawn" allow="2+" />
+      <command name="spawn" allow="3+" />
       <command name="stop" allow="-" />
       <command name="teleport" aliases="tp" allow="4,5" />
       <command name="tell" aliases="t" allow="1+" />
