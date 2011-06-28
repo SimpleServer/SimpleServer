@@ -273,7 +273,11 @@ public class AutoBackup {
 
   private static long age(File file) {
     try {
-      return System.currentTimeMillis() - date(file);
+      if (file == null) {
+        return 0;
+      } else {
+        return System.currentTimeMillis() - date(file);
+      }
     } catch (ParseException e) {
       return System.currentTimeMillis() - file.lastModified();
     }

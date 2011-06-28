@@ -683,4 +683,8 @@ public class Player {
   public boolean teleport(Position position) throws IOException {
     return server.bots.connect(new Teleporter(this, position));
   }
+
+  public boolean teleportToSpawn() throws IOException {
+    return server.bots.connect(new Teleporter(this));
+  }
 }
