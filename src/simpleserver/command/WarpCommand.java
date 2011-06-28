@@ -35,10 +35,10 @@ public class WarpCommand extends AbstractCommand implements PlayerCommand {
     if (arguments.length == 0) {
       String warp = commandPrefix() + "warp";
       player.addTMessage(Color.GRAY, "Usage:");
-      player.addTMessage(Color.GRAY, "%s name:        teleport to waypoint", warp);
-      player.addTMessage(Color.GRAY, "%s list:        list waypoints", warp);
-      player.addTMessage(Color.GRAY, "%s add name:    add waypoint", warp);
-      player.addTMessage(Color.GRAY, "%s remove name: remove waypoint", warp);
+      player.addTMessage(Color.GRAY, "%s name: teleport to waypoint", warp);
+      player.addTMessage(Color.GRAY, "%s: list waypoints", warp + " list");
+      player.addTMessage(Color.GRAY, "%s name: add waypoint", warp + " add");
+      player.addTMessage(Color.GRAY, "%s name: remove waypoint", warp + " remove");
       return;
     }
     String command = arguments[0];
