@@ -54,15 +54,18 @@ public class HelpCommand extends AbstractCommand implements PlayerCommand {
       StringBuffer line = new StringBuffer();
 
       String prefix = commandPrefix();
-      for (PlayerCommand command : parser.getPlayerCommands()) {
-        if ((command instanceof InvalidCommand)
-             || player.getServer().permissions.commandIsHidden(command.getName())
-             || !player.commandAllowed(command.getName())) {
+
+      for (Object cmd : player.getServer().permissions.getAllCommands()) {
+        String commandName = cmd.toString();
+        parser.getPlayerCommand(commandName);
+
+        if (player.getServer().permissions.commandIsHidden(commandName)
+            || !player.commandAllowed(commandName)) {
           continue;
         }
 
         line.append(prefix);
-        line.append(command.getName());
+        line.append(commandName);
         line.append(" ");
       }
 

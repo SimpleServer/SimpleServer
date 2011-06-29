@@ -444,6 +444,10 @@ public class PermissionConfig extends AbstractConfig {
     return perms;
   }
 
+  public List getAllCommands() {
+    return config.getList("/permissions/commands/command/@name");
+  }
+
   // replacement for CommandList.playerAllowed
   public boolean playerCommandAllowed(String cmd, Player player) {
     boolean allowed = false;
