@@ -3,8 +3,14 @@
  * added global and area-based chest usage permission
  * added announceRestart, announceSave options
  * added forward=only possibility for commands
- * changed time command to support with vanilla syntax
- * fixed !myarea unsave
+ * added waypoint based teleporting (/warp, /spawn)
+ * added localization
+ * added dimension and altitude support in areas
+ * added automatic backup deletion in case disk is full
+ * added configuration files to backup
+ * added forwardUnknownCommands option for groups
+ * changed time command to support vanilla syntax and save freezeTime
+ * fixed /myarea unsave
  * fixed kits with amount being multiple of 64
 
 == 8.1 ==
