@@ -20,20 +20,25 @@
  */
 package simpleserver.command;
 
-import simpleserver.Player;
+import simpleserver.Server;
 
-public class GivePlayerCommand extends GiveCommand implements PlayerCommand {
-  public GivePlayerCommand() {
-    super("giveplayer PLAYER ITEM [AMOUNT]", "Spawn items for another player");
+public class GiveServerCommand extends GiveCommand implements ServerCommand {
+
+  public GiveServerCommand() {
+    super("give", "Spawn items for players");
   }
 
-  public void execute(Player player, String message) {
-    executor = player;
+  public void execute(Server server, String message) {
     String[] arguments = extractArguments(message);
     if (arguments.length == 0) {
       error("No player specified");
       return;
     }
-    execute(extractArguments(message, 1), getTarget(arguments[0], player.getServer()), player.getName());
+    execute(extractArguments(message, 1), getTarget(arguments[0], server), "Console");
+  }
+
+  @Override
+  protected void error(String message, Object... args) {
+    System.out.println(String.format(message, args));
   }
 }

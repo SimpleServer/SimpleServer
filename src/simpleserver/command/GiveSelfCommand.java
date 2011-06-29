@@ -22,18 +22,13 @@ package simpleserver.command;
 
 import simpleserver.Player;
 
-public class GivePlayerCommand extends GiveCommand implements PlayerCommand {
-  public GivePlayerCommand() {
-    super("giveplayer PLAYER ITEM [AMOUNT]", "Spawn items for another player");
+public class GiveSelfCommand extends GiveCommand implements PlayerCommand {
+  public GiveSelfCommand() {
+    super("give ITEM[:DAMAGE] [AMOUNT]", "Spawn items for yourself");
   }
 
   public void execute(Player player, String message) {
     executor = player;
-    String[] arguments = extractArguments(message);
-    if (arguments.length == 0) {
-      error("No player specified");
-      return;
-    }
-    execute(extractArguments(message, 1), getTarget(arguments[0], player.getServer()), player.getName());
+    execute(extractArguments(message), player, player.getName());
   }
 }

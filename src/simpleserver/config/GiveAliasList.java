@@ -28,30 +28,30 @@ public class GiveAliasList extends PropertiesConfig {
   private static final String[] suffixes = new String[] { "s", "block",
       "blocks", "ore", "ores", "es" };
 
-  private final Map<String, Integer> aliases;
+  private final Map<String, Item> aliases;
 
   public GiveAliasList() {
     super("give-alias-list.txt", true);
 
-    aliases = new HashMap<String, Integer>();
+    aliases = new HashMap<String, Item>();
   }
 
-  public Integer getItemId(String itemAlias) {
+  public Item getItemId(String itemAlias) {
     itemAlias = itemAlias.toLowerCase();
-    Integer itemId = aliases.get(itemAlias);
+    Item item = aliases.get(itemAlias);
 
     for (String suffix : suffixes) {
-      if (itemId != null) {
+      if (item != null) {
         break;
       }
 
       if (itemAlias.endsWith(suffix)) {
         int prefixLength = itemAlias.length() - suffix.length();
-        itemId = aliases.get(itemAlias.substring(0, prefixLength));
+        item = aliases.get(itemAlias.substring(0, prefixLength));
       }
     }
 
-    return itemId;
+    return item;
   }
 
   @Override
@@ -61,14 +61,33 @@ public class GiveAliasList extends PropertiesConfig {
     aliases.clear();
     for (Entry<Object, Object> alias : properties.entrySet()) {
       Integer id;
+      Short damage = 0;
+      String[] parts = ((String) alias.getValue()).split(":");
       try {
-        id = Integer.valueOf((String) alias.getValue());
+        id = Integer.valueOf(parts[0]);
+        if (parts.length > 1) {
+          damage = Short.valueOf(parts[1]);
+        }
       } catch (NumberFormatException e) {
         System.out.println("Invalid give alias: " + alias.toString());
         continue;
       }
 
-      aliases.put(((String) alias.getKey()).toLowerCase(), id);
+      aliases.put(((String) alias.getKey()).toLowerCase(), new Item(id, damage));
+    }
+  }
+
+  public class Item {
+    public int id;
+    public short damage;
+
+    public Item(int id) {
+      this(id, (short) 0);
+    }
+
+    public Item(int id, short damage) {
+      this.id = id;
+      this.damage = damage;
     }
   }
 }

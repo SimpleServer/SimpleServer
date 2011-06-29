@@ -3,9 +3,9 @@
  certain suffixes removed.  For instance, giving "stoneblock", "stoneblocks",
  "stoneore", "stoneores" or "stones" each give "stone" unless they are
  specified separately.
- Format: Alias=ItemID
+ Format: Alias=ItemID[:damage]
 
  Item IDs are listed here: http://www.minecraftwiki.net/wiki/Data_values
 
- Example: trinitrotoluene=46 means you can !give trinitrotoluene instead of
- !give 64 and in both cases receive TNT.
+ Example: trinitrotoluene=46 means you can /give trinitrotoluene instead of
+ /give 64 and in both cases receive TNT.

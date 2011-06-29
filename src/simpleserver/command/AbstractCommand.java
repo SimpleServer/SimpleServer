@@ -65,14 +65,18 @@ public abstract class AbstractCommand implements Command {
     return false;
   }
 
-  protected String[] extractArguments(String message) {
+  protected String[] extractArguments(String message, int startOffset) {
+    startOffset++;
     String[] parts = message.split("\\s+");
 
-    // JDK 1.5 Compatibility
-    String[] copy = new String[parts.length - 1];
-    System.arraycopy(parts, 1, copy, 0, parts.length - 1);
+    String[] copy = new String[parts.length - startOffset];
+    System.arraycopy(parts, startOffset, copy, 0, parts.length - startOffset);
 
     return copy;
+  }
+
+  protected String[] extractArguments(String message) {
+    return extractArguments(message, 0);
   }
 
   protected String extractArgument(String message, int startOffset) {

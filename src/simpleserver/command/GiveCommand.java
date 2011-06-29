@@ -23,51 +23,81 @@ package simpleserver.command;
 import simpleserver.Color;
 import simpleserver.Player;
 import simpleserver.Server;
+import simpleserver.bot.BotController.ConnectException;
+import simpleserver.config.GiveAliasList.Item;
 
-public class GiveCommand extends AbstractCommand implements PlayerCommand {
-  private int offset;
+public abstract class GiveCommand extends AbstractCommand {
+  protected Player executor;
 
-  public GiveCommand() {
-    this("give ITEM [AMOUNT]", "Spawn items for yourself", 0);
+  public GiveCommand(String name, String usage) {
+    super(name, usage);
   }
 
-  protected GiveCommand(String name, String commandCode, int offset) {
-    super(name, commandCode);
-
-    this.offset = offset;
-  }
-
-  public void execute(Player player, String message) {
-    String[] arguments = extractArguments(message);
-
-    Player target = getTarget(player, player.getServer(), arguments);
+  public void execute(String[] arguments, Player target, String logName) {
     if (target == null) {
       return;
     }
 
-    if (arguments.length > offset) {
-      String item = arguments[offset];
-      Integer id = player.getServer().giveAliasList.getItemId(item);
-      if (id != null) {
-        item = id.toString();
+    if (arguments.length != 0) {
+      int id;
+      short damage = 0;
+
+      String[] request = arguments[0].split(":");
+      if (request[0].matches("\\d+")) {
+        id = Integer.valueOf(request[0]);
+      } else {
+        Item item = target.getServer().giveAliasList.getItemId(request[0]);
+        if (item == null) {
+          error("Can't find item %s", request[0]);
+          return;
+        }
+        id = item.id;
+        damage = item.damage;
       }
 
-      String amount = null;
-      if (arguments.length > offset + 1) {
-        amount = arguments[offset + 1];
+      if (request.length > 1) {
+        try {
+          damage = Short.valueOf(request[1]);
+        } catch (Exception e) {
+          error("Invalid damage value: %s", request[1]);
+          return;
+        }
       }
 
-      player.getServer().adminLog("User " + player.getName()
-                                  + " used giveplayer:\t"
-                                  + target.getName() + "\t" + item + "\t("
+      int amount = 1;
+      if (arguments.length > 1) {
+        try {
+          amount = Integer.valueOf(arguments[1]);
+        } catch (Exception e) {
+          error("Invalid amount: %s", arguments[1]);
+          return;
+        }
+      }
+
+      target.getServer().adminLog("Give:\t" + logName + "\t"
+                                  + target.getName() + "\t" + id + ":" + damage + "\t("
                                   + amount + ")");
-      target.give(item, amount);
+
+      try {
+        target.give(id, damage, amount);
+      } catch (ConnectException e) {
+        error("Giving failed!");
+      }
     } else {
-      player.addTMessage(Color.RED, "No item or amount specified!");
+      error("No item or amount specified!");
     }
   }
 
-  protected Player getTarget(Player player, Server server, String[] arguments) {
-    return player;
+  protected void error(String message, Object... args) {
+    executor.addTMessage(Color.RED, message, args);
+  }
+
+  protected Player getTarget(String name, Server server) {
+    Player target = null;
+    target = server.findPlayer(name);
+    if (target == null) {
+      error("Player not online (%s)", name);
+    }
+    return target;
   }
 }

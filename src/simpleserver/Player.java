@@ -31,6 +31,7 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import simpleserver.Coordinate.Dimension;
+import simpleserver.bot.Giver;
 import simpleserver.bot.Teleporter;
 import simpleserver.bot.BotController.ConnectException;
 import simpleserver.command.ExternalCommand;
@@ -422,51 +423,29 @@ public class Player {
     }
   }
 
-  public boolean give(String rawItem, String rawAmount) {
-    boolean success = true;
-
-    int item = 0;
-    try {
-      item = Integer.parseInt(rawItem);
-
-      if (item < 0) {
-        addTMessage(Color.RED, "Item ID must be positive!");
-        success = false;
-      }
-    } catch (NumberFormatException e) {
-      addTMessage(Color.RED, "Item ID must map to a number!");
-      success = false;
-    }
-
-    int amount = 1;
-    if (rawAmount != null) {
-      try {
-        amount = Integer.parseInt(rawAmount);
-
-        if ((amount < 1) || (amount > 1000)) {
-          addTMessage(Color.RED, "Amount must be within 1-1000!");
-          success = false;
-        }
-      } catch (NumberFormatException e) {
-        addTMessage(Color.RED, "Amount must be a number!");
-        success = false;
-      }
-    }
-
-    if (!success) {
-      addTMessage(Color.RED, "Unable to give %s", rawItem);
-      return false;
-    }
-
-    String baseCommand = getName() + " " + item + " ";
+  public void give(int id, int amount) {
+    String baseCommand = getName() + " " + id + " ";
     for (int c = 0; c < amount / 64; ++c) {
       server.runCommand("give", baseCommand + 64);
     }
     if (amount % 64 != 0) {
       server.runCommand("give", baseCommand + amount % 64);
     }
+  }
 
-    return true;
+  public void give(int id, short damage, int amount) throws ConnectException {
+    if (damage == 0) {
+      give(id, amount);
+    } else {
+      Giver giver = new Giver(this);
+      for (int c = 0; c < amount / 64; ++c) {
+        giver.add(id, 64, damage);
+      }
+      if (amount % 64 != 0) {
+        giver.add(id, amount % 64, damage);
+      }
+      server.bots.connect(giver);
+    }
   }
 
   public void updateGroup() {
