@@ -24,6 +24,7 @@ import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import simpleserver.Color;
 import simpleserver.Player;
 import simpleserver.Server;
 
@@ -87,7 +88,11 @@ public class KitList extends PropertiesConfig {
         kitList.append(", ");
       }
     }
-    player.addTCaptionedMessage("Allowed kits", kitList.substring(0, kitList.length() - 2));
+    if (kitList.length() == 0) {
+      player.addTMessage(Color.RED, "You can't use any kits");
+    } else {
+      player.addTCaptionedMessage("Allowed kits", kitList.substring(0, kitList.length() - 2));
+    }
   }
 
   @Override

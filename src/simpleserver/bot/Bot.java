@@ -41,7 +41,7 @@ import simpleserver.Player.LocalAddressFactory;
 public class Bot {
   private static final LocalAddressFactory addressFactory = new LocalAddressFactory();
 
-  private static final int VERSION = 13;
+  private static final int VERSION = 14;
 
   protected String name;
   protected Server server;
