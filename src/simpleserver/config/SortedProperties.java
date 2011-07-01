@@ -30,8 +30,8 @@ public class SortedProperties extends Properties {
 
   @Override
   @SuppressWarnings("unchecked")
-  public synchronized Enumeration keys() {
-    Enumeration keysEnum = super.keys();
+  public synchronized Enumeration<Object> keys() {
+    Enumeration<Object> keysEnum = super.keys();
     Vector keyList = new Vector();
     while (keysEnum.hasMoreElements()) {
       keyList.add(keysEnum.nextElement());

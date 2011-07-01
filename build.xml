@@ -1,7 +1,26 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<project default="release" name="Create Runnable Jar for Project SimpleServer with Jar-in-Jar Loader">
+<project default="create-release-zip" name="Create Runnable Jar for Project SimpleServer with Jar-in-Jar Loader">
   <property name="version-file" value="bin/simpleserver/VERSION" />
+  <property name="build.sysclasspath" value="last" />
+	
+  <path id="project-classpath">
+    <fileset dir="./lib" includes="*.jar" />
+  </path>
 
+  <target name="copy-non-java-files">
+    <copy todir="bin" includeemptydirs="false">
+      <fileset dir="src" excludes="**/*.java" />
+    </copy>
+  </target>
+
+  <target name="compile" depends="cleanbuild, copy-non-java-files">
+    <mkdir dir="bin" />
+    <javac srcdir="src" destdir="bin" debug="yes">
+      <classpath refid="project-classpath" />
+      <compilerarg value="-Xlint"/> 
+    </javac>
+  </target>
+	
   <target name="set-version">
     <exec executable="script/update-version.sh" osfamily="unix">
       <arg file="${version-file}" />
@@ -14,9 +33,7 @@
     </exec>
   </target>
 
-  <target name="release" depends="clean, create-release-zip" />
-
-  <target name="create-release-jar" depends="set-version">
+  <target name="create-release-jar" depends="clean, compile, set-version">
     <mkdir dir="release" />
     <jar destfile="release/SimpleServer.jar">
       <manifest>
@@ -43,7 +60,7 @@
     </jar>
   </target>
 	
- <target name="nbt" depends="clean">
+ <target name="nbt" depends="clean, compile">
     <mkdir dir="release" />
     <jar destfile="release/NBT.jar">
       <manifest>
@@ -55,7 +72,7 @@
     </jar>
   </target>
 
-  <target name="create-release-zip" depends="create-release-jar">
+  <target name="create-release-zip" depends="clean, create-release-jar">
     <zip destfile="release/SimpleServer.zip">
       <zipfileset file="CHANGES"/>
       <zipfileset file="CONTRIBUTORS"/>
@@ -67,6 +84,10 @@
     </zip>
   </target>
 
+  <target name="cleanbuild">
+    <delete dir="bin" />
+  </target>
+	
   <target name="clean">
     <delete dir="release" />
     <delete file="${version-file}" />

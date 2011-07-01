@@ -31,7 +31,6 @@ import org.apache.commons.io.FileUtils;
 import simpleserver.Server;
 
 public class AutoFreeSpaceChecker {
-  private static final File BACKUP_DIRECTORY = new File("backups");
   private static final int period = 5 * 60 * 1000;
 
   private final Timer timer;

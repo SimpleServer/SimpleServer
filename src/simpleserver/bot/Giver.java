@@ -64,6 +64,7 @@ public class Giver extends Bot {
     return true;
   }
 
+  @SuppressWarnings("fallthrough")
   @Override
   protected void handlePacket(byte packetId) throws IOException {
     switch (packetId) {

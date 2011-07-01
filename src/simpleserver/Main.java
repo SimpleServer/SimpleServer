@@ -29,16 +29,20 @@ public class Main {
   private static final String license = "SimpleServer -- Copyright (C) 2011 SimpleServer authors (see CONTRIBUTORS)";
   private static final String warranty = "This program is licensed under The MIT License.\nSee file LICENSE for details.";
   private static final String baseVersion = "8.1.3";
+  private static final boolean release = false;
+  private static final String releaseState = "alpha";
   private static final String version;
 
   static {
     String extendedVersion = baseVersion;
-
-    String commitversion = getVersionString("VERSION");
-    if (!commitversion.equals("")) {
-      extendedVersion += "-" + commitversion;
+    if (release) {
+      extendedVersion += "-" + releaseState;
+    } else {
+      String commitversion = getVersionString("VERSION");
+      if (!commitversion.equals("")) {
+        extendedVersion += "-" + commitversion;
+      }
     }
-
     version = extendedVersion;
   }
 

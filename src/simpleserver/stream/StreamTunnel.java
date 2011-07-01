@@ -988,7 +988,7 @@ public class StreamTunnel {
 
   private String getLastColorCode(String message) {
     String colorCode = "";
-    int lastIndex = message.lastIndexOf('§');
+    int lastIndex = message.lastIndexOf('\u00a7');
     if (lastIndex != -1 && lastIndex + 1 < message.length()) {
       colorCode = message.substring(lastIndex, lastIndex + 2);
     }
@@ -1008,7 +1008,7 @@ public class StreamTunnel {
         end++;
       }
 
-      if (message.charAt(end) == '§') {
+      if (message.charAt(end) == '\u00a7') {
         end--;
       }
 
@@ -1017,7 +1017,7 @@ public class StreamTunnel {
       sendMessage(getLastColorCode(firstPart) + message.substring(end));
     } else {
       int end = message.length();
-      if (message.charAt(end - 1) == '§') {
+      if (message.charAt(end - 1) == '\u00a7') {
         end--;
       }
       sendMessagePacket(message.substring(0, end));
