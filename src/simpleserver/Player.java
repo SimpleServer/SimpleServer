@@ -36,7 +36,7 @@ import simpleserver.bot.Teleporter;
 import simpleserver.bot.BotController.ConnectException;
 import simpleserver.command.ExternalCommand;
 import simpleserver.command.PlayerCommand;
-import simpleserver.config.GlobalData.StatField;
+import simpleserver.config.data.Stats.StatField;
 import simpleserver.stream.StreamTunnel;
 
 public class Player {
