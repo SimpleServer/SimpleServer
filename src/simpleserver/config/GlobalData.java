@@ -28,14 +28,17 @@ import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+import simpleserver.Player;
 import simpleserver.Position;
 import simpleserver.Resource;
 import simpleserver.Coordinate.Dimension;
+import simpleserver.config.LegacyStats.Statistic;
 import simpleserver.nbt.GZipNBTFile;
 import simpleserver.nbt.NBTByte;
 import simpleserver.nbt.NBTCompound;
 import simpleserver.nbt.NBTDouble;
 import simpleserver.nbt.NBTFloat;
+import simpleserver.nbt.NBTInt;
 import simpleserver.thread.AutoBackup;
 
 public class GlobalData implements Resource {
@@ -47,9 +50,11 @@ public class GlobalData implements Resource {
 
   private GZipNBTFile nbt;
   public Warp warp;
+  public PlayerData players;
 
   public GlobalData() {
     warp = new Warp();
+    players = new PlayerData();
   }
 
   public void load() {
@@ -90,6 +95,7 @@ public class GlobalData implements Resource {
     }
 
     warp.load();
+    players.load();
   }
 
   public void save() {
@@ -152,5 +158,97 @@ public class GlobalData implements Resource {
       node = new NBTCompound("warp");
       nbt.root().put(node);
     }
+  }
+
+  public class PlayerData {
+    private NBTCompound node;
+    public Stats stats = new Stats();
+
+    private void load() {
+      if (nbt.root().containsKey("players")) {
+        try {
+          node = nbt.root().getCompound("players");
+          return;
+        } catch (Exception e) {
+          System.out.println("[WARNING] Player list is corrupt. Replacing it with empty list...");
+        }
+      }
+      node = new NBTCompound("players");
+      nbt.root().put(node);
+      loadOldStats();
+    }
+
+    private void loadOldStats() {
+      LegacyStats old = new LegacyStats();
+      old.load();
+      for (String name : old.stats.keySet()) {
+        Statistic oldStats = old.stats.get(name);
+        NBTCompound tag = new NBTCompound(name);
+        NBTCompound stats = new NBTCompound("stats");
+        stats.put(new NBTInt(StatField.PLAY_TIME.toString(), oldStats.minutes));
+        stats.put(new NBTInt(StatField.BLOCKS_DESTROYED.toString(), oldStats.blocksDestroyed));
+        stats.put(new NBTInt(StatField.BLOCKS_PLACED.toString(), oldStats.blocksPlaced));
+        tag.put(stats);
+        node.put(tag);
+      }
+      old.save();
+    }
+
+    private NBTCompound get(String name) {
+      name = name.toLowerCase();
+      if (node.containsKey(name)) {
+        return node.getCompound(name);
+      } else {
+        NBTCompound player = new NBTCompound(name);
+        node.put(player);
+        return player;
+      }
+    }
+
+    public class Stats {
+      private final static String STATS = "stats";
+
+      public int get(Player player, StatField field) {
+        return getInt(player.getName(), field.toString()).get();
+      }
+
+      public void set(Player player, StatField field, int value) {
+        getInt(player.getName(), field.toString()).set(value);
+      }
+
+      public int add(Player player, StatField field, int amount) {
+        NBTInt tag = getInt(player.getName(), field.toString());
+        tag.set(tag.get() + amount);
+        return tag.get();
+      }
+
+      private NBTCompound getStats(String name) {
+        NBTCompound player = PlayerData.this.get(name);
+        if (player.containsKey(STATS)) {
+          return player.getCompound(STATS);
+        } else {
+          NBTCompound tag = new NBTCompound(STATS);
+          player.put(tag);
+          return tag;
+        }
+      }
+
+      private NBTInt getInt(String name, String key) {
+        NBTCompound player = getStats(name);
+        if (player.containsKey(key)) {
+          return player.getInt(key);
+        } else {
+          NBTInt tag = new NBTInt(key, 0);
+          player.put(tag);
+          return tag;
+        }
+      }
+    }
+  }
+
+  public enum StatField {
+    PLAY_TIME,
+    BLOCKS_DESTROYED,
+    BLOCKS_PLACED;
   }
 }

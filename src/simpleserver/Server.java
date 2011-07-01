@@ -43,7 +43,6 @@ import simpleserver.config.MuteList;
 import simpleserver.config.PermissionConfig;
 import simpleserver.config.RobotList;
 import simpleserver.config.Rules;
-import simpleserver.config.Stats;
 import simpleserver.config.WhiteList;
 import simpleserver.lang.Translations;
 import simpleserver.log.AdminLog;
@@ -79,7 +78,6 @@ public class Server {
   public WhiteList whitelist;
   public MuteList mutelist;
   public GiveAliasList giveAliasList;
-  public Stats stats;
   public GlobalData data;
   private RobotList robots;
 
@@ -361,7 +359,6 @@ public class Server {
     resources.add(whitelist = new WhiteList());
     resources.add(mutelist = new MuteList());
     resources.add(giveAliasList = new GiveAliasList());
-    resources.add(stats = new Stats());
     resources.add(data = new GlobalData());
 
     time = new Time(this);

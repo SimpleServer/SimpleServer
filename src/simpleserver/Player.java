@@ -36,6 +36,7 @@ import simpleserver.bot.Teleporter;
 import simpleserver.bot.BotController.ConnectException;
 import simpleserver.command.ExternalCommand;
 import simpleserver.command.PlayerCommand;
+import simpleserver.config.GlobalData.StatField;
 import simpleserver.stream.StreamTunnel;
 
 public class Player {
@@ -465,13 +466,13 @@ public class Player {
     Integer[] stats = new Integer[4];
 
     stats[0] = (int) (System.currentTimeMillis() - connected) / 1000 / 60;
-    stats[1] = server.stats.getMinutes(this) + stats[0];
-    stats[2] = server.stats.addPlacedBlocks(this, blocksPlaced);
-    stats[3] = server.stats.addDestroyedBlocks(this, blocksDestroyed);
+    stats[1] = server.data.players.stats.get(this, StatField.PLAY_TIME) + stats[0];
+    stats[2] = server.data.players.stats.add(this, StatField.BLOCKS_PLACED, blocksPlaced);
+    stats[3] = server.data.players.stats.add(this, StatField.BLOCKS_DESTROYED, blocksDestroyed);
 
     blocksPlaced = 0;
     blocksDestroyed = 0;
-    server.stats.save();
+    server.data.save();
 
     return stats;
   }
@@ -495,10 +496,10 @@ public class Player {
     }
 
     if (name != null) {
-      server.stats.addOnlineMinutes(this, (int) (System.currentTimeMillis() - connected) / 1000 / 60);
-      server.stats.addDestroyedBlocks(this, blocksDestroyed);
-      server.stats.addPlacedBlocks(this, blocksPlaced);
-      server.stats.save();
+      server.data.players.stats.add(this, StatField.PLAY_TIME, (int) (System.currentTimeMillis() - connected) / 1000 / 60);
+      server.data.players.stats.add(this, StatField.BLOCKS_DESTROYED, blocksDestroyed);
+      server.data.players.stats.add(this, StatField.BLOCKS_PLACED, blocksPlaced);
+      server.data.save();
 
       server.playerList.removePlayer(this);
       name = null;

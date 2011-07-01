@@ -46,6 +46,6 @@ public enum Color {
 
   @Override
   public String toString() {
-    return "§" + code;
+    return "\u00a7" + code;
   }
 }
