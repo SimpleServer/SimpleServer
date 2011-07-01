@@ -33,8 +33,10 @@ import java.util.List;
 import java.util.concurrent.Semaphore;
 
 import simpleserver.config.AuthenticationList;
+import simpleserver.bot.BotController;
 import simpleserver.config.ChestList;
 import simpleserver.config.GiveAliasList;
+import simpleserver.config.GlobalData;
 import simpleserver.config.HelpText;
 import simpleserver.config.IPBanList;
 import simpleserver.config.KitList;
@@ -43,17 +45,18 @@ import simpleserver.config.MuteList;
 import simpleserver.config.PermissionConfig;
 import simpleserver.config.RobotList;
 import simpleserver.config.Rules;
-import simpleserver.config.Stats;
 import simpleserver.config.WhiteList;
 import simpleserver.lang.Translations;
 import simpleserver.log.AdminLog;
 import simpleserver.log.ConnectionLog;
 import simpleserver.log.ErrorLog;
 import simpleserver.minecraft.MinecraftWrapper;
+import simpleserver.nbt.WorldFile;
 import simpleserver.options.Options;
 import simpleserver.rcon.RconServer;
 import simpleserver.telnet.TelnetServer;
 import simpleserver.thread.AutoBackup;
+import simpleserver.thread.AutoFreeSpaceChecker;
 import simpleserver.thread.AutoRestart;
 import simpleserver.thread.AutoRun;
 import simpleserver.thread.AutoSave;
@@ -77,7 +80,7 @@ public class Server {
   public WhiteList whitelist;
   public MuteList mutelist;
   public GiveAliasList giveAliasList;
-  public Stats stats;
+  public GlobalData data;
   public AuthenticationList auths;
   private RobotList robots;
 
@@ -99,6 +102,7 @@ public class Server {
   private RconServer rconServer;
   private TelnetServer telnetServer;
   private AutoRun c10t;
+  public AutoFreeSpaceChecker autoSpaceCheck;
   private AutoBackup autoBackup;
   private AutoSave autosave;
   private AutoRestart autoRestart;
@@ -113,6 +117,8 @@ public class Server {
   public Semaphore saveLock = new Semaphore(1);
 
   public Time time;
+  public BotController bots;
+  public WorldFile world;
 
   public Server() {
     listener = new Listener();
@@ -271,12 +277,11 @@ public class Server {
   }
 
   public int localChat(Player player, String msg) {
-    String chat = "\u00a77" + player.getName() + " says:\u00a7f " + msg;
     int localPlayers = 0;
     int radius = options.getInt("localChatRadius");
     for (Player friend : playerList.getArray()) {
       if (friend.distanceTo(player) < radius) {
-        friend.addMessage(chat);
+        friend.addCaptionedMessage(t("%s says", player.getName()), msg);
         if (player != friend) {
           localPlayers++;
         }
@@ -367,10 +372,11 @@ public class Server {
     resources.add(whitelist = new WhiteList());
     resources.add(mutelist = new MuteList());
     resources.add(giveAliasList = new GiveAliasList());
-    resources.add(stats = new Stats());
+    resources.add(data = new GlobalData());
     resources.add(auths = new AuthenticationList());
 
     time = new Time(this);
+    bots = new BotController(this);
 
     systemInput = new SystemInputQueue();
     adminLog = new AdminLog();
@@ -387,6 +393,7 @@ public class Server {
     errorLog.stop();
     connectionLog.stop();
     time.unfreeze();
+    bots.cleanup();
   }
 
   private void startup() {
@@ -421,6 +428,8 @@ public class Server {
     if (options.getBoolean("enableRcon")) {
       rconServer = new RconServer(this);
     }
+    world = new WorldFile(options.get("levelName"));
+    autoSpaceCheck = new AutoFreeSpaceChecker(this);
     autoBackup = new AutoBackup(this);
     autosave = new AutoSave(this);
     autoRestart = new AutoRestart(this);
@@ -432,11 +441,15 @@ public class Server {
         System.out.println("[SimpleServer] Warning: freezeTime option is not valid");
       }
     }
+
+    bots.ready();
   }
 
   private void shutdown() {
     System.out.println("[SimpleServer] Stopping Server...");
     save = false;
+
+    bots.stop();
 
     if (!saveLock.tryAcquire()) {
       System.out.println("[SimpleServer] Server is currently Backing Up/Saving...");
@@ -458,6 +471,7 @@ public class Server {
     if (rconServer != null) {
       rconServer.stop();
     }
+    autoSpaceCheck.cleanup();
     autoBackup.stop();
     autosave.stop();
     autoRestart.stop();

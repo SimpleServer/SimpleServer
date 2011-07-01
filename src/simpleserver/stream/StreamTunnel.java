@@ -54,7 +54,8 @@ public class StreamTunnel {
   private static final int BUFFER_SIZE = 1024;
   private static final byte BLOCK_DESTROYED_STATUS = 2;
   private static final Pattern MESSAGE_PATTERN = Pattern.compile("^<([^>]+)> (.*)$");
-  private static final Pattern COLOR_PATTERN = Pattern.compile("\u00a7[0-9a-f]");
+  private static final Pattern COLOR_PATTERN = Pattern.compile("§[0-9a-f]");
+  private static final Pattern JOIN_PATTERN = Pattern.compile("§.(\\d|\\w)* (joined|left) the game.");
   private static final String CONSOLE_CHAT_PATTERN = "\\(CONSOLE:.*\\)";
   private static final int MESSAGE_SIZE = 60;
   private static final int MAXIMUM_MESSAGE_SIZE = 119;
@@ -71,7 +72,6 @@ public class StreamTunnel {
   private StreamDumper inputDumper;
   private StreamDumper outputDumper;
 
-  private int motionCounter = 0;
   private boolean inGame = false;
 
   private volatile long lastRead;
@@ -209,8 +209,12 @@ public class StreamTunnel {
         break;
       case 0x03: // Chat Message
         String message = readUTF16();
-        if (isServerTunnel && server.options.getBoolean("useMsgFormats")) {
-
+        Matcher joinMatcher = JOIN_PATTERN.matcher(message);
+        if (isServerTunnel && joinMatcher.find()) {
+          if (server.bots.ninja(joinMatcher.group(1))) {
+            break;
+          }
+        } else if (isServerTunnel && server.options.getBoolean("useMsgFormats")) {
           Matcher colorMatcher = COLOR_PATTERN.matcher(message);
           String cleanMessage = colorMatcher.replaceAll("");
 
@@ -338,15 +342,18 @@ public class StreamTunnel {
       case 0x0b: // Player Position
         write(packetId);
         copyPlayerLocation();
+        copyNBytes(1);
         break;
       case 0x0c: // Player Look
         write(packetId);
-        copyNBytes(9);
+        copyPlayerLook();
+        copyNBytes(1);
         break;
       case 0x0d: // Player Position & Look
         write(packetId);
         copyPlayerLocation();
-        copyNBytes(8);
+        copyPlayerLook();
+        copyNBytes(1);
         break;
       case 0x0e: // Player Digging
         if (!isServerTunnel) {
@@ -519,10 +526,16 @@ public class StreamTunnel {
         write(in.readByte());
         break;
       case 0x14: // Named Entity Spawn
-        write(packetId);
-        write(in.readInt());
-        write(readUTF16());
-        copyNBytes(16);
+        int eid = in.readInt();
+        name = readUTF16();
+        if (!server.bots.ninja(name)) {
+          write(packetId);
+          write(eid);
+          write(name);
+          copyNBytes(16);
+        } else {
+          skipNBytes(16);
+        }
         break;
       case 0x15: // Pickup spawn
         write(packetId);
@@ -871,23 +884,23 @@ public class StreamTunnel {
   }
 
   private void copyPlayerLocation() throws IOException {
-    if (!isServerTunnel) {
-      motionCounter++;
-    }
-    if (!isServerTunnel && motionCounter % 8 == 0) {
-      double x = in.readDouble();
-      double y = in.readDouble();
-      double stance = in.readDouble();
-      double z = in.readDouble();
-      player.updateLocation(x, y, z, stance);
-      write(x);
-      write(y);
-      write(stance);
-      write(z);
-      copyNBytes(1);
-    } else {
-      copyNBytes(33);
-    }
+    double x = in.readDouble();
+    double y = in.readDouble();
+    double stance = in.readDouble();
+    double z = in.readDouble();
+    player.position.updatePosition(x, y, z, stance);
+    write(x);
+    write(y);
+    write(stance);
+    write(z);
+  }
+
+  private void copyPlayerLook() throws IOException {
+    float yaw = in.readFloat();
+    float pitch = in.readFloat();
+    player.position.updateLook(yaw, pitch);
+    write(yaw);
+    write(pitch);
   }
 
   private void copyUnknownBlob() throws IOException {
@@ -1038,7 +1051,11 @@ public class StreamTunnel {
       sendMessagePacket(firstPart);
       sendMessage(getLastColorCode(firstPart) + message.substring(end));
     } else {
-      sendMessagePacket(message);
+      int end = message.length();
+      if (message.charAt(end - 1) == '\u00a7') {
+        end--;
+      }
+      sendMessagePacket(message.substring(0, end));
     }
   }
 

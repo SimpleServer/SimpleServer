@@ -25,13 +25,15 @@ public class Group {
   private final boolean showTitle;
   private final boolean isAdmin;
   private final String color;
+  private final boolean forwardsCommands;
 
   public Group(String groupName, boolean showTitle, boolean isAdmin,
-               String color) {
+               String color, boolean forwardsCommands) {
     this.groupName = groupName;
     this.showTitle = showTitle;
     this.isAdmin = isAdmin;
     this.color = color;
+    this.forwardsCommands = forwardsCommands;
   }
 
   public String getName() {
@@ -50,4 +52,7 @@ public class Group {
     return color;
   }
 
+  public boolean getForwardsCommands() {
+    return forwardsCommands;
+  }
 }

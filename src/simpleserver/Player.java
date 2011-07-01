@@ -31,8 +31,12 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import simpleserver.Coordinate.Dimension;
+import simpleserver.bot.Giver;
+import simpleserver.bot.Teleporter;
+import simpleserver.bot.BotController.ConnectException;
 import simpleserver.command.ExternalCommand;
 import simpleserver.command.PlayerCommand;
+import simpleserver.config.GlobalData.StatField;
 import simpleserver.stream.StreamTunnel;
 
 public class Player {
@@ -55,7 +59,7 @@ public class Player {
   private boolean instantDestroy = false;
   private boolean godMode = false;
   private String kickMsg = null;
-  private double x, y, z;
+  public Position position;
   private Dimension dimension;
   private int group = 0;
   private int entityId = 0;
@@ -85,6 +89,7 @@ public class Player {
 
   public Player(Socket inc, Server parent) {
     connected = System.currentTimeMillis();
+    position = new Position();
     server = parent;
     extsocket = inc;
     if (server.isRobot(getIPAddress())) {
@@ -189,18 +194,11 @@ public class Player {
   }
 
   public double distanceTo(Player player) {
-    return Math.sqrt(Math.pow(x - player.x, 2) + Math.pow(y - player.y, 2)
-        + Math.pow(z - player.z, 2));
+    return Math.sqrt(Math.pow(x() - player.x(), 2) + Math.pow(y() - player.y(), 2) + Math.pow(z() - player.z(), 2));
   }
 
   public long getConnectedAt() {
     return connected;
-  }
-
-  public void updateLocation(double x, double y, double z, double stance) {
-    this.x = x;
-    this.y = y;
-    this.z = z;
   }
 
   public boolean isAttemptLock() {
@@ -365,20 +363,28 @@ public class Player {
     return extsocket.getInetAddress().getHostAddress();
   }
 
-  public double getX() {
-    return x;
+  public double x() {
+    return position.x;
   }
 
-  public double getY() {
-    return y;
+  public double y() {
+    return position.y;
   }
 
-  public double getZ() {
-    return z;
+  public double z() {
+    return position.z;
   }
 
   public Coordinate position() {
-    return new Coordinate((int) x, (int) y, (int) z, dimension);
+    return position.coordinate();
+  }
+
+  public float yaw() {
+    return position.yaw;
+  }
+
+  public float pitch() {
+    return position.pitch;
   }
 
   public void setLocalChat(boolean mode) {
@@ -418,7 +424,8 @@ public class Player {
 
     return !((server.permissions.commandShouldPassThroughToMod(command.getName())
             || server.options.getBoolean("forwardAllCommands")
-            || invalidCommand || command instanceof ExternalCommand) && server.options.contains("alternateJarFile"));
+            || invalidCommand || command instanceof ExternalCommand)
+            && server.options.contains("alternateJarFile") && getGroup().getForwardsCommands());
   }
 
   public void execute(Class<? extends PlayerCommand> c) {
@@ -444,51 +451,29 @@ public class Player {
     }
   }
 
-  public boolean give(String rawItem, String rawAmount) {
-    boolean success = true;
-
-    int item = 0;
-    try {
-      item = Integer.parseInt(rawItem);
-
-      if (item < 0) {
-        addTMessage(Color.RED, "Item ID must be positive!");
-        success = false;
-      }
-    } catch (NumberFormatException e) {
-      addTMessage(Color.RED, "Item ID must map to a number!");
-      success = false;
-    }
-
-    int amount = 1;
-    if (rawAmount != null) {
-      try {
-        amount = Integer.parseInt(rawAmount);
-
-        if ((amount < 1) || (amount > 1000)) {
-          addTMessage(Color.RED, "Amount must be within 1-1000!");
-          success = false;
-        }
-      } catch (NumberFormatException e) {
-        addTMessage(Color.RED, "Amount must be a number!");
-        success = false;
-      }
-    }
-
-    if (!success) {
-      addTMessage(Color.RED, "Unable to give %s", rawItem);
-      return false;
-    }
-
-    String baseCommand = getName() + " " + item + " ";
+  public void give(int id, int amount) {
+    String baseCommand = getName() + " " + id + " ";
     for (int c = 0; c < amount / 64; ++c) {
       server.runCommand("give", baseCommand + 64);
     }
     if (amount % 64 != 0) {
       server.runCommand("give", baseCommand + amount % 64);
     }
+  }
 
-    return true;
+  public void give(int id, short damage, int amount) throws ConnectException {
+    if (damage == 0) {
+      give(id, amount);
+    } else {
+      Giver giver = new Giver(this);
+      for (int c = 0; c < amount / 64; ++c) {
+        giver.add(id, 64, damage);
+      }
+      if (amount % 64 != 0) {
+        giver.add(id, amount % 64, damage);
+      }
+      server.bots.connect(giver);
+    }
   }
 
   public void updateGroup() {
@@ -508,13 +493,13 @@ public class Player {
     Integer[] stats = new Integer[4];
 
     stats[0] = (int) (System.currentTimeMillis() - connected) / 1000 / 60;
-    stats[1] = server.stats.getMinutes(this) + stats[0];
-    stats[2] = server.stats.addPlacedBlocks(this, blocksPlaced);
-    stats[3] = server.stats.addDestroyedBlocks(this, blocksDestroyed);
+    stats[1] = server.data.players.stats.get(this, StatField.PLAY_TIME) + stats[0];
+    stats[2] = server.data.players.stats.add(this, StatField.BLOCKS_PLACED, blocksPlaced);
+    stats[3] = server.data.players.stats.add(this, StatField.BLOCKS_DESTROYED, blocksDestroyed);
 
     blocksPlaced = 0;
     blocksDestroyed = 0;
-    server.stats.save();
+    server.data.save();
 
     return stats;
   }
@@ -549,10 +534,10 @@ public class Player {
         server.authenticator.rememberGuest(name, getIPAddress());
       }
 
-      server.stats.addOnlineMinutes(this, (int) (System.currentTimeMillis() - connected) / 1000 / 60);
-      server.stats.addDestroyedBlocks(this, blocksDestroyed);
-      server.stats.addPlacedBlocks(this, blocksPlaced);
-      server.stats.save();
+      server.data.players.stats.add(this, StatField.PLAY_TIME, (int) (System.currentTimeMillis() - connected) / 1000 / 60);
+      server.data.players.stats.add(this, StatField.BLOCKS_DESTROYED, blocksDestroyed);
+      server.data.players.stats.add(this, StatField.BLOCKS_PLACED, blocksPlaced);
+      server.data.save();
 
       server.playerList.removePlayer(this);
       name = null;
@@ -613,11 +598,11 @@ public class Player {
     }
   }
 
-  private static final class LocalAddressFactory {
+  public static final class LocalAddressFactory {
     private static final int[] octets = { 0, 0, 1 };
     private static Boolean canCycle = null;
 
-    private synchronized String getNextAddress() {
+    public synchronized String getNextAddress() {
       if (!canCycle()) {
         return "127.0.0.1";
       }
@@ -710,4 +695,11 @@ public class Player {
     return dimension;
   }
 
+  public void teleport(Coordinate coordinate) throws IOException, ConnectException {
+    server.bots.connect(new Teleporter(this, coordinate));
+  }
+
+  public void teleport(Position position) throws IOException, ConnectException {
+    server.bots.connect(new Teleporter(this, position));
+  }
 }

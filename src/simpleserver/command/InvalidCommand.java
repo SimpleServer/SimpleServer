@@ -32,7 +32,8 @@ public class InvalidCommand extends AbstractCommand implements PlayerCommand,
   }
 
   public void execute(Player player, String message) {
-    if (!player.getServer().options.contains("alternateJarFile")) {
+    if (!player.getServer().options.contains("alternateJarFile") ||
+        !player.getGroup().getForwardsCommands()) {
       player.addTMessage(Color.RED, "No such command %s", message);
     }
   }
@@ -43,6 +44,6 @@ public class InvalidCommand extends AbstractCommand implements PlayerCommand,
 
   @Override
   public void reloadText() {
-    helpText = "\u00a7c" + t(commandCode);
+    helpText = Color.RED + t(commandCode);
   }
 }

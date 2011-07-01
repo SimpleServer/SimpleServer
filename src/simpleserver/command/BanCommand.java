@@ -30,22 +30,33 @@ public class BanCommand extends PlayerArgCommand {
     super("ban PLAYER [REASON]", "Kick and ban the named player");
   }
 
+  protected boolean allowed(Player player, String target) {
+    Server server = player.getServer();
+    if (server.permissions.getNameGroup(target) >= player.getGroupId()) {
+      player.addTMessage(Color.RED, "You cannot ban players that are in your group or higher!");
+      return false;
+    }
+    return true;
+  }
+
   @Override
   protected void executeWithTarget(Player player, String message, String target) {
-    Server server = player.getServer();
-    String reason = extractArgument(message, 1);
-    if (reason == null) {
-      reason = t("Banned by admin.");
+    if (allowed(player, target)) {
+      Server server = player.getServer();
+      String reason = extractArgument(message, 1);
+      if (reason == null) {
+        reason = t("Banned by admin.");
+      }
+
+      server.runCommand("ban", target);
+      server.kick(target, reason);
+
+      server.adminLog("User " + player.getName() + " banned player:\t " + target +
+          "\t(Banned by admin.)");
+
+      String msg = t("Player %s has been banned! (%s)", target, reason);
+      server.runCommand("say", msg);
     }
-
-    server.runCommand("ban", target);
-    server.kick(target, reason);
-
-    server.adminLog("User " + player.getName() + " banned player:\t " + target +
-        "\t(Banned by admin.)");
-
-    String msg = t("Player %s has been banned! (%s)", target, reason);
-    server.runCommand("say", msg);
   }
 
   @Override

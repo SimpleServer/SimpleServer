@@ -20,7 +20,6 @@
  */
 package simpleserver.command;
 
-import static simpleserver.lang.Translations.t;
 import simpleserver.Color;
 import simpleserver.Player;
 
@@ -44,32 +43,33 @@ public class HelpCommand extends AbstractCommand implements PlayerCommand {
       String[] aliases = player.getServer().permissions.getCommandAliases(command.getName());
       if (aliases.length > 0) {
         StringBuffer line = new StringBuffer();
-        line.append("\u00a77" + t("Aliases:") + "\u00a7f ");
         for (String alias : aliases) {
           line.append(commandPrefix());
           line.append(alias);
           line.append(" ");
         }
-        player.addMessage(line.toString());
+        player.addTCaptionedMessage("Aliases", line.toString());
       }
     } else {
       StringBuffer line = new StringBuffer();
-      line.append("\u00a77" + t("Available Commands:") + "\u00a7f ");
 
       String prefix = commandPrefix();
-      for (PlayerCommand command : parser.getPlayerCommands()) {
-        if ((command instanceof InvalidCommand)
-             || player.getServer().permissions.commandIsHidden(command.getName())
-             || !player.commandAllowed(command.getName())) {
+
+      for (Object cmd : player.getServer().permissions.getAllCommands()) {
+        String commandName = cmd.toString();
+        parser.getPlayerCommand(commandName);
+
+        if (player.getServer().permissions.commandIsHidden(commandName)
+            || !player.commandAllowed(commandName)) {
           continue;
         }
 
         line.append(prefix);
-        line.append(command.getName());
+        line.append(commandName);
         line.append(" ");
       }
 
-      player.addMessage(line.toString());
+      player.addTCaptionedMessage("Available Commands", line.toString());
 
       player.addTMessage(Color.GRAY, "Say %s command for details of a specific command.",
                          prefix + "help");

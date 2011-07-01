@@ -6,12 +6,12 @@
 
   <groups>
   <!-- Groups must have distinct integer ids -->
-    <group id="0" name="Guest" color="f" showTitle="true" ignoreChestlocks="false" />
-    <group id="1" name="Player" color="f" showTitle="false" ignoreChestlocks="false" />
-    <group id="2" name="Trusted" color="9" showTitle="false" ignoreChestlocks="false" />
-    <group id="3" name="Mod" color="9" showTitle="true" ignoreChestlocks="true" />
-    <group id="4" name="Admin" color="2" showTitle="true" ignoreChestlocks="true" />
-    <group id="5" name="Owner" color="3" showTitle="true" ignoreChestlocks="true" />
+    <group id="0" name="Guest" color="f" showTitle="true" ignoreChestlocks="false" forwardUnknownCommands="false" />
+    <group id="1" name="Player" color="f" showTitle="false" ignoreChestlocks="false" forwardUnknownCommands="true" />
+    <group id="2" name="Trusted" color="9" showTitle="false" ignoreChestlocks="false" forwardUnknownCommands="true" />
+    <group id="3" name="Mod" color="9" showTitle="true" ignoreChestlocks="true" forwardUnknownCommands="true" />
+    <group id="4" name="Admin" color="2" showTitle="true" ignoreChestlocks="true" forwardUnknownCommands="true" />
+    <group id="5" name="Owner" color="3" showTitle="true" ignoreChestlocks="true" forwardUnknownCommands="true" />
   </groups>
 
   <members>
@@ -62,6 +62,7 @@
       <command name="servertime" allow="0+" />
       <command name="setgroup" allow="4,5" />
       <command name="setipgroup" allow="4,5" />
+      <command name="spawn" allow="3+" />
       <command name="stop" allow="-" />
       <command name="teleport" aliases="tp" allow="4,5" />
       <command name="tell" aliases="t" allow="1+" />
@@ -72,6 +73,7 @@
       <command name="unmute" allow="3-5" />
       <command name="unwhitelist" allow="3-5" />
       <command name="visit" allow="-" />
+      <command name="warp" allow="3-5" />
       <command name="warpmeto" allow="3-5" />
       <command name="warptome" allow="3-5" />
       <command name="whitelist" allow="3-5" />
@@ -93,15 +95,17 @@
      but should not overlap (on the same nesting level), because
      only the first matching area would be found and used.
      Areas must have distinct names (for identification) and have start
-     and end coordinates. Coordinates must be written as "x,z" or "x,z,y"
-     if at least one coordinate has no given y value, the area is declared
-     on any height (0-127).
+     and end coordinates. Coordinates must be written as "x,z" or "x,y,z"
+     or "x,z;Dimension" or "x,y,z;Dimension" if at least one coordinate
+     has no given y value, the area is declared on any height (0-127).
+     Dimension must be either Earth or Nether. If there is no Dimension
+     value, Earth will be chosen.
      Deeper area permissions override permissions of the parent area,
      disallow overrides allow for the same area.
 
 	   Example:
 
-    <area name="OuterA" start="0,0" end="19,19">
+    <area name="OuterA" start="0,0,0;Earth" end="19,19,19;Earth">
       <permissions>
         <blocks allowPlace="5" allowDestroy="5" />
         <commands>
@@ -112,7 +116,7 @@
         <area name="InnerA" start="5,5" end="10,10" />
       </areas>
     </area>
-    <area name="OuterB" start="0,20" end="20,40" />
+    <area name="OuterB" start="0,20;Nether" end="20,40;Nether" />
   -->
 
   </areas>

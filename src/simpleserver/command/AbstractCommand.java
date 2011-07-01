@@ -21,6 +21,10 @@
 package simpleserver.command;
 
 import static simpleserver.lang.Translations.t;
+
+import java.util.List;
+
+import simpleserver.Color;
 import simpleserver.CommandParser;
 
 public abstract class AbstractCommand implements Command {
@@ -31,7 +35,7 @@ public abstract class AbstractCommand implements Command {
 
   protected AbstractCommand(String name, String commandCode) {
     if (name != null) {
-      helpText = name + "\u00a7f : " + t(commandCode);
+      helpText = name + Color.WHITE + " : " + t(commandCode);
 
       int splitIndex = name.indexOf(" ");
       if (splitIndex != -1) {
@@ -51,7 +55,7 @@ public abstract class AbstractCommand implements Command {
 
   public String getHelpText(String prefix) {
     if (name != null) {
-      return "\u00a72" + prefix + helpText;
+      return Color.DARK_GREEN + prefix + helpText;
     } else {
       return helpText;
     }
@@ -61,14 +65,18 @@ public abstract class AbstractCommand implements Command {
     return false;
   }
 
-  protected String[] extractArguments(String message) {
+  protected String[] extractArguments(String message, int startOffset) {
+    startOffset++;
     String[] parts = message.split("\\s+");
 
-    // JDK 1.5 Compatibility
-    String[] copy = new String[parts.length - 1];
-    System.arraycopy(parts, 1, copy, 0, parts.length - 1);
+    String[] copy = new String[parts.length - startOffset];
+    System.arraycopy(parts, startOffset, copy, 0, parts.length - startOffset);
 
     return copy;
+  }
+
+  protected String[] extractArguments(String message) {
+    return extractArguments(message, 0);
   }
 
   protected String extractArgument(String message, int startOffset) {
@@ -96,9 +104,26 @@ public abstract class AbstractCommand implements Command {
     }
   }
 
+  protected static String join(List<String> list) {
+    return join(list, "");
+  }
+
+  protected static String join(List<String> list, String prefix) {
+    StringBuilder string = new StringBuilder();
+    for (String part : list) {
+      string.append(prefix);
+      string.append(part);
+      string.append(", ");
+    }
+    if (string.length() > 0) {
+      string.delete(string.length() - 2, string.length() - 1);
+    }
+    return string.toString();
+  }
+
   public void reloadText() {
     if (name != null) {
-      helpText = name + "\u00a7f : " + t(commandCode);
+      helpText = name + Color.WHITE + " : " + t(commandCode);
     } else {
       helpText = t(commandCode);
     }

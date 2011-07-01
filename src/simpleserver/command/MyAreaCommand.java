@@ -21,7 +21,6 @@
 package simpleserver.command;
 
 import simpleserver.Color;
-import simpleserver.Coordinate.Dimension;
 import simpleserver.Player;
 import simpleserver.config.PermissionConfig;
 
@@ -45,17 +44,12 @@ public class MyAreaCommand extends AbstractCommand implements PlayerCommand {
       return;
     }
 
-    if (player.getDimension() != Dimension.EARTH && (arguments[0].equals("start") || arguments[0].equals("end"))) {
-      player.addTMessage(Color.RED, "You can only create areas on Earth!");
-      return;
-    }
-
     if (arguments[0].equals("start")) {
-      player.areastart = perm.coordinateFromPlayer(player);
+      player.areastart = player.position();
       player.areastart = player.areastart.setY((byte) 0); // no height limit
       player.addTMessage(Color.GRAY, "Start coordinate set.");
     } else if (arguments[0].equals("end")) {
-      player.areaend = perm.coordinateFromPlayer(player);
+      player.areaend = player.position();
       player.areaend = player.areaend.setY((byte) 0); // no height limit
       player.addTMessage(Color.GRAY, "End coordinate set.");
     } else if (arguments[0].equals("save")) {

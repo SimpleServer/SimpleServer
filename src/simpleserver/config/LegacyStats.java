@@ -20,19 +20,26 @@
  */
 package simpleserver.config;
 
+import java.io.File;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import simpleserver.Player;
+public class LegacyStats extends PropertiesConfig {
+  public final ConcurrentMap<String, Statistic> stats;
 
-public class Stats extends PropertiesConfig {
-  private final ConcurrentMap<String, Statistic> stats;
-
-  public Stats() {
+  public LegacyStats() {
     super("stats.txt");
 
     stats = new ConcurrentHashMap<String, Statistic>();
+  }
+
+  @Override
+  public void save() {
+    File stats = new File("simpleserver" + File.separator + "stats.txt");
+    File oldconf = new File("simpleserver" + File.separator + "oldconf");
+    oldconf.mkdir();
+    stats.renameTo(new File(oldconf.getPath() + File.separator + "stats.txt"));
   }
 
   @Override
@@ -67,46 +74,10 @@ public class Stats extends PropertiesConfig {
     }
   }
 
-  public void addOnlineMinutes(Player player, int minutes) {
-    getStatistic(player).addMinutes(minutes);
-    updatePorperties(player);
-  }
-
-  public int addDestroyedBlocks(Player player, int ammount) {
-    ammount = getStatistic(player).addDestroyedBlocks(ammount);
-    updatePorperties(player);
-    return ammount;
-  }
-
-  public int addPlacedBlocks(Player player, int ammount) {
-    ammount = getStatistic(player).addPlacedBlocks(ammount);
-    updatePorperties(player);
-    return ammount;
-  }
-
-  public int getMinutes(Player player) {
-    return getStatistic(player).minutes;
-  }
-
-  private void updatePorperties(Player player) {
-    properties.setProperty(player.getName().toLowerCase(), stats.get(player.getName().toLowerCase()).toString());
-  }
-
-  private Statistic getStatistic(Player player) {
-    String key = player.getName().toLowerCase();
-    if (stats.containsKey(key)) {
-      return stats.get(key);
-    } else {
-      Statistic empty = new Statistic();
-      stats.put(key, empty);
-      return empty;
-    }
-  }
-
-  private class Statistic {
-    private int minutes;
-    private int blocksPlaced;
-    private int blocksDestroyed;
+  public class Statistic {
+    public int minutes;
+    public int blocksPlaced;
+    public int blocksDestroyed;
 
     public Statistic(Integer[] stats) {
       if (stats.length >= 3) {
@@ -115,32 +86,5 @@ public class Stats extends PropertiesConfig {
         blocksDestroyed = stats[2];
       }
     }
-
-    public int addDestroyedBlocks(int ammount) {
-      blocksDestroyed += ammount;
-      return blocksDestroyed;
-    }
-
-    public int addPlacedBlocks(int ammount) {
-      blocksPlaced += ammount;
-      return blocksPlaced;
-    }
-
-    public Statistic() {
-      minutes = 0;
-      blocksDestroyed = 0;
-      blocksPlaced = 0;
-    }
-
-    public void addMinutes(int minutes) {
-      this.minutes += minutes;
-    }
-
-    @Override
-    public String toString() {
-      return minutes + "," + blocksPlaced + "," + blocksDestroyed;
-    }
-
   }
-
 }

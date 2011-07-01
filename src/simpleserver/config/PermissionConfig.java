@@ -43,6 +43,7 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXParseException;
 
 import simpleserver.Coordinate;
+import simpleserver.Coordinate.Dimension;
 import simpleserver.Group;
 import simpleserver.Player;
 import simpleserver.Server;
@@ -92,10 +93,8 @@ class DTDErrorHandler implements ErrorHandler {
 public class PermissionConfig extends AbstractConfig {
   private Server server = null;
 
-  private boolean isDefault = false; // true if this instance is loaded from
-  // defaults
-  private PermissionConfig permDefaults = null; // contains default
-  // configuration as fallback
+  private boolean isDefault = false; // true if this is loaded from defaults
+  private PermissionConfig permDefaults = null; // contains defaults
 
   public boolean loadsuccess = true;
 
@@ -106,8 +105,8 @@ public class PermissionConfig extends AbstractConfig {
     this.server = server;
     isDefault = false;
 
-    permDefaults = new PermissionConfig(server, true); // load defaults in the
-    // background
+    permDefaults = new PermissionConfig(server, true);
+    // load defaults in the background
   }
 
   public PermissionConfig(Server server, boolean isDefault) {
@@ -164,6 +163,7 @@ public class PermissionConfig extends AbstractConfig {
     String showtitle = config.getString(pathpart + "showTitle", "");
     String isadmin = config.getString(pathpart + "ignoreChestlocks", "");
     String color = config.getString(pathpart + "color", "");
+    String forwardsCommands = config.getString(pathpart + "forwardUnknownCommands", "");
 
     /* set defaults for missing attributes */
     if (name.equals("")) {
@@ -178,8 +178,11 @@ public class PermissionConfig extends AbstractConfig {
     if (isadmin.equals("")) {
       isadmin = "false";
     }
+    if (forwardsCommands.equals("")) {
+      forwardsCommands = "true";
+    }
 
-    return new Group(name, Boolean.valueOf(showtitle), Boolean.valueOf(isadmin), color);
+    return new Group(name, Boolean.valueOf(showtitle), Boolean.valueOf(isadmin), color, Boolean.valueOf(forwardsCommands));
   }
 
   private int getIPGroup(String ipAddress) {
@@ -348,6 +351,10 @@ public class PermissionConfig extends AbstractConfig {
     return groups.build();
   }
 
+  public boolean forwardsUnknownCommands(Player player) {
+    return player.getGroup().getForwardsCommands();
+  }
+
   public boolean canOpenChests(Player player, Coordinate coordinate) {
     boolean allowed = true;
     String pathpart = "/permissions/blocks/";
@@ -378,7 +385,7 @@ public class PermissionConfig extends AbstractConfig {
     boolean[] perms = new boolean[4];
 
     if (blockCoord == null) {
-      blockCoord = coordinateFromPlayer(player);
+      blockCoord = player.position();
     }
 
     ArrayList<String> attrs = new ArrayList<String>();
@@ -437,6 +444,10 @@ public class PermissionConfig extends AbstractConfig {
     return perms;
   }
 
+  public List getAllCommands() {
+    return config.getList("/permissions/commands/command/@name");
+  }
+
   // replacement for CommandList.playerAllowed
   public boolean playerCommandAllowed(String cmd, Player player) {
     boolean allowed = false;
@@ -447,7 +458,7 @@ public class PermissionConfig extends AbstractConfig {
     }
 
     // get all parent areas and check them incrementally
-    String xpath = getAreanodeForCoordinate(coordinateFromPlayer(player));
+    String xpath = getAreanodeForCoordinate(player.position());
     String[] areas = getAllAreasFromAreaXPath(xpath);
 
     for (String area : areas) {
@@ -551,15 +562,7 @@ public class PermissionConfig extends AbstractConfig {
   }
 
   public String getCurrentArea(Player player) {
-    return getAreanameForCoordinate(coordinateFromPlayer(player));
-  }
-
-  public Coordinate coordinateFromPlayer(Player player) {
-    int x = (int) Math.round(player.getX());
-    byte y = (byte) Math.round(player.getY());
-    int z = (int) Math.round(player.getZ());
-
-    return new Coordinate(x, y, z);
+    return getAreanameForCoordinate(player.position());
   }
 
   public String getAreanameForCoordinate(Coordinate coord) {
@@ -624,6 +627,11 @@ public class PermissionConfig extends AbstractConfig {
   }
 
   private boolean areaContainsCoordinate(Coordinate start, Coordinate end, Coordinate coord) {
+    if (start.dimension() != end.dimension()) {
+      System.out.println("[SimpleServer] Warning: The dimension values do not match for area!");
+      return false;
+    }
+
     if (start.dimension() != coord.dimension() || end.dimension() != coord.dimension()) {
       return false;
     }
@@ -652,20 +660,30 @@ public class PermissionConfig extends AbstractConfig {
       return null;
     }
 
-    String[] coords = c.split(",");
+    String[] dim = c.split(";");
+    String[] coords = dim[0].split(",");
     if (coords.length < 2) {
       return null;
     }
 
-    Integer x = Integer.valueOf(coords[0]);
-    Integer z = Integer.valueOf(coords[1]);
-
+    int i = 0;
+    Integer x = Integer.valueOf(coords[i++]);
     byte y = 0;
     if (coords.length == 3) {
-      y = (byte) Integer.valueOf(coords[2]).intValue();
+      y = (byte) Integer.valueOf(coords[i++]).intValue();
+    }
+    Integer z = Integer.valueOf(coords[i]);
+
+    Dimension dimension = Dimension.EARTH;
+    if (dim.length == 2) {
+      dimension = Dimension.get(dim[1]);
+      if (dimension == Dimension.LIMBO) {
+        dimension = Dimension.EARTH;
+        System.out.println("[SimpleServer] Warning: The dimension value was invalid for an area!");
+      }
     }
 
-    return new Coordinate(x, y, z);
+    return new Coordinate(x, y, z, dimension);
   }
 
   public void createPlayerArea(Player player) {
@@ -679,8 +697,8 @@ public class PermissionConfig extends AbstractConfig {
     String path = "/areas/area[@owner='" + escape(name) + "']";
 
     config.addProperty(path + "[1] @name", name + "'s private area");
-    config.addProperty(path + "[1] @start", player.areastart.x() + "," + player.areastart.z());
-    config.addProperty(path + "[1] @end", player.areaend.x() + "," + player.areaend.z());
+    config.addProperty(path + "[1] @start", player.areastart.x() + "," + player.areastart.z() + ";" + player.areastart.dimension());
+    config.addProperty(path + "[1] @end", player.areaend.x() + "," + player.areaend.z() + ";" + player.areaend.dimension());
 
     config.addProperty(path + "[1] permissions/blocks@allowPlace", ";" + name);
     config.addProperty(path + "[1]/permissions/blocks @allowDestroy", ";" + name);

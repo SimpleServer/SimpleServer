@@ -29,18 +29,28 @@ public class KickCommand extends OnlinePlayerArgCommand {
     super("kick PLAYER [REASON]", "Kick the named player from the server");
   }
 
+  protected boolean allowed(Player player, Player target) {
+    if (target.getGroupId() >= player.getGroupId()) {
+      player.addTMessage(Color.RED, "You cannot kick players that are in your group or higher!");
+      return false;
+    }
+    return true;
+  }
+
   @Override
   protected void executeWithTarget(Player player, String message, Player target) {
-    String reason = extractArgument(message, 1);
-    if (reason == null) {
-      reason = t("Kicked by admin.");
-    }
+    if (allowed(player, target)) {
+      String reason = extractArgument(message, 1);
+      if (reason == null) {
+        reason = t("Kicked by admin.");
+      }
 
-    target.kick(reason);
-    player.getServer().adminLog("Admin " + player.getName() + " kicked player:\t " +
-        target.getName() + "\t(" + reason + ")");
-    String msg = t("Player %s has been kicked! (%s)", target.getName(), reason);
-    player.getServer().runCommand("say", msg);
+      target.kick(reason);
+      player.getServer().adminLog("Admin " + player.getName() + " kicked player:\t " +
+          target.getName() + "\t(" + reason + ")");
+      String msg = t("Player %s has been kicked! (%s)", target.getName(), reason);
+      player.getServer().runCommand("say", msg);
+    }
   }
 
   @Override

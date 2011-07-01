@@ -20,63 +20,20 @@
  */
 package simpleserver.command;
 
-import simpleserver.Color;
 import simpleserver.Player;
-import simpleserver.Server;
 
-public class GivePlayerCommand extends GiveCommand implements ServerCommand {
+public class GivePlayerCommand extends GiveCommand implements PlayerCommand {
   public GivePlayerCommand() {
-    super("giveplayer PLAYER ITEM [AMOUNT]", "Spawn items for another player", 1);
+    super("giveplayer PLAYER ITEM [AMOUNT]", "Spawn items for another player");
   }
 
-  public void execute(Server server, String message) {
+  public void execute(Player player, String message) {
+    executor = player;
     String[] arguments = extractArguments(message);
-
-    Player target = getTarget(null, server, arguments);
-    if (target == null) {
+    if (arguments.length == 0) {
+      error("No player specified");
       return;
     }
-
-    if (arguments.length <= 1) {
-      System.out.println("No item or amount specified!");
-      return;
-    }
-
-    String item = arguments[1];
-    Integer id = server.giveAliasList.getItemId(item);
-    if (id != null) {
-      item = id.toString();
-    }
-
-    String amount = null;
-    if (arguments.length > 2) {
-      amount = arguments[2];
-    }
-
-    target.give(item, amount);
-  }
-
-  @Override
-  protected Player getTarget(Player player, Server server, String[] arguments) {
-    Player target = null;
-    if (arguments.length > 0) {
-      target = server.findPlayer(arguments[0]);
-      if (target == null) {
-        if (player != null) {
-          player.addTMessage(Color.RED, "Player not online (%s)",
-                             arguments[0]);
-        } else {
-          System.out.println("Player not online (" + arguments[0] + ")");
-        }
-      }
-    } else {
-      if (player != null) {
-        player.addTMessage(Color.RED, "No item or amount specified!");
-      } else {
-        System.out.println("No player or item specified!");
-      }
-    }
-
-    return target;
+    execute(extractArguments(message, 1), getTarget(arguments[0], player.getServer()), player.getName());
   }
 }
