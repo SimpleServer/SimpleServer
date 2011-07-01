@@ -41,10 +41,12 @@ public class GlobalData implements Resource {
   GZipNBTFile nbt;
   public Warp warp;
   public PlayerData players;
+  public Chests chests;
 
   public GlobalData() {
     warp = new Warp();
     players = new PlayerData();
+    chests = new Chests();
   }
 
   public void load() {
@@ -86,9 +88,14 @@ public class GlobalData implements Resource {
 
     warp.load(nbt.root());
     players.load(nbt.root());
+    chests.load(nbt.root());
+
+    save();
   }
 
   public void save() {
+    chests.save();
+
     try {
       nbt.save(PATH);
     } catch (IOException e) {

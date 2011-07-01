@@ -20,6 +20,10 @@
  */
 package simpleserver;
 
+import simpleserver.nbt.NBTByte;
+import simpleserver.nbt.NBTCompound;
+import simpleserver.nbt.NBTInt;
+
 public class Coordinate {
   private int x;
   private byte y;
@@ -33,6 +37,13 @@ public class Coordinate {
 
   public Coordinate(int x, byte y, int z, Player player) {
     this(x, y, z, player.getDimension());
+  }
+
+  public Coordinate(NBTCompound tag) {
+    this(tag.getInt("x").get(),
+         tag.getByte("y").get(),
+         tag.getInt("z").get(),
+         Dimension.get(tag.getByte("dimension").get()));
   }
 
   public Coordinate(int x, byte y, int z, Dimension dimension) {
@@ -112,6 +123,15 @@ public class Coordinate {
   @Override
   public int hashCode() {
     return hashCode;
+  }
+
+  public NBTCompound tag() {
+    NBTCompound tag = new NBTCompound("coordinate");
+    tag.put(new NBTInt("x", x));
+    tag.put(new NBTByte("y", y));
+    tag.put(new NBTInt("z", z));
+    tag.put(new NBTByte("dimension", dimension.index()));
+    return tag;
   }
 
   public enum Dimension {

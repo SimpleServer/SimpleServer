@@ -21,6 +21,8 @@
 package simpleserver.config.data;
 
 import simpleserver.Player;
+import simpleserver.config.LegacyStats;
+import simpleserver.config.LegacyStats.Statistic;
 import simpleserver.nbt.NBTCompound;
 import simpleserver.nbt.NBTInt;
 
@@ -73,5 +75,20 @@ public class Stats {
     PLAY_TIME,
     BLOCKS_DESTROYED,
     BLOCKS_PLACED;
+  }
+
+  public void loadOldConfig() {
+    LegacyStats old = new LegacyStats();
+    old.load();
+    for (String name : old.stats.keySet()) {
+      Statistic oldStats = old.stats.get(name);
+      NBTCompound tag = playerData.get(name);
+      NBTCompound stats = new NBTCompound("stats");
+      stats.put(new NBTInt(StatField.PLAY_TIME.toString(), oldStats.minutes));
+      stats.put(new NBTInt(StatField.BLOCKS_DESTROYED.toString(), oldStats.blocksDestroyed));
+      stats.put(new NBTInt(StatField.BLOCKS_PLACED.toString(), oldStats.blocksPlaced));
+      tag.put(stats);
+    }
+    old.save();
   }
 }

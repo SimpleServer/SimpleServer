@@ -31,6 +31,7 @@ import simpleserver.nbt.NBTFloat;
 
 public class Warp {
   private NBTCompound node;
+  private final String WARP = "warp";
 
   public Set<String> names() {
     return node.names();
@@ -70,15 +71,15 @@ public class Warp {
   }
 
   void load(NBTCompound data) {
-    if (data.containsKey("warp")) {
+    if (data.containsKey(WARP)) {
       try {
-        node = data.getCompound("warp");
+        node = data.getCompound(WARP);
         return;
       } catch (Exception e) {
         System.out.println("[WARNING] Warp list is corrupt. Replacing it with empty list...");
       }
     }
-    node = new NBTCompound("warp");
+    node = new NBTCompound(WARP);
     data.put(node);
   }
 }

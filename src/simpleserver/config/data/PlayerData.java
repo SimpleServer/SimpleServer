@@ -20,11 +20,7 @@
  */
 package simpleserver.config.data;
 
-import simpleserver.config.LegacyStats;
-import simpleserver.config.LegacyStats.Statistic;
-import simpleserver.config.data.Stats.StatField;
 import simpleserver.nbt.NBTCompound;
-import simpleserver.nbt.NBTInt;
 
 public class PlayerData {
   private NBTCompound node;
@@ -41,23 +37,7 @@ public class PlayerData {
     }
     node = new NBTCompound("players");
     data.put(node);
-    loadOldStats();
-  }
-
-  private void loadOldStats() {
-    LegacyStats old = new LegacyStats();
-    old.load();
-    for (String name : old.stats.keySet()) {
-      Statistic oldStats = old.stats.get(name);
-      NBTCompound tag = new NBTCompound(name);
-      NBTCompound stats = new NBTCompound("stats");
-      stats.put(new NBTInt(StatField.PLAY_TIME.toString(), oldStats.minutes));
-      stats.put(new NBTInt(StatField.BLOCKS_DESTROYED.toString(), oldStats.blocksDestroyed));
-      stats.put(new NBTInt(StatField.BLOCKS_PLACED.toString(), oldStats.blocksPlaced));
-      tag.put(stats);
-      node.put(tag);
-    }
-    old.save();
+    stats.loadOldConfig();
   }
 
   NBTCompound get(String name) {

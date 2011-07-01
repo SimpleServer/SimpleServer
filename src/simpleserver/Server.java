@@ -32,7 +32,6 @@ import java.util.List;
 import java.util.concurrent.Semaphore;
 
 import simpleserver.bot.BotController;
-import simpleserver.config.ChestList;
 import simpleserver.config.GiveAliasList;
 import simpleserver.config.HelpText;
 import simpleserver.config.IPBanList;
@@ -71,7 +70,6 @@ public class Server {
   public Options options;
   public MOTD motd;
   public KitList kits;
-  public ChestList chests;
   public Rules rules;
   public HelpText helptext;
   public IPBanList ipBans;
@@ -350,7 +348,6 @@ public class Server {
     resources.add(permissions = new PermissionConfig(this));
     resources.add(options = new Options());
     resources.add(robots = new RobotList());
-    resources.add(chests = new ChestList());
     resources.add(motd = new MOTD());
     resources.add(rules = new Rules());
     resources.add(helptext = new HelpText());
