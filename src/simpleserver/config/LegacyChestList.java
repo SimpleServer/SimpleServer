@@ -91,6 +91,16 @@ public class LegacyChestList extends AsciiConfig {
     }
   }
 
+  @Override
+  protected void missingFile() {
+  }
+
+  @Override
+  protected String saveString() {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
   public static final class Chest {
     private String owner;
     private String name;
@@ -129,11 +139,4 @@ public class LegacyChestList extends AsciiConfig {
       this.name = name;
     }
   }
-
-  @Override
-  protected String saveString() {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
 }

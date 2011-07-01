@@ -38,11 +38,9 @@ public class LockCommand extends AbstractCommand implements PlayerCommand {
         player.setAttemptedAction(null);
         player.addTMessage(Color.GRAY, "Chests you place or open will no longer be locked.");
         return;
-      } else {
-        name = "Locked Chest";
       }
     }
-    if (name.equals("list")) {
+    if (name != null && name.equals("list")) {
       Map<String, Integer> list = player.getServer().data.chests.chestList(player);
       if (list.size() == 0) {
         player.addTMessage(Color.GRAY, "You don't have any locked chests.");

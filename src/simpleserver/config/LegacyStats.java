@@ -74,6 +74,10 @@ public class LegacyStats extends PropertiesConfig {
     }
   }
 
+  @Override
+  protected void missingFile() {
+  }
+
   public class Statistic {
     public int minutes;
     public int blocksPlaced;

@@ -79,7 +79,7 @@ public abstract class AsciiConfig extends AbstractConfig {
         reader.close();
       }
     } catch (FileNotFoundException e) {
-      System.out.println(getFilename() + " is missing.  Loading defaults.");
+      missingFile();
       loadDefaults();
 
       save();
@@ -91,6 +91,10 @@ public abstract class AsciiConfig extends AbstractConfig {
     if (!success) {
       System.out.println("Failed to load " + getFilename() + "!");
     }
+  }
+
+  protected void missingFile() {
+    System.out.println(getFilename() + " is missing.  Loading defaults.");
   }
 
   protected abstract String saveString();

@@ -666,7 +666,16 @@ public class StreamTunnel {
         String typeString = in.readUTF();
         byte unknownByte = in.readByte();
         if (invtype == 0) {
-          if (!server.permissions.canOpenChests(player, player.openedChest())) {
+          Chest adjacent = server.data.chests.adjacentChest(player.openedChest());
+          if (!server.data.chests.isChest(player.openedChest())) {
+            if (adjacent == null) {
+              server.data.chests.addOpenChest(player.openedChest());
+            } else {
+              server.data.chests.giveLock(adjacent.owner, player.openedChest(), adjacent.name);
+            }
+            server.data.save();
+          }
+          if (!server.permissions.canOpenChests(player, player.openedChest()) || (adjacent != null && !server.permissions.canOpenChests(player, adjacent.coordinate))) {
             player.addTMessage(Color.RED, "You can't use chests here");
             break;
           } else if (server.data.chests.canOpen(player, player.openedChest()) || player.isAdmin()) {
@@ -684,7 +693,7 @@ public class StreamTunnel {
               typeString = t("Open Chest");
               if (player.isAttemptLock()) {
                 lockChest(player.openedChest());
-                typeString = player.nextChestName();
+                typeString = (player.nextChestName() == null) ? t("Locked Chest") : player.nextChestName();
               }
             }
 
