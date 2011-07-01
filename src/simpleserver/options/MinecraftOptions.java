@@ -35,9 +35,9 @@ public class MinecraftOptions extends AbstractOptions {
   public void save() {
     load();
     options.setProperty("server-ip", "127.0.0.1");
-    if(simpleServerOptions.getBoolean("custAuth")){
+    if (simpleServerOptions.getBoolean("custAuth")) {
       options.setProperty("online-mode", "false");
-    } else{
+    } else {
       options.setProperty("online-mode", simpleServerOptions.get("onlineMode"));
     }
     options.setProperty("server-port", simpleServerOptions.get("internalPort"));

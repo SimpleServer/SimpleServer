@@ -56,9 +56,9 @@ public class Authenticator {
   private Timer timer;
 
   private LinkedList<AuthRequest> authRequests = new LinkedList<AuthRequest>();
-  // private LindedList<Guests>
   private Hashtable<String, loginBan> loginBans = new Hashtable<String, loginBan>();
   private PriorityQueue<Short> freeGuestNumbers = new PriorityQueue<Short>(MAX_GUEST_PLAYERS);
+  private Hashtable<String, String> playerRenames = new Hashtable<String, String>();
 
   public Authenticator(Server se) {
     server = se;
@@ -78,9 +78,15 @@ public class Authenticator {
       timer = new Timer();
       timer.schedule(new MinecraftOnlineChecker(this), 0, REFRESH_TIME * 1000);
     }
+
+    playerRenames.put("D0l4", "Notch");
   }
 
   /***** PERMISSIONS *****/
+  public boolean vanillaOnlineMode() {
+    return !server.options.getBoolean("custAuth") && server.options.getBoolean("onlineMode");
+  }
+
   public boolean useCustAuth() {
     return server.options.getBoolean("onlineMode") && isMinecraftUp;
   }
@@ -147,9 +153,9 @@ public class Authenticator {
       AuthRequest current = requests.next();
       if (current.IP.equals(IP)) {
         res = current;
-        if (current.isGuest) {
+        /*if (current.isGuest) {
           releaseGuestName(current.playerName);
-        }
+        }*/
         requests.remove();
         break;
       }
@@ -206,15 +212,21 @@ public class Authenticator {
     }
   }
 
+  /***** RENAMING *****/
+  public String renamePlayer(String name) {
+    if (playerRenames.containsKey(name)) {
+      return playerRenames.get(name);
+    }
+    return name;
+  }
+
   /***** GUEST NAMES *****/
 
-  public synchronized String getFreeGuestName(String IP) {
-    String name = null;
-    AuthRequest req = getAuthRequest(IP);
-    if (req != null && req.isValid() && server.playerList.findPlayerExact(req.playerName) != null) {
-      return req.playerName;
+  public synchronized String getFreeGuestName() {
+    String name;
+    if (freeGuestNumbers.peek() == null) {
+      name = "Player";
     } else {
-
       name = buildGuestName(freeGuestNumbers.poll());
     }
 
@@ -238,6 +250,13 @@ public class Authenticator {
     return GUEST_PREFIX + guestNumber;
   }
 
+  public boolean isGuestName(String name) {
+    if (name.length() < GUEST_PREFIX.length()) {
+      return false;
+    }
+    return name.substring(0, GUEST_PREFIX.length()).equals(GUEST_PREFIX);
+  }
+
   /***** MINECRAFT.NET AUTHENTICATION *****/
 
   public boolean onlineAuthenticate(Player player) {
@@ -248,7 +267,7 @@ public class Authenticator {
     boolean result = false;
     // Send a GET request to minecraft.net
 
-    String urlStr = MINECRAFT_AUTH_URL + String.format("?user=%s&serverId=%s", player.getName(), player.getConnectionHash());
+    String urlStr = MINECRAFT_AUTH_URL + String.format("?user=%s&serverId=%s", player.getName(true), player.getConnectionHash());
     try {
       URL url = new URL(urlStr);
       URLConnection conn = url.openConnection();
@@ -287,16 +306,12 @@ public class Authenticator {
     if (before != isMinecraftUp) {
       if (!isMinecraftUp) {
         // just went down
-        server.runCommand("say", t("Minecraft.net just went down!"));
+        System.out.println("[SimpleServer] Minecraft.net just went down!");
       } else {
         // back online
-        server.runCommand("say", t("minecraft.net is back online!"));
+        System.out.println("[SimpleServer] Minecraft.net is back online!");
       }
     }
-
-    String o = "[SimpleServer] Minecraft.net is ";
-    o += (isMinecraftUp) ? "up!" : "down!";
-    System.out.println(o);
   }
 
   @Override

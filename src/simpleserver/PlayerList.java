@@ -20,6 +20,8 @@
  */
 package simpleserver;
 
+import static simpleserver.lang.Translations.t;
+
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -99,9 +101,9 @@ public class PlayerList {
       }
 
       if (playerToKick == null) {
-        player.kick("Sorry, server is full!");
+        player.kick(t("Sorry, server is full!"));
       } else {
-        playerToKick.kick("Sorry, making space for more senior member.");
+        playerToKick.kick(t("Sorry, making space for more senior member."));
         players.remove(playerToKick.getName().toLowerCase());
         players.put(player.getName().toLowerCase(), player);
       }

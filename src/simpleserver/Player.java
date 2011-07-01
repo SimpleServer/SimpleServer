@@ -31,9 +31,9 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import simpleserver.Coordinate.Dimension;
+import simpleserver.bot.BotController.ConnectException;
 import simpleserver.bot.Giver;
 import simpleserver.bot.Teleporter;
-import simpleserver.bot.BotController.ConnectException;
 import simpleserver.command.ExternalCommand;
 import simpleserver.command.PlayerCommand;
 import simpleserver.config.GlobalData.StatField;
@@ -52,6 +52,7 @@ public class Player {
   private Watchdog watchdog;
 
   private String name = null;
+  private String renameName = null;
   private String connectionHash;
   private boolean closed = false;
   private boolean isKicked = false;
@@ -65,8 +66,8 @@ public class Player {
   private int entityId = 0;
   private Group groupObject = null;
   private boolean isRobot = false;
-  private boolean guest = false; // in the scence that player is not
-                                 // authenticated with minecraft.net
+  private boolean guest = false; // player is not authenticated with
+                                 // minecraft.net
   private boolean usedAuthenticator = false;
   private boolean localChat = false;
   private int blocksPlaced = 0;
@@ -150,21 +151,28 @@ public class Player {
   }
 
   public boolean setName(String name) {
+    renameName = server.authenticator.renamePlayer(name);
+    System.out.println("renameName: " + renameName);
 
     name = name.trim();
     if (name.length() == 0 || this.name != null) {
-      kick("Invalid Name!");
+      kick(t("Invalid Name!"));
+      return false;
+    }
+
+    if (name == "Player") {
+      kick(t("Too many guests in server!"));
       return false;
     }
 
     if (server.options.getBoolean("useWhitelist")
         && !server.whitelist.isWhitelisted(name)) {
-      kick("You are not whitelisted!");
+      kick(t("You are not whitelisted!"));
       return false;
     }
 
     if (server.playerList.findPlayerExact(name) != null) {
-      kick("Player already in server!");
+      kick(t("Player already in server!"));
       return false;
     }
 
@@ -183,7 +191,11 @@ public class Player {
   }
 
   public String getName() {
-    return name;
+    return renameName;
+  }
+
+  public String getName(boolean original) {
+    return (original) ? name : renameName;
   }
 
   public String getConnectionHash() {

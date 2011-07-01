@@ -154,7 +154,7 @@ public class StreamTunnel {
         if (isServerTunnel) {
           if (server.authenticator.useCustAuth(player)
               && !server.authenticator.onlineAuthenticate(player)) {
-            player.kick("[CustAuth] Failed to login 2: User not premium");
+            player.kick(t("%s Failed to login: User not premium", "[CustAuth]"));
             break;
           }
           player.setEntityId(write(in.readInt()));
@@ -179,19 +179,22 @@ public class StreamTunnel {
         if (isServerTunnel) {
           if (!server.authenticator.useCustAuth(player)) {
             name = "-";
-          } else {
+          } else if (!server.authenticator.vanillaOnlineMode()) {
             name = player.getConnectionHash();
           }
         } else {
           if (name.equals("Player") || !server.authenticator.isMinecraftUp) {
-
             AuthRequest req = server.authenticator.getAuthRequest(player.getIPAddress());
             if (req != null) {
               name = req.playerName;
               nameSet = server.authenticator.completeLogin(req, player);
             }
             if (req == null || !nameSet) {
-              name = server.authenticator.getFreeGuestName(player.getIPAddress());
+              if (!name.equals("Player")) {
+                player.addTMessage(Color.RED, "Login verification failed.");
+                player.addTMessage(Color.RED, "You were logged in as guest.");
+              }
+              name = server.authenticator.getFreeGuestName();
               nameSet = player.setName(name);
               player.setGuest(true);
             }
