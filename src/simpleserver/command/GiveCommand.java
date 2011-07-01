@@ -74,6 +74,11 @@ public abstract class GiveCommand extends AbstractCommand {
         }
       }
 
+      if (amount > 1000) {
+        error("You can't give more than 1000 items at once.");
+        return;
+      }
+
       target.getServer().adminLog("Give:\t" + logName + "\t"
                                   + target.getName() + "\t" + id + ":" + damage + "\t("
                                   + amount + ")");
