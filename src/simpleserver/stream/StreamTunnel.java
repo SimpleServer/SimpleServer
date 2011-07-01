@@ -54,7 +54,7 @@ public class StreamTunnel {
   private static final byte BLOCK_DESTROYED_STATUS = 2;
   private static final Pattern MESSAGE_PATTERN = Pattern.compile("^<([^>]+)> (.*)$");
   private static final Pattern COLOR_PATTERN = Pattern.compile("§[0-9a-f]");
-  private static final Pattern JOIN_PATTERN = Pattern.compile("§.(\\d|\\w)* (joined|left) the game.");
+  private static final Pattern JOIN_PATTERN = Pattern.compile("§.((\\d|\\w)*) (joined|left) the game.");
   private static final String CONSOLE_CHAT_PATTERN = "\\(CONSOLE:.*\\)";
   private static final int MESSAGE_SIZE = 60;
   private static final int MAXIMUM_MESSAGE_SIZE = 119;
@@ -179,7 +179,8 @@ public class StreamTunnel {
           if (server.bots.ninja(joinMatcher.group(1))) {
             break;
           }
-        } else if (isServerTunnel && server.options.getBoolean("useMsgFormats")) {
+        }
+        if (isServerTunnel && server.options.getBoolean("useMsgFormats")) {
           Matcher colorMatcher = COLOR_PATTERN.matcher(message);
           String cleanMessage = colorMatcher.replaceAll("");
 
