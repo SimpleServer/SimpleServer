@@ -40,7 +40,7 @@ import simpleserver.nbt.NBTString;
 public class Chests {
   private final static String CHESTS = "chests";
 
-  private NBTList<NBTCompound> node;
+  private NBTCompound root;
   private final ConcurrentMap<Coordinate, Chest> locations;
 
   public Chests() {
@@ -48,22 +48,24 @@ public class Chests {
   }
 
   void load(NBTCompound data) {
+    root = data;
     locations.clear();
+    NBTList<NBTCompound> node;
     if (data.containsKey(CHESTS)) {
       try {
         node = data.getList(CHESTS).cast();
-        loadChests();
+        loadChests(node);
         return;
       } catch (Exception e) {
         System.out.println("[WARNING] Chest list is corrupt. Replacing it with empty list...");
+      } finally {
+        freeMemory();
       }
     }
-    node = new NBTList<NBTCompound>(CHESTS, NBT.COMPOUND);
-    data.put(node);
     loadOldConfig();
   }
 
-  private void loadChests() {
+  private void loadChests(NBTList<NBTCompound> node) {
     for (int i = 0; i < node.size(); i++) {
       NBTCompound tag = node.get(i);
       Coordinate coord;
@@ -104,46 +106,8 @@ public class Chests {
     old.save();
   }
 
-  public static final class Chest {
-    public String owner;
-    public final Coordinate coordinate;
-    public String name;
-
-    private Chest(String player, Coordinate coordinate, String name) {
-      owner = player;
-      this.coordinate = coordinate;
-      this.name = name;
-    }
-
-    private Chest(String player, Coordinate coordinate) {
-      owner = player;
-      this.coordinate = coordinate;
-    }
-
-    private Chest(Coordinate coordinate) {
-      this.coordinate = coordinate;
-    }
-
-    public boolean isOpen() {
-      return owner == null;
-    }
-
-    public void lock(Player player) {
-      owner = player.getName().toLowerCase();
-    }
-
-    public void unlock() {
-      owner = null;
-      name = null;
-    }
-
-    public boolean ownedBy(Player player) {
-      return owner != null && owner.equals(player.getName().toLowerCase());
-    }
-  }
-
   void save() {
-    node.clear();
+    NBTList<NBTCompound> node = new NBTList<NBTCompound>(CHESTS, NBT.COMPOUND);
     for (Chest chest : locations.values()) {
       NBTCompound tag = new NBTCompound();
       tag.put(chest.coordinate.tag());
@@ -154,6 +118,13 @@ public class Chests {
         }
       }
       node.add(tag);
+    }
+    root.put(node);
+  }
+
+  void freeMemory() {
+    if (root.containsKey(CHESTS)) {
+      root.remove(CHESTS);
     }
   }
 
@@ -263,4 +234,41 @@ public class Chests {
     return chests;
   }
 
+  public static final class Chest {
+    public String owner;
+    public final Coordinate coordinate;
+    public String name;
+
+    private Chest(String player, Coordinate coordinate, String name) {
+      owner = player;
+      this.coordinate = coordinate;
+      this.name = name;
+    }
+
+    private Chest(String player, Coordinate coordinate) {
+      owner = player;
+      this.coordinate = coordinate;
+    }
+
+    private Chest(Coordinate coordinate) {
+      this.coordinate = coordinate;
+    }
+
+    public boolean isOpen() {
+      return owner == null;
+    }
+
+    public void lock(Player player) {
+      owner = player.getName().toLowerCase();
+    }
+
+    public void unlock() {
+      owner = null;
+      name = null;
+    }
+
+    public boolean ownedBy(Player player) {
+      return owner != null && owner.equals(player.getName().toLowerCase());
+    }
+  }
 }

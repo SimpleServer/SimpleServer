@@ -91,6 +91,8 @@ public class GlobalData implements Resource {
     chests.load(nbt.root());
 
     save();
+
+    chests.freeMemory();
   }
 
   public void save() {
