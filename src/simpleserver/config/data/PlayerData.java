@@ -18,36 +18,36 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package simpleserver.command;
+package simpleserver.config.data;
 
-import java.util.List;
+import simpleserver.nbt.NBTCompound;
 
-import simpleserver.Color;
-import simpleserver.Player;
-import simpleserver.Player.Action;
-import simpleserver.config.data.Chests.Chest;
+public class PlayerData {
+  private NBTCompound node;
+  public Stats stats = new Stats(this);
 
-public class UnlockCommand extends AbstractCommand implements PlayerCommand {
-  public UnlockCommand() {
-    super("unlock [name]", "Unlocks locked chests");
+  void load(NBTCompound data) {
+    if (data.containsKey("players")) {
+      try {
+        node = data.getCompound("players");
+        return;
+      } catch (Exception e) {
+        System.out.println("[WARNING] Player list is corrupt. Replacing it with empty list...");
+      }
+    }
+    node = new NBTCompound("players");
+    data.put(node);
+    stats.loadOldConfig();
   }
 
-  public void execute(Player player, String message) {
-    String name = extractArgument(message);
-    if (name == null) {
-      player.setAttemptedAction(Action.Unlock);
-      player.addTMessage(Color.GRAY, "The next chest you open will get unlocked.");
+  NBTCompound get(String name) {
+    name = name.toLowerCase();
+    if (node.containsKey(name)) {
+      return node.getCompound(name);
     } else {
-      List<Chest> chests = player.getServer().data.chests.getChestsByName(name);
-      for (Chest chest : chests) {
-        chest.unlock();
-      }
-      player.getServer().data.save();
-      if (chests.size() > 1) {
-        player.addTMessage(Color.GRAY, "%d chests have been unlocked!", chests.size());
-      } else {
-        player.addTMessage(Color.GRAY, "The chest has been unlocked!");
-      }
+      NBTCompound player = new NBTCompound(name);
+      node.put(player);
+      return player;
     }
   }
 }
