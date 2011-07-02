@@ -88,7 +88,7 @@ public class Authenticator {
 
   /***** PERMISSIONS *****/
   public boolean vanillaOnlineMode() {
-    return !server.options.getBoolean("custAuth") && server.options.getBoolean("onlineMode");
+    return false;
   }
 
   public boolean useCustAuth() {
@@ -352,7 +352,10 @@ public class Authenticator {
 
   @Override
   public void finalize() {
-    timer.cancel();
+    try {
+      timer.cancel();
+    } catch (Exception e) {
+    }
     cleanLoginRequests();
   }
 
