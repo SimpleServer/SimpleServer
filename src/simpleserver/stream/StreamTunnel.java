@@ -1057,30 +1057,32 @@ public class StreamTunnel {
   }
 
   private void sendMessage(String message) throws IOException {
-    if (message.length() > MESSAGE_SIZE) {
-      int end = MESSAGE_SIZE - 1;
-      while (end > 0 && message.charAt(end) != ' ') {
-        end--;
-      }
-      if (end == 0) {
-        end = MESSAGE_SIZE;
+    if (message.length() > 0) {
+      if (message.length() > MESSAGE_SIZE) {
+        int end = MESSAGE_SIZE - 1;
+        while (end > 0 && message.charAt(end) != ' ') {
+          end--;
+        }
+        if (end == 0) {
+          end = MESSAGE_SIZE;
+        } else {
+          end++;
+        }
+
+        if (end > 0 && message.charAt(end) == '\u00a7') {
+          end--;
+        }
+
+        String firstPart = message.substring(0, end);
+        sendMessagePacket(firstPart);
+        sendMessage(getLastColorCode(firstPart) + message.substring(end));
       } else {
-        end++;
+        int end = message.length();
+        if (message.charAt(end - 1) == '\u00a7') {
+          end--;
+        }
+        sendMessagePacket(message.substring(0, end));
       }
-
-      if (message.charAt(end) == '\u00a7') {
-        end--;
-      }
-
-      String firstPart = message.substring(0, end);
-      sendMessagePacket(firstPart);
-      sendMessage(getLastColorCode(firstPart) + message.substring(end));
-    } else {
-      int end = message.length();
-      if (message.charAt(end - 1) == '\u00a7') {
-        end--;
-      }
-      sendMessagePacket(message.substring(0, end));
     }
   }
 
@@ -1089,9 +1091,11 @@ public class StreamTunnel {
       System.out.println("[SimpleServer] Invalid message size: " + message);
       return;
     }
-    write(0x03);
-    write(message);
-    packetFinished();
+    if (message.length() > 0) {
+      write(0x03);
+      write(message);
+      packetFinished();
+    }
   }
 
   private void packetFinished() throws IOException {

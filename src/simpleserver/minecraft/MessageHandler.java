@@ -35,6 +35,7 @@ public class MessageHandler {
   private final static Pattern CONNECT = Pattern.compile(".*\\[INFO\\] (.*) \\[.*\\] logged in with entity id \\d+ at .*");
 
   private boolean loaded = false;
+  private int ignoreLines = 0;
 
   public MessageHandler(Server server) {
     this.server = server;
@@ -84,6 +85,9 @@ public class MessageHandler {
       }
     }
 
+    if (ignoreLine()) {
+      return;
+    }
     if (line.contains("[INFO] Done (")) {
       synchronized (this) {
         loaded = true;
@@ -99,6 +103,7 @@ public class MessageHandler {
     } else if (line.matches("^>+$")) {
       return;
     } else if (line.contains("SERVER IS RUNNING IN OFFLINE/INSECURE MODE") && server.options.getBoolean("onlineMode")) {
+      ignoreNextLines(3);
       return;
     } else {
       Matcher connect = CONNECT.matcher(line);
@@ -125,6 +130,18 @@ public class MessageHandler {
     if ((command != null) && (command.getClass() != InvalidCommand.class)) {
       command.execute(server, line);
       return !command.shouldPassThroughToConsole();
+    }
+    return false;
+  }
+
+  private void ignoreNextLines(int count) {
+    ignoreLines = count;
+  }
+
+  private boolean ignoreLine() {
+    if (ignoreLines > 0) {
+      ignoreLines--;
+      return true;
     }
     return false;
   }
