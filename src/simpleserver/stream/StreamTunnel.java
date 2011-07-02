@@ -220,6 +220,12 @@ public class StreamTunnel {
           if (server.bots.ninja(joinMatcher.group(1))) {
             break;
           }
+          if (message.contains("join")) {
+            player.addTMessage(Color.GRAY, "%s joined the game.", joinMatcher.group(1));
+          } else {
+            player.addTMessage(Color.GRAY, "%s left the game.", joinMatcher.group(1));
+          }
+          break;
         }
         if (isServerTunnel && server.options.getBoolean("useMsgFormats")) {
           Matcher colorMatcher = COLOR_PATTERN.matcher(message);

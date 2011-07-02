@@ -376,7 +376,6 @@ public class Server {
     adminLog = new AdminLog();
     errorLog = new ErrorLog();
     connectionLog = new ConnectionLog();
-    authenticator = new Authenticator(this);
 
     commandParser = new CommandParser(options, permissions);
   }
@@ -400,6 +399,7 @@ public class Server {
       System.exit(1);
     }
 
+    authenticator = new Authenticator(this);
     playerList = new PlayerList(options);
     requestTracker = new RequestTracker(this);
 
