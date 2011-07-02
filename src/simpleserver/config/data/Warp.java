@@ -20,10 +20,13 @@
  */
 package simpleserver.config.data;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 import simpleserver.Position;
 import simpleserver.Coordinate.Dimension;
+import simpleserver.nbt.NBTArray;
 import simpleserver.nbt.NBTByte;
 import simpleserver.nbt.NBTCompound;
 import simpleserver.nbt.NBTDouble;
@@ -32,16 +35,44 @@ import simpleserver.nbt.NBTFloat;
 public class Warp {
   private NBTCompound node;
   private final String WARP = "warp";
+  private final String CAPS = "capitals";
 
-  public Set<String> names() {
+  public Set<String> keys() {
     return node.names();
   }
 
+  public List<String> names() {
+    Set<String> keys = keys();
+    List<String> names = new ArrayList<String>(keys.size());
+    for (String key : keys) {
+      names.add(capitalize(key));
+    }
+    return names;
+  }
+
   public boolean contains(String name) {
-    return node.containsKey(name);
+    return node.containsKey(name.toLowerCase());
+  }
+
+  public String getName(String prefix) {
+    prefix = prefix.toLowerCase();
+    if (contains(prefix)) {
+      return capitalize(prefix);
+    }
+    for (String name : keys()) {
+      if (name.startsWith(prefix)) {
+        return capitalize(name);
+      }
+    }
+    return null;
+  }
+
+  private String capitalize(String name) {
+    return capitalize(name, node.getCompound(name).getArray(CAPS).get());
   }
 
   public Position get(String name) {
+    name = name.toLowerCase();
     if (!node.containsKey(name)) {
       return null;
     }
@@ -56,17 +87,19 @@ public class Warp {
   }
 
   public void set(String name, Position pos) {
-    NBTCompound p = new NBTCompound(name);
+    NBTCompound p = new NBTCompound(name.toLowerCase());
     p.put(new NBTDouble("x", pos.x));
     p.put(new NBTDouble("y", pos.y));
     p.put(new NBTDouble("z", pos.z));
     p.put(new NBTByte("Dimension", pos.dimension.index()));
     p.put(new NBTFloat("yaw", pos.yaw));
     p.put(new NBTFloat("pitch", pos.pitch));
+    p.put(new NBTArray(CAPS, capitals(name)));
     node.put(p);
   }
 
   public void remove(String name) {
+    name = name.toLowerCase();
     node.remove(name);
   }
 
@@ -74,6 +107,7 @@ public class Warp {
     if (data.containsKey(WARP)) {
       try {
         node = data.getCompound(WARP);
+        capitalizeWaypoints();
         return;
       } catch (Exception e) {
         System.out.println("[WARNING] Warp list is corrupt. Replacing it with empty list...");
@@ -81,5 +115,47 @@ public class Warp {
     }
     node = new NBTCompound(WARP);
     data.put(node);
+  }
+
+  private void capitalizeWaypoints() {
+    List<String> keys = new ArrayList<String>(keys());
+    for (String name : keys) {
+      if (!node.getCompound(name).containsKey(CAPS)) {
+        node.getCompound(name).put(new NBTArray(CAPS, capitals(name)));
+        node.rename(name, name.toLowerCase());
+      }
+    }
+  }
+
+  public static byte[] capitals(String string) {
+    int length = string.length() / 8;
+    if (string.length() % 8 != 0) {
+      length++;
+    }
+    byte[] caps = new byte[length];
+    for (int i = 0; i < length; i++) {
+      byte bools = 0;
+      for (int j = 0; j < 8; j++) {
+        int pos = i * 8 + j;
+        if (pos >= string.length()) {
+          break;
+        }
+        if (string.charAt(pos) >= 0x41 && string.charAt(pos) <= 0x5a) {
+          bools = (byte) (bools | (0x1 << j));
+        }
+      }
+      caps[i] = bools;
+    }
+    return caps;
+  }
+
+  public static String capitalize(String string, byte[] capitals) {
+    StringBuilder builder = new StringBuilder(string);
+    for (int i = 0; i < string.length(); i++) {
+      if ((capitals[i / 8] & (1 << i % 8)) != 0) {
+        builder.setCharAt(i, (char) (string.charAt(i) - 32));
+      }
+    }
+    return builder.toString();
   }
 }

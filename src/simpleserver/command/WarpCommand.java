@@ -20,8 +20,6 @@
  */
 package simpleserver.command;
 
-import java.util.ArrayList;
-
 import simpleserver.Color;
 import simpleserver.Player;
 
@@ -43,7 +41,7 @@ public class WarpCommand extends AbstractCommand implements PlayerCommand {
     }
     String command = arguments[0];
     if (command.equals("list")) {
-      player.addTCaptionedMessage("Waypoints", "%s", join(new ArrayList<String>(player.getServer().data.warp.names())));
+      player.addTCaptionedMessage("Waypoints", "%s", join(player.getServer().data.warp.names()));
     } else if (command.equals("add")) {
       if (arguments.length == 1) {
         player.addTMessage(Color.RED, "You have to provide the name of a waypoint");
@@ -59,15 +57,21 @@ public class WarpCommand extends AbstractCommand implements PlayerCommand {
         player.addTMessage(Color.RED, "You have to provide the name of a waypoint");
         return;
       }
-      player.getServer().data.warp.remove(arguments[1]);
+      String waypoint = player.getServer().data.warp.getName(arguments[1]);
+      if (waypoint == null) {
+        player.addTMessage(Color.RED, "No such waypoint exists.");
+        return;
+      }
+      player.getServer().data.warp.remove(waypoint);
       player.addTMessage(Color.GRAY, "Waypoint removed");
     } else {
-      if (!player.getServer().data.warp.contains(command)) {
+      String waypoint = player.getServer().data.warp.getName(command);
+      if (waypoint == null) {
         player.addTMessage(Color.RED, "No such waypoint exists.");
         return;
       }
       try {
-        player.teleport(player.getServer().data.warp.get(command));
+        player.teleport(player.getServer().data.warp.get(waypoint));
       } catch (Exception e) {
         player.addTMessage(Color.RED, "Teleporting failed.");
       }

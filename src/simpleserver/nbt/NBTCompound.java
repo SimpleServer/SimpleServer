@@ -76,6 +76,13 @@ public class NBTCompound extends NBTag {
     value.remove(name);
   }
 
+  public void rename(String name, String rename) {
+    NBTag tag = get(name);
+    remove(name);
+    tag.name.set(rename);
+    put(tag);
+  }
+
   public NBTByte getByte(String name) {
     return (NBTByte) value.get(name);
   }
