@@ -31,7 +31,7 @@ public class GivePlayerCommand extends GiveCommand implements PlayerCommand {
     executor = player;
     String[] arguments = extractArguments(message);
     if (arguments.length == 0) {
-      error("No player specified");
+      tError("No player specified");
       return;
     }
     execute(extractArguments(message, 1), getTarget(arguments[0], player.getServer()), player.getName());
