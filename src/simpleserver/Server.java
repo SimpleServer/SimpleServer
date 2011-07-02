@@ -166,8 +166,7 @@ public class Server {
   }
 
   public String nextHash() {
-    // return Long.toString(random.nextLong(), 16);
-    return "83f8c94ad9634c7e";
+    return Long.toHexString(random.nextLong());
   }
 
   public boolean cmdAllowed(String cmd, Player p) {
