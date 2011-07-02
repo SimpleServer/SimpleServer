@@ -46,7 +46,7 @@
       <command name="local" aliases="l" allow="0+" />
       <command name="localtoggle" allow="0+" />
       <command name="lock" allow="1+" />
-      <command name="login" allow="0" />
+      <command name="login" allow="0+" />
       <command name="motd" allow="0+" />
       <command name="mute" allow="3-5" />
       <command name="myarea" allow="2+" />
