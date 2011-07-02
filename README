@@ -1,4 +1,4 @@
-Simple Server 8.1.3
+Simple Server 8.2
 An open source simple server tunnel for minecraft beta multiplayer servers.
 Copyright (c) 2011 SimpleServer authors (see CONTRIBUTORS)
 See LICENSE for details.
@@ -51,8 +51,7 @@ accessible commands.
   /backup -- Backup the map
   /ban PLAYER [REASON] -- Kick and ban the named player
   /banip IPADDRESS -- Kick and ban players with this IP
-  /external -- External command
-  /give ITEM [AMOUNT] -- Spawn items for yourself
+  /give ITEM[:DAMAGE] [AMOUNT] -- Spawn items for yourself
   /giveplayer PLAYER ITEM [AMOUNT] -- Spawn items for another player
   /gps [PLAYER] -- Display block coordinates of named player or yourself
   /help [COMMAND] -- List commands or get help for one command
@@ -64,20 +63,23 @@ accessible commands.
   /local MESSAGE -- Send a chat message to nearby players
   /localtoggle [on|off] -- Toggle local chat mode
   /lock [name|list] -- Create or list locked chests
+  /login PLAYER PASSWORD -- Login using CustAuth.
   /motd -- Display the message of the day
   /mute PLAYER -- Block the named player from normal chat
   /myarea [start|end|save|unsave|rename] -- Manage your personal area
   /mystats -- Display your statistics
-  /ok PLAYER -- Teleport to the player if he agrees with ok
+  /ok PLAYER -- Agree a visit request
   /rcon COMMAND ARGUMENTS... -- Execute a command on the server console
+  /register [OLD PASSWORD] NEW_PASSWORD NEW_PASSWORD -- Set or change password for CustAuth.
   /reload -- Reread the configuration files from disk
   /reply MESSAGE -- Sends a message to the player that last told you something
-  /restart -- Stop the minecraft server and start it again
+  /restart -- Stop the Minecraft server and start it again
   /rules -- Display the server rules
   /save -- Store configuration to disk and force a map save
   /servertime -- Display the real-world time of the server
   /setgroup PLAYER GROUP -- Set the group ID of the named player
   /setipgroup IP|Player -- Set the group ID of an IP address
+  /spawn -- Teleport to spawn
   /stop -- Shutdown the entire server
   /teleport PLAYER1 PLAYER2 -- Teleport the first player to the second
   /tell PLAYER MESSAGE... -- Send a message to the named player
@@ -88,6 +90,7 @@ accessible commands.
   /unmute PLAYER -- Allow the named player to use normal chat again
   /unwhitelist PLAYER -- Remove player from server access list
   /visit PLAYER -- Teleport to the player if he agrees with ok
+  /warp [list|remove|add] [name] -- Use and manage waypoints
   /warpmeto PLAYER -- Teleport to the named player
   /warptome PLAYER -- Teleport the named player to you
   /whitelist PLAYER -- Add player to server access list
