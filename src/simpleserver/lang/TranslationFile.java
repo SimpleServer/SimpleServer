@@ -58,6 +58,11 @@ public class TranslationFile {
     File file = new File(resourceLocation + File.separator + filename);
     BufferedReader reader = null;
 
+    if (!file.exists()) {
+      loadInternal();
+      return;
+    }
+
     try {
       reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), "UTF-8"));
 
@@ -68,12 +73,7 @@ public class TranslationFile {
       }
 
       options = new JSONObject(contents);
-    } catch (NullPointerException e) {
-      loadInternal();
-    } catch (JSONException e) {
-      System.out.println("[SimpleServer] " + e);
-      System.out.println("[SimpleServer] Could not read " + filename);
-    } catch (IOException e) {
+    } catch (Exception e) {
       System.out.println("[SimpleServer] " + e);
       System.out.println("[SimpleServer] Could not read " + filename);
     } finally {
@@ -99,13 +99,7 @@ public class TranslationFile {
       }
 
       options = new JSONObject(contents);
-    } catch (NullPointerException e) {
-      System.out.println("[SimpleServer] " + e);
-      System.out.println("[SimpleServer] Could not read " + filename);
-    } catch (JSONException e) {
-      System.out.println("[SimpleServer] " + e);
-      System.out.println("[SimpleServer] Could not read " + filename);
-    } catch (IOException e) {
+    } catch (Exception e) {
       System.out.println("[SimpleServer] " + e);
       System.out.println("[SimpleServer] Could not read " + filename);
     } finally {
