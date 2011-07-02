@@ -31,13 +31,18 @@ public class NBTArray extends NBTag {
     super(in, named);
   }
 
+  public NBTArray(String name, byte[] array) {
+    super(name);
+    value = array;
+  }
+
   @Override
   protected byte id() {
     return 7;
   }
 
   @Override
-  byte[] get() {
+  public byte[] get() {
     return value;
   }
 

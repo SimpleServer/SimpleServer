@@ -32,7 +32,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Semaphore;
 
-import simpleserver.config.AuthenticationList;
 import simpleserver.bot.BotController;
 import simpleserver.config.GiveAliasList;
 import simpleserver.config.HelpText;
@@ -79,7 +78,6 @@ public class Server {
   public MuteList mutelist;
   public GiveAliasList giveAliasList;
   public GlobalData data;
-  public AuthenticationList auths;
   private RobotList robots;
 
   private SecureRandom random = new SecureRandom();
@@ -370,7 +368,6 @@ public class Server {
     resources.add(mutelist = new MuteList());
     resources.add(giveAliasList = new GiveAliasList());
     resources.add(data = new GlobalData());
-    resources.add(auths = new AuthenticationList());
 
     time = new Time(this);
     bots = new BotController(this);
@@ -563,7 +560,7 @@ public class Server {
   public void setMapSeed(long seed) {
     if (mapSeed != seed) {
       mapSeed = seed;
-      System.out.println("[MAP SEED] " + mapSeed);
+      // System.out.println("[MAP SEED] " + mapSeed);
     }
   }
 

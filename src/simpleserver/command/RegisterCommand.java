@@ -92,6 +92,7 @@ public class RegisterCommand extends AbstractCommand implements PlayerCommand {
       if (newPw1.equals(newPw2)) {
 
         auth.register(player, newPw1);
+        player.updateRealName();
         player.addTMessage(Color.GRAY, "Registration successful!");
       } else {
         player.addTMessage(Color.RED, "New passwords do not match!");

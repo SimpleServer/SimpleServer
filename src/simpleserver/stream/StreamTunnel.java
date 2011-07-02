@@ -200,6 +200,7 @@ public class StreamTunnel {
             }
           } else {
             nameSet = player.setName(name);
+            player.updateRealName();
           }
         }
 

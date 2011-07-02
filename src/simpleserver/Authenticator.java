@@ -29,14 +29,15 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.ListIterator;
 import java.util.PriorityQueue;
 import java.util.Timer;
 import java.util.TimerTask;
-
-import simpleserver.config.AuthenticationList;
 
 public class Authenticator {
   private static final int REFRESH_TIME = 120; // online status
@@ -49,20 +50,18 @@ public class Authenticator {
   private static final String GUEST_PREFIX = t("Player");
 
   private final Server server;
-  private AuthenticationList auths;
 
   public boolean isMinecraftUp = true;
   private URL minecraftNet;
+  private MessageDigest shaMD;
   private Timer timer;
 
   private LinkedList<AuthRequest> authRequests = new LinkedList<AuthRequest>();
   private Hashtable<String, loginBan> loginBans = new Hashtable<String, loginBan>();
   private PriorityQueue<Short> freeGuestNumbers = new PriorityQueue<Short>(MAX_GUEST_PLAYERS);
-  private Hashtable<String, String> playerRenames = new Hashtable<String, String>();
 
   public Authenticator(Server se) {
     server = se;
-    auths = server.auths;
 
     for (int i = 0; i < MAX_GUEST_PLAYERS;) {
       freeGuestNumbers.offer((short) ++i);
@@ -74,12 +73,18 @@ public class Authenticator {
       e1.printStackTrace();
     }
 
+    try {
+      shaMD = MessageDigest.getInstance("SHA-256");
+    } catch (NoSuchAlgorithmException nsae) {
+      System.out.println("Attention: Seems like MessageDigest is missing in your Java installation...");
+    }
+
     if (useCustAuth()) {
       timer = new Timer();
       timer.schedule(new MinecraftOnlineChecker(this), 0, REFRESH_TIME * 1000);
     }
 
-    playerRenames.put("D0l4", "Notch");
+    // playerRenames.put("D0l4", "Notch");
   }
 
   /***** PERMISSIONS *****/
@@ -106,16 +111,18 @@ public class Authenticator {
   /***** REGISTRATION *****/
 
   public void register(Player player, String password) {
-    auths.addAuthentication(player.getName(), password);
+    server.data.players.setPw(player, generateHash(password, player.getName()));
+    server.data.save();
   }
 
   public boolean isRegistered(String playerName) {
-    return auths.isRegistered(playerName);
+    return server.data.players.getPwHash(playerName) != null;
   }
 
   public boolean changePassword(Player player, String oldPassword, String newPassword) {
-    if (auths.passwordMatches(player.getName(), oldPassword)) {
-      auths.changePassword(player.getName(), newPassword);
+    if (passwordMatches(player.getName(), oldPassword)) {
+      server.data.players.setPw(player, generateHash(newPassword, player.getName()));
+      server.data.save();
       return true;
     }
     return false;
@@ -125,11 +132,19 @@ public class Authenticator {
 
   public boolean login(Player player, String playerName, String password) {
     // synchronize
-    if (auths.passwordMatches(playerName, password)) {
+    if (passwordMatches(playerName, password)) {
       addLoginRequest(playerName, player.getIPAddress());
       return true;
     }
     return false;
+  }
+
+  private boolean passwordMatches(String playerName, String password) {
+    return Arrays.equals(generateHash(password, playerName), getPasswordHash(playerName));
+  }
+
+  private String getRealPlayerName(String playerName) {
+    return server.data.players.getRealName(playerName);
   }
 
   private void addLoginRequest(String playerName, String IP) {
@@ -140,9 +155,34 @@ public class Authenticator {
     authRequests.add(new AuthRequest(playerName, IP, false));
   }
 
+  /***** PW HASHING *****/
+
+  private byte[] getPasswordHash(String playerName) {
+    return server.data.players.getPwHash(playerName);
+  }
+
+  private byte[] generateHash(String pw, String playerName) {
+    byte[] salt = getSHA(playerName.toLowerCase().getBytes());
+    byte[] pwArray = pw.getBytes();
+    byte[] toHash = new byte[salt.length + pwArray.length];
+    System.arraycopy(pwArray, 0, toHash, 0, pwArray.length);
+    System.arraycopy(salt, 0, toHash, pwArray.length, salt.length);
+    return getSHA(toHash);
+  }
+
+  private byte[] getSHA(byte[] s) {
+    // returns SHA-256 Hash of a String
+
+    shaMD.reset();
+    shaMD.update(s);
+    byte[] encrypted = shaMD.digest();
+
+    return encrypted;
+  }
+
   /***** LOGIN REQUEST VALIDATION / COMPLETE LOGIN *****/
 
-  public AuthRequest getAuthRequest(String IP) {
+  public synchronized AuthRequest getAuthRequest(String IP) {
     if (!allowLogin()) {
       return null;
     }
@@ -153,9 +193,6 @@ public class Authenticator {
       AuthRequest current = requests.next();
       if (current.IP.equals(IP)) {
         res = current;
-        /*if (current.isGuest) {
-          releaseGuestName(current.playerName);
-        }*/
         requests.remove();
         break;
       }
@@ -214,10 +251,7 @@ public class Authenticator {
 
   /***** RENAMING *****/
   public String renamePlayer(String name) {
-    if (playerRenames.containsKey(name)) {
-      return playerRenames.get(name);
-    }
-    return name;
+    return server.data.players.getRenameName(name);
   }
 
   /***** GUEST NAMES *****/
@@ -242,11 +276,11 @@ public class Authenticator {
     // delete name.dat or set to empty
   }
 
-  private short extractGuestNumber(String guestName) {
+  private static short extractGuestNumber(String guestName) {
     return Short.parseShort(guestName.substring(GUEST_PREFIX.length()));
   }
 
-  private String buildGuestName(short guestNumber) {
+  private static String buildGuestName(short guestNumber) {
     return GUEST_PREFIX + guestNumber;
   }
 
@@ -327,13 +361,13 @@ public class Authenticator {
     public boolean isGuest = false;
 
     public AuthRequest(String playerName, String IP) {
-      this.playerName = playerName;
+      this.playerName = getRealPlayerName(playerName);
       this.IP = IP;
       expirationTime = System.currentTimeMillis() + (REQUEST_EXPIRATION * 1000);
     }
 
     public AuthRequest(String playerName, String IP, boolean isGuest) {
-      this.playerName = playerName;
+      this.playerName = getRealPlayerName(playerName);
       this.IP = IP;
       expirationTime = System.currentTimeMillis() + (REMEMBER_TIME * 1000);
       remember = true;

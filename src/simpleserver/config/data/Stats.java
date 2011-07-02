@@ -83,7 +83,7 @@ public class Stats {
     for (String name : old.stats.keySet()) {
       Statistic oldStats = old.stats.get(name);
       NBTCompound tag = playerData.get(name);
-      NBTCompound stats = new NBTCompound("stats");
+      NBTCompound stats = new NBTCompound(STATS);
       stats.put(new NBTInt(StatField.PLAY_TIME.toString(), oldStats.minutes));
       stats.put(new NBTInt(StatField.BLOCKS_DESTROYED.toString(), oldStats.blocksDestroyed));
       stats.put(new NBTInt(StatField.BLOCKS_PLACED.toString(), oldStats.blocksPlaced));

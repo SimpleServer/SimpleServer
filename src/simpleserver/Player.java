@@ -151,8 +151,7 @@ public class Player {
   }
 
   public boolean setName(String name) {
-    renameName = server.authenticator.renamePlayer(name);
-    System.out.println("renameName: " + renameName);
+    renameName = server.data.players.getRenameName(name);
 
     name = name.trim();
     if (name.length() == 0 || this.name != null) {
@@ -196,6 +195,14 @@ public class Player {
 
   public String getName(boolean original) {
     return (original) ? name : renameName;
+  }
+
+  public String getRealName() {
+    return server.data.players.getRealName(name);
+  }
+
+  public void updateRealName() {
+    server.data.players.setRealName(name);
   }
 
   public String getConnectionHash() {

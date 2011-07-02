@@ -20,22 +20,27 @@
  */
 package simpleserver.config.data;
 
+import simpleserver.Player;
+import simpleserver.nbt.NBTArray;
 import simpleserver.nbt.NBTCompound;
+import simpleserver.nbt.NBTString;
 
 public class PlayerData {
   private NBTCompound node;
   public Stats stats = new Stats(this);
 
+  private final static String PLAYERS = "players";
+
   void load(NBTCompound data) {
-    if (data.containsKey("players")) {
+    if (data.containsKey(PLAYERS)) {
       try {
-        node = data.getCompound("players");
+        node = data.getCompound(PLAYERS);
         return;
       } catch (Exception e) {
         System.out.println("[WARNING] Player list is corrupt. Replacing it with empty list...");
       }
     }
-    node = new NBTCompound("players");
+    node = new NBTCompound(PLAYERS);
     data.put(node);
     stats.loadOldConfig();
   }
@@ -50,4 +55,78 @@ public class PlayerData {
       return player;
     }
   }
+
+  public String getRealName(String playerName) {
+    NBTCompound playerData = get(playerName.toLowerCase());
+    String field = PlayerField.FULL_NAME.toString();
+    if (playerData.containsKey(field)) {
+      return playerData.getString(field).get();
+    } else {
+      NBTString tag = new NBTString(field, playerName);
+      playerData.put(tag);
+      return tag.get();
+    }
+  }
+
+  public String getRenameName(String playerName) {
+    NBTCompound playerData = get(playerName.toLowerCase());
+    String field = PlayerField.RENAME_NAME.toString();
+    if (playerData.containsKey(field)) {
+      return playerData.getString(field).get();
+    } else {
+      NBTString tag = new NBTString(field, playerName);
+      playerData.put(tag);
+      return tag.get();
+    }
+  }
+
+  public byte[] getPwHash(String playerName) {
+    NBTCompound playerData = get(playerName.toLowerCase());
+    String field = PlayerField.PW_HASH.toString();
+    if (playerData.containsKey(field)) {
+      byte[] a = playerData.getArray(field).get();
+      return a;
+    }
+    return null;
+  }
+
+  public void setRealName(String realName) {
+    NBTCompound playerData = get(realName.toLowerCase());
+    String field = PlayerField.FULL_NAME.toString();
+    if (playerData.containsKey(field)) {
+      playerData.getString(field).set(realName);
+    } else {
+      NBTString tag = new NBTString(field, realName);
+      playerData.put(tag);
+    }
+  }
+
+  public void setRenameName(Player player, String renameName) {
+    NBTCompound playerData = get(player.getName(true).toLowerCase());
+    String field = PlayerField.RENAME_NAME.toString();
+    if (playerData.containsKey(field)) {
+      playerData.getString(field).set(renameName);
+    } else {
+      NBTString tag = new NBTString(field, player.getName());
+      playerData.put(tag);
+    }
+  }
+
+  public void setPw(Player player, byte[] pwHash) {
+    NBTCompound playerData = get(player.getName().toLowerCase());
+    String field = PlayerField.PW_HASH.toString();
+    if (playerData.containsKey(field)) {
+      playerData.getArray(field).set(pwHash);
+    } else {
+      NBTArray tag = new NBTArray(field, pwHash);
+      playerData.put(tag);
+    }
+  }
+
+  public enum PlayerField {
+    FULL_NAME, // String
+    RENAME_NAME, // String
+    PW_HASH; // byte[]
+  }
+
 }
