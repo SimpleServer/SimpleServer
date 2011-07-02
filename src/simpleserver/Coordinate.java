@@ -137,6 +137,7 @@ public class Coordinate {
   public enum Dimension {
     EARTH((byte) 0),
     NETHER((byte) -1),
+    SKY((byte) 1),
     LIMBO;
 
     private byte index;

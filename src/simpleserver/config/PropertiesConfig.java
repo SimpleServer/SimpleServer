@@ -63,13 +63,17 @@ public abstract class PropertiesConfig extends AbstractConfig {
         stream.close();
       }
     } catch (FileNotFoundException e) {
-      System.out.println(getFilename() + " is missing.  Loading defaults.");
+      missingFile();
       properties = (SortedProperties) defaultProperties.clone();
       save();
     } catch (IOException e) {
       System.out.println("[SimpleServer] " + e);
       System.out.println("[SimpleServer] Failed to load " + getFilename());
     }
+  }
+
+  protected void missingFile() {
+    System.out.println(getFilename() + " is missing.  Loading defaults.");
   }
 
   @Override
