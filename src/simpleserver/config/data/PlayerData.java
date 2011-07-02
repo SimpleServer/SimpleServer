@@ -112,8 +112,8 @@ public class PlayerData {
     }
   }
 
-  public void setPw(Player player, byte[] pwHash) {
-    NBTCompound playerData = get(player.getName().toLowerCase());
+  public void setPw(String playerName, byte[] pwHash) {
+    NBTCompound playerData = get(playerName.toLowerCase());
     String field = PlayerField.PW_HASH.toString();
     if (playerData.containsKey(field)) {
       playerData.getArray(field).set(pwHash);

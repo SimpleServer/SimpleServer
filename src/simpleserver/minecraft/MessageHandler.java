@@ -98,6 +98,8 @@ public class MessageHandler {
       handleError(new Exception(line));
     } else if (line.matches("^>+$")) {
       return;
+    } else if (line.contains("SERVER IS RUNNING IN OFFLINE/INSECURE MODE") && server.options.getBoolean("onlineMode")) {
+      return;
     } else {
       Matcher connect = CONNECT.matcher(line);
       if (connect.find()) {

@@ -23,6 +23,7 @@ package simpleserver;
 import static simpleserver.lang.Translations.t;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -83,8 +84,6 @@ public class Authenticator {
       timer = new Timer();
       timer.schedule(new MinecraftOnlineChecker(this), 0, REFRESH_TIME * 1000);
     }
-
-    // playerRenames.put("D0l4", "Notch");
   }
 
   /***** PERMISSIONS *****/
@@ -110,8 +109,9 @@ public class Authenticator {
 
   /***** REGISTRATION *****/
 
-  public void register(Player player, String password) {
-    server.data.players.setPw(player, generateHash(password, player.getName()));
+  public void register(String playerName, String password) {
+    server.data.players.setPw(playerName, generateHash(password, playerName));
+    server.data.players.setRealName(playerName);
     server.data.save();
   }
 
@@ -120,8 +120,9 @@ public class Authenticator {
   }
 
   public boolean changePassword(Player player, String oldPassword, String newPassword) {
-    if (passwordMatches(player.getName(), oldPassword)) {
-      server.data.players.setPw(player, generateHash(newPassword, player.getName()));
+    String playerName = player.getName();
+    if (passwordMatches(playerName, oldPassword)) {
+      server.data.players.setPw(playerName, generateHash(newPassword, playerName));
       server.data.save();
       return true;
     }
@@ -131,7 +132,6 @@ public class Authenticator {
   /***** LOGIN *****/
 
   public boolean login(Player player, String playerName, String password) {
-    // synchronize
     if (passwordMatches(playerName, password)) {
       addLoginRequest(playerName, player.getIPAddress());
       return true;
@@ -198,6 +198,9 @@ public class Authenticator {
       }
 
       if (!current.isValid()) {
+        if (current.isGuest) {
+          releaseGuestName(current.playerName);
+        }
         requests.remove();
       }
     }
@@ -238,14 +241,12 @@ public class Authenticator {
     ListIterator<AuthRequest> requests = authRequests.listIterator();
     while (requests.hasNext()) {
       AuthRequest current = requests.next();
-      if (current.isValid()) {
-        break;
+      if (!current.isValid()) {
+        if (current.isGuest) {
+          releaseGuestName(current.playerName);
+        }
+        requests.remove();
       }
-      if (current.isGuest) {
-        releaseGuestName(current.playerName);
-      }
-
-      requests.remove();
     }
   }
 
@@ -273,7 +274,9 @@ public class Authenticator {
 
   public synchronized void releaseGuestName(String name) {
     freeGuestNumbers.offer(extractGuestNumber(name));
-    // delete name.dat or set to empty
+
+    File dat = new File(server.options.get("levelName") + File.separator + "players" + File.separator + name + ".dat");
+    server.bots.trash(dat);
   }
 
   private static short extractGuestNumber(String guestName) {
@@ -294,7 +297,7 @@ public class Authenticator {
   /***** MINECRAFT.NET AUTHENTICATION *****/
 
   public boolean onlineAuthenticate(Player player) {
-    if (useCustAuth()) {
+    if (!useCustAuth(player)) {
       return true;
     }
 
@@ -316,7 +319,6 @@ public class Authenticator {
       // seems to be down
       updateMinecraftState();
     }
-
     return result;
   }
 
@@ -351,46 +353,7 @@ public class Authenticator {
   @Override
   public void finalize() {
     timer.cancel();
-  }
-
-  public class AuthRequest {
-    public String playerName;
-    public String IP;
-    public long expirationTime;
-    public boolean remember = false;
-    public boolean isGuest = false;
-
-    public AuthRequest(String playerName, String IP) {
-      this.playerName = getRealPlayerName(playerName);
-      this.IP = IP;
-      expirationTime = System.currentTimeMillis() + (REQUEST_EXPIRATION * 1000);
-    }
-
-    public AuthRequest(String playerName, String IP, boolean isGuest) {
-      this.playerName = getRealPlayerName(playerName);
-      this.IP = IP;
-      expirationTime = System.currentTimeMillis() + (REMEMBER_TIME * 1000);
-      remember = true;
-      this.isGuest = isGuest;
-    }
-
-    public boolean isValid() {
-      return (expirationTime >= System.currentTimeMillis());
-    }
-  }
-
-  private class MinecraftOnlineChecker extends TimerTask {
-
-    private Authenticator parent;
-
-    public MinecraftOnlineChecker(Authenticator parent) {
-      this.parent = parent;
-    }
-
-    @Override
-    public void run() {
-      parent.updateMinecraftState();
-    }
+    cleanLoginRequests();
   }
 
   /***** LOGIN BAN *****/
@@ -441,6 +404,46 @@ public class Authenticator {
 
     public static int banTime(int level) {
       return (int) Math.pow(2, level) / 10;
+    }
+  }
+
+  public class AuthRequest {
+    public String playerName;
+    public String IP;
+    public long expirationTime;
+    public boolean remember = false;
+    public boolean isGuest = false;
+
+    public AuthRequest(String playerName, String IP) {
+      this.playerName = getRealPlayerName(playerName);
+      this.IP = IP;
+      expirationTime = System.currentTimeMillis() + (REQUEST_EXPIRATION * 1000);
+    }
+
+    public AuthRequest(String playerName, String IP, boolean isGuest) {
+      this.playerName = getRealPlayerName(playerName);
+      this.IP = IP;
+      expirationTime = System.currentTimeMillis() + (REMEMBER_TIME * 1000);
+      remember = true;
+      this.isGuest = isGuest;
+    }
+
+    public boolean isValid() {
+      return (expirationTime >= System.currentTimeMillis());
+    }
+  }
+
+  private class MinecraftOnlineChecker extends TimerTask {
+
+    private Authenticator parent;
+
+    public MinecraftOnlineChecker(Authenticator parent) {
+      this.parent = parent;
+    }
+
+    @Override
+    public void run() {
+      parent.updateMinecraftState();
     }
   }
 }

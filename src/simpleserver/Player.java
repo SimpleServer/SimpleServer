@@ -201,7 +201,7 @@ public class Player {
     return server.data.players.getRealName(name);
   }
 
-  public void updateRealName() {
+  public void updateRealName(String name) {
     server.data.players.setRealName(name);
   }
 
