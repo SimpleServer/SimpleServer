@@ -122,7 +122,7 @@ public class BotController {
     }
   }
 
-  void trash(File file) {
+  public void trash(File file) {
     garbage.add(file);
   }
 

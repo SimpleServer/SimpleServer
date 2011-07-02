@@ -27,6 +27,7 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.security.SecureRandom;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Semaphore;
@@ -79,9 +80,12 @@ public class Server {
   public GlobalData data;
   private RobotList robots;
 
+  private SecureRandom random = new SecureRandom();
+
   public PermissionConfig permissions;
 
   public PlayerList playerList;
+  public Authenticator authenticator;
   private List<Resource> resources;
   private CommandParser commandParser;
 
@@ -99,6 +103,8 @@ public class Server {
   private AutoSave autosave;
   private AutoRestart autoRestart;
   public RequestTracker requestTracker;
+
+  public long mapSeed;
 
   private boolean run = true;
   private boolean restart = false;
@@ -157,6 +163,11 @@ public class Server {
       return robots.getRobotPorts();
     }
     return null;
+  }
+
+  public String nextHash() {
+    // return Long.toString(random.nextLong(), 16);
+    return "83f8c94ad9634c7e";
   }
 
   public boolean cmdAllowed(String cmd, Player p) {
@@ -388,6 +399,7 @@ public class Server {
       System.exit(1);
     }
 
+    authenticator = new Authenticator(this);
     playerList = new PlayerList(options);
     requestTracker = new RequestTracker(this);
 
@@ -446,6 +458,7 @@ public class Server {
     }
 
     kickAllPlayers();
+    authenticator.finalize();
     if (telnetServer != null) {
       telnetServer.stop();
     }
@@ -542,6 +555,17 @@ public class Server {
 
   public long time() {
     return time.get();
+  }
+
+  public void setMapSeed(long seed) {
+    if (mapSeed != seed) {
+      mapSeed = seed;
+      // System.out.println("[MAP SEED] " + mapSeed);
+    }
+  }
+
+  public long getMapSeed() {
+    return mapSeed;
   }
 
 }

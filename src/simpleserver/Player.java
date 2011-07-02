@@ -31,9 +31,9 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import simpleserver.Coordinate.Dimension;
+import simpleserver.bot.BotController.ConnectException;
 import simpleserver.bot.Giver;
 import simpleserver.bot.Teleporter;
-import simpleserver.bot.BotController.ConnectException;
 import simpleserver.command.ExternalCommand;
 import simpleserver.command.PlayerCommand;
 import simpleserver.config.data.Stats.StatField;
@@ -52,6 +52,8 @@ public class Player {
   private Watchdog watchdog;
 
   private String name = null;
+  private String renameName = null;
+  private String connectionHash;
   private boolean closed = false;
   private boolean isKicked = false;
   private Action attemptedAction;
@@ -64,6 +66,9 @@ public class Player {
   private int entityId = 0;
   private Group groupObject = null;
   private boolean isRobot = false;
+  private boolean guest = false; // player is not authenticated with
+                                 // minecraft.net
+  private boolean usedAuthenticator = false;
   private boolean localChat = false;
   private int blocksPlaced = 0;
   private int blocksDestroyed = 0;
@@ -146,21 +151,27 @@ public class Player {
   }
 
   public boolean setName(String name) {
+    renameName = server.data.players.getRenameName(name);
 
     name = name.trim();
     if (name.length() == 0 || this.name != null) {
-      kick("Invalid Name!");
+      kick(t("Invalid Name!"));
+      return false;
+    }
+
+    if (name == "Player") {
+      kick(t("Too many guests in server!"));
       return false;
     }
 
     if (server.options.getBoolean("useWhitelist")
         && !server.whitelist.isWhitelisted(name)) {
-      kick("You are not whitelisted!");
+      kick(t("You are not whitelisted!"));
       return false;
     }
 
     if (server.playerList.findPlayerExact(name) != null) {
-      kick("Player already in server!");
+      kick(t("Player already in server!"));
       return false;
     }
 
@@ -179,7 +190,26 @@ public class Player {
   }
 
   public String getName() {
-    return name;
+    return renameName;
+  }
+
+  public String getName(boolean original) {
+    return (original) ? name : renameName;
+  }
+
+  public String getRealName() {
+    return server.data.players.getRealName(name);
+  }
+
+  public void updateRealName(String name) {
+    server.data.players.setRealName(name);
+  }
+
+  public String getConnectionHash() {
+    if (connectionHash == null) {
+      connectionHash = server.nextHash();
+    }
+    return connectionHash;
   }
 
   public double distanceTo(Player player) {
@@ -330,6 +360,22 @@ public class Player {
       return groupObject.isAdmin();
     }
     return false;
+  }
+
+  public void setGuest(boolean guest) {
+    this.guest = guest;
+  }
+
+  public boolean isGuest() {
+    return guest;
+  }
+
+  public void setUsedAuthenticator(boolean usedAuthenticator) {
+    this.usedAuthenticator = usedAuthenticator;
+  }
+
+  public boolean usedAuthenticator() {
+    return usedAuthenticator;
   }
 
   public String getIPAddress() {
@@ -496,6 +542,17 @@ public class Player {
     }
 
     if (name != null) {
+      server.authenticator.unbanLogin(this);
+      if (usedAuthenticator) {
+        if (guest) {
+          server.authenticator.releaseGuestName(name);
+        } else {
+          server.authenticator.rememberAuthentication(name, getIPAddress());
+        }
+      } else if (guest) {
+        server.authenticator.rememberGuest(name, getIPAddress());
+      }
+
       server.data.players.stats.add(this, StatField.PLAY_TIME, (int) (System.currentTimeMillis() - connected) / 1000 / 60);
       server.data.players.stats.add(this, StatField.BLOCKS_DESTROYED, blocksDestroyed);
       server.data.players.stats.add(this, StatField.BLOCKS_PLACED, blocksPlaced);

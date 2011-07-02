@@ -44,6 +44,10 @@ public class SetGroupCommand extends PlayerArgCommand {
       player.addTMessage(Color.RED, "You cannot promote to your group or higher!");
       return false;
     }
+    if (server.authenticator.isGuestName(target)) {
+      player.addTMessage(Color.RED, "You cannot promote a guest!");
+      return false;
+    }
     return true;
   }
 

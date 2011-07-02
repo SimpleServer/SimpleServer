@@ -37,12 +37,13 @@ import java.util.IllegalFormatException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import simpleserver.Authenticator.AuthRequest;
 import simpleserver.Color;
 import simpleserver.Coordinate;
+import simpleserver.Coordinate.Dimension;
 import simpleserver.Group;
 import simpleserver.Player;
 import simpleserver.Server;
-import simpleserver.Coordinate.Dimension;
 import simpleserver.command.LocalSayCommand;
 import simpleserver.command.PlayerListCommand;
 import simpleserver.config.data.Chests.Chest;
@@ -151,13 +152,20 @@ public class StreamTunnel {
       case 0x01: // Login Request/Response
         write(packetId);
         if (isServerTunnel) {
-          player.setEntityId(in.readInt());
-          write(player.getEntityId());
+          if (server.authenticator.useCustAuth(player)
+              && !server.authenticator.onlineAuthenticate(player)) {
+            player.kick(t("%s Failed to login: User not premium", "[CustAuth]"));
+            break;
+          }
+          player.setEntityId(write(in.readInt()));
+          write(readUTF16());
+          server.setMapSeed(write(in.readLong()));
         } else {
           write(in.readInt());
+          readUTF16(); // and throw away
+          write(player.getName());
+          write(in.readLong());
         }
-        write(readUTF16());
-        write(in.readLong());
         dimension = in.readByte();
         if (isServerTunnel) {
           player.setDimension(Dimension.get(dimension));
@@ -166,11 +174,44 @@ public class StreamTunnel {
         break;
       case 0x02: // Handshake
         String name = readUTF16();
-        if (isServerTunnel || player.setName(name)) {
+        boolean nameSet = false;
+
+        if (isServerTunnel) {
+          if (!server.authenticator.useCustAuth(player)) {
+            name = "-";
+          } else if (!server.authenticator.vanillaOnlineMode()) {
+            name = player.getConnectionHash();
+          }
+        } else {
+          if (name.equals("Player") || !server.authenticator.isMinecraftUp) {
+            AuthRequest req = server.authenticator.getAuthRequest(player.getIPAddress());
+            if (req != null) {
+              name = req.playerName;
+              nameSet = server.authenticator.completeLogin(req, player);
+            }
+            if (req == null || !nameSet) {
+              if (!name.equals("Player")) {
+                player.addTMessage(Color.RED, "Login verification failed.");
+                player.addTMessage(Color.RED, "You were logged in as guest.");
+              }
+              name = server.authenticator.getFreeGuestName();
+              nameSet = player.setName(name);
+              player.setGuest(true);
+            }
+          } else {
+            nameSet = player.setName(name);
+            if (nameSet) {
+              player.updateRealName(name);
+            }
+          }
+        }
+
+        if (isServerTunnel || nameSet) {
           tunneler.setName(streamType + "-" + player.getName());
           write(packetId);
           write(name);
         }
+
         break;
       case 0x03: // Chat Message
         String message = readUTF16();
@@ -179,6 +220,12 @@ public class StreamTunnel {
           if (server.bots.ninja(joinMatcher.group(1))) {
             break;
           }
+          if (message.contains("join")) {
+            player.addTMessage(Color.GRAY, "%s joined the game.", joinMatcher.group(1));
+          } else {
+            player.addTMessage(Color.GRAY, "%s left the game.", joinMatcher.group(1));
+          }
+          break;
         }
         if (isServerTunnel && server.options.getBoolean("useMsgFormats")) {
           Matcher colorMatcher = COLOR_PATTERN.matcher(message);
