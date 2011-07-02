@@ -51,6 +51,10 @@ public class Inventory {
     slots.put(slot, new Slot(id, count, damage));
   }
 
+  public Slot get(byte slot) {
+    return slots.get(slot);
+  }
+
   public NBTList<NBTCompound> nbt() {
     NBTList<NBTCompound> list = new NBTList<NBTCompound>("Inventory", NBT.COMPOUND);
     for (byte slot : slots.keySet()) {
@@ -74,10 +78,17 @@ public class Inventory {
     return !slots.containsKey(slot);
   }
 
+  public static byte networkSlot(byte slot) {
+    if (slot <= 8) {
+      return (byte) (slot + 36);
+    }
+    return slot;
+  }
+
   public class Slot {
-    private short id;
-    private byte count;
-    private short damage;
+    public short id;
+    public byte count;
+    public short damage;
 
     public Slot(short id, byte count, short damage) {
       this.id = id;

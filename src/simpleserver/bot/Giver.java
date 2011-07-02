@@ -26,18 +26,19 @@ import java.net.UnknownHostException;
 import simpleserver.Player;
 import simpleserver.nbt.Inventory;
 import simpleserver.nbt.PlayerFile;
+import simpleserver.nbt.Inventory.Slot;
 
 public class Giver extends Bot {
 
   private Inventory inv;
-  private int[] counts;
+  private int count;
   private Player player;
   int slot;
 
   public Giver(Player player) {
     super(player.getServer(), "Giver" + Math.round(100000 * Math.random()));
     inv = new Inventory();
-    counts = new int[9];
+    count = 0;
     slot = 0;
     this.player = player;
   }
@@ -55,7 +56,7 @@ public class Giver extends Bot {
   public void add(int id, int count, int damage) {
     if (slot < 9) {
       inv.add(id, count, damage);
-      counts[slot++] = count;
+      this.count++;
     }
   }
 
@@ -78,19 +79,25 @@ public class Giver extends Bot {
   protected void drop() throws IOException {
     super.ready();
     writeLock.lock();
-    for (int i = 0; i < 9; i++) {
-      if (counts[i] > 0) {
-        out.writeByte(0x10);
-        out.writeShort(i);
-        for (int j = 0; j < counts[i]; j++) {
-          out.writeByte(0x0e);
-          out.writeByte(0x4);
-          out.writeInt(0);
-          out.writeByte(0);
-          out.writeInt(0);
-          out.writeByte(0);
-        }
-      }
+    for (byte i = 0; i < count; i++) {
+      Slot slot = inv.get(i);
+      out.writeByte(0x66);
+      out.writeByte(0);
+      out.writeShort(Inventory.networkSlot(i));
+      out.writeByte(0);
+      out.writeShort(i * 2);
+      out.writeBoolean(false);
+      out.writeShort(slot.id);
+      out.writeByte(slot.count);
+      out.writeShort(slot.damage);
+      out.flush();
+      out.writeByte(0x66);
+      out.writeByte(0);
+      out.writeShort(-999);
+      out.writeByte(0);
+      out.writeShort(i * 2 + 1);
+      out.writeBoolean(false);
+      out.writeShort(-1);
       out.flush();
     }
     writeLock.unlock();
