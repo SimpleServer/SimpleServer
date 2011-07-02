@@ -48,7 +48,7 @@ public abstract class GiveCommand extends AbstractCommand {
       } else {
         Item item = target.getServer().giveAliasList.getItemId(request[0]);
         if (item == null) {
-          error("Can't find item %s", request[0]);
+          tError("Can't find item %s", request[0]);
           return;
         }
         id = item.id;
@@ -59,7 +59,7 @@ public abstract class GiveCommand extends AbstractCommand {
         try {
           damage = Short.valueOf(request[1]);
         } catch (Exception e) {
-          error("Invalid damage value: %s", request[1]);
+          tError("Invalid damage value: %s", request[1]);
           return;
         }
       }
@@ -69,13 +69,13 @@ public abstract class GiveCommand extends AbstractCommand {
         try {
           amount = Integer.valueOf(arguments[1]);
         } catch (Exception e) {
-          error("Invalid amount: %s", arguments[1]);
+          tError("Invalid amount: %s", arguments[1]);
           return;
         }
       }
 
       if (amount > 1000) {
-        error("You can't give more than 1000 items at once.");
+        tError("You can't give more than 1000 items at once.");
         return;
       }
 
@@ -86,14 +86,14 @@ public abstract class GiveCommand extends AbstractCommand {
       try {
         target.give(id, damage, amount);
       } catch (ConnectException e) {
-        error("Giving failed!");
+        tError("Giving failed!");
       }
     } else {
-      error("No item or amount specified!");
+      tError("No item or amount specified!");
     }
   }
 
-  protected void error(String message, Object... args) {
+  protected void tError(String message, Object... args) {
     executor.addTMessage(Color.RED, message, args);
   }
 
@@ -101,7 +101,7 @@ public abstract class GiveCommand extends AbstractCommand {
     Player target = null;
     target = server.findPlayer(name);
     if (target == null) {
-      error("Player not online (%s)", name);
+      tError("Player not online (%s)", name);
     }
     return target;
   }

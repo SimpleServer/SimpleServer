@@ -32,8 +32,6 @@ Features (See CHANGES for updates):
  * Muting players from global chat (mute-list.txt).
  * Rules listing (rules.txt).
  * Optional member whitelist (white-list.txt).
- * CustAuth lets people login even if verification servers are down 
-   and provides better handling of unverified players.
  * Selectable language packages for all in-game notifications.
 See simpleserver.properties for general configuration.
 
@@ -66,13 +64,11 @@ accessible commands.
   /local MESSAGE -- Send a chat message to nearby players
   /localtoggle [on|off] -- Toggle local chat mode
   /lock [name|list] -- Create or list locked chests
-  /login PLAYER PASSWORD -- Login to the server as PLAYER with CustAuth
   /motd -- Display the message of the day
   /mute PLAYER -- Block the named player from normal chat
   /myarea [start|end|save|unsave|rename] -- Manage your personal area
   /mystats -- Display your statistics
   /ok PLAYER -- Teleport to the player if he agrees with ok
-  /passwd [OLD PW] PW PW -- Register for CustAuth or change password
   /rcon COMMAND ARGUMENTS... -- Execute a command on the server console
   /reload -- Reread the configuration files from disk
   /reply MESSAGE -- Sends a message to the player that last told you something

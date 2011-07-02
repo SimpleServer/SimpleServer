@@ -1,14 +1,17 @@
 == 8.2 ==
+ * added support for Minecraft Beta 1.7
  * added ModLoaderMP support
- * added global and area-based chest usage permission
- * added announceRestart, announceSave options
- * added forward=only possibility for commands
  * added waypoint based teleporting (/warp, /spawn)
  * added localization
+ * added customAuthentication
+ * added give command with damage
+ * added global and area-based chest usage permission
  * added dimension and altitude support in areas
  * added automatic backup deletion in case disk is full
  * added configuration files to backup
+ * added forward=only possibility for commands
  * added forwardUnknownCommands option for groups
+ * added announceRestart, announceSave options
  * changed time command to support vanilla syntax and save freezeTime
  * fixed /myarea unsave
  * fixed kits with amount being multiple of 64

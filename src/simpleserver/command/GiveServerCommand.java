@@ -31,14 +31,14 @@ public class GiveServerCommand extends GiveCommand implements ServerCommand {
   public void execute(Server server, String message) {
     String[] arguments = extractArguments(message);
     if (arguments.length == 0) {
-      error("No player specified");
+      tError("No player specified");
       return;
     }
     execute(extractArguments(message, 1), getTarget(arguments[0], server), "Console");
   }
 
   @Override
-  protected void error(String message, Object... args) {
+  protected void tError(String message, Object... args) {
     System.out.println(String.format(message, args));
   }
 }
