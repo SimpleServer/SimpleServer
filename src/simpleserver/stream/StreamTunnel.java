@@ -221,9 +221,9 @@ public class StreamTunnel {
             break;
           }
           if (message.contains("join")) {
-            player.addTMessage(Color.GRAY, "%s joined the game.", joinMatcher.group(1));
+            player.addTMessage(Color.YELLOW, "%s joined the game.", joinMatcher.group(1));
           } else {
-            player.addTMessage(Color.GRAY, "%s left the game.", joinMatcher.group(1));
+            player.addTMessage(Color.YELLOW, "%s left the game.", joinMatcher.group(1));
           }
           break;
         }
