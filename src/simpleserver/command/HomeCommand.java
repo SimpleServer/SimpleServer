@@ -53,6 +53,7 @@ public class HomeCommand extends AbstractCommand implements PlayerCommand {
       }
 
       player.getServer().data.players.homes.set(playerName, player.position);
+      player.getServer().data.save();
       player.addTMessage(Color.GRAY, "Your home has been added.");
     } else if (command.equals("delete")) {
       if (player.getServer().data.players.homes.get(playerName) == null) {

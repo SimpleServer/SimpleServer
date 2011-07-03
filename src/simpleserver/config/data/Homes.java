@@ -33,7 +33,7 @@ public class Homes {
   }
 
   public Position get(String playerName) {
-    NBTCompound player = playerData.get(playerName.toLowerCase());
+    NBTCompound player = playerData.get(playerName);
     if (player.containsKey(HOME)) {
       return new Position(player.getCompound(HOME));
     }
@@ -41,14 +41,14 @@ public class Homes {
   }
 
   public void remove(String playerName) {
-    NBTCompound player = playerData.get(playerName.toLowerCase());
+    NBTCompound player = playerData.get(playerName);
     if (player.containsKey(HOME)) {
       player.remove(HOME);
     }
   }
 
   public void set(String playerName, Position home) {
-    NBTCompound player = playerData.get(playerName.toLowerCase());
+    NBTCompound player = playerData.get(playerName);
     NBTCompound tag = home.tag();
     tag.rename(HOME);
     player.put(tag);
