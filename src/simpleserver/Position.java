@@ -36,6 +36,7 @@ public class Position {
   private final static String Z = "z";
   private final static String YAW = "yaw";
   private final static String PITCH = "pitch";
+  private static final String POSITION = "position";
 
   public double x;
   public double y;
@@ -83,13 +84,13 @@ public class Position {
   }
 
   public NBTCompound tag() {
-    NBTCompound tag = new NBTCompound("position");
-    tag.put(new NBTDouble("x", x));
-    tag.put(new NBTDouble("y", y));
-    tag.put(new NBTDouble("z", z));
+    NBTCompound tag = new NBTCompound(POSITION);
+    tag.put(new NBTDouble(X, x));
+    tag.put(new NBTDouble(Y, y));
+    tag.put(new NBTDouble(Z, z));
     tag.put(new NBTByte(DIMENSION, dimension.index()));
-    tag.put(new NBTFloat("yaw", yaw));
-    tag.put(new NBTFloat("pitch", pitch));
+    tag.put(new NBTFloat(YAW, yaw));
+    tag.put(new NBTFloat(PITCH, pitch));
     return tag;
   }
 
