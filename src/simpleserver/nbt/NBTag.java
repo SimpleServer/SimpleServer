@@ -103,6 +103,15 @@ abstract class NBTag {
     return builder;
   }
 
+  @Override
+  public boolean equals(Object o) {
+    if (!(o instanceof NBTag)) {
+      return false;
+    }
+    NBTag tag = (NBTag) o;
+    return named == tag.named && tag.get().equals(get());
+  }
+
   static NBTCompound load(DataInputStream in) throws Exception {
     NBTag root = NBT.loadTag(in, true);
     if (!(root instanceof NBTCompound)) {
