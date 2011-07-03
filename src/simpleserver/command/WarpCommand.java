@@ -22,6 +22,7 @@ package simpleserver.command;
 
 import simpleserver.Color;
 import simpleserver.Player;
+import simpleserver.config.data.Warp;
 
 public class WarpCommand extends AbstractCommand implements PlayerCommand {
   public WarpCommand() {
@@ -30,13 +31,14 @@ public class WarpCommand extends AbstractCommand implements PlayerCommand {
 
   public void execute(Player player, String message) {
     String arguments[] = extractArguments(message);
+    Warp warp = player.getServer().data.warp;
     if (arguments.length == 0) {
-      String warp = commandPrefix() + "warp";
+      String warpCommand = commandPrefix() + "warp";
       player.addTMessage(Color.GRAY, "Usage:");
-      player.addTMessage(Color.GRAY, "%s name: teleport to waypoint", warp);
-      player.addTMessage(Color.GRAY, "%s: list waypoints", warp + " list");
-      player.addTMessage(Color.GRAY, "%s name: add waypoint", warp + " add");
-      player.addTMessage(Color.GRAY, "%s name: remove waypoint", warp + " remove");
+      player.addTMessage(Color.GRAY, "%s name: teleport to waypoint", warpCommand);
+      player.addTMessage(Color.GRAY, "%s: list waypoints", warpCommand + " list");
+      player.addTMessage(Color.GRAY, "%s name: add waypoint", warpCommand + " add");
+      player.addTMessage(Color.GRAY, "%s name: remove waypoint", warpCommand + " remove");
       return;
     }
     String command = arguments[0];
@@ -46,32 +48,34 @@ public class WarpCommand extends AbstractCommand implements PlayerCommand {
       if (arguments.length == 1) {
         player.addTMessage(Color.RED, "You have to provide the name of a waypoint");
         return;
-      } else if (player.getServer().data.warp.contains(arguments[1])) {
+      } else if (warp.contains(arguments[1])) {
         player.addTMessage(Color.RED, "There already exists a waypoint named %s", arguments[1]);
         return;
       }
-      player.getServer().data.warp.set(arguments[1], player.position);
+      warp.set(arguments[1], player.position);
+      player.getServer().data.save();
       player.addTMessage(Color.GRAY, "Waypoint added");
     } else if (command.equals("remove")) {
       if (arguments.length == 1) {
         player.addTMessage(Color.RED, "You have to provide the name of a waypoint");
         return;
       }
-      String waypoint = player.getServer().data.warp.getName(arguments[1]);
+      String waypoint = warp.getName(arguments[1]);
       if (waypoint == null) {
         player.addTMessage(Color.RED, "No such waypoint exists.");
         return;
       }
-      player.getServer().data.warp.remove(waypoint);
+      warp.remove(waypoint);
+      player.getServer().data.save();
       player.addTMessage(Color.GRAY, "Waypoint removed");
     } else {
-      String waypoint = player.getServer().data.warp.getName(command);
+      String waypoint = warp.getName(command);
       if (waypoint == null) {
         player.addTMessage(Color.RED, "No such waypoint exists.");
         return;
       }
       try {
-        player.teleport(player.getServer().data.warp.get(waypoint));
+        player.teleport(warp.get(waypoint));
       } catch (Exception e) {
         player.addTMessage(Color.RED, "Teleporting failed.");
       }
