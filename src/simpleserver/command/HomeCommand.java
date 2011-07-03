@@ -22,6 +22,7 @@ package simpleserver.command;
 
 import simpleserver.Color;
 import simpleserver.Player;
+import simpleserver.Position;
 
 public class HomeCommand extends AbstractCommand implements PlayerCommand {
   public HomeCommand() {
@@ -29,15 +30,16 @@ public class HomeCommand extends AbstractCommand implements PlayerCommand {
   }
 
   public void execute(Player player, String message) {
+    String playerName = player.getName();
     String arguments[] = extractArguments(message);
     if (arguments.length == 0) {
-      String waypoint = player.getServer().data.homes.getName(player.getName(true));
-      if (waypoint == null) {
+      Position home = player.getServer().data.players.getHome(playerName);
+      if (home == null) {
         player.addTMessage(Color.RED, "You don't have a home to teleport to!");
         return;
       }
       try {
-        player.teleport(player.getServer().data.homes.get(waypoint));
+        player.teleport(home);
       } catch (Exception e) {
         player.addTMessage(Color.RED, "Teleporting failed.");
       }
@@ -45,21 +47,20 @@ public class HomeCommand extends AbstractCommand implements PlayerCommand {
     }
     String command = arguments[0];
     if (command.equals("set")) {
-      if (player.getServer().data.homes.contains(player.getName(true))) {
+      if (player.getServer().data.players.getHome(playerName) != null) {
         player.addTMessage(Color.RED, "You must delete your old home before saving a new one!");
         return;
       }
 
-      player.getServer().data.homes.set(player.getName(true), player.position);
+      player.getServer().data.players.setHome(playerName, player.position);
       player.addTMessage(Color.GRAY, "Your home has been added.");
     } else if (command.equals("delete")) {
-      String waypoint = player.getServer().data.homes.getName(player.getName(true));
-      if (waypoint == null) {
-        player.addTMessage(Color.RED, "You don't have a home to delete!");
+      if (player.getServer().data.players.getHome(playerName) == null) {
+        player.addTMessage(Color.GRAY, "You don't have a home to delete!");
         return;
       }
 
-      player.getServer().data.homes.remove(waypoint);
+      player.getServer().data.players.removeHome(playerName);
       player.addTMessage(Color.GRAY, "Your home has been deleted.");
     } else {
       String home = commandPrefix() + "home";

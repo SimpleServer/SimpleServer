@@ -20,9 +20,14 @@
  */
 package simpleserver.config.data;
 
+import simpleserver.Coordinate.Dimension;
 import simpleserver.Player;
+import simpleserver.Position;
 import simpleserver.nbt.NBTArray;
+import simpleserver.nbt.NBTByte;
 import simpleserver.nbt.NBTCompound;
+import simpleserver.nbt.NBTDouble;
+import simpleserver.nbt.NBTFloat;
 import simpleserver.nbt.NBTString;
 
 public class PlayerData {
@@ -90,6 +95,22 @@ public class PlayerData {
     return null;
   }
 
+  public Position getHome(String playerName) {
+    NBTCompound playerData = get(playerName.toLowerCase());
+    String field = PlayerField.HOME.toString();
+    if (playerData.containsKey(field)) {
+      NBTCompound home = playerData.getCompound(field);
+      double x = home.getDouble("x").get();
+      double y = home.getDouble("y").get();
+      double z = home.getDouble("z").get();
+      Dimension dim = Dimension.get(home.getByte("Dimension").get());
+      float yaw = home.getFloat("yaw").get();
+      float pitch = home.getFloat("pitch").get();
+      return new Position(x, y, z, dim, yaw, pitch);
+    }
+    return null;
+  }
+
   public void setRealName(String realName) {
     NBTCompound playerData = get(realName.toLowerCase());
     String field = PlayerField.FULL_NAME.toString();
@@ -123,10 +144,39 @@ public class PlayerData {
     }
   }
 
+  public void setHome(String playerName, Position home) {
+    NBTCompound playerData = get(playerName.toLowerCase());
+    String field = PlayerField.HOME.toString();
+
+    if (playerData.containsKey(field)) {
+      playerData.remove(field);
+    }
+    NBTCompound tag = new NBTCompound(field);
+    tag.put(new NBTDouble("x", home.x));
+    tag.put(new NBTDouble("y", home.y));
+    tag.put(new NBTDouble("z", home.z));
+    tag.put(new NBTByte("Dimension", home.dimension.index()));
+    tag.put(new NBTFloat("yaw", home.yaw));
+    tag.put(new NBTFloat("pitch", home.pitch));
+    // TODO what is this used for?
+    // tag.put(new NBTArray(CAPS, capitals(name)));
+    playerData.put(tag);
+  }
+
+  public void removeHome(String playerName) {
+    NBTCompound playerData = get(playerName.toLowerCase());
+    String field = PlayerField.HOME.toString();
+
+    if (playerData.containsKey(field)) {
+      playerData.remove(field);
+    }
+  }
+
   public enum PlayerField {
     FULL_NAME, // String
     RENAME_NAME, // String
-    PW_HASH; // byte[]
+    PW_HASH, // byte[]
+    HOME; // Position
   }
 
 }

@@ -39,13 +39,11 @@ public class GlobalData implements Resource {
   private final static String BACKUP_PATH = BACKUP_FOLDER + File.separator + FILENAME;
 
   GZipNBTFile nbt;
-  public Homes homes;
   public Warp warp;
   public PlayerData players;
   public Chests chests;
 
   public GlobalData() {
-    homes = new Homes();
     warp = new Warp();
     players = new PlayerData();
     chests = new Chests();
@@ -88,7 +86,6 @@ public class GlobalData implements Resource {
       }
     }
 
-    homes.load(nbt.root());
     warp.load(nbt.root());
     players.load(nbt.root());
     chests.load(nbt.root());
