@@ -33,7 +33,7 @@ public class HomeCommand extends AbstractCommand implements PlayerCommand {
     String playerName = player.getName();
     String arguments[] = extractArguments(message);
     if (arguments.length == 0) {
-      Position home = player.getServer().data.players.getHome(playerName);
+      Position home = player.getServer().data.players.homes.get(playerName);
       if (home == null) {
         player.addTMessage(Color.RED, "You don't have a home to teleport to!");
         return;
@@ -47,20 +47,20 @@ public class HomeCommand extends AbstractCommand implements PlayerCommand {
     }
     String command = arguments[0];
     if (command.equals("set")) {
-      if (player.getServer().data.players.getHome(playerName) != null) {
+      if (player.getServer().data.players.homes.get(playerName) != null) {
         player.addTMessage(Color.RED, "You must delete your old home before saving a new one!");
         return;
       }
 
-      player.getServer().data.players.setHome(playerName, player.position);
+      player.getServer().data.players.homes.set(playerName, player.position);
       player.addTMessage(Color.GRAY, "Your home has been added.");
     } else if (command.equals("delete")) {
-      if (player.getServer().data.players.getHome(playerName) == null) {
+      if (player.getServer().data.players.homes.get(playerName) == null) {
         player.addTMessage(Color.GRAY, "You don't have a home to delete!");
         return;
       }
 
-      player.getServer().data.players.removeHome(playerName);
+      player.getServer().data.players.homes.remove(playerName);
       player.addTMessage(Color.GRAY, "Your home has been deleted.");
     } else {
       String home = commandPrefix() + "home";
