@@ -21,8 +21,10 @@
 package simpleserver.config.data;
 
 import simpleserver.Player;
+import simpleserver.nbt.NBT;
 import simpleserver.nbt.NBTArray;
 import simpleserver.nbt.NBTCompound;
+import simpleserver.nbt.NBTList;
 import simpleserver.nbt.NBTString;
 
 public class PlayerData {
@@ -55,6 +57,17 @@ public class PlayerData {
       node.put(player);
       return player;
     }
+  }
+
+  public NBTList<NBTCompound> getAll() {
+    NBTList<NBTCompound> list = new NBTList<NBTCompound>(NBT.COMPOUND);
+    for (String name : node.names()) {
+      NBTCompound compound = node.getCompound(name);
+      if (compound != null) {
+        list.add(compound);
+      }
+    }
+    return list;
   }
 
   public String getRealName(String playerName) {

@@ -20,9 +20,13 @@
  */
 package simpleserver.command;
 
+import java.util.List;
+
 import simpleserver.Color;
 import simpleserver.Player;
-import simpleserver.Position;
+import simpleserver.config.data.Homes;
+import simpleserver.config.data.Homes.HomePoint;
+import simpleserver.nbt.NBTString;
 
 public class HomeCommand extends AbstractCommand implements PlayerCommand {
   public HomeCommand() {
@@ -30,16 +34,17 @@ public class HomeCommand extends AbstractCommand implements PlayerCommand {
   }
 
   public void execute(Player player, String message) {
+    Homes homes = player.getServer().data.players.homes;
     String playerName = player.getName();
     String arguments[] = extractArguments(message);
     if (arguments.length == 0) {
-      Position home = player.getServer().data.players.homes.get(playerName);
+      HomePoint home = homes.get(playerName);
       if (home == null) {
         player.addTMessage(Color.RED, "You don't have a home to teleport to!");
         return;
       }
       try {
-        player.teleport(home);
+        player.teleport(home.position);
       } catch (Exception e) {
         player.addTMessage(Color.RED, "Teleporting failed.");
       }
@@ -47,28 +52,158 @@ public class HomeCommand extends AbstractCommand implements PlayerCommand {
     }
     String command = arguments[0];
     if (command.equals("set")) {
-      if (player.getServer().data.players.homes.get(playerName) != null) {
+      if (homes.get(playerName) != null) {
         player.addTMessage(Color.RED, "You must delete your old home before saving a new one!");
         return;
       }
 
-      player.getServer().data.players.homes.set(playerName, player.position);
+      homes.set(playerName, homes.makeHomePoint(player.position));
       player.getServer().data.save();
-      player.addTMessage(Color.GRAY, "Your home has been added.");
+      player.addTMessage(Color.GRAY, "Your home has been saved.");
     } else if (command.equals("delete")) {
-      if (player.getServer().data.players.homes.get(playerName) == null) {
+      if (homes.get(playerName) == null) {
         player.addTMessage(Color.GRAY, "You don't have a home to delete!");
         return;
       }
 
-      player.getServer().data.players.homes.remove(playerName);
+      homes.remove(playerName);
+      player.getServer().data.save();
       player.addTMessage(Color.GRAY, "Your home has been deleted.");
+    } else if (command.equals("public")) {
+      HomePoint home = homes.get(playerName);
+      if (home == null) {
+        player.addTMessage(Color.RED, "You don't have a home to manage!");
+        return;
+      }
+      if (home.isPublic == true) {
+        player.addTMessage(Color.GRAY, "Your home is already public!");
+        return;
+      }
+      home.isPublic = true;
+      homes.set(playerName, home);
+      player.getServer().data.save();
+      player.addTMessage(Color.GRAY, "Your home is now public!");
+    } else if (command.equals("private")) {
+      HomePoint home = homes.get(playerName);
+      if (home == null) {
+        player.addTMessage(Color.RED, "You don't have a home to manage!");
+        return;
+      }
+      if (home.isPublic == false) {
+        player.addTMessage(Color.GRAY, "Your home is already private!");
+        return;
+      }
+      home.isPublic = false;
+      homes.set(playerName, home);
+      player.getServer().data.save();
+      player.addTMessage(Color.GRAY, "Your home is now private!");
+    } else if (command.equals("ilist")) {
+      List<String> list = homes.getHomesPlayerInvitedTo(playerName);
+      if (list.isEmpty()) {
+        player.addTMessage(Color.GRAY, "Noone has invited you.");
+        return;
+      }
+      player.addTMessage(Color.GRAY, "You have been invited by %s.", join(list).trim());
+    } else if (command.equals("list")) {
+      HomePoint home = homes.get(playerName);
+      if (home == null) {
+        player.addTMessage(Color.RED, "You don't have a home to manage!");
+        return;
+      }
+      if (home.isPublic) {
+        player.addTMessage(Color.GRAY, "Your home is public; everyone can visit it.");
+        return;
+      }
+      List<String> list = home.getPlayersInvited();
+      if (list.isEmpty()) {
+        player.addTMessage(Color.GRAY, "Noone has been invited by you.");
+        return;
+      }
+      player.addTMessage(Color.GRAY, "You have invited %s.", join(list).trim());
+    } else if (command.equals("invite")) {
+      HomePoint home = homes.get(playerName);
+      if (home == null) {
+        player.addTMessage(Color.RED, "You don't have a home to manage!");
+        return;
+      }
+      if (arguments.length == 1) {
+        player.addTMessage(Color.RED, "Invalid argument!");
+        usage(player);
+        return;
+      }
+      String iPlayer = arguments[1];
+      if (!home.invites.contains(new NBTString(iPlayer))) {
+        home.invites.add(new NBTString(iPlayer));
+        player.addTMessage(Color.GRAY, "You just invited %s.", iPlayer);
+      } else {
+        player.addTMessage(Color.GRAY, "Player has already been invited.");
+      }
+    } else if (command.equals("uninvite")) {
+      HomePoint home = homes.get(playerName);
+      if (home == null) {
+        player.addTMessage(Color.RED, "You don't have a home to manage!");
+        return;
+      }
+      if (arguments.length == 1) {
+        player.addTMessage(Color.RED, "Invalid argument!");
+        usage(player);
+        return;
+      }
+      String uiPlayer = arguments[1];
+      if (home.invites.contains(new NBTString(uiPlayer))) {
+        home.invites.remove(new NBTString(uiPlayer));
+        player.addTMessage(Color.GRAY, "You just uninvited %s.", uiPlayer);
+      } else {
+        player.addTMessage(Color.GRAY, "Player wasn't invited.");
+      }
     } else {
-      String home = commandPrefix() + "home";
-      player.addTMessage(Color.GRAY, "Usage:");
-      player.addTMessage(Color.GRAY, "%s: teleport home", home);
-      player.addTMessage(Color.GRAY, "%s: set your home at your location", home + " set");
-      player.addTMessage(Color.GRAY, "%s: delete your home", home + " delete");
+      if (command == playerName) {
+        usage(player);
+        return;
+      }
+      HomePoint home = homes.get(command);
+      if (home == null) {
+        usage(player);
+        return;
+      }
+      if (home.isPublic || home.invites.contains(new NBTString(playerName))) {
+        try {
+          player.teleport(home.position);
+        } catch (Exception e) {
+          player.addTMessage(Color.RED, "Teleporting failed.");
+        }
+      } else {
+        player.addTMessage(Color.RED, "You are not allowed to visit %s's home.", command);
+      }
+    }
+  }
+
+  private void usage(Player player) {
+    String playerName = player.getName();
+    String home = commandPrefix() + "home";
+    HomePoint playerHome = player.getServer().data.players.homes.get(playerName);
+
+    player.addTMessage(Color.GRAY, "Usage:");
+    if (playerHome != null) {
+      player.addTMessage(Color.GRAY, "%s:%s teleport home", home, Color.WHITE);
+    }
+    player.addTMessage(Color.GRAY, "%s name:%s visit someone's home", home, Color.WHITE);
+    player.addTMessage(Color.GRAY, "%s:%s set your home at your location", home + " set", Color.WHITE);
+    if (playerHome != null) {
+      player.addTMessage(Color.GRAY, "%s:%s delete your home", home + " delete", Color.WHITE);
+      if (!playerHome.isPublic) {
+        player.addTMessage(Color.GRAY, "%s:%s make everyone able to visit your home", home + " public", Color.WHITE);
+      } else {
+        player.addTMessage(Color.GRAY, "%s:%s only allow invited players to visit", home + " private", Color.WHITE);
+      }
+    }
+    player.addTMessage(Color.GRAY, "%s:%s see homes you can visit", home + " ilist", Color.WHITE);
+    if (playerHome != null) {
+      player.addTMessage(Color.GRAY, "%s:%s see players who can visit your home", home + " list", Color.WHITE);
+      if (!playerHome.isPublic) {
+        player.addTMessage(Color.GRAY, "%s name:%s allow player to visit your home", home + " invite", Color.WHITE);
+        player.addTMessage(Color.GRAY, "%s name:%s disallow player to visit your home", home + " uninvite", Color.WHITE);
+      }
     }
   }
 }

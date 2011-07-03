@@ -20,8 +20,16 @@
  */
 package simpleserver.config.data;
 
+import java.util.LinkedList;
+import java.util.List;
+
+import simpleserver.Player;
 import simpleserver.Position;
+import simpleserver.nbt.NBT;
+import simpleserver.nbt.NBTByte;
 import simpleserver.nbt.NBTCompound;
+import simpleserver.nbt.NBTList;
+import simpleserver.nbt.NBTString;
 
 public class Homes {
   private final static String HOME = "home";
@@ -32,12 +40,26 @@ public class Homes {
     this.playerData = playerData;
   }
 
-  public Position get(String playerName) {
+  public HomePoint get(String playerName) {
     NBTCompound player = playerData.get(playerName);
     if (player.containsKey(HOME)) {
-      return new Position(player.getCompound(HOME));
+      return new HomePoint(player.getCompound(HOME));
     }
     return null;
+  }
+
+  public List<String> getHomesPlayerInvitedTo(String playerName) {
+    List<String> invitedTo = new LinkedList<String>();
+    NBTList<NBTCompound> allPlayers = playerData.getAll();
+    for (NBTCompound player : allPlayers.getValue()) {
+      if (player.containsKey(HOME)) {
+        HomePoint home = new HomePoint(player.getCompound(HOME));
+        if (home.invites.contains(new NBTString(playerName))) {
+          invitedTo.add(player.getName().get());
+        }
+      }
+    }
+    return invitedTo;
   }
 
   public void remove(String playerName) {
@@ -47,10 +69,60 @@ public class Homes {
     }
   }
 
-  public void set(String playerName, Position home) {
+  public void set(String playerName, HomePoint homePoint) {
     NBTCompound player = playerData.get(playerName);
-    NBTCompound tag = home.tag();
-    tag.rename(HOME);
-    player.put(tag);
+    player.put(homePoint.tag());
+  }
+
+  public HomePoint makeHomePoint(Position position) {
+    return new HomePoint(position);
+  }
+
+  public class HomePoint {
+    private final static String PUBLIC = "isPublic";
+    private final static String INVITES = "invites";
+
+    public Position position;
+    public boolean isPublic;
+    public NBTList<NBTString> invites;
+
+    public HomePoint(Position position) {
+      this.position = position;
+      isPublic = false;
+      invites = new NBTList<NBTString>(INVITES, NBT.STRING);
+    }
+
+    public HomePoint(Position position, boolean isPublic, NBTList<NBTString> invites) {
+      this.position = position;
+      this.isPublic = isPublic;
+      this.invites = invites;
+    }
+
+    public HomePoint(NBTCompound tag) {
+      position = new Position(tag);
+      isPublic = tag.getByte(PUBLIC).get().equals((byte) 0);
+      invites = tag.getList(INVITES).cast();
+    }
+
+    public List<String> getPlayersInvited() {
+      List<String> playersInvited = new LinkedList<String>();
+      for (NBTString invite : invites.getValue()) {
+        playersInvited.add(invite.get());
+      }
+      return playersInvited;
+    }
+
+    public boolean getPlayerInvited(Player player) {
+      return invites.contains(new NBTString(player.getName()));
+    }
+
+    public NBTCompound tag() {
+      NBTCompound tag = position.tag();
+      tag.rename(HOME);
+      NBTByte publicValue = new NBTByte(PUBLIC, isPublic ? (byte) 0 : (byte) 1);
+      tag.put(publicValue);
+      tag.put(invites);
+      return tag;
+    }
   }
 }

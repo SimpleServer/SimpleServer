@@ -75,7 +75,7 @@ public class NBTList<T extends NBTag> extends NBTag {
     return NBT.values()[tagId];
   }
 
-  @SuppressWarnings( { "unchecked", "hiding" })
+  @SuppressWarnings({ "unchecked", "hiding" })
   public <T extends NBTag> T cast() {
     return (T) this;
   }
@@ -92,6 +92,10 @@ public class NBTList<T extends NBTag> extends NBTag {
 
   public T get(int index) {
     return value.get(index);
+  }
+
+  public boolean remove(T obj) {
+    return value.remove(obj);
   }
 
   public NBTByte getByte(int index) {
@@ -133,6 +137,10 @@ public class NBTList<T extends NBTag> extends NBTag {
 
   public NBTCompound getCompound(int index) {
     return (NBTCompound) value.get(index);
+  }
+
+  public ArrayList<T> getValue() {
+    return value;
   }
 
   @SuppressWarnings("unchecked")

@@ -112,6 +112,13 @@ abstract class NBTag {
     return named == tag.named && tag.get().equals(get());
   }
 
+  public NBTString getName() {
+    if (named && name.get().length() > 0) {
+      return name;
+    }
+    return null;
+  }
+
   static NBTCompound load(DataInputStream in) throws Exception {
     NBTag root = NBT.loadTag(in, true);
     if (!(root instanceof NBTCompound)) {
