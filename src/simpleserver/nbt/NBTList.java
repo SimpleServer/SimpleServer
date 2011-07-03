@@ -86,6 +86,10 @@ public class NBTList<T extends NBTag> extends NBTag {
     }
   }
 
+  public boolean contains(T obj) {
+    return value.contains(obj);
+  }
+
   public T get(int index) {
     return value.get(index);
   }
