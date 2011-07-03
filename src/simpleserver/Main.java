@@ -28,9 +28,9 @@ import java.io.InputStreamReader;
 public class Main {
   private static final String license = "SimpleServer -- Copyright (C) 2011 SimpleServer authors (see CONTRIBUTORS)";
   private static final String warranty = "This program is licensed under The MIT License.\nSee file LICENSE for details.";
-  private static final String baseVersion = "8.2";
+  private static final String baseVersion = "8.2.1";
   private static final boolean release = false;
-  private static final String releaseState = "beta";
+  private static final String releaseState = "stable";
   private static final String version;
 
   static {
