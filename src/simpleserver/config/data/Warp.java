@@ -25,12 +25,8 @@ import java.util.List;
 import java.util.Set;
 
 import simpleserver.Position;
-import simpleserver.Coordinate.Dimension;
 import simpleserver.nbt.NBTArray;
-import simpleserver.nbt.NBTByte;
 import simpleserver.nbt.NBTCompound;
-import simpleserver.nbt.NBTDouble;
-import simpleserver.nbt.NBTFloat;
 
 public class Warp {
   private NBTCompound node;
@@ -76,26 +72,14 @@ public class Warp {
     if (!node.containsKey(name)) {
       return null;
     }
-    NBTCompound p = node.getCompound(name);
-    double x = p.getDouble("x").get();
-    double y = p.getDouble("y").get();
-    double z = p.getDouble("z").get();
-    Dimension dim = Dimension.get(p.getByte("Dimension").get());
-    float yaw = p.getFloat("yaw").get();
-    float pitch = p.getFloat("pitch").get();
-    return new Position(x, y, z, dim, yaw, pitch);
+    return new Position(node.getCompound(name));
   }
 
   public void set(String name, Position pos) {
-    NBTCompound p = new NBTCompound(name.toLowerCase());
-    p.put(new NBTDouble("x", pos.x));
-    p.put(new NBTDouble("y", pos.y));
-    p.put(new NBTDouble("z", pos.z));
-    p.put(new NBTByte("Dimension", pos.dimension.index()));
-    p.put(new NBTFloat("yaw", pos.yaw));
-    p.put(new NBTFloat("pitch", pos.pitch));
-    p.put(new NBTArray(CAPS, capitals(name)));
-    node.put(p);
+    NBTCompound tag = pos.tag();
+    tag.rename(name.toLowerCase());
+    tag.put(new NBTArray(CAPS, capitals(name)));
+    node.put(tag);
   }
 
   public void remove(String name) {

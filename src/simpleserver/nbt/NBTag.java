@@ -49,6 +49,10 @@ abstract class NBTag {
 
   abstract Object get();
 
+  public void rename(String name) {
+    this.name.set(name);
+  }
+
   void save(DataOutputStream out) throws IOException {
     save(out, true);
   }
