@@ -24,8 +24,20 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 import simpleserver.Coordinate.Dimension;
+import simpleserver.nbt.NBTByte;
+import simpleserver.nbt.NBTCompound;
+import simpleserver.nbt.NBTDouble;
+import simpleserver.nbt.NBTFloat;
 
 public class Position {
+  private final static String DIMENSION = "dimension";
+  private final static String X = "x";
+  private final static String Y = "y";
+  private final static String Z = "z";
+  private final static String YAW = "yaw";
+  private final static String PITCH = "pitch";
+  private static final String POSITION = "position";
+
   public double x;
   public double y;
   public double z;
@@ -56,6 +68,30 @@ public class Position {
 
   public Position(Coordinate coordinate) {
     this(coordinate.x(), coordinate.y(), coordinate.z(), coordinate.dimension());
+  }
+
+  public Position(NBTCompound tag) {
+    x = tag.getDouble(X).get();
+    y = tag.getDouble(Y).get();
+    z = tag.getDouble(Z).get();
+    if (tag.containsKey("Dimension")) {
+      tag.rename("Dimension", DIMENSION);
+    }
+    dimension = Dimension.get(tag.getByte(DIMENSION).get());
+    yaw = tag.getFloat(YAW).get();
+    pitch = tag.getFloat(PITCH).get();
+    onGround = true;
+  }
+
+  public NBTCompound tag() {
+    NBTCompound tag = new NBTCompound(POSITION);
+    tag.put(new NBTDouble(X, x));
+    tag.put(new NBTDouble(Y, y));
+    tag.put(new NBTDouble(Z, z));
+    tag.put(new NBTByte(DIMENSION, dimension.index()));
+    tag.put(new NBTFloat(YAW, yaw));
+    tag.put(new NBTFloat(PITCH, pitch));
+    return tag;
   }
 
   public void updatePosition(double x, double y, double z, double stance) {
