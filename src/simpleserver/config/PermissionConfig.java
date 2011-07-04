@@ -455,6 +455,10 @@ public class PermissionConfig extends AbstractConfig {
     String globalpermission = config.getString(pathpart + "allow", "");
     if (!globalpermission.equals("")) {
       allowed = includesPlayer(globalpermission, player);
+      String globalrestriction = config.getString(pathpart + "disallow", "");
+      if (!globalrestriction.equals("")) {
+        allowed = !includesPlayer(globalrestriction, player);
+      }
     }
 
     // get all parent areas and check them incrementally
