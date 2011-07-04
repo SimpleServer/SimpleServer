@@ -91,6 +91,7 @@ public class Player {
   public Coordinate areaend;
 
   private boolean underCooldown = false;
+  private Cooldown cooldown;
 
   public Player(Socket inc, Server parent) {
     connected = System.currentTimeMillis();
@@ -724,20 +725,31 @@ public class Player {
 
   public void teleport(Position position) {
     if (underCooldown) {
-      // TODO Try to find a way to display time left in cooldown.
-      addTMessage(Color.GRAY, "You are under cooldown; you cannot teleport yet.");
-      return;
-    }
-    int warmup = getGroup().getWarmupMillis();
-    if (warmup > 0) {
-      Timer timer = new Timer();
-      timer.schedule(new Warmup(this, position), warmup);
-      addTMessage(Color.GRAY, "You will be teleported in %s seconds.", warmup / 1000);
+      if (cooldown != null) {
+        int millisLeft = (int) (cooldown.scheduledExecutionTime() - System.currentTimeMillis());
+        addTMessage(Color.GRAY, "You need to wait %d seconds until you can teleport again.", millisLeft / 1000);
+      } else {
+        addTMessage(Color.GRAY, "You cannot teleport yet.");
+      }
     } else {
-      try {
-        server.bots.connect(new Teleporter(this, position));
-      } catch (Exception e) {
-        addTMessage(Color.RED, "Teleporting failed.");
+      int warmup = getGroup().getWarmupMillis();
+      if (warmup > 0) {
+        Timer timer = new Timer();
+        timer.schedule(new Warmup(this, position), warmup);
+        addTMessage(Color.GRAY, "You will be teleported in %s seconds.", warmup / 1000);
+      } else {
+        try {
+          server.bots.connect(new Teleporter(this, position));
+        } catch (Exception e) {
+          addTMessage(Color.RED, "Teleporting failed.");
+        }
+
+        int cooldownLenght = getGroup().getCooldownMillis();
+        if (cooldownLenght > 0) {
+          Timer timer = new Timer();
+          cooldown = new Cooldown();
+          timer.schedule(cooldown, cooldownLenght);
+        }
       }
     }
   }
@@ -764,13 +776,16 @@ public class Player {
     public void run() {
       try {
         server.bots.connect(new Teleporter(player, position));
-        int cooldown = getGroup().getCooldownMillis();
-        if (cooldown > 0) {
+        int cooldownLenght = getGroup().getCooldownMillis();
+        if (cooldownLenght > 0) {
           Timer timer = new Timer();
-          timer.schedule(new Cooldown(), cooldown);
+          cooldown = new Cooldown();
+          timer.schedule(cooldown, cooldownLenght);
+        } else {
+          underCooldown = false;
         }
       } catch (Exception e) {
-        player.addTMessage(Color.RED, "Teleporting failed.");
+        addTMessage(Color.RED, "Teleporting failed.");
         return;
       }
     }

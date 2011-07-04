@@ -194,11 +194,7 @@ public class HomeCommand extends AbstractCommand implements PlayerCommand {
       player.addTMessage(Color.RED, "You don't have a home to teleport to!");
       return;
     }
-    try {
-      player.teleport(home.position);
-    } catch (Exception e) {
-      player.addTMessage(Color.RED, "Teleporting failed.");
-    }
+    player.teleport(home.position);
   }
 
   private void usage(Player player) {
