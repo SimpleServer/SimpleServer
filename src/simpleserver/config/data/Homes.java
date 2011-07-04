@@ -104,6 +104,15 @@ public class Homes {
       invites = tag.getList(INVITES).cast();
     }
 
+    public String getInvitedPlayer(String prefix) {
+      for (String playerName : getPlayersInvited()) {
+        if (playerName.startsWith(prefix)) {
+          return playerName;
+        }
+      }
+      return prefix;
+    }
+
     public List<String> getPlayersInvited() {
       List<String> playersInvited = new LinkedList<String>();
       for (NBTString invite : invites.getValue()) {

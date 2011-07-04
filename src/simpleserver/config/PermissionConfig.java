@@ -164,6 +164,8 @@ public class PermissionConfig extends AbstractConfig {
     String isadmin = config.getString(pathpart + "ignoreChestlocks", "");
     String color = config.getString(pathpart + "color", "");
     String forwardsCommands = config.getString(pathpart + "forwardUnknownCommands", "");
+    String warmup = config.getString(pathpart + "warmup", "");
+    String cooldown = config.getString(pathpart + "cooldown", "");
 
     /* set defaults for missing attributes */
     if (name.equals("")) {
@@ -181,8 +183,15 @@ public class PermissionConfig extends AbstractConfig {
     if (forwardsCommands.equals("")) {
       forwardsCommands = "true";
     }
+    if (warmup.equals("")) {
+      warmup = "0";
+    }
+    if (cooldown.equals("")) {
+      cooldown = "0";
+    }
 
-    return new Group(name, Boolean.valueOf(showtitle), Boolean.valueOf(isadmin), color, Boolean.valueOf(forwardsCommands));
+    return new Group(name, Boolean.valueOf(showtitle), Boolean.valueOf(isadmin), color, Boolean.valueOf(forwardsCommands),
+                     Integer.valueOf(warmup), Integer.valueOf(cooldown));
   }
 
   private int getIPGroup(String ipAddress) {

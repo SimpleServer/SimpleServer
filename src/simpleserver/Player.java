@@ -28,6 +28,8 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.Queue;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import simpleserver.Coordinate.Dimension;
@@ -66,8 +68,8 @@ public class Player {
   private int entityId = 0;
   private Group groupObject = null;
   private boolean isRobot = false;
-  private boolean guest = false; // player is not authenticated with
-                                 // minecraft.net
+  // player is not authenticated with minecraft.net:
+  private boolean guest = false;
   private boolean usedAuthenticator = false;
   private boolean localChat = false;
   private int blocksPlaced = 0;
@@ -84,9 +86,11 @@ public class Player {
 
   private String nextChestName;
 
-  // temporary coordinate storage for !myarea command
+  // temporary coordinate storage for /myarea command
   public Coordinate areastart;
   public Coordinate areaend;
+
+  private boolean underCooldown = false;
 
   public Player(Socket inc, Server parent) {
     connected = System.currentTimeMillis();
@@ -714,11 +718,74 @@ public class Player {
     return dimension;
   }
 
-  public void teleport(Coordinate coordinate) throws IOException, ConnectException {
-    server.bots.connect(new Teleporter(this, coordinate));
+  public void teleport(Coordinate coordinate) {
+    teleport(new Position(coordinate));
   }
 
-  public void teleport(Position position) throws IOException, ConnectException {
-    server.bots.connect(new Teleporter(this, position));
+  public void teleport(Position position) {
+    if (underCooldown) {
+      // TODO Try to find a way to display time left in cooldown.
+      addTMessage(Color.GRAY, "You are under cooldown; you cannot teleport yet.");
+      return;
+    }
+    int warmup = getGroup().getWarmupMillis();
+    if (warmup > 0) {
+      Timer timer = new Timer();
+      timer.schedule(new Warmup(this, position), warmup);
+      addTMessage(Color.GRAY, "You will be teleported in %s seconds.", warmup / 1000);
+    } else {
+      try {
+        server.bots.connect(new Teleporter(this, position));
+      } catch (Exception e) {
+        addTMessage(Color.RED, "Teleporting failed.");
+      }
+    }
+  }
+
+  private final class Warmup extends TimerTask {
+    private final Player player;
+    private final Position position;
+
+    private Warmup(Player player, Position position) {
+      super();
+      underCooldown = true;
+      this.player = player;
+      this.position = position;
+    }
+
+    private Warmup(Player player, Coordinate coordinate) {
+      super();
+      underCooldown = true;
+      this.player = player;
+      position = new Position(coordinate);
+    }
+
+    @Override
+    public void run() {
+      try {
+        server.bots.connect(new Teleporter(player, position));
+        int cooldown = getGroup().getCooldownMillis();
+        if (cooldown > 0) {
+          Timer timer = new Timer();
+          timer.schedule(new Cooldown(), cooldown);
+        }
+      } catch (Exception e) {
+        player.addTMessage(Color.RED, "Teleporting failed.");
+        return;
+      }
+    }
+  }
+
+  private final class Cooldown extends TimerTask {
+    private Cooldown() {
+      super();
+      underCooldown = true;
+    }
+
+    @Override
+    public void run() {
+      underCooldown = false;
+      addTMessage(Color.GRAY, "You can now teleport again.");
+    }
   }
 }

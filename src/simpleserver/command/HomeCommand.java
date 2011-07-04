@@ -125,9 +125,16 @@ public class HomeCommand extends AbstractCommand implements PlayerCommand {
         return;
       }
       String iPlayer = arguments[1];
+      Player onlineTarget = player.getServer().findPlayer(iPlayer);
+      if (onlineTarget != null) {
+        iPlayer = onlineTarget.getName();
+      }
       if (!home.invites.contains(new NBTString(iPlayer))) {
         home.invites.add(new NBTString(iPlayer));
         player.addTMessage(Color.GRAY, "You just invited %s.", iPlayer);
+        if (onlineTarget != null) {
+          onlineTarget.addTMessage(Color.GRAY, "You were just invited to visit %s's home.", getName());
+        }
       } else {
         player.addTMessage(Color.GRAY, "Player has already been invited.");
       }
@@ -142,7 +149,7 @@ public class HomeCommand extends AbstractCommand implements PlayerCommand {
         usage(player);
         return;
       }
-      String uiPlayer = arguments[1];
+      String uiPlayer = home.getInvitedPlayer(arguments[1]);
       if (home.invites.contains(new NBTString(uiPlayer))) {
         home.invites.remove(new NBTString(uiPlayer));
         player.addTMessage(Color.GRAY, "You just uninvited %s.", uiPlayer);
@@ -154,17 +161,27 @@ public class HomeCommand extends AbstractCommand implements PlayerCommand {
         teleportHome(player);
         return;
       }
-      HomePoint home = homes.get(command);
+      String target = command;
+      String onlinePlayer = player.getServer().findName(target);
+      if (onlinePlayer != null) {
+        target = onlinePlayer;
+      } else {
+        List<String> list = homes.getHomesPlayerInvitedTo(playerName);
+        for (String p : list) {
+          if (p.startsWith(target)) {
+            target = p;
+            break;
+          }
+        }
+      }
+      HomePoint home = homes.get(target);
       if (home == null) {
         usage(player);
         return;
       }
-      if (home.isPublic || home.invites.contains(new NBTString(playerName))) {
-        try {
-          player.teleport(home.position);
-        } catch (Exception e) {
-          player.addTMessage(Color.RED, "Teleporting failed.");
-        }
+      if ((home.isPublic && player.getServer().findPlayer(target) != null) ||
+          home.invites.contains(new NBTString(playerName))) {
+        player.teleport(home.position);
       } else {
         player.addTMessage(Color.RED, "You are not allowed to visit %s's home.", command);
       }
