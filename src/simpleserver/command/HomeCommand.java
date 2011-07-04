@@ -30,7 +30,7 @@ import simpleserver.nbt.NBTString;
 
 public class HomeCommand extends AbstractCommand implements PlayerCommand {
   public HomeCommand() {
-    super("home [set|delete]", "Teleport to and manage your home");
+    super("home [help|set|delete|public|private|ilist|list|invite|uninvite] [name]", "Teleport to and manage your home");
   }
 
   public void execute(Player player, String message) {
@@ -38,20 +38,13 @@ public class HomeCommand extends AbstractCommand implements PlayerCommand {
     String playerName = player.getName();
     String arguments[] = extractArguments(message);
     if (arguments.length == 0) {
-      HomePoint home = homes.get(playerName);
-      if (home == null) {
-        player.addTMessage(Color.RED, "You don't have a home to teleport to!");
-        return;
-      }
-      try {
-        player.teleport(home.position);
-      } catch (Exception e) {
-        player.addTMessage(Color.RED, "Teleporting failed.");
-      }
+      teleportHome(player);
       return;
     }
     String command = arguments[0];
-    if (command.equals("set")) {
+    if (command.equals("help")) {
+      usage(player);
+    } else if (command.equals("set")) {
       if (homes.get(playerName) != null) {
         player.addTMessage(Color.RED, "You must delete your old home before saving a new one!");
         return;
@@ -116,7 +109,7 @@ public class HomeCommand extends AbstractCommand implements PlayerCommand {
       }
       List<String> list = home.getPlayersInvited();
       if (list.isEmpty()) {
-        player.addTMessage(Color.GRAY, "Noone has been invited by you.");
+        player.addTMessage(Color.GRAY, "You haven't invited anyone.");
         return;
       }
       player.addTMessage(Color.GRAY, "You have invited %s.", join(list).trim());
@@ -158,7 +151,7 @@ public class HomeCommand extends AbstractCommand implements PlayerCommand {
       }
     } else {
       if (command == playerName) {
-        usage(player);
+        teleportHome(player);
         return;
       }
       HomePoint home = homes.get(command);
@@ -175,6 +168,19 @@ public class HomeCommand extends AbstractCommand implements PlayerCommand {
       } else {
         player.addTMessage(Color.RED, "You are not allowed to visit %s's home.", command);
       }
+    }
+  }
+
+  private void teleportHome(Player player) {
+    HomePoint home = player.getServer().data.players.homes.get(player.getName());
+    if (home == null) {
+      player.addTMessage(Color.RED, "You don't have a home to teleport to!");
+      return;
+    }
+    try {
+      player.teleport(home.position);
+    } catch (Exception e) {
+      player.addTMessage(Color.RED, "Teleporting failed.");
     }
   }
 
