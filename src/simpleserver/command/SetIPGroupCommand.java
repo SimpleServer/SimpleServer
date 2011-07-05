@@ -26,7 +26,7 @@ import simpleserver.Color;
 import simpleserver.Player;
 import simpleserver.Server;
 
-public class SetIPGroupCommand extends SetGroupCommand {
+public class SetIPGroupCommand extends SetGroupCommand implements ServerCommand {
   public SetIPGroupCommand() {
     super("setipgroup IP|Player",
           "Set the group ID of an IP address");
@@ -47,5 +47,18 @@ public class SetIPGroupCommand extends SetGroupCommand {
     player.addTMessage(Color.GRAY, "Group of %s was set to %s!", target, group);
     server.adminLog("User " + player.getName() + " set IP's group:\t "
         + target + "\t(" + group + ")");
+  }
+
+  @Override
+  protected void setGroup(Server server, int group, String target) {
+    Player targetPlayer = server.findPlayer(target);
+    if (targetPlayer != null) {
+      target = targetPlayer.getIPAddress();
+    } else if (!Pattern.matches("^(\\d{1,3}\\.){3}\\d{1,3}$", target)) {
+      System.out.println("[SimpleServer] You must specify a user or a valid IP!");
+      return;
+    }
+    server.permissions.setIPGroup(target, group);
+    System.out.println("[SimpleServer] Group of " + target + " was set to " + group + "!");
   }
 }
