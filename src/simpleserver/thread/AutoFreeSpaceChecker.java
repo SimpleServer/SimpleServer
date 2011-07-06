@@ -47,9 +47,17 @@ public class AutoFreeSpaceChecker {
 
   public void check(boolean beforeBackup) {
     try {
-      long neededSizeKb;
+      long neededSizeKb = 0;
       if (beforeBackup) {
-        neededSizeKb = Math.round(FileUtils.sizeOfDirectory(new File(server.options.get("levelName"))) / 1024) * 2;
+        neededSizeKb += Math.round(FileUtils.sizeOfDirectory(new File(server.options.get("levelName"))) / 1024) * 2;
+        File world_nether = new File(server.options.get("levelName") + "_nether");
+        if (world_nether.exists()) {
+          neededSizeKb += Math.round(FileUtils.sizeOfDirectory(world_nether) / 1024) * 2;
+        }
+        File plugins = new File("plugins");
+        if (plugins.exists()) {
+          neededSizeKb += Math.round(FileUtils.sizeOfDirectory(plugins) / 1024) * 2;
+        }
       } else {
         neededSizeKb = 50 * 1024;
       }
@@ -75,7 +83,11 @@ public class AutoFreeSpaceChecker {
           }
         }
 
-        System.out.println("[SimpleServer] Deleted " + filesDeleted + " backup archives.");
+        if (filesDeleted > 1) {
+          System.out.println("[SimpleServer] Deleted " + filesDeleted + " backup archives.");
+        } else {
+          System.out.println("[SimpleServer] Deleted 1 backup archive.");
+        }
       }
     } catch (IOException e) {
       System.out.println("[SimpleServer] " + e);
