@@ -404,14 +404,28 @@ public class PermissionConfig extends AbstractConfig {
     attrs.add("allowTake");
 
     String pathpart = "/permissions/blocks/block[@id='" + String.valueOf(bID) + "']/@";
+    String xpath = getAreanodeForCoordinate(blockCoord);
+    String[] areas = getAllAreasFromAreaXPath(xpath);
 
-    // get global permissions
+    // get global permissions for all blocks
     for (int i = 0; i < attrs.size(); i++) {
       String permstr = config.getString("/permissions/blocks/@" + attrs.get(i), "");
       if (permstr.equals("")) {
         perms[i] = true;
       } else {
         perms[i] = includesPlayer(permstr, player);
+      }
+    }
+
+    // get areawide permissions for all blocks
+    for (String area : areas) {
+      String areapath = "//area[@name='" + area + "']";
+
+      for (int n = 0; n < attrs.size(); n++) {
+        String permstr = config.getString(areapath + "/permissions/blocks/@" + attrs.get(n), "");
+        if (!permstr.equals("")) {
+          perms[n] = includesPlayer(permstr, player);
+        }
       }
     }
 
@@ -425,21 +439,10 @@ public class PermissionConfig extends AbstractConfig {
       perms[0] = !includesPlayer(place_disallow, player);
     }
 
-    String xpath = getAreanodeForCoordinate(blockCoord);
-    String[] areas = getAllAreasFromAreaXPath(xpath);
-
+    // single block tag overrides the areawide allowPlace
     for (String area : areas) {
       String areapath = "//area[@name='" + area + "']";
 
-      // get area wide permissions
-      for (int n = 0; n < attrs.size(); n++) {
-        String permstr = config.getString(areapath + "/permissions/blocks/@" + attrs.get(n), "");
-        if (!permstr.equals("")) {
-          perms[n] = includesPlayer(permstr, player);
-        }
-      }
-
-      // single block tag overrides the areawide allowPlace
       place_allow = config.getString(areapath + pathpart + "allow", "");
       if (!place_allow.equals("")) {
         perms[0] = includesPlayer(place_allow, player);
