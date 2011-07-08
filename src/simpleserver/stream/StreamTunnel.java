@@ -206,6 +206,11 @@ public class StreamTunnel {
           }
         }
 
+        if (player.isGuest() && !server.authenticator.allowGuestJoin()) {
+          player.kick(t("Failed to login: User not authenticated"));
+          nameSet = false;
+        }
+
         if (isServerTunnel || nameSet) {
           tunneler.setName(streamType + "-" + player.getName());
           write(packetId);

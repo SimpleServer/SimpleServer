@@ -550,7 +550,11 @@ public class Player {
           server.authenticator.rememberAuthentication(name, getIPAddress());
         }
       } else if (guest) {
-        server.authenticator.rememberGuest(name, getIPAddress());
+        if (isKicked) {
+          server.authenticator.releaseGuestName(name);
+        } else {
+          server.authenticator.rememberGuest(name, getIPAddress());
+        }
       }
 
       server.data.players.stats.add(this, StatField.PLAY_TIME, (int) (System.currentTimeMillis() - connected) / 1000 / 60);

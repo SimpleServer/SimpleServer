@@ -99,6 +99,10 @@ public class Authenticator {
     return useCustAuth() && !player.isGuest() && !player.usedAuthenticator();
   }
 
+  public boolean allowGuestJoin() {
+    return server.options.getBoolean("custAuth");
+  }
+
   public boolean allowLogin() {
     return server.options.getBoolean("custAuth");
   }
