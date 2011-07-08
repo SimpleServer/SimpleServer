@@ -66,6 +66,6 @@ public class NBTByte extends NBTag {
 
   @Override
   protected String valueToString(int level) {
-    return String.format("0x%02x", get());
+    return String.format("0x%1$02x (%1$d)", get());
   }
 }

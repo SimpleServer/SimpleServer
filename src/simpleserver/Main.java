@@ -75,6 +75,12 @@ public class Main {
           return;
         }
       }
+      if (args[0].toLowerCase().equals("nbt")) {
+        String[] copy = new String[args.length - 1];
+        System.arraycopy(args, 1, copy, 0, args.length - 1);
+        simpleserver.nbt.Main.main(copy);
+        return;
+      }
     }
 
     System.out.println(license);
