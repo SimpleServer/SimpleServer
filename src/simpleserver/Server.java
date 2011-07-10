@@ -60,6 +60,7 @@ import simpleserver.thread.AutoRestart;
 import simpleserver.thread.AutoRun;
 import simpleserver.thread.AutoSave;
 import simpleserver.thread.RequestTracker;
+import simpleserver.thread.ServerRollback;
 import simpleserver.thread.SystemInputQueue;
 
 public class Server {
@@ -106,6 +107,7 @@ public class Server {
   private AutoSave autosave;
   private AutoRestart autoRestart;
   public RequestTracker requestTracker;
+  public ServerRollback rollback;
 
   public long mapSeed;
 
@@ -431,6 +433,7 @@ public class Server {
     autoBackup = new AutoBackup(this);
     autosave = new AutoSave(this);
     autoRestart = new AutoRestart(this);
+    rollback = new ServerRollback(this);
     c10t = new AutoRun(this, options.get("c10tArgs"));
     if (options.contains("freezeTime")) {
       try {
@@ -547,6 +550,7 @@ public class Server {
         }
 
         shutdown();
+        rollback.replace();
       }
 
       cleanup();
@@ -633,5 +637,4 @@ public class Server {
       return canCycle;
     }
   }
-
 }

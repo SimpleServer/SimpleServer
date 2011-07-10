@@ -58,6 +58,7 @@
       <command name="reload" allow="4,5" forward="true" />
       <command name="reply" aliases="r" allow="1+" />
       <command name="restart" allow="4,5" />
+      <command name="rollback" allow="-" />
       <command name="rules" allow="0+" />
       <command name="save" allow="4,5" forward="true" />
       <command name="servertime" allow="0+" />
