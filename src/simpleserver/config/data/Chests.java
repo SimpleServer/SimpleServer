@@ -97,7 +97,7 @@ public class Chests {
       simpleserver.config.LegacyChestList.Chest chest = old.locations.get(coord);
       if (chest.isOpen()) {
         locations.put(coord, new Chest(coord));
-      } else if (!chest.name().equals("Locked chest")) {
+      } else if (chest.name().equals("Locked chest") || chest.name().length() == 0) {
         locations.put(coord, new Chest(chest.owner(), coord));
       } else {
         locations.put(coord, new Chest(chest.owner(), coord, chest.name()));
