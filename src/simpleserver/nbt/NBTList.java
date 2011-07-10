@@ -71,7 +71,7 @@ public class NBTList<T extends NBTag> extends NBTag {
     value.clear();
   }
 
-  public NBT type() {
+  public NBT listType() {
     return NBT.values()[tagId];
   }
 

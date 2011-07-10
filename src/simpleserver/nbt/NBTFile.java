@@ -67,25 +67,4 @@ public class NBTFile {
   public String toString() {
     return root.toString();
   }
-
-  public static void main(String[] args) {
-    try {
-      if (args.length >= 2 && args[0].equals("raw")) {
-        System.out.println(new NBTFile(args[1]));
-      } else if (args.length >= 1) {
-
-        System.out.println(new GZipNBTFile(args[0]));
-
-      } else {
-        System.out.println("Usage: java -jar NBT.jar [raw] <file>");
-      }
-    } catch (FileNotFoundException e) {
-      System.out.println("Error: No such file or dictionary");
-    } catch (IOException e) {
-      System.out.println("Error: File is not in GZIP format");
-    } catch (Exception e) {
-      System.out.println("Error: " + e.getMessage());
-    }
-  }
-
 }

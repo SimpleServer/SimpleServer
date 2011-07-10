@@ -47,6 +47,10 @@ abstract class NBTag {
 
   protected abstract byte id();
 
+  public NBT type() {
+    return NBT.values()[id()];
+  }
+
   abstract Object get();
 
   public void rename(String name) {

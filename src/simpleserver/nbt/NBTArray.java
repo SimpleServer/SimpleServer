@@ -77,10 +77,7 @@ public class NBTArray extends NBTag {
   protected String valueToString(int level) {
     StringBuilder string = new StringBuilder();
     for (byte b : value) {
-      if ((b & 0xf0) == 0) {
-        string.append("0");
-      }
-      string.append(Integer.toHexString(b));
+      string.append(String.format("%02x", b));
       string.append(" ");
     }
     if (string.length() > 0) {

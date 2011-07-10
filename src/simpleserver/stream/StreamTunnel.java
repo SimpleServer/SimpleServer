@@ -37,13 +37,13 @@ import java.util.IllegalFormatException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import simpleserver.Authenticator.AuthRequest;
 import simpleserver.Color;
 import simpleserver.Coordinate;
-import simpleserver.Coordinate.Dimension;
 import simpleserver.Group;
 import simpleserver.Player;
 import simpleserver.Server;
+import simpleserver.Authenticator.AuthRequest;
+import simpleserver.Coordinate.Dimension;
 import simpleserver.command.LocalSayCommand;
 import simpleserver.command.PlayerListCommand;
 import simpleserver.config.data.Chests.Chest;
@@ -204,6 +204,11 @@ public class StreamTunnel {
               player.updateRealName(name);
             }
           }
+        }
+
+        if (player.isGuest() && !server.authenticator.allowGuestJoin()) {
+          player.kick(t("Failed to login: User not authenticated"));
+          nameSet = false;
         }
 
         if (isServerTunnel || nameSet) {
@@ -836,6 +841,11 @@ public class StreamTunnel {
         byte length = in.readByte();
         write(length);
         copyNBytes(0xff & length);
+        break;
+      case (byte) 0xc3: // BukkitContrib
+        write(packetId);
+        write(in.readInt());
+        copyNBytes(write(in.readInt()));
         break;
       case (byte) 0xc8: // Statistic
         write(packetId);
