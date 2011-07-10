@@ -49,11 +49,15 @@ public class RollbackCommand extends AbstractCommand implements PlayerCommand,
     HashMap<String, String> backups = getTenLatest();
 
     if (arguments.length == 0) {
-      player.addTMessage(Color.GRAY, "Latest backups:");
-      for (int x = 1; x <= 10; x++) {
-        String shortCode = backups.get(Integer.valueOf(x).toString());
-        if (shortCode != null) {
-          player.addMessage(Color.GRAY, "#" + x + ": " + shortCode);
+      if (backups.values().isEmpty()) {
+        player.addTMessage(Color.GRAY, "There are no backups!");
+      } else {
+        player.addTMessage(Color.GRAY, "Latest backups:");
+        for (int x = 1; x <= 10; x++) {
+          String shortCode = backups.get(Integer.valueOf(x).toString());
+          if (shortCode != null) {
+            player.addMessage(Color.GRAY, "#" + x + ": " + shortCode);
+          }
         }
       }
       return;
@@ -117,11 +121,15 @@ public class RollbackCommand extends AbstractCommand implements PlayerCommand,
     HashMap<String, String> backups = getTenLatest();
 
     if (arguments.length == 0) {
-      System.out.println("[SimpleServer] Latest backups:");
-      for (int x = 1; x <= 10; x++) {
-        String shortCode = backups.get(Integer.valueOf(x).toString());
-        if (shortCode != null) {
-          System.out.println("[SimpleServer] #" + x + ": " + shortCode);
+      if (backups.values().isEmpty()) {
+        System.out.println("[SimpleServer] There are no backups!");
+      } else {
+        System.out.println("[SimpleServer] Latest backups:");
+        for (int x = 1; x <= 10; x++) {
+          String shortCode = backups.get(Integer.valueOf(x).toString());
+          if (shortCode != null) {
+            System.out.println("[SimpleServer] #" + x + ": " + shortCode);
+          }
         }
       }
       return;
