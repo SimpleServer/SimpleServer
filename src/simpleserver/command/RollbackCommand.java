@@ -34,29 +34,43 @@ import simpleserver.Player;
 import simpleserver.Server;
 import simpleserver.thread.AutoBackup;
 
-public class RollbackCommand extends AbstractCommand implements PlayerCommand,
-    ServerCommand {
+public abstract class RollbackCommand extends AbstractCommand {
   private static final File BACKUP_DIRECTORY = new File("backups");
   private static final String BACKUP_FORMAT = BACKUP_DIRECTORY + File.separator + "%s.zip";
+
+  private Player player;
+  private Server server;
 
   public RollbackCommand() {
     super("rollback [help|latest|#|name] [quick]", "Restore the server to a backup file");
   }
 
-  public void execute(Player player, String message) {
-    Server server = player.getServer();
-    String arguments[] = extractArguments(message);
+  public void execute(String[] arguments, Player executor) {
+    player = executor;
+    execute(arguments);
+  }
+
+  public void execute(String[] arguments, Server executor) {
+    server = executor;
+    execute(arguments);
+  }
+
+  private void execute(String[] arguments) {
     HashMap<String, String> backups = getTenLatest();
+    Server target = server;
+    if (player != null) {
+      target = player.getServer();
+    }
 
     if (arguments.length == 0) {
       if (backups.values().isEmpty()) {
-        player.addTMessage(Color.GRAY, "There are no backups!");
+        tInfo("There are no backups!");
       } else {
-        player.addTMessage(Color.GRAY, "Latest backups:");
+        tInfo("Latest backups:");
         for (int x = 1; x <= 10; x++) {
           String shortCode = backups.get(Integer.valueOf(x).toString());
           if (shortCode != null) {
-            player.addMessage(Color.GRAY, "#" + x + ": " + shortCode);
+            info("#" + x + ": " + shortCode);
           }
         }
       }
@@ -71,85 +85,40 @@ public class RollbackCommand extends AbstractCommand implements PlayerCommand,
 
     if (argument.equals("help")) {
       String rollback = commandPrefix() + "rollback";
-      player.addTMessage(Color.GRAY, "Usage:");
-      player.addTMessage(Color.GRAY, "%s: list 10 latest backups", rollback);
-      player.addTMessage(Color.GRAY, "%s: use the latest backup", rollback + " latest");
-      player.addTMessage(Color.GRAY, "%s: use backup with that number", rollback + " #");
-      player.addTMessage(Color.GRAY, "%s: use backup with that filename", rollback + " name");
+      tInfo("Usage:");
+      tInfo("%s: list 10 latest backups", rollback);
+      tInfo("%s: use the latest backup", rollback + " latest");
+      tInfo("%s: use backup with that number", rollback + " #");
+      tInfo("%s: use backup with that filename", rollback + " name");
     } else if (argument.equals("latest")) {
       File latest = AutoBackup.newestBackup();
       if (latest == null) {
-        player.addTMessage(Color.RED, "No backups found.");
+        tError("No backups found!");
         return;
       }
 
-      if (quick) {
-        player.getServer().adminLog("User " + player.getName() + " initiated a quick roll-back to latest backup!");
-        System.out.println("[SimpleServer] " + player.getName() + " initiated a quick roll-back to latest backup.");
-      } else {
-        player.getServer().adminLog("User " + player.getName() + " initiated a roll-back to latest backup!");
-        System.out.println("[SimpleServer] " + player.getName() + " initiated a roll-back to latest backup.");
-      }
-
-      server.rollback.initiate(latest.getPath(), quick);
-    } else {
-      if (quick) {
-        player.getServer().adminLog("User " + player.getName() + " initiated a quick roll-back to " + argument + "!");
-        System.out.println("[SimpleServer] " + player.getName() + " initiated a quick roll-back to " + argument);
-      } else {
-        player.getServer().adminLog("User " + player.getName() + " initiated a roll-back to " + argument + "!");
-        System.out.println("[SimpleServer] " + player.getName() + " initiated a roll-back to latest backup." + argument);
-      }
-
-      String shortCode = null;
-      try {
-        String num = Integer.valueOf(argument).toString();
-        shortCode = backups.get(num);
-      } catch (Exception e) {
-      }
-
-      if (shortCode != null) {
-        server.rollback.initiate(String.format(BACKUP_FORMAT, shortCode), quick);
-      } else {
-        server.rollback.initiate(String.format(BACKUP_FORMAT, argument), quick);
-      }
-    }
-  }
-
-  public void execute(Server server, String message) {
-    String arguments[] = extractArguments(message);
-    HashMap<String, String> backups = getTenLatest();
-
-    if (arguments.length == 0) {
-      if (backups.values().isEmpty()) {
-        System.out.println("[SimpleServer] There are no backups!");
-      } else {
-        System.out.println("[SimpleServer] Latest backups:");
-        for (int x = 1; x <= 10; x++) {
-          String shortCode = backups.get(Integer.valueOf(x).toString());
-          if (shortCode != null) {
-            System.out.println("[SimpleServer] #" + x + ": " + shortCode);
-          }
+      if (player != null) {
+        if (quick) {
+          target.adminLog("User " + player.getName() + " initiated a quick roll-back to latest backup!");
+          System.out.println("[SimpleServer] " + player.getName() + " initiated a quick roll-back to latest backup.");
+        } else {
+          target.adminLog("User " + player.getName() + " initiated a roll-back to latest backup!");
+          System.out.println("[SimpleServer] " + player.getName() + " initiated a roll-back to latest backup.");
         }
       }
-      return;
-    }
 
-    String argument = arguments[0];
-    boolean quick = false;
-    if (arguments.length > 1) {
-      quick = arguments[1].equals("quick");
-    }
-
-    if (argument.equals("latest")) {
-      File latest = AutoBackup.newestBackup();
-      if (latest == null) {
-        System.out.println("[SimpleServer] No backups found.");
-        return;
+      target.rollback.initiate(latest.getPath(), quick);
+    } else {
+      if (player != null) {
+        if (quick) {
+          target.adminLog("User " + player.getName() + " initiated a quick roll-back to " + argument + "!");
+          System.out.println("[SimpleServer] " + player.getName() + " initiated a quick roll-back to " + argument);
+        } else {
+          target.adminLog("User " + player.getName() + " initiated a roll-back to " + argument + "!");
+          System.out.println("[SimpleServer] " + player.getName() + " initiated a roll-back to latest backup." + argument);
+        }
       }
 
-      server.rollback.initiate(latest.getPath(), quick);
-    } else {
       String shortCode = null;
       try {
         String num = Integer.valueOf(argument).toString();
@@ -158,14 +127,41 @@ public class RollbackCommand extends AbstractCommand implements PlayerCommand,
       }
 
       if (shortCode != null) {
-        server.rollback.initiate(String.format(BACKUP_FORMAT, shortCode), quick);
+        target.rollback.initiate(String.format(BACKUP_FORMAT, shortCode), quick);
       } else {
-        server.rollback.initiate(String.format(BACKUP_FORMAT, argument), quick);
+        target.rollback.initiate(String.format(BACKUP_FORMAT, argument), quick);
       }
+    }
+
+    server = null;
+    player = null;
+  }
+
+  protected void tError(String message, Object... args) {
+    if (player != null) {
+      player.addTMessage(Color.RED, message, args);
+    } else {
+      System.out.println("[SimpleServer] " + String.format(message, args));
     }
   }
 
-  private HashMap<String, String> getTenLatest() {
+  protected void tInfo(String message, Object... args) {
+    if (player != null) {
+      player.addTMessage(Color.GRAY, message, args);
+    } else {
+      System.out.println("[SimpleServer] " + String.format(message, args));
+    }
+  }
+
+  protected void info(String message, Object... args) {
+    if (player != null) {
+      player.addMessage(Color.GRAY, message, args);
+    } else {
+      System.out.println("[SimpleServer] " + String.format(message, args));
+    }
+  }
+
+  protected HashMap<String, String> getTenLatest() {
     final HashMap<String, String> list = new HashMap<String, String>();
 
     BACKUP_DIRECTORY.mkdir();
