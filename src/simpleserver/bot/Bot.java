@@ -36,11 +36,8 @@ import java.util.concurrent.locks.ReentrantLock;
 import simpleserver.Position;
 import simpleserver.Server;
 import simpleserver.Coordinate.Dimension;
-import simpleserver.Player.LocalAddressFactory;
 
 public class Bot {
-  private static final LocalAddressFactory addressFactory = new LocalAddressFactory();
-
   private static final int VERSION = 14;
 
   protected String name;
@@ -70,7 +67,7 @@ public class Bot {
   void connect() throws UnknownHostException, IOException {
 
     try {
-      InetAddress localAddress = InetAddress.getByName(addressFactory.getNextAddress());
+      InetAddress localAddress = InetAddress.getByName(Server.addressFactory.getNextAddress());
       socket = new Socket(InetAddress.getByName(null), server.options.getInt("internalPort"), localAddress, 0);
     } catch (Exception e) {
       socket = new Socket(InetAddress.getByName(null), server.options.getInt("internalPort"));
