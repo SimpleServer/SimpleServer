@@ -575,13 +575,14 @@ public class Server {
   public static final class LocalAddressFactory {
     private static final int[] octets = { 0, 0, 1 };
     private static Boolean canCycle = null;
+    private static boolean enabled = true;
 
     private void toggle(boolean enabled) {
-      canCycle = enabled ? null : false;
+      LocalAddressFactory.enabled = enabled;
     }
 
     public synchronized String getNextAddress() {
-      if (!canCycle()) {
+      if (!enabled || !canCycle()) {
         return "127.0.0.1";
       }
 
