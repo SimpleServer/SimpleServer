@@ -50,6 +50,11 @@ public class NBTLong extends NBTag {
     return value;
   }
 
+  @Override
+  void set(String value) {
+    this.value = Long.valueOf(value);
+  }
+
   public void set(long value) {
     this.value = value;
   }

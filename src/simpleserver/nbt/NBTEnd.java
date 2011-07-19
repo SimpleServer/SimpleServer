@@ -44,4 +44,9 @@ class NBTEnd extends NBTag {
   Object get() {
     return "END";
   }
+
+  @Override
+  void set(String value) {
+    throw new NumberFormatException("End tags can't be set");
+  }
 }

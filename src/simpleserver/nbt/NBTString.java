@@ -50,6 +50,7 @@ public class NBTString extends NBTag {
     return value;
   }
 
+  @Override
   public void set(String value) {
     this.value = value;
   }

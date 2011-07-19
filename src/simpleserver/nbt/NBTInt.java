@@ -50,6 +50,11 @@ public class NBTInt extends NBTag {
     return value;
   }
 
+  @Override
+  void set(String value) {
+    this.value = Integer.valueOf(value);
+  }
+
   public void set(int value) {
     this.value = value;
   }

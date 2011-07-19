@@ -50,6 +50,15 @@ public class NBTByte extends NBTag {
     return value;
   }
 
+  @Override
+  void set(String value) {
+    if (value.startsWith("0x")) {
+      this.value = Integer.valueOf(value.substring(2), 16).byteValue();
+    } else {
+      this.value = Integer.valueOf(value).byteValue();
+    }
+  }
+
   public void set(byte value) {
     this.value = value;
   }

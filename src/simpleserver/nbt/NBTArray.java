@@ -50,6 +50,17 @@ public class NBTArray extends NBTag {
     return value[index];
   }
 
+  @Override
+  void set(String value) {
+    if (value.length() % 2 != 0) {
+      throw new NumberFormatException("Number of characters is not even");
+    }
+    this.value = new byte[value.length() / 2];
+    for (int i = 0; i < value.length() / 2; i++) {
+      this.value[i] = Integer.valueOf(value.substring(i * 2, i * 2 + 2), 16).byteValue();
+    }
+  }
+
   public void set(byte[] value) {
     this.value = value;
   }

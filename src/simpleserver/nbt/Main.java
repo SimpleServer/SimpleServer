@@ -29,7 +29,7 @@ public class Main {
       System.out.println("Usage: java -jar NBT.jar file [command] [arguments]");
       System.out.println("\nCommands:");
       System.out.println("\tread [key]");
-      // System.out.println("\tset key value");
+      System.out.println("\tset key value");
       // System.out.println("\tadd key type [value]");
       return;
     }
@@ -61,19 +61,45 @@ public class Main {
     if (command.equals("read")) {
       NBTag tag = file.root();
       if (args.length >= 3) {
-        try {
-          tag = getTag(args[2], tag);
-        } catch (NoSuchKeyException e) {
-          System.out.println("Error: " + e.getMessage());
-          return;
-        } catch (NoContainerException e) {
-          System.out.println("Error: " + e.getMessage());
+        tag = tryGetTag(args[2], tag);
+      }
+      if (tag != null) {
+        System.out.println(tag);
+      }
+    } else if (command.equals("set")) {
+      if (args.length >= 4) {
+        NBTag tag = tryGetTag(args[2], file.root());
+        if (tag == null) {
           return;
         }
+        String value = args[3];
+        try {
+          tag.set(value);
+        } catch (NumberFormatException e) {
+          System.out.println("Error: Wrong format (" + e.getMessage() + ")");
+          return;
+        }
+        try {
+          file.save(args[0]);
+        } catch (IOException e) {
+          System.out.println("Error: File couldn't be saved (" + e.getMessage() + ")");
+        }
+      } else {
+        System.out.println("Error: Wrong number of arguments");
       }
-      System.out.println(tag);
     }
+  }
 
+  private static NBTag tryGetTag(String path, NBTag root) {
+    try {
+      return getTag(path, root);
+    } catch (NoSuchKeyException e) {
+      System.out.println("Error: " + e.getMessage());
+      return null;
+    } catch (NoContainerException e) {
+      System.out.println("Error: " + e.getMessage());
+      return null;
+    }
   }
 
   @SuppressWarnings("unchecked")

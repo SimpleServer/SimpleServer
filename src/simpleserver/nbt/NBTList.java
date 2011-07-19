@@ -64,6 +64,11 @@ public class NBTList<T extends NBTag> extends NBTag {
     return value;
   }
 
+  @Override
+  void set(String value) {
+    throw new NumberFormatException("List tags can't be set directly");
+  }
+
   public int size() {
     return value.size();
   }

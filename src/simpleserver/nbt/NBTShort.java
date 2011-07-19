@@ -50,6 +50,11 @@ public class NBTShort extends NBTag {
     return value;
   }
 
+  @Override
+  void set(String value) {
+    this.value = Short.valueOf(value);
+  }
+
   public void set(short value) {
     this.value = value;
   }

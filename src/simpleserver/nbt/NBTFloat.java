@@ -50,6 +50,11 @@ public class NBTFloat extends NBTag {
     return value;
   }
 
+  @Override
+  void set(String value) {
+    this.value = Float.valueOf(value);
+  }
+
   public void set(float value) {
     this.value = value;
   }

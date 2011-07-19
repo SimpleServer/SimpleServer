@@ -53,6 +53,8 @@ abstract class NBTag {
 
   abstract Object get();
 
+  abstract void set(String value);
+
   public NBTString name() {
     if (named && name.get().length() > 0) {
       return name;

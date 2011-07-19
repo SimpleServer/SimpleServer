@@ -50,6 +50,11 @@ public class NBTDouble extends NBTag {
     return value;
   }
 
+  @Override
+  void set(String value) {
+    this.value = Double.valueOf(value);
+  }
+
   public void set(double value) {
     this.value = value;
   }

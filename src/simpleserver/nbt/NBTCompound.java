@@ -52,6 +52,11 @@ public class NBTCompound extends NBTag {
     return value;
   }
 
+  @Override
+  void set(String value) {
+    throw new NumberFormatException("Compound tags can't be set directly");
+  }
+
   public int size() {
     return value.size();
   }
