@@ -74,11 +74,7 @@ public class WarpCommand extends AbstractCommand implements PlayerCommand {
         player.addTMessage(Color.RED, "No such waypoint exists.");
         return;
       }
-      try {
-        player.teleport(warp.get(waypoint));
-      } catch (Exception e) {
-        player.addTMessage(Color.RED, "Teleporting failed.");
-      }
+      player.teleportWithWarmup(warp.get(waypoint));
     }
   }
 }

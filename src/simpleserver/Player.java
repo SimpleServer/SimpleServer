@@ -27,15 +27,16 @@ import java.net.BindException;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.Date;
 import java.util.Queue;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import simpleserver.Coordinate.Dimension;
-import simpleserver.bot.BotController.ConnectException;
 import simpleserver.bot.Giver;
 import simpleserver.bot.Teleporter;
+import simpleserver.bot.BotController.ConnectException;
 import simpleserver.command.ExternalCommand;
 import simpleserver.command.PlayerCommand;
 import simpleserver.config.data.Stats.StatField;
@@ -90,8 +91,7 @@ public class Player {
   public Coordinate areastart;
   public Coordinate areaend;
 
-  private boolean underCooldown = false;
-  private Cooldown cooldown;
+  private long lastTeleport;
 
   public Player(Socket inc, Server parent) {
     connected = System.currentTimeMillis();
@@ -723,88 +723,71 @@ public class Player {
     return dimension;
   }
 
-  public void teleport(Coordinate coordinate) {
+  public void teleport(Coordinate coordinate) throws ConnectException, IOException {
     teleport(new Position(coordinate));
   }
 
-  public void teleport(Position position) {
-    if (underCooldown) {
-      if (cooldown != null) {
-        int millisLeft = (int) (cooldown.scheduledExecutionTime() - System.currentTimeMillis());
-        addTMessage(Color.GRAY, "You need to wait %d seconds until you can teleport again.", millisLeft / 1000);
-      } else {
-        addTMessage(Color.GRAY, "You cannot teleport yet.");
-      }
+  public void teleport(Position position) throws ConnectException, IOException {
+    server.bots.connect(new Teleporter(this, position));
+  }
+
+  public void teleportSelf(Coordinate coordinate) {
+    teleportSelf(new Position(coordinate));
+  }
+
+  public void teleportSelf(Position position) {
+    try {
+      teleport(position);
+    } catch (Exception e) {
+      addTMessage(Color.RED, "Teleporting failed.");
+      return;
+    }
+    lastTeleport = new Date().getTime();
+  }
+
+  private int cooldownLeft() {
+    int cooldown = getGroup().getCooldownMillis();
+    if (lastTeleport > new Date().getTime() - cooldown) {
+      return (int) (cooldown - new Date().getTime() + lastTeleport);
+    } else {
+      return 0;
+    }
+  }
+
+  public synchronized void teleportWithWarmup(Coordinate coordinate) {
+    teleportWithWarmup(new Position(coordinate));
+  }
+
+  public synchronized void teleportWithWarmup(Position position) {
+    int cooldown = cooldownLeft();
+    if (lastTeleport < 0) {
+      addTMessage(Color.RED, "You are already waiting for a teleport.");
+    } else if (cooldown > 0) {
+      addTMessage(Color.RED, "You have to wait %d seconds before you can teleport again.", cooldown / 1000);
     } else {
       int warmup = getGroup().getWarmupMillis();
       if (warmup > 0) {
+        lastTeleport = -1;
         Timer timer = new Timer();
-        timer.schedule(new Warmup(this, position), warmup);
+        timer.schedule(new Warmup(position), warmup);
         addTMessage(Color.GRAY, "You will be teleported in %s seconds.", warmup / 1000);
       } else {
-        try {
-          server.bots.connect(new Teleporter(this, position));
-        } catch (Exception e) {
-          addTMessage(Color.RED, "Teleporting failed.");
-        }
-
-        int cooldownLenght = getGroup().getCooldownMillis();
-        if (cooldownLenght > 0) {
-          Timer timer = new Timer();
-          cooldown = new Cooldown();
-          timer.schedule(cooldown, cooldownLenght);
-        }
+        teleportSelf(position);
       }
     }
   }
 
   private final class Warmup extends TimerTask {
-    private final Player player;
     private final Position position;
 
-    private Warmup(Player player, Position position) {
+    private Warmup(Position position) {
       super();
-      underCooldown = true;
-      this.player = player;
       this.position = position;
     }
 
-    private Warmup(Player player, Coordinate coordinate) {
-      super();
-      underCooldown = true;
-      this.player = player;
-      position = new Position(coordinate);
-    }
-
     @Override
     public void run() {
-      try {
-        server.bots.connect(new Teleporter(player, position));
-        int cooldownLenght = getGroup().getCooldownMillis();
-        if (cooldownLenght > 0) {
-          Timer timer = new Timer();
-          cooldown = new Cooldown();
-          timer.schedule(cooldown, cooldownLenght);
-        } else {
-          underCooldown = false;
-        }
-      } catch (Exception e) {
-        addTMessage(Color.RED, "Teleporting failed.");
-        return;
-      }
-    }
-  }
-
-  private final class Cooldown extends TimerTask {
-    private Cooldown() {
-      super();
-      underCooldown = true;
-    }
-
-    @Override
-    public void run() {
-      underCooldown = false;
-      addTMessage(Color.GRAY, "You can now teleport again.");
+      teleportSelf(position);
     }
   }
 }

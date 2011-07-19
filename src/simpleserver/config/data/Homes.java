@@ -20,6 +20,7 @@
  */
 package simpleserver.config.data;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -50,12 +51,12 @@ public class Homes {
 
   public List<String> getHomesPlayerInvitedTo(String playerName) {
     List<String> invitedTo = new LinkedList<String>();
-    NBTList<NBTCompound> allPlayers = playerData.getAll();
-    for (NBTCompound player : allPlayers.getValue()) {
+    for (String name : playerData.names()) {
+      NBTCompound player = playerData.get(name);
       if (player.containsKey(HOME)) {
         HomePoint home = new HomePoint(player.getCompound(HOME));
         if (home.invites.contains(new NBTString(playerName))) {
-          invitedTo.add(player.getName().get());
+          invitedTo.add(name);
         }
       }
     }
@@ -79,7 +80,7 @@ public class Homes {
   }
 
   public class HomePoint {
-    private final static String PUBLIC = "isPublic";
+    private final static String PUBLIC = "public";
     private final static String INVITES = "invites";
 
     public Position position;
@@ -100,7 +101,7 @@ public class Homes {
 
     public HomePoint(NBTCompound tag) {
       position = new Position(tag);
-      isPublic = tag.getByte(PUBLIC).get().equals((byte) 0);
+      isPublic = tag.getByte(PUBLIC).get().equals((byte) 1);
       invites = tag.getList(INVITES).cast();
     }
 
@@ -115,8 +116,9 @@ public class Homes {
 
     public List<String> getPlayersInvited() {
       List<String> playersInvited = new LinkedList<String>();
-      for (NBTString invite : invites.getValue()) {
-        playersInvited.add(invite.get());
+      Iterator<NBTString> iterator = invites.iterator();
+      while (iterator.hasNext()) {
+        playersInvited.add(iterator.next().get());
       }
       return playersInvited;
     }
@@ -128,7 +130,7 @@ public class Homes {
     public NBTCompound tag() {
       NBTCompound tag = position.tag();
       tag.rename(HOME);
-      NBTByte publicValue = new NBTByte(PUBLIC, isPublic ? (byte) 0 : (byte) 1);
+      NBTByte publicValue = new NBTByte(PUBLIC, isPublic ? (byte) 1 : (byte) 0);
       tag.put(publicValue);
       tag.put(invites);
       return tag;

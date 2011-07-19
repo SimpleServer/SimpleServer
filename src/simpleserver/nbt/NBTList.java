@@ -24,6 +24,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public class NBTList<T extends NBTag> extends NBTag {
@@ -75,23 +76,27 @@ public class NBTList<T extends NBTag> extends NBTag {
     return NBT.values()[tagId];
   }
 
-  @SuppressWarnings({ "unchecked", "hiding" })
+  @SuppressWarnings( { "unchecked", "hiding" })
   public <T extends NBTag> T cast() {
     return (T) this;
-  }
-
-  public void add(T tag) {
-    if (tagId == tag.id()) {
-      value.add(tag);
-    }
   }
 
   public boolean contains(T obj) {
     return value.contains(obj);
   }
 
+  public Iterator<T> iterator() {
+    return value.iterator();
+  }
+
   public T get(int index) {
     return value.get(index);
+  }
+
+  public void add(T tag) {
+    if (tagId == tag.id()) {
+      value.add(tag);
+    }
   }
 
   public boolean remove(T obj) {
@@ -137,10 +142,6 @@ public class NBTList<T extends NBTag> extends NBTag {
 
   public NBTCompound getCompound(int index) {
     return (NBTCompound) value.get(index);
-  }
-
-  public ArrayList<T> getValue() {
-    return value;
   }
 
   @SuppressWarnings("unchecked")

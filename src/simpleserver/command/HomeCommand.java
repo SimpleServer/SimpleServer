@@ -181,7 +181,7 @@ public class HomeCommand extends AbstractCommand implements PlayerCommand {
       }
       if ((home.isPublic && player.getServer().findPlayer(target) != null) ||
           home.invites.contains(new NBTString(playerName))) {
-        player.teleport(home.position);
+        player.teleportWithWarmup(home.position);
       } else {
         player.addTMessage(Color.RED, "You are not allowed to visit %s's home.", command);
       }
@@ -194,7 +194,7 @@ public class HomeCommand extends AbstractCommand implements PlayerCommand {
       player.addTMessage(Color.RED, "You don't have a home to teleport to!");
       return;
     }
-    player.teleport(home.position);
+    player.teleportWithWarmup(home.position);
   }
 
   private void usage(Player player) {
