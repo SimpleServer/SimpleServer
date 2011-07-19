@@ -20,6 +20,7 @@
  */
 package simpleserver.command;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import simpleserver.Color;
@@ -91,12 +92,17 @@ public class HomeCommand extends AbstractCommand implements PlayerCommand {
       player.getServer().data.save();
       player.addTMessage(Color.GRAY, "Your home is now private!");
     } else if (command.equals("ilist")) {
-      List<String> list = homes.getHomesPlayerInvitedTo(playerName);
-      if (list.isEmpty()) {
-        player.addTMessage(Color.GRAY, "Noone has invited you.");
+      List<String> inviteList = new LinkedList<String>();
+      List<String> publicList = new LinkedList<String>();
+      homes.getVisitableHomes(playerName, inviteList, publicList);
+      if (inviteList.isEmpty() && publicList.isEmpty()) {
+        player.addTMessage(Color.GRAY, "You cannot visit any home.");
         return;
       }
-      player.addTMessage(Color.GRAY, "You have been invited by %s.", join(list).trim());
+
+      player.addTMessage(Color.GRAY, "Public homes: %s", join(publicList).trim());
+      player.addTMessage(Color.GRAY, "Homes you are invited to: %s", join(inviteList).trim());
+
     } else if (command.equals("list")) {
       HomePoint home = homes.get(playerName);
       if (home == null) {
@@ -133,7 +139,7 @@ public class HomeCommand extends AbstractCommand implements PlayerCommand {
         home.invites.add(new NBTString(iPlayer));
         player.addTMessage(Color.GRAY, "You just invited %s.", iPlayer);
         if (onlineTarget != null) {
-          onlineTarget.addTMessage(Color.GRAY, "You were just invited to visit %s's home.", getName());
+          onlineTarget.addTMessage(Color.GRAY, "You were just invited to visit %s's home.", player.getName());
         }
       } else {
         player.addTMessage(Color.GRAY, "Player has already been invited.");
@@ -157,7 +163,7 @@ public class HomeCommand extends AbstractCommand implements PlayerCommand {
         player.addTMessage(Color.GRAY, "Player wasn't invited.");
       }
     } else {
-      if (command == playerName) {
+      if (command.toLowerCase().equals(playerName.toLowerCase())) {
         teleportHome(player);
         return;
       }
@@ -180,7 +186,8 @@ public class HomeCommand extends AbstractCommand implements PlayerCommand {
         return;
       }
       if ((home.isPublic && player.getServer().findPlayer(target) != null) ||
-          home.invites.contains(new NBTString(playerName))) {
+          home.invites.contains(new NBTString(playerName)) ||
+          target.toLowerCase().equals(playerName.toLowerCase())) {
         player.teleportWithWarmup(home.position);
       } else {
         player.addTMessage(Color.RED, "You are not allowed to visit %s's home.", command);

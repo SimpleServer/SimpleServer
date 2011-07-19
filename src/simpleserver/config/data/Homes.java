@@ -50,17 +50,31 @@ public class Homes {
   }
 
   public List<String> getHomesPlayerInvitedTo(String playerName) {
-    List<String> invitedTo = new LinkedList<String>();
+    List<String> invitedHomes = new LinkedList<String>();
     for (String name : playerData.names()) {
       NBTCompound player = playerData.get(name);
       if (player.containsKey(HOME)) {
         HomePoint home = new HomePoint(player.getCompound(HOME));
         if (home.invites.contains(new NBTString(playerName))) {
-          invitedTo.add(name);
+          invitedHomes.add(name);
         }
       }
     }
-    return invitedTo;
+    return invitedHomes;
+  }
+
+  public void getVisitableHomes(String playerName, List<String> invitedHomes, List<String> publicHomes) {
+    for (String name : playerData.names()) {
+      NBTCompound player = playerData.get(name);
+      if (player.containsKey(HOME)) {
+        HomePoint home = new HomePoint(player.getCompound(HOME));
+        if (home.isPublic) {
+          publicHomes.add(name);
+        } else if (home.invites.contains(new NBTString(playerName)) || name.equals(playerName.toLowerCase())) {
+          invitedHomes.add(name);
+        }
+      }
+    }
   }
 
   public void remove(String playerName) {
