@@ -1,3 +1,11 @@
+== 8.2.2 ==
+ * added "setgroup" and "setipgroup" console commands
+ * added nether and plugins of CraftBukkit to backups
+ * added BukkitContrib support
+ * added option to disable LocalAddressFactory
+ * fixed permission loading order
+ * fixed chest name conversion
+
 == 8.2.1 ==
  * fixed line endings in header files
  * fixed connection hash
