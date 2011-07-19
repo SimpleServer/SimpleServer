@@ -1,95 +1,105 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<project default="create-release-zip" name="Create Runnable Jar for Project SimpleServer with Jar-in-Jar Loader">
-  <property name="version-file" value="bin/simpleserver/VERSION" />
-  <property name="build.sysclasspath" value="last" />
-	
-  <path id="project-classpath">
-    <fileset dir="./lib" includes="*.jar" />
-  </path>
+<project default="build" name="Create Runnable Jar for Project SimpleServer with Jar-in-Jar Loader">
+	<property name="version-file" value="bin/simpleserver/VERSION" />
+	<property name="build.sysclasspath" value="last" />
 
-  <target name="copy-non-java-files">
-    <copy todir="bin" includeemptydirs="false">
-      <fileset dir="src" excludes="**/*.java" />
-    </copy>
-  </target>
+	<path id="project-classpath">
+		<fileset dir="./lib" includes="*.jar" />
+	</path>
 
-  <target name="compile" depends="cleanbuild, copy-non-java-files">
-    <mkdir dir="bin" />
-    <javac srcdir="src" destdir="bin" debug="yes">
-      <classpath refid="project-classpath" />
-      <compilerarg value="-Xlint"/> 
-    </javac>
-  </target>
-	
-  <target name="set-version">
-    <exec executable="script/update-version.sh" osfamily="unix">
-      <arg file="${version-file}" />
-    </exec>
+	<target name="clean">
+		<delete dir="release" />
+		<delete file="${version-file}" />
+	</target>
 
-    <exec executable="cmd" osfamily="winnt">
-      <arg value="/c" />
-      <arg file="script/update-version.bat" />
-      <arg file="${version-file}" />
-    </exec>
-  </target>
+	<target name="cleanbuild">
+		<delete dir="bin" />
+	</target>
 
-  <target name="create-release-jar" depends="clean, compile, set-version">
-    <mkdir dir="release" />
-    <jar destfile="release/SimpleServer.jar">
-      <manifest>
-        <attribute name="Main-Class" value="simpleserver.Main"/>
-        <attribute name="Class-Path" value="."/>
-      </manifest>
+	<target name="copy-non-java-files">
+		<copy todir="bin" includeemptydirs="false">
+			<fileset dir="src" excludes="**/*.java" />
+		</copy>
+	</target>
 
-      <fileset dir="bin"/>
-      <zipfileset excludes="META-INF/**" src="lib/commons-collections-3.2.1.jar"/>
-      <zipfileset excludes="META-INF/**" src="lib/commons-configuration-1.6.jar"/>
-      <zipfileset excludes="META-INF/**" src="lib/commons-io-2.0.1.jar"/>
-      <zipfileset excludes="META-INF/**" src="lib/commons-jxpath-1.3.jar"/>
-      <zipfileset excludes="META-INF/**" src="lib/commons-lang-2.6.jar"/>
-      <zipfileset excludes="META-INF/**" src="lib/commons-logging-1.1.1.jar"/>
-      <zipfileset excludes="META-INF/**" src="lib/dom4j-1.6.jar"/>
-      <zipfileset excludes="META-INF/**" src="lib/guava-r07.jar"/>
-      <zipfileset excludes="META-INF/**" src="lib/httpclient-4.1.jar"/>
-      <zipfileset excludes="META-INF/**" src="lib/httpcore-4.1.jar"/>
-      <zipfileset excludes="META-INF/**" src="lib/javassist-3.8.0.GA.jar"/>
-      <zipfileset excludes="META-INF/**" src="lib/json-java.jar"/>
-      <zipfileset excludes="META-INF/**" src="lib/reflections-0.9.5-RC2.jar"/>
-      <zipfileset excludes="META-INF/**" src="lib/slf4j-api-1.6.1.jar"/>
-      <zipfileset excludes="META-INF/**" src="lib/slf4j-nop-1.6.1.jar"/>
-    </jar>
-  </target>
-	
- <target name="nbt" depends="clean, compile">
-    <mkdir dir="release" />
-    <jar destfile="release/NBT.jar">
-      <manifest>
-        <attribute name="Main-Class" value="simpleserver.nbt.NBTFile"/>
-        <attribute name="Class-Path" value="."/>
-      </manifest>
+	<target name="compile" depends="cleanbuild, copy-non-java-files">
+		<mkdir dir="bin" />
+		<javac srcdir="src" destdir="bin" debug="yes">
+			<classpath refid="project-classpath" />
+			<compilerarg value="-Xlint" />
+		</javac>
+	</target>
 
-      <fileset dir="bin" includes="simpleserver/nbt/*"/>
-    </jar>
-  </target>
+	<target name="set-version">
+		<exec executable="script/update-version.sh" osfamily="unix">
+			<arg file="${version-file}" />
+		</exec>
 
-  <target name="create-release-zip" depends="clean, create-release-jar">
-    <zip destfile="release/SimpleServer.zip">
-      <zipfileset file="CHANGES"/>
-      <zipfileset file="CONTRIBUTORS"/>
-      <zipfileset file="LICENSE"/>
-      <zipfileset file="README"/>
-      <zipfileset file="launch.bat"/>
-      <zipfileset file="launch.sh"/>
-      <zipfileset file="release/SimpleServer.jar"/>
-    </zip>
-  </target>
+		<exec executable="cmd" osfamily="winnt">
+			<arg value="/c" />
+			<arg file="script/update-version.bat" />
+			<arg file="${version-file}" />
+		</exec>
+	</target>
 
-  <target name="cleanbuild">
-    <delete dir="bin" />
-  </target>
-	
-  <target name="clean">
-    <delete dir="release" />
-    <delete file="${version-file}" />
-  </target>
+	<target name="jar" depends="clean, compile, set-version">
+		<mkdir dir="release" />
+		<jar destfile="release/SimpleServer.raw.jar">
+			<manifest>
+				<attribute name="Main-Class" value="simpleserver.Main" />
+				<attribute name="Class-Path" value="." />
+			</manifest>
+
+			<fileset dir="bin" />
+			<zipfileset excludes="META-INF/**" src="lib/commons-collections-3.2.1.jar" />
+			<zipfileset excludes="META-INF/**" src="lib/commons-configuration-1.6.jar" />
+			<zipfileset excludes="META-INF/**" src="lib/commons-io-2.0.1.jar" />
+			<zipfileset excludes="META-INF/**" src="lib/commons-jxpath-1.3.jar" />
+			<zipfileset excludes="META-INF/**" src="lib/commons-lang-2.6.jar" />
+			<zipfileset excludes="META-INF/**" src="lib/commons-logging-1.1.1.jar" />
+			<zipfileset excludes="META-INF/**" src="lib/dom4j-1.6.jar" />
+			<zipfileset excludes="META-INF/**" src="lib/guava-r07.jar" />
+			<zipfileset excludes="META-INF/**" src="lib/httpclient-4.1.jar" />
+			<zipfileset excludes="META-INF/**" src="lib/httpcore-4.1.jar" />
+			<zipfileset excludes="META-INF/**" src="lib/javassist-3.8.0.GA.jar" />
+			<zipfileset excludes="META-INF/**" src="lib/json-java.jar" />
+			<zipfileset excludes="META-INF/**" src="lib/reflections-0.9.5-RC2.jar" />
+			<zipfileset excludes="META-INF/**" src="lib/slf4j-api-1.6.1.jar" />
+			<zipfileset excludes="META-INF/**" src="lib/slf4j-nop-1.6.1.jar" />
+		</jar>
+	</target>
+
+	<target name="shrink">
+		<taskdef name="yguard" classname="com.yworks.yguard.YGuardTask" classpath="lib/yguard.jar" />
+		<yguard>
+			<inoutpair in="release/SimpleServer.raw.jar" out="release/SimpleServer.jar" />
+			<shrink logfile="release/shrinklog.xml">
+				<keep>
+					<method name="void main(java.lang.String[])" class="simpleserver.Main" />
+					<class classes="private" methods="private" fields="private">
+						<patternset>
+							<include name="simpleserver.nbt.**" />
+							<include name="simpleserver.command.**" />
+							<include name="org.apache.commons.logging.impl.**" />
+							<include name="org.apache.commons.jxpath.ri.**" />
+						</patternset>
+					</class>
+				</keep>
+			</shrink>
+		</yguard>
+	</target>
+
+	<target name="build" depends="jar, shrink" />
+
+	<target name="release" depends="build">
+		<zip destfile="release/SimpleServer.zip">
+			<zipfileset file="CHANGES" />
+			<zipfileset file="CONTRIBUTORS" />
+			<zipfileset file="LICENSE" />
+			<zipfileset file="README" />
+			<zipfileset file="launch.bat" />
+			<zipfileset file="launch.sh" />
+			<zipfileset file="release/SimpleServer.jar" />
+		</zip>
+	</target>
 </project>
