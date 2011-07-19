@@ -55,6 +55,7 @@ accessible commands.
   /giveplayer PLAYER ITEM [AMOUNT] -- Spawn items for another player
   /gps [PLAYER] -- Display block coordinates of named player or yourself
   /help [COMMAND] -- List commands or get help for one command
+  /home [COMMAND] [NAME] -- Use and modify homes
   /idbehold -- Make tools work instantly for yourself
   /iddqd -- Make yourself invulnerable to other players attacks
   /kick PLAYER [REASON] -- Kick the named player from the server

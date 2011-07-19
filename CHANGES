@@ -3,6 +3,8 @@
  * added nether and plugins of CraftBukkit to backups
  * added BukkitContrib support
  * added option to disable LocalAddressFactory
+ * added "/home" command
+ * improved NBT utility
  * fixed permission loading order
  * fixed chest name conversion
 
