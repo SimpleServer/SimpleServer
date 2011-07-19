@@ -137,15 +137,17 @@ public class AutoBackup {
       copyRecursively(bukkitSettings, new File(configBackup, "bukkit.yml"));
     }
 
-    File world_nether = new File(server.options.get("levelName") + "_nether");
-    if (world_nether.exists()) {
-      copyRecursively(world_nether, new File(backup, "world_nether"));
+    File nether = new File(server.options.get("levelName") + "_nether");
+    if (nether.exists()) {
+      copyRecursively(nether, new File(backup, server.options.get("levelName") + "_nether"));
     }
 
+    /*
     File plugins = new File("plugins");
     if (plugins.exists()) {
       copyRecursively(plugins, new File(backup, "plugins"));
     }
+    */
 
     return backup;
   }
