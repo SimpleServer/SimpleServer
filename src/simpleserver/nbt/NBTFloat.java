@@ -27,6 +27,10 @@ import java.io.IOException;
 public class NBTFloat extends NBTag {
   private Float value;
 
+  NBTFloat() {
+    super();
+  }
+
   NBTFloat(DataInputStream in, Boolean named) throws Exception {
     super(in, named);
   }

@@ -39,6 +39,7 @@ public class NBTCompound extends NBTag {
   }
 
   public NBTCompound() {
+    super();
     value = new HashMap<String, NBTag>();
   }
 

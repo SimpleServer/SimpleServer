@@ -27,6 +27,10 @@ import java.io.IOException;
 public class NBTLong extends NBTag {
   private Long value;
 
+  NBTLong() {
+    super();
+  }
+
   NBTLong(DataInputStream in, Boolean named) throws Exception {
     super(in, named);
   }

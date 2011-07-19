@@ -21,6 +21,7 @@
 package simpleserver.nbt;
 
 import java.io.DataInputStream;
+import java.lang.reflect.InvocationTargetException;
 
 public enum NBT {
   END(NBTEnd.class),
@@ -45,6 +46,20 @@ public enum NBT {
     return (byte) ordinal();
   }
 
+  public NBTag getInstance() throws IllegalArgumentException, SecurityException, InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+    return c.getDeclaredConstructor().newInstance();
+  }
+
+  protected static NBT get(String type) {
+    type = type.toLowerCase();
+    for (NBT tag : values()) {
+      if (tag.toString().toLowerCase().equals(type)) {
+        return tag;
+      }
+    }
+    return null;
+  }
+
   protected static NBTag loadTag(DataInputStream in, boolean named) throws Exception {
     return loadTag(in, named, in.readByte());
   }
@@ -59,5 +74,4 @@ public enum NBT {
       throw new Exception("Something went horribly wrong: " + e.getMessage());
     }
   }
-
 }

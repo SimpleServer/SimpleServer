@@ -27,6 +27,11 @@ import java.io.IOException;
 public class NBTString extends NBTag {
   private String value;
 
+  NBTString() {
+    super();
+    value = "";
+  }
+
   NBTString(DataInputStream in, Boolean named) throws Exception {
     super(in, named);
   }

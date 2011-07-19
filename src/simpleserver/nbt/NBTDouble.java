@@ -27,6 +27,10 @@ import java.io.IOException;
 public class NBTDouble extends NBTag {
   private Double value;
 
+  NBTDouble() {
+    super();
+  }
+
   NBTDouble(DataInputStream in, Boolean named) throws Exception {
     super(in, named);
   }

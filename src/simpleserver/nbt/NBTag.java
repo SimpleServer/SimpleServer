@@ -63,7 +63,12 @@ abstract class NBTag {
   }
 
   public void rename(String name) {
-    this.name.set(name);
+    if (!named) {
+      named = true;
+      this.name = new NBTString(name);
+    } else {
+      this.name.set(name);
+    }
   }
 
   void save(DataOutputStream out) throws IOException {

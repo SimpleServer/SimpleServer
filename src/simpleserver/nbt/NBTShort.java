@@ -27,6 +27,10 @@ import java.io.IOException;
 public class NBTShort extends NBTag {
   private Short value;
 
+  NBTShort() {
+    super();
+  }
+
   NBTShort(DataInputStream in, Boolean named) throws Exception {
     super(in, named);
   }

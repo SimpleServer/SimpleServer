@@ -27,6 +27,10 @@ import java.io.IOException;
 public class NBTArray extends NBTag {
   private byte[] value;
 
+  NBTArray() {
+    super();
+  }
+
   NBTArray(DataInputStream in, Boolean named) throws Exception {
     super(in, named);
   }

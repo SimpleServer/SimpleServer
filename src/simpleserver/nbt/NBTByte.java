@@ -27,6 +27,10 @@ import java.io.IOException;
 public class NBTByte extends NBTag {
   private Byte value;
 
+  NBTByte() {
+    super();
+  }
+
   NBTByte(DataInputStream in, Boolean named) throws Exception {
     super(in, named);
   }

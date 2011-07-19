@@ -27,6 +27,10 @@ import java.io.IOException;
 public class NBTInt extends NBTag {
   private Integer value;
 
+  NBTInt() {
+    super();
+  }
+
   NBTInt(DataInputStream in, Boolean named) throws Exception {
     super(in, named);
   }
