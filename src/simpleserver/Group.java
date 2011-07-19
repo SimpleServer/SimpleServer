@@ -26,14 +26,19 @@ public class Group {
   private final boolean isAdmin;
   private final String color;
   private final boolean forwardsCommands;
+  private final int warmupSecs;
+  private final int cooldownSecs;
 
   public Group(String groupName, boolean showTitle, boolean isAdmin,
-               String color, boolean forwardsCommands) {
+               String color, boolean forwardsCommands, int warmupSecs,
+               int cooldownSecs) {
     this.groupName = groupName;
     this.showTitle = showTitle;
     this.isAdmin = isAdmin;
     this.color = color;
     this.forwardsCommands = forwardsCommands;
+    this.warmupSecs = warmupSecs;
+    this.cooldownSecs = cooldownSecs;
   }
 
   public String getName() {
@@ -54,5 +59,13 @@ public class Group {
 
   public boolean getForwardsCommands() {
     return forwardsCommands;
+  }
+
+  public int getWarmupMillis() {
+    return warmupSecs * 1000;
+  }
+
+  public int getCooldownMillis() {
+    return cooldownSecs * 1000;
   }
 }

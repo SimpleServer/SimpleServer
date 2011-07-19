@@ -25,7 +25,11 @@ import static simpleserver.lang.Translations.t;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.net.UnknownHostException;
+import java.util.Date;
 import java.util.Queue;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import simpleserver.Coordinate.Dimension;
@@ -62,8 +66,8 @@ public class Player {
   private int entityId = 0;
   private Group groupObject = null;
   private boolean isRobot = false;
-  private boolean guest = false; // player is not authenticated with
-  // minecraft.net
+  // player is not authenticated with minecraft.net:
+  private boolean guest = false;
   private boolean usedAuthenticator = false;
   private boolean localChat = false;
   private int blocksPlaced = 0;
@@ -80,9 +84,11 @@ public class Player {
 
   private String nextChestName;
 
-  // temporary coordinate storage for !myarea command
+  // temporary coordinate storage for /myarea command
   public Coordinate areastart;
   public Coordinate areaend;
+
+  private long lastTeleport;
 
   public Player(Socket inc, Server parent) {
     connected = System.currentTimeMillis();
@@ -657,11 +663,71 @@ public class Player {
     return dimension;
   }
 
-  public void teleport(Coordinate coordinate) throws IOException, ConnectException {
-    server.bots.connect(new Teleporter(this, coordinate));
+  public void teleport(Coordinate coordinate) throws ConnectException, IOException {
+    teleport(new Position(coordinate));
   }
 
-  public void teleport(Position position) throws IOException, ConnectException {
+  public void teleport(Position position) throws ConnectException, IOException {
     server.bots.connect(new Teleporter(this, position));
+  }
+
+  public void teleportSelf(Coordinate coordinate) {
+    teleportSelf(new Position(coordinate));
+  }
+
+  public void teleportSelf(Position position) {
+    try {
+      teleport(position);
+    } catch (Exception e) {
+      addTMessage(Color.RED, "Teleporting failed.");
+      return;
+    }
+    lastTeleport = new Date().getTime();
+  }
+
+  private int cooldownLeft() {
+    int cooldown = getGroup().getCooldownMillis();
+    if (lastTeleport > new Date().getTime() - cooldown) {
+      return (int) (cooldown - new Date().getTime() + lastTeleport);
+    } else {
+      return 0;
+    }
+  }
+
+  public synchronized void teleportWithWarmup(Coordinate coordinate) {
+    teleportWithWarmup(new Position(coordinate));
+  }
+
+  public synchronized void teleportWithWarmup(Position position) {
+    int cooldown = cooldownLeft();
+    if (lastTeleport < 0) {
+      addTMessage(Color.RED, "You are already waiting for a teleport.");
+    } else if (cooldown > 0) {
+      addTMessage(Color.RED, "You have to wait %d seconds before you can teleport again.", cooldown / 1000);
+    } else {
+      int warmup = getGroup().getWarmupMillis();
+      if (warmup > 0) {
+        lastTeleport = -1;
+        Timer timer = new Timer();
+        timer.schedule(new Warmup(position), warmup);
+        addTMessage(Color.GRAY, "You will be teleported in %s seconds.", warmup / 1000);
+      } else {
+        teleportSelf(position);
+      }
+    }
+  }
+
+  private final class Warmup extends TimerTask {
+    private final Position position;
+
+    private Warmup(Position position) {
+      super();
+      this.position = position;
+    }
+
+    @Override
+    public void run() {
+      teleportSelf(position);
+    }
   }
 }

@@ -22,6 +22,8 @@
   showTitle NMTOKEN #IMPLIED
   ignoreChestlocks NMTOKEN #IMPLIED
   forwardUnknownCommands NMTOKEN #IMPLIED
+  warmup CDATA #IMPLIED
+  cooldown CDATA #IMPLIED
 >
 <!ATTLIST player
   name NMTOKEN #REQUIRED

@@ -20,6 +20,8 @@
  */
 package simpleserver.config.data;
 
+import java.util.Set;
+
 import simpleserver.Player;
 import simpleserver.nbt.NBTArray;
 import simpleserver.nbt.NBTCompound;
@@ -28,6 +30,7 @@ import simpleserver.nbt.NBTString;
 public class PlayerData {
   private NBTCompound node;
   public Stats stats = new Stats(this);
+  public Homes homes = new Homes(this);
 
   private final static String PLAYERS = "players";
 
@@ -54,6 +57,10 @@ public class PlayerData {
       node.put(player);
       return player;
     }
+  }
+
+  public Set<String> names() {
+    return node.names();
   }
 
   public String getRealName(String playerName) {

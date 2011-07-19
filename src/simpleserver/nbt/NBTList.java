@@ -24,6 +24,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public class NBTList<T extends NBTag> extends NBTag {
@@ -80,18 +81,26 @@ public class NBTList<T extends NBTag> extends NBTag {
     return (T) this;
   }
 
+  public boolean contains(T obj) {
+    return value.contains(obj);
+  }
+
+  public Iterator<T> iterator() {
+    return value.iterator();
+  }
+
+  public T get(int index) {
+    return value.get(index);
+  }
+
   public void add(T tag) {
     if (tagId == tag.id()) {
       value.add(tag);
     }
   }
 
-  public boolean contains(T obj) {
-    return value.contains(obj);
-  }
-
-  public T get(int index) {
-    return value.get(index);
+  public boolean remove(T obj) {
+    return value.remove(obj);
   }
 
   public NBTByte getByte(int index) {
