@@ -22,7 +22,7 @@ package simpleserver.command;
 
 import static simpleserver.lang.Translations.t;
 
-import java.util.List;
+import java.util.Collection;
 
 import simpleserver.Color;
 import simpleserver.CommandParser;
@@ -104,11 +104,11 @@ public abstract class AbstractCommand implements Command {
     }
   }
 
-  protected static String join(List<String> list) {
+  protected static String join(Collection<String> list) {
     return join(list, "");
   }
 
-  protected static String join(List<String> list, String prefix) {
+  protected static String join(Collection<String> list, String prefix) {
     StringBuilder string = new StringBuilder();
     for (String part : list) {
       string.append(prefix);

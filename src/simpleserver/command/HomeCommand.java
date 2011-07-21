@@ -22,6 +22,7 @@ package simpleserver.command;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import simpleserver.Color;
 import simpleserver.Player;
@@ -113,7 +114,7 @@ public class HomeCommand extends AbstractCommand implements PlayerCommand {
         player.addTMessage(Color.GRAY, "Your home is public; everyone can visit it.");
         return;
       }
-      List<String> list = home.getPlayersInvited();
+      Set<String> list = home.getPlayersInvited();
       if (list.isEmpty()) {
         player.addTMessage(Color.GRAY, "You haven't invited anyone.");
         return;
@@ -172,7 +173,7 @@ public class HomeCommand extends AbstractCommand implements PlayerCommand {
       if (onlinePlayer != null) {
         target = onlinePlayer;
       } else {
-        List<String> list = homes.getHomesPlayerInvitedTo(playerName);
+        Set<String> list = homes.getHomesPlayerInvitedTo(playerName);
         for (String p : list) {
           if (p.startsWith(target)) {
             target = p;
