@@ -120,6 +120,9 @@ public class Homes {
     }
 
     public String getInvitedPlayer(String prefix) {
+      if (getPlayersInvited().contains(prefix)) {
+        return prefix;
+      }
       for (String playerName : getPlayersInvited()) {
         if (playerName.startsWith(prefix)) {
           return playerName;
