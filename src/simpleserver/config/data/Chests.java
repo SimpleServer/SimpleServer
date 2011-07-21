@@ -199,7 +199,7 @@ public class Chests {
   }
 
   public void giveLock(Player player, Coordinate coordinate, String name) {
-    giveLock(player.getName(), coordinate, name);
+    giveLock(player.getName().toLowerCase(), coordinate, name);
   }
 
   public void addOpenChest(Coordinate coordinate) {
