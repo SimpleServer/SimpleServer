@@ -20,25 +20,45 @@
  */
 package simpleserver.command;
 
-import simpleserver.Color;
+import simpleserver.Group;
 import simpleserver.Player;
-import simpleserver.message.LocalMessage;
+import simpleserver.config.PermissionConfig;
+import simpleserver.message.GroupMessage;
 import simpleserver.message.Message;
 
-public class LocalSayCommand extends MessageCommand implements PlayerCommand {
-  public LocalSayCommand() {
-    super("local MESSAGE", "Send a chat message to nearby players");
+public class GroupSayCommand extends MessageCommand implements PlayerCommand {
+
+  String chatMessage;
+
+  public GroupSayCommand() {
+    super("group [GROUP] MESSAGE", "talk to the specified or your group (use id)");
   }
 
   @Override
   protected Message getMessageInstance(Player sender, String message) {
-    return new LocalMessage(sender);
+    // TODO: make it possible to use group name(prefix)
+
+    Group group = sender.getGroup();
+    chatMessage = message;
+
+    PermissionConfig perm = sender.getServer().permissions;
+
+    String[] arguments = extractArguments(message);
+    try {
+      int groupId = Integer.parseInt(arguments[0]);
+      if (arguments.length > 1 && perm.getGroup(groupId) != null) {
+        group = perm.getGroup(groupId);
+        chatMessage = extractArgument(message);
+      }
+    } catch (NumberFormatException e) {
+    }
+
+    return new GroupMessage(sender, group);
   }
 
   @Override
-  protected void complete(Message msg) {
-    if (msg.getRecieverCount() <= 0) {
-      msg.getSender().addTMessage(Color.RED, "Nobody is around to hear you.");
-    }
+  protected String extractMessage(String message) {
+    return extractArgument(chatMessage);
   }
+
 }

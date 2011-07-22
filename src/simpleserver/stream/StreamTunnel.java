@@ -33,18 +33,15 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.IllegalFormatException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import simpleserver.Authenticator.AuthRequest;
 import simpleserver.Color;
 import simpleserver.Coordinate;
-import simpleserver.Group;
+import simpleserver.Coordinate.Dimension;
 import simpleserver.Player;
 import simpleserver.Server;
-import simpleserver.Authenticator.AuthRequest;
-import simpleserver.Coordinate.Dimension;
-import simpleserver.command.LocalSayCommand;
 import simpleserver.command.PlayerListCommand;
 import simpleserver.config.data.Chests.Chest;
 
@@ -238,30 +235,7 @@ public class StreamTunnel {
 
           Matcher messageMatcher = MESSAGE_PATTERN.matcher(cleanMessage);
           if (messageMatcher.find()) {
-            Player friend = server.findPlayerExact(messageMatcher.group(1));
 
-            if (friend != null) {
-              String color = "f";
-              String title = "";
-              String format = server.options.get("msgFormat");
-              Group group = friend.getGroup();
-
-              if (group != null) {
-                color = group.getColor();
-                if (group.showTitle()) {
-                  title = group.getName();
-                  format = server.options.get("msgTitleFormat");
-                }
-              }
-
-              try {
-                message = String.format(format, friend.getName(), title, color)
-                    + messageMatcher.group(2);
-              } catch (IllegalFormatException e) {
-                System.out.println("[SimpleServer] There is an error in your msgFormat/msgTitleFormat settings!");
-              }
-
-            }
           } else if (cleanMessage.matches(CONSOLE_CHAT_PATTERN) && !server.options.getBoolean("chatConsoleToOps")) {
             break;
           }
@@ -287,17 +261,11 @@ public class StreamTunnel {
             break;
           }
 
-          if (player.localChat() && !message.startsWith("/") && !message.startsWith("!")) {
-            player.execute(LocalSayCommand.class, message);
+          if (message.startsWith("/") || message.startsWith("!")) {
             break;
           }
 
-          if (message.length() > MAXIMUM_MESSAGE_SIZE) {
-            message = message.substring(0, MAXIMUM_MESSAGE_SIZE);
-          }
-
-          write(packetId);
-          write(message);
+          player.sendMessage(message);
         }
 
         break;

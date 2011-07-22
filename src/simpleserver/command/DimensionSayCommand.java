@@ -20,25 +20,35 @@
  */
 package simpleserver.command;
 
-import simpleserver.Color;
+import simpleserver.Coordinate.Dimension;
 import simpleserver.Player;
-import simpleserver.message.LocalMessage;
+import simpleserver.message.DimensionMessage;
 import simpleserver.message.Message;
 
-public class LocalSayCommand extends MessageCommand implements PlayerCommand {
-  public LocalSayCommand() {
-    super("local MESSAGE", "Send a chat message to nearby players");
+public class DimensionSayCommand extends MessageCommand implements PlayerCommand {
+
+  String chatMessage;
+
+  public DimensionSayCommand() {
+    super("dimension [DIMENSION] MESSAGE", "Send message only in specified dimension and to yourself");
   }
 
   @Override
-  protected Message getMessageInstance(Player sender, String message) {
-    return new LocalMessage(sender);
-  }
+  protected Message getMessageInstance(Player sender, String rawMessage) {
+    Dimension dim = sender.getDimension();
+    chatMessage = rawMessage;
 
-  @Override
-  protected void complete(Message msg) {
-    if (msg.getRecieverCount() <= 0) {
-      msg.getSender().addTMessage(Color.RED, "Nobody is around to hear you.");
+    String[] arguments = extractArguments(rawMessage);
+    if (arguments.length > 1 && Dimension.get(arguments[0]) != Dimension.LIMBO) {
+      dim = Dimension.get(arguments[0]);
+      chatMessage = extractArgument(rawMessage);
     }
+    return new DimensionMessage(sender, dim);
   }
+
+  @Override
+  protected String extractMessage(String message) {
+    return extractArgument(chatMessage);
+  }
+
 }

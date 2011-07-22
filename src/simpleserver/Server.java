@@ -50,6 +50,7 @@ import simpleserver.lang.Translations;
 import simpleserver.log.AdminLog;
 import simpleserver.log.ConnectionLog;
 import simpleserver.log.ErrorLog;
+import simpleserver.message.Messager;
 import simpleserver.minecraft.MinecraftWrapper;
 import simpleserver.nbt.WorldFile;
 import simpleserver.options.Options;
@@ -93,6 +94,7 @@ public class Server {
   public Authenticator authenticator;
   private List<Resource> resources;
   private CommandParser commandParser;
+  private Messager messager;
 
   private AdminLog adminLog;
   private ErrorLog errorLog;
@@ -314,6 +316,10 @@ public class Server {
     minecraft.execute(command, arguments);
   }
 
+  public Messager getMessager() {
+    return messager;
+  }
+
   public void adminLog(String message) {
     adminLog.addMessage(message);
   }
@@ -407,6 +413,7 @@ public class Server {
     authenticator = new Authenticator(this);
     playerList = new PlayerList(options);
     requestTracker = new RequestTracker(this);
+    messager = new Messager(this);
 
     minecraft = new MinecraftWrapper(this, options, systemInput);
     if (!minecraft.prepareServerJar()) {

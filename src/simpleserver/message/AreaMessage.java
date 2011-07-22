@@ -18,27 +18,34 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package simpleserver.command;
+package simpleserver.message;
 
 import simpleserver.Color;
 import simpleserver.Player;
-import simpleserver.message.LocalMessage;
-import simpleserver.message.Message;
+import simpleserver.config.PermissionConfig;
 
-public class LocalSayCommand extends MessageCommand implements PlayerCommand {
-  public LocalSayCommand() {
-    super("local MESSAGE", "Send a chat message to nearby players");
+public class AreaMessage extends AbstractMessage {
+
+  PermissionConfig perm;
+
+  public AreaMessage(Player sender) {
+    super(sender);
+
+    perm = sender.getServer().permissions;
+    chatRoom = perm.getCurrentArea(sender);
   }
 
   @Override
-  protected Message getMessageInstance(Player sender, String message) {
-    return new LocalMessage(sender);
+  protected boolean sendToPlayer(Player reciever) {
+    return !perm.getCurrentArea(sender).isEmpty() && (perm.getCurrentArea(reciever) == perm.getCurrentArea(sender));
   }
 
   @Override
-  protected void complete(Message msg) {
-    if (msg.getRecieverCount() <= 0) {
-      msg.getSender().addTMessage(Color.RED, "Nobody is around to hear you.");
+  protected void noRecieverFound() {
+    if (perm.getCurrentArea(sender).isEmpty()) {
+      sender.addTMessage(Color.RED, "You are in no area at the moment");
+    } else {
+      sender.addTMessage(Color.RED, "Nobody is in this area to hear you");
     }
   }
 }

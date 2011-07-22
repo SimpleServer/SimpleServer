@@ -22,23 +22,38 @@ package simpleserver.command;
 
 import simpleserver.Color;
 import simpleserver.Player;
-import simpleserver.message.LocalMessage;
 import simpleserver.message.Message;
 
-public class LocalSayCommand extends MessageCommand implements PlayerCommand {
-  public LocalSayCommand() {
-    super("local MESSAGE", "Send a chat message to nearby players");
+public abstract class MessageCommand extends AbstractCommand {
+
+  public MessageCommand(String name, String usage) {
+    super(name, usage);
   }
 
-  @Override
-  protected Message getMessageInstance(Player sender, String message) {
-    return new LocalMessage(sender);
-  }
-
-  @Override
-  protected void complete(Message msg) {
-    if (msg.getRecieverCount() <= 0) {
-      msg.getSender().addTMessage(Color.RED, "Nobody is around to hear you.");
+  public void execute(Player player, String message) {
+    Message messageInstance = getMessageInstance(player, message);
+    if (messageInstance != null) {
+      String rawMessage = extractMessage(message);
+      if (rawMessage != null) {
+        messageInstance.setMessage(rawMessage);
+        player.sendMessage(messageInstance);
+        complete(messageInstance);
+      } else {
+        player.addTMessage(Color.RED, "Please supply a message.");
+      }
     }
+  }
+
+  // returns Message instance
+  protected abstract Message getMessageInstance(Player sender, String message);
+
+  protected String extractMessage(String message) {
+    // returns rawMessage
+    return extractArgument(message);
+  }
+
+  protected void complete(Message messageInstance) {
+    // called after sending messages
+    return;
   }
 }

@@ -190,8 +190,8 @@ public class PermissionConfig extends AbstractConfig {
       cooldown = "0";
     }
 
-    return new Group(name, Boolean.valueOf(showtitle), Boolean.valueOf(isadmin), color, Boolean.valueOf(forwardsCommands),
-                     Integer.valueOf(warmup), Integer.valueOf(cooldown));
+    return new Group(name, id, Boolean.valueOf(showtitle), Boolean.valueOf(isadmin), color,
+                     Boolean.valueOf(forwardsCommands), Integer.valueOf(warmup), Integer.valueOf(cooldown));
   }
 
   private int getIPGroup(String ipAddress) {

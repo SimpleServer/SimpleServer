@@ -18,27 +18,58 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package simpleserver.command;
+package simpleserver.message;
 
-import simpleserver.Color;
+import java.util.IllegalFormatException;
+
+import simpleserver.Group;
 import simpleserver.Player;
-import simpleserver.message.LocalMessage;
-import simpleserver.message.Message;
+import simpleserver.Server;
 
-public class LocalSayCommand extends MessageCommand implements PlayerCommand {
-  public LocalSayCommand() {
-    super("local MESSAGE", "Send a chat message to nearby players");
+public class GlobalMessage extends AbstractMessage {
+
+  public GlobalMessage(Player sender) {
+    super(sender);
   }
 
   @Override
-  protected Message getMessageInstance(Player sender, String message) {
-    return new LocalMessage(sender);
+  protected String buildMessage(String message, Player reciever) {
+    return getPrefix() + message;
   }
 
   @Override
-  protected void complete(Message msg) {
-    if (msg.getRecieverCount() <= 0) {
-      msg.getSender().addTMessage(Color.RED, "Nobody is around to hear you.");
+  protected boolean sendToPlayer(Player reciever) {
+    return true;
+  }
+
+  private String getPrefix() {
+    Server server = sender.getServer();
+
+    String prefix = "";
+    String color = "f";
+    String title = "";
+    String format = server.options.get("msgFormat");
+    Group group = sender.getGroup();
+
+    if (group != null) {
+      color = group.getColor();
+      if (group.showTitle()) {
+        title = group.getName();
+        format = server.options.get("msgTitleFormat");
+      }
     }
+
+    try {
+      prefix = String.format(format, sender.getName(), title, color);
+    } catch (IllegalFormatException e) {
+      System.out.println("[SimpleServer] There is an error in your msgFormat/msgTitleFormat settings!");
+    }
+    return prefix;
   }
+
+  @Override
+  protected void noRecieverFound() {
+    return;
+  }
+
 }

@@ -20,25 +20,19 @@
  */
 package simpleserver.command;
 
-import simpleserver.Color;
 import simpleserver.Player;
-import simpleserver.message.LocalMessage;
+import simpleserver.message.AreaMessage;
 import simpleserver.message.Message;
 
-public class LocalSayCommand extends MessageCommand implements PlayerCommand {
-  public LocalSayCommand() {
-    super("local MESSAGE", "Send a chat message to nearby players");
+public class AreaSayCommand extends MessageCommand implements PlayerCommand {
+
+  public AreaSayCommand() {
+    super("areasay MESSAGE", "Send message to all players in your area");
   }
 
   @Override
   protected Message getMessageInstance(Player sender, String message) {
-    return new LocalMessage(sender);
+    return new AreaMessage(sender);
   }
 
-  @Override
-  protected void complete(Message msg) {
-    if (msg.getRecieverCount() <= 0) {
-      msg.getSender().addTMessage(Color.RED, "Nobody is around to hear you.");
-    }
-  }
 }

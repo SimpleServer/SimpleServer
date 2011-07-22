@@ -18,27 +18,48 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package simpleserver.command;
+package simpleserver.message;
+
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 
 import simpleserver.Color;
 import simpleserver.Player;
-import simpleserver.message.LocalMessage;
-import simpleserver.message.Message;
+import simpleserver.PlayerList;
 
-public class LocalSayCommand extends MessageCommand implements PlayerCommand {
-  public LocalSayCommand() {
-    super("local MESSAGE", "Send a chat message to nearby players");
+public class PrivateMessage extends AbstractMessage {
+
+  private Player reciever;
+
+  public PrivateMessage(Player sender, Player reciever) {
+    super(sender);
+    this.reciever = reciever;
+    chatRoom = reciever.getName();
   }
 
   @Override
-  protected Message getMessageInstance(Player sender, String message) {
-    return new LocalMessage(sender);
-  }
-
-  @Override
-  protected void complete(Message msg) {
-    if (msg.getRecieverCount() <= 0) {
-      msg.getSender().addTMessage(Color.RED, "Nobody is around to hear you.");
+  public List<Player> getRecievers(PlayerList playerList) {
+    List<Player> recieverList = new LinkedList<Player>();
+    try {
+      Collections.addAll(recieverList, sender, reciever);
+      recieverCount = 2;
+    } catch (NullPointerException e) {
+      noRecieverFound();
     }
+
+    return recieverList;
   }
+
+  @Override
+  @Deprecated
+  protected boolean sendToPlayer(Player reciever) {
+    return (reciever.equals(this.reciever) || reciever.equals(sender));
+  }
+
+  @Override
+  protected void noRecieverFound() {
+    sender.addTMessage(Color.RED, "Player not online (%s)", reciever.getName());
+  }
+
 }

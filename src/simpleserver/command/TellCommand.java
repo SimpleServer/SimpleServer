@@ -22,8 +22,10 @@ package simpleserver.command;
 
 import simpleserver.Color;
 import simpleserver.Player;
+import simpleserver.message.Message;
+import simpleserver.message.PrivateMessage;
 
-public class TellCommand extends OnlinePlayerArgCommand implements
+public class TellCommand extends MessageCommand implements
     PlayerCommand {
 
   public TellCommand() {
@@ -32,21 +34,25 @@ public class TellCommand extends OnlinePlayerArgCommand implements
   }
 
   @Override
-  protected void executeWithTarget(Player player, String message, Player target) {
-    String chat = extractArgument(message, 1);
-    if (chat != null) {
-      String caption = player.getName() + " -> " + target.getName();
-      player.addCaptionedMessage(caption, chat);
-      target.addCaptionedMessage(caption, chat);
+  protected Message getMessageInstance(Player sender, String message) {
+    String[] arguments = extractArguments(message);
 
-      target.setReply(player);
+    if (arguments.length > 0) {
+      Player reciever = sender.getServer().findPlayer(arguments[0]);
+      if (reciever == null) {
+        sender.addTMessage(Color.RED, "Player not online (%s)", arguments[0]);
+      } else {
+        reciever.setReply(sender);
+        return new PrivateMessage(sender, reciever);
+      }
     } else {
-      player.addTMessage(Color.RED, "Please supply a message.");
+      sender.addTMessage(Color.RED, "No player or message specified.");
     }
+    return null;
   }
 
   @Override
-  protected void noTargetSpecified(Player player, String message) {
-    player.addTMessage(Color.RED, "No player or message specified.");
+  protected String extractMessage(String message) {
+    return extractArgument(message, 1);
   }
 }

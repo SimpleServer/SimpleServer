@@ -22,6 +22,7 @@ package simpleserver;
 
 public class Group {
   private final String groupName;
+  private final int groupId;
   private final boolean showTitle;
   private final boolean isAdmin;
   private final String color;
@@ -29,10 +30,11 @@ public class Group {
   private final int warmupSecs;
   private final int cooldownSecs;
 
-  public Group(String groupName, boolean showTitle, boolean isAdmin,
-               String color, boolean forwardsCommands, int warmupSecs,
-               int cooldownSecs) {
+  public Group(String groupName, int groupId, boolean showTitle,
+               boolean isAdmin, String color, boolean forwardsCommands,
+               int warmupSecs, int cooldownSecs) {
     this.groupName = groupName;
+    this.groupId = groupId;
     this.showTitle = showTitle;
     this.isAdmin = isAdmin;
     this.color = color;
@@ -43,6 +45,10 @@ public class Group {
 
   public String getName() {
     return groupName;
+  }
+
+  public int getId() {
+    return groupId;
   }
 
   public boolean showTitle() {

@@ -31,13 +31,16 @@
     -->
     <commands>
       <command name="area" allow="0+" />
+      <command name="areasay" aliases="a" allow="1+"/>
       <command name="back" allow="4,5" />
       <command name="backup" allow="4,5" />
       <command name="ban" allow="4,5" />
       <command name="banip" allow="4,5" />
+      <command name="dimension" aliases="d" allow="1+" />
       <command name="give" allow="3-5" />
       <command name="giveplayer" allow="4,5" />
       <command name="gps" allow="3-5" />
+      <command name="group" aliases="g" allow="1+" />
       <command name="help" aliases="commands" allow="0+" />
       <command name="home" allow="1+" />
       <command name="idbehold" allow="-" />

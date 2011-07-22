@@ -18,27 +18,22 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package simpleserver.command;
+package simpleserver.message;
 
-import simpleserver.Color;
 import simpleserver.Player;
-import simpleserver.message.LocalMessage;
-import simpleserver.message.Message;
+import simpleserver.Server;
 
-public class LocalSayCommand extends MessageCommand implements PlayerCommand {
-  public LocalSayCommand() {
-    super("local MESSAGE", "Send a chat message to nearby players");
+public class Messager {
+  Server server;
+
+  public Messager(Server server) {
+    this.server = server;
   }
 
-  @Override
-  protected Message getMessageInstance(Player sender, String message) {
-    return new LocalMessage(sender);
-  }
-
-  @Override
-  protected void complete(Message msg) {
-    if (msg.getRecieverCount() <= 0) {
-      msg.getSender().addTMessage(Color.RED, "Nobody is around to hear you.");
+  public void propagate(Message message) {
+    for (Player reciever : message.getRecievers(server.playerList)) {
+      reciever.addMessage(message.getMessage(reciever));
     }
   }
+
 }
