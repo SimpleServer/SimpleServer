@@ -41,13 +41,14 @@ public class PrivateMessage extends AbstractMessage {
   @Override
   public List<Player> getRecievers(PlayerList playerList) {
     List<Player> recieverList = new LinkedList<Player>();
-    try {
+    if (reciever.getName() != null) {
       Collections.addAll(recieverList, sender, reciever);
-      recieverCount = 2;
-    } catch (NullPointerException e) {
-      noRecieverFound();
+      reciever.setReply(sender);
+    } else {
+      recieverList.clear();
     }
 
+    recieverCount = recieverList.size();
     return recieverList;
   }
 
@@ -58,8 +59,8 @@ public class PrivateMessage extends AbstractMessage {
   }
 
   @Override
-  protected void noRecieverFound() {
-    sender.addTMessage(Color.RED, "Player not online (%s)", reciever.getName());
+  public void noRecieverFound() {
+    sender.addTMessage(Color.RED, "Player not online (%s)", chatRoom);
   }
 
 }

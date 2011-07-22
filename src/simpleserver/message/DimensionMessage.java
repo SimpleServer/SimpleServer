@@ -19,7 +19,7 @@ public class DimensionMessage extends AbstractMessage {
   }
 
   @Override
-  protected void noRecieverFound() {
+  public void noRecieverFound() {
     sender.addTMessage(Color.RED, "Nobody is in this dimension to hear you");
   }
 }

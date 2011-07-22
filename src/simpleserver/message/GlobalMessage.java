@@ -28,8 +28,11 @@ import simpleserver.Server;
 
 public class GlobalMessage extends AbstractMessage {
 
+  private static final String GLOBAL_CHAT = "global";
+
   public GlobalMessage(Player sender) {
     super(sender);
+    chatRoom = GLOBAL_CHAT;
   }
 
   @Override
@@ -68,7 +71,7 @@ public class GlobalMessage extends AbstractMessage {
   }
 
   @Override
-  protected void noRecieverFound() {
+  public void noRecieverFound() {
     return;
   }
 

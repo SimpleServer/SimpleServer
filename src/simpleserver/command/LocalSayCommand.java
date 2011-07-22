@@ -20,7 +20,6 @@
  */
 package simpleserver.command;
 
-import simpleserver.Color;
 import simpleserver.Player;
 import simpleserver.message.LocalMessage;
 import simpleserver.message.Message;
@@ -33,12 +32,5 @@ public class LocalSayCommand extends MessageCommand implements PlayerCommand {
   @Override
   protected Message getMessageInstance(Player sender, String message) {
     return new LocalMessage(sender);
-  }
-
-  @Override
-  protected void complete(Message msg) {
-    if (msg.getRecieverCount() <= 0) {
-      msg.getSender().addTMessage(Color.RED, "Nobody is around to hear you.");
-    }
   }
 }

@@ -45,9 +45,10 @@ public abstract class AbstractMessage implements Message, Cloneable {
     this.message = message;
   }
 
-  @Override
-  public AbstractMessage clone() throws CloneNotSupportedException {
-    return (AbstractMessage) super.clone();
+  public AbstractMessage clone(String message) throws CloneNotSupportedException {
+    AbstractMessage clone = (AbstractMessage) super.clone();
+    clone.setMessage(message);
+    return clone;
   }
 
   public Player getSender() {
@@ -64,9 +65,6 @@ public abstract class AbstractMessage implements Message, Cloneable {
           recieverCount++;
         }
       }
-    }
-    if (recieverCount == 0) {
-      noRecieverFound();
     }
     return recieverList;
   }
@@ -90,7 +88,7 @@ public abstract class AbstractMessage implements Message, Cloneable {
 
   abstract protected boolean sendToPlayer(Player reciever);
 
-  abstract protected void noRecieverFound();
+  abstract public void noRecieverFound();
 
   protected static final String getCaptionedString(String Caption, String message) {
     return String.format("%s%s: %s%s", Color.GRAY, Caption, Color.WHITE, message);
@@ -98,5 +96,10 @@ public abstract class AbstractMessage implements Message, Cloneable {
 
   protected static final String getColoredString(Color color, String message) {
     return String.format("%s%s", color, message);
+  }
+
+  @Override
+  public String toString() {
+    return chatRoom;
   }
 }

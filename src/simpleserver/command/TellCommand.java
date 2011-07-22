@@ -42,7 +42,6 @@ public class TellCommand extends MessageCommand implements
       if (reciever == null) {
         sender.addTMessage(Color.RED, "Player not online (%s)", arguments[0]);
       } else {
-        reciever.setReply(sender);
         return new PrivateMessage(sender, reciever);
       }
     } else {

@@ -34,6 +34,9 @@ public class Messager {
     for (Player reciever : message.getRecievers(server.playerList)) {
       reciever.addMessage(message.getMessage(reciever));
     }
+    if (message.getRecieverCount() == 0) {
+      message.noRecieverFound();
+    }
   }
 
 }

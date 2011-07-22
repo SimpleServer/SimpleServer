@@ -35,5 +35,7 @@ public interface Message extends Cloneable {
 
   public int getRecieverCount();
 
+  public void noRecieverFound();
+
   public String getMessage(Player reciever);
 }

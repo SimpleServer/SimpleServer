@@ -29,6 +29,7 @@ public class AreaMessage extends AbstractMessage {
   PermissionConfig perm;
 
   public AreaMessage(Player sender) {
+    // TODO: notice that area is changed when walking around...
     super(sender);
 
     perm = sender.getServer().permissions;
@@ -41,7 +42,7 @@ public class AreaMessage extends AbstractMessage {
   }
 
   @Override
-  protected void noRecieverFound() {
+  public void noRecieverFound() {
     if (perm.getCurrentArea(sender).isEmpty()) {
       sender.addTMessage(Color.RED, "You are in no area at the moment");
     } else {

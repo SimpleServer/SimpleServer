@@ -24,7 +24,7 @@ public class GroupMessage extends AbstractMessage {
   }
 
   @Override
-  protected void noRecieverFound() {
+  public void noRecieverFound() {
     sender.addTMessage(Color.RED, "Nobody in group %s is online", group.getName());
   }
 

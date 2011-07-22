@@ -262,6 +262,8 @@ public class StreamTunnel {
           }
 
           if (message.startsWith("/") || message.startsWith("!")) {
+            write(packetId);
+            write(message);
             break;
           }
 

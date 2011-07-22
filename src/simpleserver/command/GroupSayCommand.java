@@ -44,13 +44,15 @@ public class GroupSayCommand extends MessageCommand implements PlayerCommand {
     PermissionConfig perm = sender.getServer().permissions;
 
     String[] arguments = extractArguments(message);
-    try {
-      int groupId = Integer.parseInt(arguments[0]);
-      if (arguments.length > 1 && perm.getGroup(groupId) != null) {
-        group = perm.getGroup(groupId);
-        chatMessage = extractArgument(message);
+    if (arguments.length > 1) {
+      try {
+        int groupId = Integer.parseInt(arguments[0]);
+        if (perm.getGroup(groupId) != null) {
+          group = perm.getGroup(groupId);
+          chatMessage = extractArgument(message);
+        }
+      } catch (NumberFormatException e) {
       }
-    } catch (NumberFormatException e) {
     }
 
     return new GroupMessage(sender, group);
