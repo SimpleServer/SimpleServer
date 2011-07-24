@@ -31,9 +31,9 @@ import java.util.TimerTask;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import simpleserver.Coordinate.Dimension;
+import simpleserver.bot.BotController.ConnectException;
 import simpleserver.bot.Giver;
 import simpleserver.bot.Teleporter;
-import simpleserver.bot.BotController.ConnectException;
 import simpleserver.command.ExternalCommand;
 import simpleserver.command.PlayerCommand;
 import simpleserver.config.data.Stats.StatField;
@@ -59,7 +59,6 @@ public class Player {
   private boolean godMode = false;
   private String kickMsg = null;
   public Position position;
-  private Dimension dimension;
   private int group = 0;
   private int entityId = 0;
   private Group groupObject = null;
@@ -654,11 +653,11 @@ public class Player {
   }
 
   public void setDimension(Dimension dimension) {
-    this.dimension = dimension;
+    position.updateDimension(dimension);
   }
 
   public Dimension getDimension() {
-    return dimension;
+    return position.dimension();
   }
 
   public void teleport(Coordinate coordinate) throws ConnectException, IOException {
