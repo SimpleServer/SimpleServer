@@ -20,9 +20,10 @@
  */
 package simpleserver.config.data;
 
+import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import simpleserver.Player;
 import simpleserver.Position;
@@ -49,8 +50,8 @@ public class Homes {
     return null;
   }
 
-  public List<String> getHomesPlayerInvitedTo(String playerName) {
-    List<String> invitedHomes = new LinkedList<String>();
+  public Set<String> getHomesPlayerInvitedTo(String playerName) {
+    Set<String> invitedHomes = new HashSet<String>();
     for (String name : playerData.names()) {
       NBTCompound player = playerData.get(name);
       if (player.containsKey(HOME)) {
@@ -120,7 +121,11 @@ public class Homes {
     }
 
     public String getInvitedPlayer(String prefix) {
-      for (String playerName : getPlayersInvited()) {
+      Set<String> invitedPlayers = getPlayersInvited();
+      if (invitedPlayers.contains(prefix)) {
+        return prefix;
+      }
+      for (String playerName : invitedPlayers) {
         if (playerName.startsWith(prefix)) {
           return playerName;
         }
@@ -128,8 +133,8 @@ public class Homes {
       return prefix;
     }
 
-    public List<String> getPlayersInvited() {
-      List<String> playersInvited = new LinkedList<String>();
+    public Set<String> getPlayersInvited() {
+      Set<String> playersInvited = new HashSet<String>();
       Iterator<NBTString> iterator = invites.iterator();
       while (iterator.hasNext()) {
         playersInvited.add(iterator.next().get());
