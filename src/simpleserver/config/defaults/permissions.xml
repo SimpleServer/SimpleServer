@@ -6,6 +6,7 @@
 
   <groups>
   <!-- Groups must have distinct integer ids -->
+    <group id="-1" name="Rulebreaker" color="8" showTitle="true" ignoreChestlocks="false" forwardUnknownCommands="false" warmup="0" cooldown="0" />
     <group id="0" name="Guest" color="f" showTitle="true" ignoreChestlocks="false" forwardUnknownCommands="false" warmup="0" cooldown="0" />
     <group id="1" name="Player" color="f" showTitle="false" ignoreChestlocks="false" forwardUnknownCommands="true" warmup="0" cooldown="0" />
     <group id="2" name="Trusted" color="9" showTitle="false" ignoreChestlocks="false" forwardUnknownCommands="true" warmup="0" cooldown="0" />
@@ -41,6 +42,8 @@
       <command name="home" allow="1+" />
       <command name="idbehold" allow="-" />
       <command name="iddqd" allow="4,5" />
+      <command name="jail" allow="4,5" />
+      <command name="jailset" allow="5" />
       <command name="kick" allow="3-5" />
       <command name="kit" aliases="kits" allow="1+" />
       <command name="listips" allow="3-5" />
@@ -70,6 +73,7 @@
       <command name="time" allow="4,5" />
       <command name="unban" allow="4,5" />
       <command name="unbanip" allow="4,5" />
+      <command name="unjail" allow="4,5" />
       <command name="unlock" allow="1+" />
       <command name="unmute" allow="3-5" />
       <command name="unwhitelist" allow="3-5" />
@@ -120,5 +124,4 @@
   -->
 
   </areas>
-
 </config>

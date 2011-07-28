@@ -20,11 +20,16 @@
  */
 package simpleserver.command;
 
+import java.util.List;
+
 import simpleserver.Color;
 import simpleserver.Player;
 import simpleserver.config.data.Warp;
 
 public class WarpCommand extends AbstractCommand implements PlayerCommand {
+  // All warp names used by other commands, e.g. /jail
+  private final String[] restrictedNames = { "jail" };
+
   public WarpCommand() {
     super("warp [list|remove|add] [name]", "Use and manage waypoints");
   }
@@ -43,14 +48,30 @@ public class WarpCommand extends AbstractCommand implements PlayerCommand {
     }
     String command = arguments[0];
     if (command.equals("list")) {
-      player.addTCaptionedMessage("Waypoints", "%s", join(player.getServer().data.warp.names()));
+      List<String> list = player.getServer().data.warp.names();
+      for (String name : restrictedNames) {
+        for (String listedName : list) {
+          if (listedName.equals(name)) {
+            list.remove(listedName);
+          }
+        }
+      }
+      player.addTCaptionedMessage("Waypoints", "%s", join(list));
     } else if (command.equals("add")) {
       if (arguments.length == 1) {
         player.addTMessage(Color.RED, "You have to provide the name of a waypoint");
         return;
-      } else if (warp.contains(arguments[1])) {
-        player.addTMessage(Color.RED, "There already exists a waypoint named %s", arguments[1]);
-        return;
+      } else {
+        for (String name : restrictedNames) {
+          if (arguments[1].equals(name)) {
+            player.addTMessage(Color.RED, "This name is restricted!");
+            return;
+          }
+        }
+        if (warp.contains(arguments[1])) {
+          player.addTMessage(Color.RED, "There already exists a waypoint named %s", arguments[1]);
+          return;
+        }
       }
       warp.set(arguments[1], player.position);
       player.getServer().data.save();
@@ -65,6 +86,12 @@ public class WarpCommand extends AbstractCommand implements PlayerCommand {
         player.addTMessage(Color.RED, "No such waypoint exists.");
         return;
       }
+      for (String name : restrictedNames) {
+        if (waypoint.equals(name)) {
+          player.addTMessage(Color.RED, "This name is restricted!");
+          return;
+        }
+      }
       warp.remove(waypoint);
       player.getServer().data.save();
       player.addTMessage(Color.GRAY, "Waypoint removed");
@@ -73,6 +100,12 @@ public class WarpCommand extends AbstractCommand implements PlayerCommand {
       if (waypoint == null) {
         player.addTMessage(Color.RED, "No such waypoint exists.");
         return;
+      }
+      for (String name : restrictedNames) {
+        if (waypoint.equals(name)) {
+          player.addTMessage(Color.RED, "This name is restricted!");
+          return;
+        }
       }
       player.teleportWithWarmup(warp.get(waypoint));
     }

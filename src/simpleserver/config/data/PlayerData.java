@@ -31,6 +31,7 @@ public class PlayerData {
   private NBTCompound node;
   public Stats stats = new Stats(this);
   public Homes homes = new Homes(this);
+  public JailRecord jail = new JailRecord(this);
 
   private final static String PLAYERS = "players";
 

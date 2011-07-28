@@ -37,6 +37,7 @@ import simpleserver.bot.Teleporter;
 import simpleserver.command.ExternalCommand;
 import simpleserver.command.PlayerCommand;
 import simpleserver.config.data.Stats.StatField;
+import simpleserver.config.data.Warp;
 import simpleserver.stream.StreamTunnel;
 
 public class Player {
@@ -347,10 +348,16 @@ public class Player {
   }
 
   public int getGroupId() {
+    if (getIsJailed()) {
+      return Integer.valueOf(server.options.get("jailGroup"));
+    }
     return group;
   }
 
   public Group getGroup() {
+    if (getIsJailed()) {
+      return server.permissions.getGroup(Integer.valueOf(server.options.get("jailGroup")));
+    }
     return groupObject;
   }
 
@@ -658,6 +665,34 @@ public class Player {
 
   public Dimension getDimension() {
     return position.dimension();
+  }
+
+  public boolean getIsJailed() {
+    return server.data.players.jail.get(getName()).getIsJailed();
+  }
+
+  public boolean jail(int mins, String reason) {
+    Warp warp = server.data.warp;
+    String waypoint = warp.getName("jail");
+    if (waypoint == null) {
+      return false;
+    }
+
+    try {
+      teleport(warp.get(waypoint));
+    } catch (Exception e) {
+      System.out.println("[SimpleServer] " + e.getMessage());
+      System.out.println("[SimpleServer] Failed to jail " + getName() + "!");
+      return false;
+    }
+
+    server.data.players.jail.get(getName()).jail(mins);
+    addTMessage(Color.RED, "You were sent to jail: %s", reason);
+    return true;
+  }
+
+  public void unjail() {
+    server.data.players.jail.get(getName()).unjail();
   }
 
   public void teleport(Coordinate coordinate) throws ConnectException, IOException {
