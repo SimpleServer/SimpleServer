@@ -18,39 +18,37 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package simpleserver.command;
+package simpleserver;
 
-import simpleserver.Color;
-import simpleserver.Player;
+import java.util.Timer;
+import java.util.TimerTask;
 
-public class UnjailCommand extends OnlinePlayerArgCommand {
-  public UnjailCommand() {
-    super("unjail PLAYER", "Return the jailed player back to his origin group");
+public class JailRelease {
+  public void addRelease(Player player, long afterMillis) {
+    String playerName = player.getName();
+
+    Timer timer = new Timer("Unjail_" + playerName);
+    timer.schedule(new Releaser(player.getServer(), playerName), afterMillis);
   }
 
-  protected boolean allowed(Player player, Player target) {
-    if (target.getGroupId() >= player.getGroupId()) {
-      player.addTMessage(Color.RED, "You cannot unjail players that are in your group or higher!");
-      return false;
+  private class Releaser extends TimerTask {
+    private final Server server;
+    private final String playerName;
+
+    Releaser(Server server, String playerName) {
+      this.server = server;
+      this.playerName = playerName;
     }
-    return true;
-  }
 
-  @Override
-  protected void executeWithTarget(Player player, String message, Player target) {
-    if (allowed(player, target)) {
-      if (target.getIsJailed()) {
-        target.unjail();
-        player.addTMessage(Color.GRAY, "Player %s is now un-jailed.", target.getName());
-        player.getServer().adminLog("Admin " + player.getName() + " unjailed player:\t " + target.getName());
-      } else {
-        player.addTMessage(Color.GRAY, "Player %s wasn't jailed before.", target.getName());
+    @Override
+    public void run() {
+      Player target = server.findPlayer(playerName);
+
+      if (target != null) {
+        if (target.getIsJailed()) {
+          target.unjail();
+        }
       }
     }
-  }
-
-  @Override
-  protected void noTargetSpecified(Player player, String message) {
-    player.addTMessage(Color.RED, "No player specified.");
   }
 }

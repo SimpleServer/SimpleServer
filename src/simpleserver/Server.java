@@ -97,6 +97,7 @@ public class Server {
   private ConnectionLog connectionLog;
   private SystemInputQueue systemInput;
 
+  public JailRelease jailRelease;
   private MinecraftWrapper minecraft;
   private RconServer rconServer;
   private TelnetServer telnetServer;
@@ -372,6 +373,8 @@ public class Server {
     resources.add(mutelist = new MuteList());
     resources.add(giveAliasList = new GiveAliasList());
     resources.add(data = new GlobalData());
+
+    jailRelease = new JailRelease();
 
     time = new Time(this);
     bots = new BotController(this);

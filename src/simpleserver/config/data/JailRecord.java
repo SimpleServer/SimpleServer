@@ -54,14 +54,28 @@ public class JailRecord {
     player.put(record.tag());
   }
 
+  public enum JailState {
+    RELEASED((byte) 0), LOCKED((byte) 1);
+
+    private final byte type;
+
+    JailState(byte type) {
+      this.type = type;
+    }
+
+    public byte getType() {
+      return type;
+    }
+  }
+
   public class Record {
-    private final static String IS_JAILED = "isJailed";
+    private final static String STATE = "state";
     private final static String JAILED_UNTIL = "jailedUntil";
     private final static String WILL_GET_RELEASED = "willGetReleased";
 
     private final String playerName;
 
-    private boolean isJailed = false;
+    private JailState state = JailState.RELEASED;
     private long jailedUntil = 0;
     private boolean willGetReleased = true;
 
@@ -72,15 +86,22 @@ public class JailRecord {
     Record(NBTCompound tag, String playerName) {
       this.playerName = playerName;
 
-      isJailed = tag.getByte(IS_JAILED).get().equals((byte) 1);
+      state = (tag.getByte(STATE).get().equals((byte) 1)) ? JailState.LOCKED : JailState.RELEASED;
       jailedUntil = tag.getLong(JAILED_UNTIL).get();
       willGetReleased = tag.getByte(WILL_GET_RELEASED).get().equals((byte) 1);
+
+      if (state == JailState.LOCKED) {
+        if (willGetReleased) {
+          if (System.currentTimeMillis() >= jailedUntil) {
+            unjail();
+          }
+        }
+      }
     }
 
-    public void jail(int jailLenghtMins) {
-      isJailed = true;
+    public void jail(long jailLenghtMillis) {
+      state = JailState.LOCKED;
 
-      long jailLenghtMillis = jailLenghtMins * 60 * 1000;
       willGetReleased = (jailLenghtMillis != 0);
       jailedUntil = System.currentTimeMillis() + jailLenghtMillis;
 
@@ -88,31 +109,19 @@ public class JailRecord {
     }
 
     public void unjail() {
-      isJailed = false;
+      state = JailState.RELEASED;
       jailedUntil = 0;
       willGetReleased = true;
       set(playerName, this);
     }
 
-    public boolean getIsJailed() {
-      if (!isJailed) {
-        return false;
-      }
-
-      if (willGetReleased) {
-        if (System.currentTimeMillis() >= jailedUntil) {
-          isJailed = false;
-          set(playerName, this);
-          return false;
-        }
-      }
-
-      return true;
+    public JailState getIsJailed() {
+      return state;
     }
 
     public NBTCompound tag() {
       NBTCompound tag = new NBTCompound(JAIL);
-      NBTByte isJailedValue = new NBTByte(IS_JAILED, isJailed ? (byte) 1 : (byte) 0);
+      NBTByte isJailedValue = new NBTByte(STATE, state.getType());
       tag.put(isJailedValue);
       NBTLong jailedUntilValue = new NBTLong(JAILED_UNTIL, jailedUntil);
       tag.put(jailedUntilValue);

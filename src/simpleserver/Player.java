@@ -36,6 +36,7 @@ import simpleserver.bot.Giver;
 import simpleserver.bot.Teleporter;
 import simpleserver.command.ExternalCommand;
 import simpleserver.command.PlayerCommand;
+import simpleserver.config.data.JailRecord.JailState;
 import simpleserver.config.data.Stats.StatField;
 import simpleserver.config.data.Warp;
 import simpleserver.stream.StreamTunnel;
@@ -668,7 +669,7 @@ public class Player {
   }
 
   public boolean getIsJailed() {
-    return server.data.players.jail.get(getName()).getIsJailed();
+    return server.data.players.jail.get(getName()).getIsJailed() == JailState.LOCKED;
   }
 
   public boolean jail(int mins, String reason) {
@@ -686,13 +687,24 @@ public class Player {
       return false;
     }
 
-    server.data.players.jail.get(getName()).jail(mins);
     addTMessage(Color.RED, "You were sent to jail: %s", reason);
+    long millis = mins * 60 * 1000;
+    server.data.players.jail.get(getName()).jail(millis);
+    server.jailRelease.addRelease(this, millis);
     return true;
   }
 
   public void unjail() {
     server.data.players.jail.get(getName()).unjail();
+    addTMessage(Color.GRAY, "You were released from jail.");
+
+    try {
+      teleport(server.world.spawnPoint());
+    } catch (Exception e) {
+      System.out.println("[SimpleServer] " + e.getMessage());
+      System.out.println("[SimpleServer] Could not teleport " + getName() + " out of jail!");
+      addTMessage(Color.RED, "Sorry, we couldn't teleport you out of jail!");
+    }
   }
 
   public void teleport(Coordinate coordinate) throws ConnectException, IOException {
