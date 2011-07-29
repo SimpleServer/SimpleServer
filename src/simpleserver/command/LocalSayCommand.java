@@ -39,4 +39,10 @@ public class LocalSayCommand extends AbstractCommand implements PlayerCommand {
       player.addTMessage(Color.RED, "Please supply a message.");
     }
   }
+
+  @Override
+  public void usage(Player player) {
+    player.addTMessage(Color.GRAY, "Send a message to all players within %s block radius of you",
+                       player.getServer().options.getInt("localChatRadius"));
+  }
 }

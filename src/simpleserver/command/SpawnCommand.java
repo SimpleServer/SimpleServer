@@ -35,4 +35,9 @@ public class SpawnCommand extends AbstractCommand implements PlayerCommand {
       player.addTMessage(Color.RED, "Teleporting failed.");
     }
   }
+
+  @Override
+  public void usage(Player player) {
+    player.addTMessage(Color.GRAY, "Teleport yourself back to the spawn point");
+  }
 }

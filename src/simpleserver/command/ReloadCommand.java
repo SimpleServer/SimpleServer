@@ -46,4 +46,10 @@ public class ReloadCommand extends AbstractCommand implements PlayerCommand,
       System.out.println("Resources Reloaded!");
     }
   }
+
+  @Override
+  public void usage(Player player) {
+    player.addTMessage(Color.GRAY, "Reload all the configuration files (e.g. permissions.xml)");
+    player.addTMessage(Color.GRAY, "This does not affect the map");
+  }
 }

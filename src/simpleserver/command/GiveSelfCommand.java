@@ -20,6 +20,7 @@
  */
 package simpleserver.command;
 
+import simpleserver.Color;
 import simpleserver.Player;
 
 public class GiveSelfCommand extends GiveCommand implements PlayerCommand {
@@ -30,5 +31,12 @@ public class GiveSelfCommand extends GiveCommand implements PlayerCommand {
   public void execute(Player player, String message) {
     executor = player;
     execute(extractArguments(message), player, player.getName());
+  }
+
+  @Override
+  public void usage(Player player) {
+    player.addTMessage(Color.GRAY, "Give yourself specific amount of items");
+    player.addTMessage(Color.GRAY, "The optional %s value is used for colored wool & other specific items",
+                       Color.WHITE + "DAMAGE" + Color.GRAY);
   }
 }

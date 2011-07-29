@@ -41,4 +41,9 @@ public class SaveCommand extends AbstractCommand implements PlayerCommand,
     server.runCommand("save-all", null);
     System.out.println("Resources Saved!");
   }
+
+  @Override
+  public void usage(Player player) {
+    player.addTMessage(Color.GRAY, "Save all the configuration files (e.g. permissions.xml) and the map");
+  }
 }

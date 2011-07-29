@@ -48,4 +48,10 @@ public class VisitCommand extends OnlinePlayerArgCommand {
       player.addTMessage(Color.RED, "No teleport possible!");
     }
   }
+
+  @Override
+  public void usage(Player player) {
+    player.addTMessage(Color.GRAY, "Send a player request saying that you would like to visit him/her");
+    player.addTMessage(Color.GRAY, "If the player aggrees to it, you are teleported to him/her");
+  }
 }

@@ -35,4 +35,10 @@ public class MOTDCommand extends AbstractCommand implements PlayerCommand {
       player.addTMessage(Color.RED, "MOTD is empty.");
     }
   }
+
+  @Override
+  public void usage(Player player) {
+    player.addTMessage(Color.GRAY, "The message of the day is a message that the server owner can make to inform the players about news and other important things");
+    player.addTMessage(Color.GRAY, "This message is also displayed when to a player when he/she joins");
+  }
 }

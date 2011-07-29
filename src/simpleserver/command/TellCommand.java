@@ -23,12 +23,9 @@ package simpleserver.command;
 import simpleserver.Color;
 import simpleserver.Player;
 
-public class TellCommand extends OnlinePlayerArgCommand implements
-    PlayerCommand {
-
+public class TellCommand extends OnlinePlayerArgCommand implements PlayerCommand {
   public TellCommand() {
-    super("tell PLAYER MESSAGE...",
-          "Send a message to the named player");
+    super("tell PLAYER MESSAGE...", "Send a message to the named player");
   }
 
   @Override
@@ -48,5 +45,10 @@ public class TellCommand extends OnlinePlayerArgCommand implements
   @Override
   protected void noTargetSpecified(Player player, String message) {
     player.addTMessage(Color.RED, "No player or message specified.");
+  }
+
+  @Override
+  public void usage(Player player) {
+    player.addTMessage(Color.GRAY, "Send a player a quiet message (whisper) that only he receives");
   }
 }

@@ -43,4 +43,9 @@ public class IPListCommand extends AbstractCommand implements PlayerCommand,
       System.out.println(friend.getName() + " " + friend.getIPAddress());
     }
   }
+
+  @Override
+  public void usage(Player player) {
+    player.addTMessage(Color.GRAY, "Show the IP adresses that the players are connected to the server from");
+  }
 }

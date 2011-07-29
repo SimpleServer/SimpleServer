@@ -85,4 +85,11 @@ public class LoginCommand extends AbstractCommand implements PlayerCommand {
     }
     return true;
   }
+
+  @Override
+  public void usage(Player player) {
+    player.addTMessage(Color.GRAY, "Log in using the SimpleServer custom authorisation you registred");
+    player.addTMessage(Color.GRAY, "%s needs to be your username,", Color.WHITE + "PLAYER" + Color.GRAY);
+    player.addTMessage(Color.GRAY, "%s needs to be your password", Color.WHITE + "PASSWORD" + Color.GRAY);
+  }
 }

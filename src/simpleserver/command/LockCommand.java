@@ -56,4 +56,13 @@ public class LockCommand extends AbstractCommand implements PlayerCommand {
       player.setChestName(name);
     }
   }
+
+  @Override
+  public void usage(Player player) {
+    String lock = commandPrefix() + "lock";
+    player.addTMessage(Color.GRAY, "Locked chests are chests that can be opened only by you and admins who have recieved rights to do so.");
+    player.addTMessage(Color.GRAY, "To lock a chest, use %s", Color.WHITE + lock);
+    player.addTMessage(Color.GRAY, "To give the locked chest a name, use %s name", Color.WHITE + lock);
+    player.addTMessage(Color.GRAY, "To see all your locked chests, use %s", Color.WHITE + lock + " list");
+  }
 }

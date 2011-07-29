@@ -39,4 +39,9 @@ public class RulesCommand extends AbstractCommand implements PlayerCommand {
       player.addTMessage(Color.RED, "Rules are empty.");
     }
   }
+
+  @Override
+  public void usage(Player player) {
+    player.addTMessage(Color.GRAY, "Show the server rules set by server owner");
+  }
 }

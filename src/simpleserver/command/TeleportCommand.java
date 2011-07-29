@@ -26,8 +26,7 @@ import simpleserver.Server;
 
 public class TeleportCommand extends OnlinePlayerArgCommand {
   public TeleportCommand() {
-    super("teleport PLAYER1 PLAYER2",
-          "Teleport the first player to the second");
+    super("teleport PLAYER1 PLAYER2", "Teleport the first player to the second");
   }
 
   @Override
@@ -62,5 +61,10 @@ public class TeleportCommand extends OnlinePlayerArgCommand {
   @Override
   protected void noTargetSpecified(Player player, String message) {
     player.addTMessage(Color.RED, "No players specified.");
+  }
+
+  @Override
+  public void usage(Player player) {
+    player.addTMessage(Color.GRAY, "Teleport %s to %s if they are in the same dimension", "PLAYER1", "PLAYER2");
   }
 }

@@ -28,8 +28,7 @@ import simpleserver.Server;
 
 public class SetIPGroupCommand extends SetGroupCommand implements ServerCommand {
   public SetIPGroupCommand() {
-    super("setipgroup IP|Player",
-          "Set the group ID of an IP address");
+    super("setipgroup IP|Player", "Set the group ID of an IP address");
   }
 
   @Override
@@ -60,5 +59,11 @@ public class SetIPGroupCommand extends SetGroupCommand implements ServerCommand 
     }
     server.permissions.setIPGroup(target, group);
     System.out.println("[SimpleServer] Group of " + target + " was set to " + group + "!");
+  }
+
+  @Override
+  public void usage(Player player) {
+    player.addTMessage(Color.GRAY, "Change the group ID of all players playing from the IP address");
+    player.addTMessage(Color.GRAY, "To know the IDs of each group, ask the server owner or refer to the permissions.xml file");
   }
 }

@@ -106,4 +106,11 @@ public class RegisterCommand extends AbstractCommand implements PlayerCommand {
     }
     return r;
   }
+
+  @Override
+  public void usage(Player player) {
+    player.addTMessage(Color.GRAY, "Register or change password in the SimpleServer custom authorisation");
+    player.addTMessage(Color.GRAY, "You must enter the new password twice, with a space between them");
+    player.addTMessage(Color.GRAY, "If you are already registred, you also need to enter your old password");
+  }
 }

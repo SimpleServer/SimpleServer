@@ -32,7 +32,7 @@ import simpleserver.nbt.NBTString;
 
 public class HomeCommand extends AbstractCommand implements PlayerCommand {
   public HomeCommand() {
-    super("home [help|set|delete|public|private|ilist|list|invite|uninvite] [name]", "Teleport to and manage your home");
+    super("home [set|delete|public|private|ilist|list|invite|uninvite] [name]", "Teleport to and manage your home");
   }
 
   public void execute(Player player, String message) {
@@ -44,9 +44,7 @@ public class HomeCommand extends AbstractCommand implements PlayerCommand {
       return;
     }
     String command = arguments[0];
-    if (command.equals("help")) {
-      usage(player);
-    } else if (command.equals("set")) {
+    if (command.equals("set")) {
       if (homes.get(playerName) != null) {
         player.addTMessage(Color.RED, "You must delete your old home before saving a new one!");
         return;
@@ -205,31 +203,32 @@ public class HomeCommand extends AbstractCommand implements PlayerCommand {
     player.teleportWithWarmup(home.position);
   }
 
-  private void usage(Player player) {
-    String playerName = player.getName();
+  @Override
+  public void usage(Player player) {
     String home = commandPrefix() + "home";
-    HomePoint playerHome = player.getServer().data.players.homes.get(playerName);
+    HomePoint playerHome = player.getServer().data.players.homes.get(player.getName());
+    boolean playerHasHome = playerHome != null;
 
-    player.addTMessage(Color.GRAY, "Usage:");
-    if (playerHome != null) {
-      player.addTMessage(Color.GRAY, "%s:%s teleport home", home, Color.WHITE);
+    if (playerHasHome) {
+      player.addTMessage(Color.GRAY, "To teleport to your home, use %s", Color.WHITE + home);
     }
-    player.addTMessage(Color.GRAY, "%s name:%s visit someone's home", home, Color.WHITE);
-    player.addTMessage(Color.GRAY, "%s:%s set your home at your location", home + " set", Color.WHITE);
-    if (playerHome != null) {
-      player.addTMessage(Color.GRAY, "%s:%s delete your home", home + " delete", Color.WHITE);
+    player.addTMessage(Color.GRAY, "To visit some else's home, use %s name", Color.WHITE + home);
+    if (!playerHasHome) {
+      player.addTMessage(Color.GRAY, "To set home at your location, use %s", Color.WHITE + home + " set");
+    } else if (playerHasHome) {
+      player.addTMessage(Color.GRAY, "To delete your home, use %s", Color.WHITE + home + " delete");
       if (!playerHome.isPublic) {
-        player.addTMessage(Color.GRAY, "%s:%s make everyone able to visit your home", home + " public", Color.WHITE);
+        player.addTMessage(Color.GRAY, "To allow anyone to visit you home, use %s", Color.WHITE + home + " public");
       } else {
-        player.addTMessage(Color.GRAY, "%s:%s only allow invited players to visit", home + " private", Color.WHITE);
+        player.addTMessage(Color.GRAY, "To only allow invited players visit, use %s", Color.WHITE + home + " private");
       }
     }
-    player.addTMessage(Color.GRAY, "%s:%s see homes you can visit", home + " ilist", Color.WHITE);
-    if (playerHome != null) {
-      player.addTMessage(Color.GRAY, "%s:%s see players who can visit your home", home + " list", Color.WHITE);
+    player.addTMessage(Color.GRAY, "To see homes that you can visit, use %s", Color.WHITE + home + " ilist");
+    if (playerHasHome) {
+      player.addTMessage(Color.GRAY, "To see players that can visit your home, use %s", Color.WHITE + home + " list");
       if (!playerHome.isPublic) {
-        player.addTMessage(Color.GRAY, "%s name:%s allow player to visit your home", home + " invite", Color.WHITE);
-        player.addTMessage(Color.GRAY, "%s name:%s disallow player to visit your home", home + " uninvite", Color.WHITE);
+        player.addTMessage(Color.GRAY, "To invite player to visit, use %s name%s,", Color.WHITE + home + " invite", Color.GRAY);
+        player.addTMessage(Color.GRAY, "but to remove the invite, use %s name", Color.WHITE + home + " uninvite");
       }
     }
   }

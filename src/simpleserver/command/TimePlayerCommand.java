@@ -66,4 +66,15 @@ public class TimePlayerCommand extends TimeCommand implements PlayerCommand {
   protected void tInfo(String message) {
     info(t(message));
   }
+
+  @Override
+  public void usage(Player player) {
+    String time = parser.commandPrefix() + "time";
+    player.addTMessage(Color.GRAY, "To know the current time, use %s", Color.WHITE + time);
+    player.addTMessage(Color.GRAY, "To set the current time, use %s value", Color.WHITE + time + " set" + Color.GRAY);
+    player.addTMessage(Color.GRAY, "The value can be%s a number, %s or %s", Color.WHITE, "day", "night");
+    player.addTMessage(Color.GRAY, "To freeze time, use %s", Color.WHITE + time + " freeze");
+    player.addTMessage(Color.GRAY, "To freeze time at a selected value, use %s value %s", Color.WHITE + time, "freeze");
+    player.addTMessage(Color.GRAY, "To unfreeze time, use %s", Color.WHITE + time + " unfreeze");
+  }
 }

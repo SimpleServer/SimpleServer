@@ -46,4 +46,8 @@ public class InvalidCommand extends AbstractCommand implements PlayerCommand,
   public void reloadText() {
     helpText = Color.RED + t(commandCode);
   }
+
+  @Override
+  public void usage(Player player) {
+  }
 }

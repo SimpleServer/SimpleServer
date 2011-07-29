@@ -32,8 +32,12 @@ public class UnbanCommand extends PlayerArgCommand {
   protected void executeWithTarget(Player player, String message, String name) {
     player.getServer().runCommand("pardon", name);
 
-    player.getServer().adminLog("User " + player.getName()
-                                    + " unbanned player:\t " + name);
+    player.getServer().adminLog("User " + player.getName() + " unbanned player:\t " + name);
     player.addTMessage(Color.GRAY, "Unbanned %s!", name);
+  }
+
+  @Override
+  public void usage(Player player) {
+    player.addTMessage(Color.GRAY, "Allow the banned player to join the server again");
   }
 }

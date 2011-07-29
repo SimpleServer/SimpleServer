@@ -50,6 +50,9 @@ public class HelpCommand extends AbstractCommand implements PlayerCommand {
         }
         player.addTCaptionedMessage("Aliases", line.toString());
       }
+      if (message.endsWith("-e")) {
+        command.usage(player);
+      }
     } else {
       StringBuffer line = new StringBuffer();
 
@@ -71,8 +74,8 @@ public class HelpCommand extends AbstractCommand implements PlayerCommand {
 
       player.addTCaptionedMessage("Available Commands", line.toString());
 
-      player.addTMessage(Color.GRAY, "Say %s command for details of a specific command.",
-                         prefix + "help");
+      player.addTMessage(Color.GRAY, "Say %s command %s for details of a specific command.", Color.WHITE + prefix + "help", Color.GRAY);
+      player.addTMessage(Color.GRAY, "Say %s command %s for even more help for a command.", Color.WHITE + prefix + "help", "-e" + Color.GRAY);
 
       // additional custom help text from helptext.txt
       String[] helplines = player.getServer().helptext.getHelpText().split("\n");
@@ -81,5 +84,10 @@ public class HelpCommand extends AbstractCommand implements PlayerCommand {
         player.addMessage(Color.WHITE, l);
       }
     }
+  }
+
+  @Override
+  public void usage(Player player) {
+    execute(player, parser.commandPrefix() + "help");
   }
 }

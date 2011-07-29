@@ -57,4 +57,9 @@ public class KickCommand extends OnlinePlayerArgCommand {
   protected void noTargetSpecified(Player player, String message) {
     player.addTMessage(Color.RED, "No player or reason specified.");
   }
+
+  @Override
+  public void usage(Player player) {
+    player.addTMessage(Color.GRAY, "Disconnect the player from the server and display the optional reason");
+  }
 }

@@ -418,8 +418,10 @@ public class Player {
       return true;
     }
 
+    String prefix = server.getCommandParser().commandPrefix();
+
     // Repeat last command
-    if (message.equals(server.getCommandParser().commandPrefix() + "!")) {
+    if (message.equals(prefix + "!")) {
       message = lastCommand;
     }
 
@@ -436,7 +438,12 @@ public class Player {
     }
 
     if (server.permissions.commandShouldBeExecuted(command.getName())) {
-      command.execute(this, message);
+      if (message.endsWith(" help")/* && !message.startsWith(prefix + "help")*/) {
+        PlayerCommand helpCommand = server.getCommandParser().getPlayerCommand(prefix + "help");
+        helpCommand.execute(this, prefix + "help " + command.getName() + " -e");
+      } else {
+        command.execute(this, message);
+      }
     }
     lastCommand = message;
 

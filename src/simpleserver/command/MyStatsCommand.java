@@ -41,4 +41,9 @@ public class MyStatsCommand extends AbstractCommand implements PlayerCommand {
                        new Integer(stats[2]).toString(),
                        new Integer(stats[3]).toString());
   }
+
+  @Override
+  public void usage(Player player) {
+    player.addTMessage(Color.GRAY, "Get server statistics about your online time, blocks destroyed and block placed");
+  }
 }

@@ -26,13 +26,16 @@ import simpleserver.Color;
 import simpleserver.Player;
 
 public class ServerTimeCommand extends AbstractCommand implements PlayerCommand {
-
   public ServerTimeCommand() {
     super("servertime", "Display the real-world time of the server");
   }
 
   public void execute(Player player, String message) {
-    player.addTMessage(Color.GRAY, "Server time: %s %tc",
-                       Color.WHITE, new Date());
+    player.addTMessage(Color.GRAY, "Server time: %s %tc", Color.WHITE, new Date());
+  }
+
+  @Override
+  public void usage(Player player) {
+    player.addTMessage(Color.GRAY, "Show what time the server's clock is currently at");
   }
 }

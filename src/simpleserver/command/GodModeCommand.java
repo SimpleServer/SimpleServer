@@ -36,4 +36,10 @@ public class GodModeCommand extends AbstractCommand implements PlayerCommand {
       player.addTMessage(Color.GRAY, "God-Mode Disabled!");
     }
   }
+
+  @Override
+  public void usage(Player player) {
+    player.addTMessage(Color.GRAY, "This will protect%s only%s from other players attacks!", Color.RED, Color.GRAY);
+    player.addTMessage(Color.RED, "That means that you can get hurt by being hit by mobs, falling from great heights, drowing, falling in lava, etc.");
+  }
 }

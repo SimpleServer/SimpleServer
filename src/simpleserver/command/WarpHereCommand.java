@@ -33,12 +33,15 @@ public class WarpHereCommand extends OnlinePlayerArgCommand {
     if (player.getDimension() == target.getDimension()) {
       target.teleportTo(player);
 
-      player.getServer().adminLog("Admin " + player.getName() + " teleported:\t "
-                                      + target.getName() + "\tto\t"
-                                      + player.getName());
+      player.getServer().adminLog("Admin " + player.getName() + " teleported:\t " + target.getName() + "\tto\t" + player.getName());
     } else {
       player.addTMessage(Color.RED, "You and %s are in different dimensions.", target.getName());
       player.addTMessage(Color.RED, "No teleport possible!");
     }
+  }
+
+  @Override
+  public void usage(Player player) {
+    player.addTMessage("Teleport the player to your location if the you are in the same dimension");
   }
 }

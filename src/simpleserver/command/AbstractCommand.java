@@ -26,6 +26,7 @@ import java.util.Collection;
 
 import simpleserver.Color;
 import simpleserver.CommandParser;
+import simpleserver.Player;
 
 public abstract class AbstractCommand implements Command {
   protected final String name;
@@ -132,4 +133,6 @@ public abstract class AbstractCommand implements Command {
   public void setParser(CommandParser parser) {
     this.parser = parser;
   }
+
+  public abstract void usage(Player player);
 }
