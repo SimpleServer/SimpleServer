@@ -93,7 +93,7 @@ public class JailRecord {
       if (state == JailState.LOCKED) {
         if (willGetReleased) {
           if (System.currentTimeMillis() >= jailedUntil) {
-            unjail();
+            // FIXME RELEASE THE POOR GUY!
           }
         }
       }

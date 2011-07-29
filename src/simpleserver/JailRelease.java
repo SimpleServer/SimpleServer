@@ -20,15 +20,28 @@
  */
 package simpleserver;
 
+import java.io.IOException;
+import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import simpleserver.nbt.PlayerFile;
+
 public class JailRelease {
+  private HashMap<String, Timer> timers = new HashMap<String, Timer>();
+
   public void addRelease(Player player, long afterMillis) {
     String playerName = player.getName();
 
-    Timer timer = new Timer("Unjail_" + playerName);
-    timer.schedule(new Releaser(player.getServer(), playerName), afterMillis);
+    if (timers.containsKey(playerName)) {
+      timers.get(playerName).cancel();
+    }
+
+    Timer timer = new Timer("UnjailTimer-" + playerName, true);
+    TimerTask task = new Releaser(player.getServer(), playerName);
+
+    timers.put(playerName, timer);
+    timer.schedule(task, afterMillis);
   }
 
   private class Releaser extends TimerTask {
@@ -47,6 +60,16 @@ public class JailRelease {
       if (target != null) {
         if (target.getIsJailed()) {
           target.unjail();
+        }
+      } else {
+        server.data.players.jail.get(playerName).unjail();
+        PlayerFile dat = new PlayerFile(playerName, server);
+        dat.setPosition(server.world.spawnPoint());
+        try {
+          dat.save();
+        } catch (IOException e) {
+          System.out.println("[SimpleServer] " + e.getMessage());
+          System.out.println("[SimpleServer] Could not teleport " + playerName + " out of jail!");
         }
       }
     }
