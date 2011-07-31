@@ -335,7 +335,13 @@ public class AutoBackup {
             System.out.println("[SimpleServer] Automated Server Backup Failure!");
           }
           server.saveLock.release();
-          pauseBackup = (server.numPlayers() == 0);
+
+          if (server.numPlayers() == 0) {
+            pauseBackup = true;
+          }
+        }
+        if (pauseBackup && server.numPlayers() > 0) {
+          pauseBackup = false;
         }
 
         try {
