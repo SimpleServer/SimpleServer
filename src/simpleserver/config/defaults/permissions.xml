@@ -44,6 +44,7 @@
       <command name="dimension" aliases="d" allow="0+" />
       <command name="give" allow="3-5" />
       <command name="giveplayer" allow="4,5" />
+      <command name="global" allow="0+" />
       <command name="gps" allow="3-5" />
       <command name="group" aliases="g" allow="0+" />
       <command name="help" aliases="commands" allow="0+" />
