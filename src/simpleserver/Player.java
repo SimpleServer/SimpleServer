@@ -77,7 +77,7 @@ public class Player {
   private Player reply = null;
   private String lastCommand = "";
 
-  private AbstractMessage messagePrototype;
+  private AbstractMessage messageType;
   private Queue<String> messages = new ConcurrentLinkedQueue<String>();
   private Queue<PlayerVisitRequest> visitreqs = new ConcurrentLinkedQueue<PlayerVisitRequest>();
 
@@ -97,7 +97,7 @@ public class Player {
     connected = System.currentTimeMillis();
     position = new Position();
     server = parent;
-    messagePrototype = new GlobalMessage(this);
+    messageType = new GlobalMessage(this);
     extsocket = inc;
     if (server.isRobot(getIPAddress())) {
       System.out.println("[SimpleServer] Robot Heartbeat: " + getIPAddress()
@@ -247,26 +247,19 @@ public class Player {
   }
 
   public void setMessagePrototype(AbstractMessage message) {
-    messagePrototype = message;
+    messageType = message;
   }
 
   public String getChatRoom() {
-    return messagePrototype.toString();
+    return messageType.toString();
   }
 
   public void sendMessage(String message) {
-    AbstractMessage newMessage;
-    try {
-      newMessage = messagePrototype.clone(message);
-      sendMessage(newMessage);
-    } catch (CloneNotSupportedException e) {
-      e.printStackTrace();
-    }
-
+    sendMessage(messageType, message);
   }
 
-  public void sendMessage(Message message) {
-    server.getMessager().propagate(message);
+  public void sendMessage(Message messageType, String message) {
+    server.getMessager().propagate(messageType, message);
   }
 
   public boolean hasMessages() {

@@ -48,7 +48,6 @@ public class PrivateMessage extends AbstractMessage {
       recieverList.clear();
     }
 
-    recieverCount = recieverList.size();
     return recieverList;
   }
 

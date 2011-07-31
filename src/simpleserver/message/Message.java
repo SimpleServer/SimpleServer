@@ -25,17 +25,13 @@ import java.util.List;
 import simpleserver.Player;
 import simpleserver.PlayerList;
 
-public interface Message extends Cloneable {
-
-  public void setMessage(String message);
+public interface Message {
 
   public Player getSender();
 
   public List<Player> getRecievers(PlayerList playerList);
 
-  public int getRecieverCount();
-
   public void noRecieverFound();
 
-  public String getMessage(Player reciever);
+  public String buildMessage(String message, Player reciever);
 }

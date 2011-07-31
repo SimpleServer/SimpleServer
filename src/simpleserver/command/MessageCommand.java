@@ -35,8 +35,7 @@ public abstract class MessageCommand extends AbstractCommand {
     if (messageInstance != null) {
       String rawMessage = extractMessage(message);
       if (rawMessage != null) {
-        messageInstance.setMessage(rawMessage);
-        player.sendMessage(messageInstance);
+        player.sendMessage(messageInstance, rawMessage);
         complete(messageInstance);
       } else {
         player.addTMessage(Color.RED, "Please supply a message.");

@@ -32,23 +32,10 @@ public abstract class AbstractMessage implements Message, Cloneable {
   private static final String captionFormat = "%s -> %s";
 
   protected Player sender;
-  protected String message;
-  protected int recieverCount = 0;
-
   protected String chatRoom;
 
   protected AbstractMessage(Player sender) {
     this.sender = sender;
-  }
-
-  public void setMessage(String message) {
-    this.message = message;
-  }
-
-  public AbstractMessage clone(String message) throws CloneNotSupportedException {
-    AbstractMessage clone = (AbstractMessage) super.clone();
-    clone.setMessage(message);
-    return clone;
   }
 
   public Player getSender() {
@@ -57,31 +44,15 @@ public abstract class AbstractMessage implements Message, Cloneable {
 
   public List<Player> getRecievers(PlayerList playerList) {
     List<Player> recieverList = new LinkedList<Player>();
-    recieverCount = 0;
     for (Player reciever : playerList.getArray()) {
       if (sendToPlayer(reciever)) {
         recieverList.add(reciever);
-        if (!reciever.equals(sender)) {
-          recieverCount++;
-        }
       }
     }
     return recieverList;
   }
 
-  public int getRecieverCount() {
-    return recieverCount;
-  }
-
-  public String getMessage(Player reciever) {
-    return buildMessage(message, reciever);
-  }
-
-  public String getRawMessage() {
-    return message;
-  }
-
-  protected String buildMessage(String message, Player reciever) {
+  public String buildMessage(String message, Player reciever) {
     String caption = String.format(captionFormat, sender.getName(), chatRoom);
     return getCaptionedString(caption, message);
   }

@@ -14,7 +14,7 @@ public class GroupMessage extends AbstractMessage {
   }
 
   @Override
-  protected String buildMessage(String message, Player reciever) {
+  public String buildMessage(String message, Player reciever) {
     return "\u00a7" + group.getColor() + super.buildMessage(message, reciever).substring(2);
   }
 

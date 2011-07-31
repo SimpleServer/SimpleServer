@@ -36,7 +36,7 @@ public class GlobalMessage extends AbstractMessage {
   }
 
   @Override
-  protected String buildMessage(String message, Player reciever) {
+  public String buildMessage(String message, Player reciever) {
     return getPrefix() + message;
   }
 

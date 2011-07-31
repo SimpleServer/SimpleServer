@@ -46,7 +46,7 @@ public class ChatRoomCommand extends AbstractCommand implements PlayerCommand {
       return;
     }
 
-    String mode = args[0];
+    String mode = args[0].toLowerCase();
     if (mode.equals("global")) {
       player.setMessagePrototype(new GlobalMessage(player));
     } else if (mode.equals("dimension")) {
