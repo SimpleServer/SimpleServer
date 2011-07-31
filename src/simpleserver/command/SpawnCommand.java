@@ -30,7 +30,7 @@ public class SpawnCommand extends AbstractCommand implements PlayerCommand {
 
   public void execute(Player player, String message) {
     try {
-      player.teleport(player.getServer().world.spawnPoint());
+      player.teleportWithWarmup(player.getServer().world.spawnPoint());
     } catch (Exception e) {
       player.addTMessage(Color.RED, "Teleporting failed.");
     }
