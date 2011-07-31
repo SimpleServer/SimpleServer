@@ -27,6 +27,7 @@ import java.util.concurrent.ConcurrentMap;
 import simpleserver.Color;
 import simpleserver.Player;
 import simpleserver.Server;
+import simpleserver.bot.BotController.ConnectException;
 
 import com.google.common.collect.ImmutableList;
 
@@ -39,11 +40,17 @@ public class KitList extends PropertiesConfig {
 
     private static final class Entry {
       private final int item;
+      private final short damage;
       private final int amount;
 
-      public Entry(int item, int amount) {
+      public Entry(int item, short damage, int amount) {
         this.item = item;
+        this.damage = damage;
         this.amount = amount;
+      }
+
+      public Entry(int item, int amount) {
+        this(item, (short) 0, amount);
       }
     }
 
@@ -66,12 +73,10 @@ public class KitList extends PropertiesConfig {
     Kit kit = kits.get(kitName.toLowerCase());
     if ((kit != null) && (server.permissions.includesPlayer(kit.groups, player))) {
       for (Kit.Entry entry : kit.items) {
-        String baseCommand = player.getName() + " " + entry.item;
-        for (int c = 0; c < entry.amount / 64; ++c) {
-          server.runCommand("give", baseCommand + " " + 64);
-        }
-        if (entry.amount % 64 > 0) {
-          server.runCommand("give", baseCommand + " " + entry.amount % 64);
+        try {
+          player.give(entry.item, entry.damage, entry.amount);
+        } catch (ConnectException e) {
+          player.addTMessage(Color.RED, "Giving %s failed!", entry.item);
         }
       }
       return true;
@@ -107,29 +112,85 @@ public class KitList extends PropertiesConfig {
         continue;
       }
 
+      boolean legacy = false;
+
       ImmutableList.Builder<Kit.Entry> items = ImmutableList.builder();
       for (int c = 1; c < options.length; ++c) {
-        String[] item = options[c].split(":");
-        if (item.length != 2) {
+
+        if (options[c].contains(":")) {
+          // legacy
+          Kit.Entry item = loadLegacyEntry(options[c]);
+          if (item != null) {
+            items.add(item);
+            legacy = true;
+          }
+          continue;
+        }
+
+        String[] item = options[c].split("\\*");
+        String[] data = item[0].split("\\.");
+        if (item.length < 1 || item.length > 2 || data.length > 2 || data.length < 1) {
           System.out.println("Skipping bad kit item " + options[c]);
           continue;
         }
 
         Integer block;
-        Integer amount;
+        Short damage = 0;
+        Integer amount = 1;
+
         try {
-          block = Integer.parseInt(item[0]);
-          amount = Integer.parseInt(item[1]);
+          if (data.length == 2) {
+            damage = Short.parseShort(data[1]);
+          }
+          block = Integer.parseInt(data[0]);
+          if (item.length == 2) {
+            amount = Integer.parseInt(item[1]);
+          }
         } catch (NumberFormatException e) {
           System.out.println("Skipping bad kit item " + options[c]);
           continue;
         }
 
-        items.add(new Kit.Entry(block, amount));
+        items.add(new Kit.Entry(block, damage, amount));
       }
 
       Kit kit = new Kit(options[0], items.build());
       kits.put(entry.getKey().toString().toLowerCase(), kit);
+
+      if (legacy) {
+        StringBuilder convertedEntry = new StringBuilder(kit.groups);
+        for (Kit.Entry item : kit.items) {
+          convertedEntry.append("|" + item.item);
+          if (item.damage != 0) {
+            convertedEntry.append("." + item.damage);
+          }
+          if (item.amount != 1) {
+            convertedEntry.append("*" + item.amount);
+          }
+        }
+        properties.setProperty(entry.getKey().toString(), convertedEntry.toString());
+        System.out.println("Converting Kit " + entry.getKey().toString() + " to new format.");
+      }
     }
+  }
+
+  private Kit.Entry loadLegacyEntry(String line) {
+    String[] item = line.split(":");
+    if (item.length != 2) {
+      System.out.println("Skipping bad kit item " + line);
+      return null;
+    }
+
+    Integer block;
+    Integer amount;
+    try {
+      block = Integer.parseInt(item[0]);
+      amount = Integer.parseInt(item[1]);
+    } catch (NumberFormatException e) {
+      System.out.println("Skipping bad kit item " + line);
+      return null;
+    }
+
+    return new Kit.Entry(block, amount);
   }
 }
