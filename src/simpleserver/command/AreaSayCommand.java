@@ -21,8 +21,8 @@
 package simpleserver.command;
 
 import simpleserver.Player;
-import simpleserver.message.AreaMessage;
-import simpleserver.message.Message;
+import simpleserver.message.AreaChat;
+import simpleserver.message.Chat;
 
 public class AreaSayCommand extends MessageCommand implements PlayerCommand {
 
@@ -31,8 +31,8 @@ public class AreaSayCommand extends MessageCommand implements PlayerCommand {
   }
 
   @Override
-  protected Message getMessageInstance(Player sender, String message) {
-    return new AreaMessage(sender);
+  protected Chat getMessageInstance(Player sender, String message) {
+    return new AreaChat(sender);
   }
 
 }

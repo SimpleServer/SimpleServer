@@ -20,6 +20,7 @@
  */
 package simpleserver.message;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -27,50 +28,38 @@ import simpleserver.Color;
 import simpleserver.Player;
 import simpleserver.PlayerList;
 
-public abstract class AbstractMessage implements Message, Cloneable {
+public class PrivateChat extends AbstractChat {
 
-  private static final String captionFormat = "%s -> %s";
+  private Player reciever;
 
-  protected Player sender;
-  protected String chatRoom;
-
-  protected AbstractMessage(Player sender) {
-    this.sender = sender;
-  }
-
-  public Player getSender() {
-    return sender;
-  }
-
-  public List<Player> getRecievers(PlayerList playerList) {
-    List<Player> recieverList = new LinkedList<Player>();
-    for (Player reciever : playerList.getArray()) {
-      if (sendToPlayer(reciever)) {
-        recieverList.add(reciever);
-      }
-    }
-    return recieverList;
-  }
-
-  public String buildMessage(String message, Player reciever) {
-    String caption = String.format(captionFormat, sender.getName(), chatRoom);
-    return getCaptionedString(caption, message);
-  }
-
-  abstract protected boolean sendToPlayer(Player reciever);
-
-  abstract public void noRecieverFound();
-
-  protected static final String getCaptionedString(String Caption, String message) {
-    return String.format("%s%s: %s%s", Color.GRAY, Caption, Color.WHITE, message);
-  }
-
-  protected static final String getColoredString(Color color, String message) {
-    return String.format("%s%s", color, message);
+  public PrivateChat(Player sender, Player reciever) {
+    super(sender);
+    this.reciever = reciever;
+    chatRoom = reciever.getName();
   }
 
   @Override
-  public String toString() {
-    return chatRoom;
+  public List<Player> getRecievers(PlayerList playerList) {
+    List<Player> recieverList = new LinkedList<Player>();
+    if (reciever.getName() != null) {
+      Collections.addAll(recieverList, sender, reciever);
+      reciever.setReply(sender);
+    } else {
+      recieverList.clear();
+    }
+
+    return recieverList;
   }
+
+  @Override
+  @Deprecated
+  protected boolean sendToPlayer(Player reciever) {
+    return (reciever.equals(this.reciever) || reciever.equals(sender));
+  }
+
+  @Override
+  public void noRecieverFound() {
+    sender.addTMessage(Color.RED, "Player not online (%s)", chatRoom);
+  }
+
 }

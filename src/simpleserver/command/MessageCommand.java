@@ -22,7 +22,7 @@ package simpleserver.command;
 
 import simpleserver.Color;
 import simpleserver.Player;
-import simpleserver.message.Message;
+import simpleserver.message.Chat;
 
 public abstract class MessageCommand extends AbstractCommand {
 
@@ -31,7 +31,7 @@ public abstract class MessageCommand extends AbstractCommand {
   }
 
   public void execute(Player player, String message) {
-    Message messageInstance = getMessageInstance(player, message);
+    Chat messageInstance = getMessageInstance(player, message);
     if (messageInstance != null) {
       String rawMessage = extractMessage(message);
       if (rawMessage != null) {
@@ -44,14 +44,14 @@ public abstract class MessageCommand extends AbstractCommand {
   }
 
   // returns Message instance
-  protected abstract Message getMessageInstance(Player sender, String message);
+  protected abstract Chat getMessageInstance(Player sender, String message);
 
   protected String extractMessage(String message) {
     // returns rawMessage
     return extractArgument(message);
   }
 
-  protected void complete(Message messageInstance) {
+  protected void complete(Chat messageInstance) {
     // called after sending messages
     return;
   }

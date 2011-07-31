@@ -20,33 +20,18 @@
  */
 package simpleserver.message;
 
-import simpleserver.Color;
+import java.util.List;
+
 import simpleserver.Player;
-import simpleserver.config.PermissionConfig;
+import simpleserver.PlayerList;
 
-public class AreaMessage extends AbstractMessage {
+public interface Chat {
 
-  PermissionConfig perm;
+  public Player getSender();
 
-  public AreaMessage(Player sender) {
-    // TODO: notice that area is changed when walking around...
-    super(sender);
+  public List<Player> getRecievers(PlayerList playerList);
 
-    perm = sender.getServer().permissions;
-    chatRoom = perm.getCurrentArea(sender);
-  }
+  public void noRecieverFound();
 
-  @Override
-  protected boolean sendToPlayer(Player reciever) {
-    return !perm.getCurrentArea(sender).isEmpty() && (perm.getCurrentArea(reciever) == perm.getCurrentArea(sender));
-  }
-
-  @Override
-  public void noRecieverFound() {
-    if (perm.getCurrentArea(sender).isEmpty()) {
-      sender.addTMessage(Color.RED, "You are in no area at the moment");
-    } else {
-      sender.addTMessage(Color.RED, "Nobody is in this area to hear you");
-    }
-  }
+  public String buildMessage(String message, Player reciever);
 }

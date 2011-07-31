@@ -22,8 +22,8 @@ package simpleserver.command;
 
 import simpleserver.Coordinate.Dimension;
 import simpleserver.Player;
-import simpleserver.message.DimensionMessage;
-import simpleserver.message.Message;
+import simpleserver.message.Chat;
+import simpleserver.message.DimensionChat;
 
 public class DimensionSayCommand extends MessageCommand implements PlayerCommand {
 
@@ -34,7 +34,7 @@ public class DimensionSayCommand extends MessageCommand implements PlayerCommand
   }
 
   @Override
-  protected Message getMessageInstance(Player sender, String rawMessage) {
+  protected Chat getMessageInstance(Player sender, String rawMessage) {
     Dimension dim = sender.getDimension();
     chatMessage = rawMessage;
 
@@ -43,7 +43,7 @@ public class DimensionSayCommand extends MessageCommand implements PlayerCommand
       dim = Dimension.get(arguments[0]);
       chatMessage = extractArgument(rawMessage);
     }
-    return new DimensionMessage(sender, dim);
+    return new DimensionChat(sender, dim);
   }
 
   @Override

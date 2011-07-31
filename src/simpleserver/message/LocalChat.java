@@ -20,46 +20,29 @@
  */
 package simpleserver.message;
 
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-
+import static simpleserver.lang.Translations.t;
 import simpleserver.Color;
 import simpleserver.Player;
-import simpleserver.PlayerList;
 
-public class PrivateMessage extends AbstractMessage {
+public class LocalChat extends AbstractChat {
 
-  private Player reciever;
+  private static final String LOCAL_CHAT = t("local area");
+  private final int localChatRadius;
 
-  public PrivateMessage(Player sender, Player reciever) {
+  public LocalChat(Player sender) {
     super(sender);
-    this.reciever = reciever;
-    chatRoom = reciever.getName();
+    localChatRadius = sender.getServer().options.getInt("localChatRadius");
+    chatRoom = LOCAL_CHAT;
   }
 
   @Override
-  public List<Player> getRecievers(PlayerList playerList) {
-    List<Player> recieverList = new LinkedList<Player>();
-    if (reciever.getName() != null) {
-      Collections.addAll(recieverList, sender, reciever);
-      reciever.setReply(sender);
-    } else {
-      recieverList.clear();
-    }
-
-    return recieverList;
-  }
-
-  @Override
-  @Deprecated
   protected boolean sendToPlayer(Player reciever) {
-    return (reciever.equals(this.reciever) || reciever.equals(sender));
+    return (sender.distanceTo(reciever) < localChatRadius);
   }
 
   @Override
   public void noRecieverFound() {
-    sender.addTMessage(Color.RED, "Player not online (%s)", chatRoom);
+    sender.addTMessage(Color.RED, "Nobody is around to hear you");
   }
 
 }

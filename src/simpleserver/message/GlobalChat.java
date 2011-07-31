@@ -20,17 +20,19 @@
  */
 package simpleserver.message;
 
+import static simpleserver.lang.Translations.t;
+
 import java.util.IllegalFormatException;
 
 import simpleserver.Group;
 import simpleserver.Player;
 import simpleserver.Server;
 
-public class GlobalMessage extends AbstractMessage {
+public class GlobalChat extends AbstractChat {
 
-  private static final String GLOBAL_CHAT = "global";
+  private static final String GLOBAL_CHAT = t("global");
 
-  public GlobalMessage(Player sender) {
+  public GlobalChat(Player sender) {
     super(sender);
     chatRoom = GLOBAL_CHAT;
   }

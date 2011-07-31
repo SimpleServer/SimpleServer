@@ -4,10 +4,10 @@ import simpleserver.Color;
 import simpleserver.Coordinate.Dimension;
 import simpleserver.Player;
 
-public class DimensionMessage extends AbstractMessage {
+public class DimensionChat extends AbstractChat {
   Dimension dimension;
 
-  public DimensionMessage(Player sender, Dimension dim) {
+  public DimensionChat(Player sender, Dimension dim) {
     super(sender);
     dimension = dim;
     chatRoom = dimension.toString();

@@ -25,12 +25,12 @@ import simpleserver.Coordinate.Dimension;
 import simpleserver.Group;
 import simpleserver.Player;
 import simpleserver.config.PermissionConfig;
-import simpleserver.message.AreaMessage;
-import simpleserver.message.DimensionMessage;
-import simpleserver.message.GlobalMessage;
-import simpleserver.message.GroupMessage;
-import simpleserver.message.LocalMessage;
-import simpleserver.message.PrivateMessage;
+import simpleserver.message.AreaChat;
+import simpleserver.message.DimensionChat;
+import simpleserver.message.GlobalChat;
+import simpleserver.message.GroupChat;
+import simpleserver.message.LocalChat;
+import simpleserver.message.PrivateChat;
 
 public class ChatRoomCommand extends AbstractCommand implements PlayerCommand {
 
@@ -48,7 +48,7 @@ public class ChatRoomCommand extends AbstractCommand implements PlayerCommand {
 
     String mode = args[0].toLowerCase();
     if (mode.equals("global")) {
-      player.setMessagePrototype(new GlobalMessage(player));
+      player.setChat(new GlobalChat(player));
     } else if (mode.equals("dimension")) {
 
       Dimension dim = player.getDimension();
@@ -56,7 +56,7 @@ public class ChatRoomCommand extends AbstractCommand implements PlayerCommand {
       if (args.length > 1 && Dimension.get(args[1]) != Dimension.LIMBO) {
         dim = Dimension.get(args[1]);
       }
-      player.setMessagePrototype(new DimensionMessage(player, dim));
+      player.setChat(new DimensionChat(player, dim));
     } else if (mode.equals("group")) {
       Group group = player.getGroup();
 
@@ -72,13 +72,13 @@ public class ChatRoomCommand extends AbstractCommand implements PlayerCommand {
         }
       }
 
-      player.setMessagePrototype(new GroupMessage(player, group));
+      player.setChat(new GroupChat(player, group));
     } else if (mode.equals("area")) {
 
-      player.setMessagePrototype(new AreaMessage(player));
+      player.setChat(new AreaChat(player));
     } else if (mode.equals("local")) {
 
-      player.setMessagePrototype(new LocalMessage(player));
+      player.setChat(new LocalChat(player));
     } else if (mode.equals("private")) {
 
       Player reciever = player.getServer().findPlayer(args[1]);
@@ -86,7 +86,7 @@ public class ChatRoomCommand extends AbstractCommand implements PlayerCommand {
         player.addTMessage(Color.RED, "Player not online (%s)", args[1]);
         return;
       } else {
-        player.setMessagePrototype(new PrivateMessage(player, reciever));
+        player.setChat(new PrivateChat(player, reciever));
       }
     } else {
       player.addTMessage(Color.RED, "specified chatMode does not exist.");

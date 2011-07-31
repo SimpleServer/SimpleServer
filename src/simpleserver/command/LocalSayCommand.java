@@ -21,8 +21,8 @@
 package simpleserver.command;
 
 import simpleserver.Player;
-import simpleserver.message.LocalMessage;
-import simpleserver.message.Message;
+import simpleserver.message.Chat;
+import simpleserver.message.LocalChat;
 
 public class LocalSayCommand extends MessageCommand implements PlayerCommand {
   public LocalSayCommand() {
@@ -30,7 +30,7 @@ public class LocalSayCommand extends MessageCommand implements PlayerCommand {
   }
 
   @Override
-  protected Message getMessageInstance(Player sender, String message) {
-    return new LocalMessage(sender);
+  protected Chat getMessageInstance(Player sender, String message) {
+    return new LocalChat(sender);
   }
 }

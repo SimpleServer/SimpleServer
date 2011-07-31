@@ -4,10 +4,10 @@ import simpleserver.Color;
 import simpleserver.Group;
 import simpleserver.Player;
 
-public class GroupMessage extends AbstractMessage {
+public class GroupChat extends AbstractChat {
   Group group;
 
-  public GroupMessage(Player sender, Group group) {
+  public GroupChat(Player sender, Group group) {
     super(sender);
     this.group = group;
     chatRoom = group.getName();

@@ -23,8 +23,8 @@ package simpleserver.command;
 import simpleserver.Group;
 import simpleserver.Player;
 import simpleserver.config.PermissionConfig;
-import simpleserver.message.GroupMessage;
-import simpleserver.message.Message;
+import simpleserver.message.Chat;
+import simpleserver.message.GroupChat;
 
 public class GroupSayCommand extends MessageCommand implements PlayerCommand {
 
@@ -35,7 +35,7 @@ public class GroupSayCommand extends MessageCommand implements PlayerCommand {
   }
 
   @Override
-  protected Message getMessageInstance(Player sender, String message) {
+  protected Chat getMessageInstance(Player sender, String message) {
     // TODO: make it possible to use group name(prefix)
 
     Group group = sender.getGroup();
@@ -55,7 +55,7 @@ public class GroupSayCommand extends MessageCommand implements PlayerCommand {
       }
     }
 
-    return new GroupMessage(sender, group);
+    return new GroupChat(sender, group);
   }
 
   @Override

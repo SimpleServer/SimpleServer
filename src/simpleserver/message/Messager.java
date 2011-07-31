@@ -30,17 +30,17 @@ public class Messager {
     this.server = server;
   }
 
-  public void propagate(Message messageType, String message) {
+  public void propagate(Chat chat, String message) {
     int recieverCount = 0;
-    for (Player reciever : messageType.getRecievers(server.playerList)) {
-      reciever.addMessage(messageType.buildMessage(message, reciever));
+    for (Player reciever : chat.getRecievers(server.playerList)) {
+      reciever.addMessage(chat.buildMessage(message, reciever));
 
-      if (!reciever.equals(messageType.getSender())) {
+      if (!reciever.equals(chat.getSender())) {
         recieverCount++;
       }
     }
     if (recieverCount == 0) {
-      messageType.noRecieverFound();
+      chat.noRecieverFound();
     }
   }
 

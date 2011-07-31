@@ -22,8 +22,8 @@ package simpleserver.command;
 
 import simpleserver.Color;
 import simpleserver.Player;
-import simpleserver.message.Message;
-import simpleserver.message.PrivateMessage;
+import simpleserver.message.Chat;
+import simpleserver.message.PrivateChat;
 
 public class TellCommand extends MessageCommand implements
     PlayerCommand {
@@ -34,7 +34,7 @@ public class TellCommand extends MessageCommand implements
   }
 
   @Override
-  protected Message getMessageInstance(Player sender, String message) {
+  protected Chat getMessageInstance(Player sender, String message) {
     String[] arguments = extractArguments(message);
 
     if (arguments.length > 0) {
@@ -42,7 +42,7 @@ public class TellCommand extends MessageCommand implements
       if (reciever == null) {
         sender.addTMessage(Color.RED, "Player not online (%s)", arguments[0]);
       } else {
-        return new PrivateMessage(sender, reciever);
+        return new PrivateChat(sender, reciever);
       }
     } else {
       sender.addTMessage(Color.RED, "No player or message specified.");
