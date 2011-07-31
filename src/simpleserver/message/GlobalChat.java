@@ -38,7 +38,7 @@ public class GlobalChat extends AbstractChat {
   }
 
   @Override
-  public String buildMessage(String message, Player reciever) {
+  public String buildMessage(String message) {
     return getPrefix() + message;
   }
 

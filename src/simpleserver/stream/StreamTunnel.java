@@ -230,6 +230,10 @@ public class StreamTunnel {
           break;
         }
         if (isServerTunnel && server.options.getBoolean("useMsgFormats")) {
+          if (server.options.getBoolean("forwardChat") && server.getMessager().wasForwarded(message)) {
+            break;
+          }
+
           Matcher colorMatcher = COLOR_PATTERN.matcher(message);
           String cleanMessage = colorMatcher.replaceAll("");
 
@@ -1095,6 +1099,14 @@ public class StreamTunnel {
       write(0x03);
       write(message);
       packetFinished();
+    }
+  }
+
+  public void forwardMessage(String message) {
+    try {
+      sendMessagePacket(message);
+    } catch (IOException e) {
+      e.printStackTrace();
     }
   }
 

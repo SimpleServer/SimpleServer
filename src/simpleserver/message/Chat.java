@@ -33,5 +33,5 @@ public interface Chat {
 
   public void noRecieverFound();
 
-  public String buildMessage(String message, Player reciever);
+  public String buildMessage(String message);
 }

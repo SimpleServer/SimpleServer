@@ -14,8 +14,8 @@ public class GroupChat extends AbstractChat {
   }
 
   @Override
-  public String buildMessage(String message, Player reciever) {
-    return "\u00a7" + group.getColor() + super.buildMessage(message, reciever).substring(2);
+  public String buildMessage(String message) {
+    return "\u00a7" + group.getColor() + super.buildMessage(message).substring(2);
   }
 
   @Override

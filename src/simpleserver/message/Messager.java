@@ -20,11 +20,15 @@
  */
 package simpleserver.message;
 
+import java.util.Hashtable;
+
 import simpleserver.Player;
 import simpleserver.Server;
 
 public class Messager {
   Server server;
+
+  Hashtable<String, Integer> forwardedMessages = new Hashtable<String, Integer>();
 
   public Messager(Server server) {
     this.server = server;
@@ -32,16 +36,44 @@ public class Messager {
 
   public void propagate(Chat chat, String message) {
     int recieverCount = 0;
+    String builtMessage = chat.buildMessage(message);
+
     for (Player reciever : chat.getRecievers(server.playerList)) {
-      reciever.addMessage(chat.buildMessage(message, reciever));
+      reciever.addMessage(builtMessage);
 
       if (!reciever.equals(chat.getSender())) {
         recieverCount++;
       }
     }
+
     if (recieverCount == 0) {
       chat.noRecieverFound();
+      return;
+    }
+
+    if (server.options.getBoolean("forwardChat")) {
+      forwardToServer(chat, message);
     }
   }
 
+  private void forwardToServer(Chat chat, String message) {
+    Player sender = chat.getSender();
+    String forwardMessage = String.format("(%s) %s", chat, message);
+
+    forwardedMessages.put(String.format("<%s> ", sender.getName()) + forwardMessage, server.numPlayers());
+    sender.forwardMessage(forwardMessage);
+  }
+
+  public boolean wasForwarded(String message) {
+    if (forwardedMessages.containsKey(message)) {
+      int toSuppress = forwardedMessages.get(message) - 1;
+      if (toSuppress > 0) {
+        forwardedMessages.put(message, toSuppress);
+      } else {
+        forwardedMessages.remove(message);
+      }
+      return true;
+    }
+    return false;
+  }
 }

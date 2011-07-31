@@ -52,7 +52,7 @@ public abstract class AbstractChat implements Chat {
     return recieverList;
   }
 
-  public String buildMessage(String message, Player reciever) {
+  public String buildMessage(String message) {
     String caption = String.format(captionFormat, sender.getName(), chatRoom);
     return getCaptionedString(caption, message);
   }

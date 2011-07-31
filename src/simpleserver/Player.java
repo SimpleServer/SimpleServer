@@ -262,6 +262,10 @@ public class Player {
     server.getMessager().propagate(messageType, message);
   }
 
+  public void forwardMessage(String message) {
+    clientToServer.forwardMessage(message);
+  }
+
   public boolean hasMessages() {
     return !messages.isEmpty();
   }
