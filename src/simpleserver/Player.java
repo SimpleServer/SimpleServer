@@ -686,7 +686,11 @@ public class Player {
   }
 
   public void teleport(Position position) throws ConnectException, IOException {
-    server.bots.connect(new Teleporter(this, position));
+    if (position.dimension() == getDimension()) {
+      server.bots.connect(new Teleporter(this, position));
+    } else {
+      addTMessage(Color.RED, "You're not in the same dimension as the specified warppoint.");
+    }
   }
 
   public void teleportSelf(Coordinate coordinate) {
