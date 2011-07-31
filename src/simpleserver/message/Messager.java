@@ -26,9 +26,9 @@ import simpleserver.Player;
 import simpleserver.Server;
 
 public class Messager {
-  Server server;
+  private Server server;
 
-  Hashtable<String, Integer> forwardedMessages = new Hashtable<String, Integer>();
+  private Hashtable<String, Integer> forwardedMessages = new Hashtable<String, Integer>();
 
   public Messager(Server server) {
     this.server = server;
@@ -58,9 +58,9 @@ public class Messager {
 
   private void forwardToServer(Chat chat, String message) {
     Player sender = chat.getSender();
-    String forwardMessage = String.format("(%s) %s", chat, message);
+    String forwardMessage = String.format(server.options.get("msgForwardFormat"), message, chat);
 
-    forwardedMessages.put(String.format("<%s> ", sender.getName()) + forwardMessage, server.numPlayers());
+    forwardedMessages.put(String.format("<%s> %s", sender.getName(), forwardMessage), server.numPlayers());
     sender.forwardMessage(forwardMessage);
   }
 
