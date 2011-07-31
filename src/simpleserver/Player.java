@@ -59,6 +59,8 @@ public class Player {
   private boolean godMode = false;
   private String kickMsg = null;
   public Position position;
+  private Position deathPlace;
+  private short health = 0;
   private int group = 0;
   private int entityId = 0;
   private Group groupObject = null;
@@ -71,7 +73,6 @@ public class Player {
   private int blocksDestroyed = 0;
   private Player reply = null;
   private String lastCommand = "";
-  private Position deathPlace = null;
 
   private Queue<String> messages = new ConcurrentLinkedQueue<String>();
   private Queue<PlayerVisitRequest> visitreqs = new ConcurrentLinkedQueue<PlayerVisitRequest>();
@@ -382,12 +383,23 @@ public class Player {
     return extsocket.getInetAddress().getHostAddress();
   }
 
-  public void setDeathPlace(Position deathPosition) {
+  private void setDeathPlace(Position deathPosition) {
     deathPlace = deathPosition;
   }
 
   public Position getDeathPlace() {
     return deathPlace;
+  }
+
+  public short getHealth() {
+    return health;
+  }
+
+  public void updateHealth(short health) {
+    this.health = health;
+    if (health <= 0) {
+      setDeathPlace(new Position(position()));
+    }
   }
 
   public double x() {

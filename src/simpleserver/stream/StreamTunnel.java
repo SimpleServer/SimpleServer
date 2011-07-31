@@ -43,7 +43,6 @@ import simpleserver.Coordinate;
 import simpleserver.Coordinate.Dimension;
 import simpleserver.Group;
 import simpleserver.Player;
-import simpleserver.Position;
 import simpleserver.Server;
 import simpleserver.command.LocalSayCommand;
 import simpleserver.command.PlayerListCommand;
@@ -336,16 +335,11 @@ public class StreamTunnel {
         break;
       case 0x08: // Update Health
         write(packetId);
-        copyNBytes(2);
+        player.updateHealth(write(in.readShort()));
         break;
       case 0x09: // Respawn
-        if (isServerTunnel) {
-          player.setDeathPlace(new Position(player.position()));
-        }
         write(packetId);
-        dimension = in.readByte();
-        write(dimension);
-        player.setDimension(Dimension.get(dimension));
+        player.setDimension(Dimension.get(write(in.readByte())));
         break;
       case 0x0a: // Player
         write(packetId);
