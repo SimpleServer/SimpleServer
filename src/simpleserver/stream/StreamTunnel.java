@@ -37,13 +37,14 @@ import java.util.IllegalFormatException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import simpleserver.Authenticator.AuthRequest;
 import simpleserver.Color;
 import simpleserver.Coordinate;
+import simpleserver.Coordinate.Dimension;
 import simpleserver.Group;
 import simpleserver.Player;
+import simpleserver.Position;
 import simpleserver.Server;
-import simpleserver.Authenticator.AuthRequest;
-import simpleserver.Coordinate.Dimension;
 import simpleserver.command.LocalSayCommand;
 import simpleserver.command.PlayerListCommand;
 import simpleserver.config.data.Chests.Chest;
@@ -338,6 +339,9 @@ public class StreamTunnel {
         copyNBytes(2);
         break;
       case 0x09: // Respawn
+        if (isServerTunnel) {
+          player.setDeathPlace(new Position(player.position()));
+        }
         write(packetId);
         dimension = in.readByte();
         write(dimension);

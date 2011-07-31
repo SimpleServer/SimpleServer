@@ -71,6 +71,7 @@ public class Player {
   private int blocksDestroyed = 0;
   private Player reply = null;
   private String lastCommand = "";
+  private Position deathPlace = null;
 
   private Queue<String> messages = new ConcurrentLinkedQueue<String>();
   private Queue<PlayerVisitRequest> visitreqs = new ConcurrentLinkedQueue<PlayerVisitRequest>();
@@ -379,6 +380,14 @@ public class Player {
 
   public String getIPAddress() {
     return extsocket.getInetAddress().getHostAddress();
+  }
+
+  public void setDeathPlace(Position deathPosition) {
+    deathPlace = deathPosition;
+  }
+
+  public Position getDeathPlace() {
+    return deathPlace;
   }
 
   public double x() {
