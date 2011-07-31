@@ -53,6 +53,7 @@ public class AutoBackup {
 
   private volatile boolean run = true;
   private volatile boolean forceBackup = false;
+  private volatile boolean pauseBackup = false;
 
   public AutoBackup(Server server) {
     this.server = server;
@@ -105,7 +106,7 @@ public class AutoBackup {
     long backupPeriod = MILLISECONDS_PER_MINUTE
         * server.options.getInt("autoBackupMins");
     return server.options.getBoolean("autoBackup")
-        && backupPeriod < lastBackupAge() && server.numPlayers() > 0
+        && backupPeriod < lastBackupAge() && !pauseBackup
         || forceBackup;
   }
 
@@ -334,6 +335,7 @@ public class AutoBackup {
             System.out.println("[SimpleServer] Automated Server Backup Failure!");
           }
           server.saveLock.release();
+          pauseBackup = (server.numPlayers() == 0);
         }
 
         try {
