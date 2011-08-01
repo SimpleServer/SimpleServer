@@ -36,8 +36,11 @@ import simpleserver.bot.Giver;
 import simpleserver.bot.Teleporter;
 import simpleserver.command.ExternalCommand;
 import simpleserver.command.PlayerCommand;
+import simpleserver.config.KitList.Kit.Entry;
 import simpleserver.config.data.Stats.StatField;
 import simpleserver.stream.StreamTunnel;
+
+import com.google.common.collect.ImmutableList;
 
 public class Player {
   private final long connected;
@@ -511,6 +514,33 @@ public class Player {
       if (amount % 64 != 0) {
         giver.add(id, amount % 64, damage);
       }
+      server.bots.connect(giver);
+    }
+  }
+
+  public void give(ImmutableList<Entry> items) throws ConnectException {
+    Giver giver = new Giver(this);
+    int slot = 9;
+
+    for (Entry e : items) {
+      if (e.damage() == 0) {
+        give(e.item(), e.amount());
+      } else {
+        int restAmount = e.amount();
+        while (restAmount > 0 && --slot >= 0) {
+          giver.add(e.item(), Math.min(restAmount, 64), e.damage());
+          restAmount -= 64;
+
+          if (slot == 0) {
+            slot = 9;
+            server.bots.connect(giver);
+            giver = new Giver(this);
+          }
+        }
+      }
+    }
+
+    if (slot != 9) {
       server.bots.connect(giver);
     }
   }

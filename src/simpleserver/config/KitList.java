@@ -34,11 +34,11 @@ import com.google.common.collect.ImmutableList;
 public class KitList extends PropertiesConfig {
   private final Server server;
 
-  private static final class Kit {
+  public static final class Kit {
     public final String groups;
     public final ImmutableList<Entry> items;
 
-    private static final class Entry {
+    public static final class Entry {
       private final int item;
       private final short damage;
       private final int amount;
@@ -51,6 +51,18 @@ public class KitList extends PropertiesConfig {
 
       public Entry(int item, int amount) {
         this(item, (short) 0, amount);
+      }
+
+      public int item() {
+        return item;
+      }
+
+      public short damage() {
+        return damage;
+      }
+
+      public int amount() {
+        return amount;
       }
     }
 
@@ -72,12 +84,10 @@ public class KitList extends PropertiesConfig {
   public boolean giveKit(Player player, String kitName) {
     Kit kit = kits.get(kitName.toLowerCase());
     if ((kit != null) && (server.permissions.includesPlayer(kit.groups, player))) {
-      for (Kit.Entry entry : kit.items) {
-        try {
-          player.give(entry.item, entry.damage, entry.amount);
-        } catch (ConnectException e) {
-          player.addTMessage(Color.RED, "Giving %s failed!", entry.item);
-        }
+      try {
+        player.give(kit.items);
+      } catch (ConnectException e) {
+        player.addTMessage(Color.RED, "Giving Kit %s failed!", kitName);
       }
       return true;
     }
