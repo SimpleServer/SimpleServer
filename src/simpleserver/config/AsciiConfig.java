@@ -23,11 +23,12 @@ package simpleserver.config;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.Writer;
 
 public abstract class AsciiConfig extends AbstractConfig {
@@ -66,7 +67,7 @@ public abstract class AsciiConfig extends AbstractConfig {
 
     File inFile = getFile();
     try {
-      BufferedReader reader = new BufferedReader(new FileReader(inFile));
+      BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(inFile), "UTF-8"));
       try {
         String line;
         while ((line = reader.readLine()) != null) {
