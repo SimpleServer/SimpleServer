@@ -56,6 +56,7 @@
       <command name="ok" allow="-" hidden="true" />
       <command name="register" aliases="passwd" allow="1+" />
       <command name="rcon" allow="5" />
+      <command name="read" allow="0+" />
       <command name="reload" allow="4,5" forward="true" />
       <command name="reply" aliases="r" allow="1+" />
       <command name="restart" allow="4,5" />

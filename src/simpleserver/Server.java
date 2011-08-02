@@ -41,6 +41,7 @@ import simpleserver.config.KitList;
 import simpleserver.config.MOTD;
 import simpleserver.config.MuteList;
 import simpleserver.config.PermissionConfig;
+import simpleserver.config.ReadFiles;
 import simpleserver.config.RobotList;
 import simpleserver.config.Rules;
 import simpleserver.config.WhiteList;
@@ -82,6 +83,7 @@ public class Server {
   public GiveAliasList giveAliasList;
   public GlobalData data;
   private RobotList robots;
+  public ReadFiles docs;
 
   private SecureRandom random = new SecureRandom();
 
@@ -372,6 +374,7 @@ public class Server {
     resources.add(mutelist = new MuteList());
     resources.add(giveAliasList = new GiveAliasList());
     resources.add(data = new GlobalData());
+    resources.add(docs = new ReadFiles());
 
     time = new Time(this);
     bots = new BotController(this);
