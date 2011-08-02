@@ -85,7 +85,7 @@ public class KitList extends PropertiesConfig {
     Kit kit = kits.get(kitName.toLowerCase());
     if ((kit != null) && (server.permissions.includesPlayer(kit.groups, player))) {
       try {
-        player.give(kit.items);
+        player.give(kit);
       } catch (ConnectException e) {
         player.addTMessage(Color.RED, "Giving Kit %s failed!", kitName);
       }

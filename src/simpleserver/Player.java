@@ -36,11 +36,9 @@ import simpleserver.bot.Giver;
 import simpleserver.bot.Teleporter;
 import simpleserver.command.ExternalCommand;
 import simpleserver.command.PlayerCommand;
-import simpleserver.config.KitList.Kit.Entry;
+import simpleserver.config.KitList.Kit;
 import simpleserver.config.data.Stats.StatField;
 import simpleserver.stream.StreamTunnel;
-
-import com.google.common.collect.ImmutableList;
 
 public class Player {
   private final long connected;
@@ -518,11 +516,11 @@ public class Player {
     }
   }
 
-  public void give(ImmutableList<Entry> items) throws ConnectException {
+  public void give(Kit kit) throws ConnectException {
     Giver giver = new Giver(this);
     int slot = 9;
 
-    for (Entry e : items) {
+    for (Kit.Entry e : kit.items) {
       if (e.damage() == 0) {
         give(e.item(), e.amount());
       } else {
