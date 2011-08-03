@@ -518,7 +518,8 @@ public class Player {
 
   public void give(Kit kit) throws ConnectException {
     Giver giver = new Giver(this);
-    int slot = 9;
+    int invSize = 45;
+    int slot = invSize;
 
     for (Kit.Entry e : kit.items) {
       if (e.damage() == 0) {
@@ -530,7 +531,7 @@ public class Player {
           restAmount -= 64;
 
           if (slot == 0) {
-            slot = 9;
+            slot = invSize;
             server.bots.connect(giver);
             giver = new Giver(this);
           }
@@ -538,7 +539,7 @@ public class Player {
       }
     }
 
-    if (slot != 9) {
+    if (slot != invSize) {
       server.bots.connect(giver);
     }
   }
