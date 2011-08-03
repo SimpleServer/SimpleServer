@@ -129,7 +129,7 @@ public class MessageHandler {
     ServerCommand command = server.getCommandParser().getServerCommand(line);
     if ((command != null) && (command.getClass() != InvalidCommand.class)) {
       command.execute(server, line);
-      return !command.shouldPassThroughToConsole();
+      return !command.shouldPassThroughToConsole(server);
     }
     return false;
   }
