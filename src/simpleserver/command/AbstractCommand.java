@@ -26,6 +26,7 @@ import java.util.Collection;
 
 import simpleserver.Color;
 import simpleserver.CommandParser;
+import simpleserver.Server;
 
 public abstract class AbstractCommand implements Command {
   protected final String name;
@@ -61,8 +62,10 @@ public abstract class AbstractCommand implements Command {
     }
   }
 
-  public boolean shouldPassThroughToConsole() {
-    return false;
+  public boolean shouldPassThroughToConsole(Server server) {
+    return (server.permissions.commandShouldPassThroughToMod(getName())
+        || server.options.getBoolean("forwardAllCommands"))
+        && server.options.contains("alternateJarFile");
   }
 
   protected String[] extractArguments(String message, int startOffset) {
