@@ -25,10 +25,11 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.io.Writer;
 
 public abstract class AsciiConfig extends AbstractConfig {
@@ -41,7 +42,7 @@ public abstract class AsciiConfig extends AbstractConfig {
     boolean success = false;
     File outFile = getFile();
     try {
-      Writer writer = new BufferedWriter(new FileWriter(outFile));
+      Writer writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outFile), "UTF-8"));
 
       try {
         writer.write(getHeader());
