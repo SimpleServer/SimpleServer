@@ -36,6 +36,7 @@ import simpleserver.bot.Giver;
 import simpleserver.bot.Teleporter;
 import simpleserver.command.ExternalCommand;
 import simpleserver.command.PlayerCommand;
+import simpleserver.config.KitList.Kit;
 import simpleserver.config.data.Stats.StatField;
 import simpleserver.stream.StreamTunnel;
 
@@ -511,6 +512,34 @@ public class Player {
       if (amount % 64 != 0) {
         giver.add(id, amount % 64, damage);
       }
+      server.bots.connect(giver);
+    }
+  }
+
+  public void give(Kit kit) throws ConnectException {
+    Giver giver = new Giver(this);
+    int invSize = 45;
+    int slot = invSize;
+
+    for (Kit.Entry e : kit.items) {
+      if (e.damage() == 0) {
+        give(e.item(), e.amount());
+      } else {
+        int restAmount = e.amount();
+        while (restAmount > 0 && --slot >= 0) {
+          giver.add(e.item(), Math.min(restAmount, 64), e.damage());
+          restAmount -= 64;
+
+          if (slot == 0) {
+            slot = invSize;
+            server.bots.connect(giver);
+            giver = new Giver(this);
+          }
+        }
+      }
+    }
+
+    if (slot != invSize) {
       server.bots.connect(giver);
     }
   }
