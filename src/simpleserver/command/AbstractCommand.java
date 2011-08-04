@@ -30,20 +30,18 @@ import simpleserver.Server;
 
 public abstract class AbstractCommand implements Command {
   protected final String name;
+  protected final String help;
   protected final String commandCode;
-  protected String helpText;
   protected CommandParser parser;
 
   protected AbstractCommand(String name, String commandCode) {
-    if (name != null) {
-      helpText = name + Color.WHITE + " : " + t(commandCode);
+    help = name;
 
+    if (name != null) {
       int splitIndex = name.indexOf(" ");
       if (splitIndex != -1) {
         name = name.substring(0, splitIndex);
       }
-    } else {
-      helpText = t(commandCode);
     }
 
     this.name = name;
@@ -55,10 +53,10 @@ public abstract class AbstractCommand implements Command {
   }
 
   public String getHelpText(String prefix) {
-    if (name != null) {
-      return Color.DARK_GREEN + prefix + helpText;
+    if (help != null) {
+      return Color.DARK_GREEN + prefix + help + " : " + Color.WHITE + t(commandCode);
     } else {
-      return helpText;
+      return t(commandCode);
     }
   }
 
@@ -122,14 +120,6 @@ public abstract class AbstractCommand implements Command {
       string.delete(string.length() - 2, string.length() - 1);
     }
     return string.toString();
-  }
-
-  public void reloadText() {
-    if (name != null) {
-      helpText = name + Color.WHITE + " : " + t(commandCode);
-    } else {
-      helpText = t(commandCode);
-    }
   }
 
   public void setParser(CommandParser parser) {

@@ -53,13 +53,7 @@ public abstract class PlayerArgCommand extends AbstractCommand implements
   }
 
   @Override
-  public void reloadText() {
-    if (name != null) {
-      helpText = name + Color.WHITE + " : " + t(commandCode) + " "
-          + t("(case-insensitive, name prefix works for online players)");
-    } else {
-      helpText = t(commandCode) + " "
-          + t("(case-insensitive, name prefix works for online players)");
-    }
+  public String getHelpText(String prefix) {
+    return super.getHelpText(prefix) + " " + t("(case-insensitive, name prefix works for online players)");
   }
 }

@@ -240,8 +240,6 @@ public class Server {
     }
 
     addressFactory.toggle(!options.getBoolean("disableAddressFactory"));
-
-    commandParser.reload();
   }
 
   public void saveResources() {

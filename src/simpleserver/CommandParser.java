@@ -142,13 +142,4 @@ public class CommandParser {
       commandClasses.put(command.getClass(), command);
     }
   }
-
-  public void reload() {
-    for (ServerCommand serverCommand : serverCommands.values()) {
-      ((AbstractCommand) serverCommand).reloadText();
-    }
-    for (PlayerCommand playerCommand : playerCommands.values()) {
-      ((AbstractCommand) playerCommand).reloadText();
-    }
-  }
 }
