@@ -24,13 +24,13 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 public class Main {
-  @SuppressWarnings("unchecked")
   public static void main(String[] args) {
     if (args.length == 0) {
       System.out.println("Usage: java -jar NBT.jar file [command] [arguments]");
       System.out.println("\nCommands:");
       System.out.println("\tread [key]");
       System.out.println("\tset key value");
+      System.out.println("\tremove key");
       System.out.println("\tadd key [name type] [value]");
       return;
     }
@@ -60,104 +60,162 @@ public class Main {
 
     String command = args[1].toLowerCase();
     if (command.equals("read")) {
-      NBTag tag = file.root();
-      if (args.length >= 3) {
-        tag = tryGetTag(args[2], tag);
-      }
-      if (tag != null) {
-        System.out.println(tag);
-      }
+      read(args, file);
     } else if (command.equals("set")) {
-      if (args.length >= 4) {
-        NBTag tag = tryGetTag(args[2], file.root());
-        if (tag == null) {
+      set(args, file);
+    } else if (command.equals("remove")) {
+      remove(args, file);
+    } else if (command.equals("add")) {
+      add(args, file);
+    }
+  }
+
+  private static void read(String[] args, NBTFile file) {
+    NBTag tag = file.root();
+    if (args.length >= 3) {
+      tag = tryGetTag(args[2], tag);
+    }
+    if (tag != null) {
+      System.out.println(tag);
+    }
+  }
+
+  private static void set(String[] args, NBTFile file) {
+    if (args.length >= 4) {
+      NBTag tag = tryGetTag(args[2], file.root());
+      if (tag == null) {
+        return;
+      }
+      String value = args[3];
+      try {
+        tag.set(value);
+      } catch (NumberFormatException e) {
+        System.out.println("Error: Wrong format (" + e.getMessage() + ")");
+        return;
+      }
+      trySave(file, args[0]);
+    } else {
+      System.out.println("Error: Wrong number of arguments");
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  private static void remove(String[] args, NBTFile file) {
+    if (args.length >= 3) {
+      String path = args[2];
+      int split = Math.max(path.lastIndexOf('.'), path.lastIndexOf('/'));
+
+      NBTag tag = tryGetTag(path.substring(0, split), file.root());
+      if (tag == null) {
+        return;
+      }
+      String name = path.substring(split + 1);
+      switch (tag.type()) {
+        case COMPOUND:
+          if (((NBTCompound) tag).containsKey(name)) {
+            ((NBTCompound) tag).remove(name);
+          } else {
+            System.out.println(new NoSuchKeyException(path));
+          }
+          break;
+        case LIST:
+          int index;
+          try {
+            index = Integer.valueOf(name);
+          } catch (NumberFormatException e) {
+            System.out.println(new NoSuchKeyException(path));
+            return;
+          }
+          if (((NBTList) tag).size() > index) {
+            ((NBTList) tag).remove(((NBTList) tag).get(index));
+          } else {
+            System.out.println(new NoSuchKeyException(path));
+          }
+          break;
+        default:
+          System.out.println(new NoContainerException(tag));
+          return;
+      }
+      trySave(file, args[0]);
+    } else {
+      System.out.println("Error: Wrong number of arguments");
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  private static void add(String[] args, NBTFile file) {
+    NBTag newTag = null;
+    if (args.length >= 3) {
+      NBTag tag = tryGetTag(args[2], file.root());
+      if (tag == null) {
+        return;
+      }
+      int index = 3;
+      if (tag.type() == NBT.COMPOUND) {
+        if (args.length >= 5) {
+          String typeString = args[4].toLowerCase();
+          if (typeString.equals("list")) {
+            System.out.println("Error: Use list.<type> for list tags (e.g. list.string)");
+            return;
+          } else if (typeString.startsWith("list.")) {
+            NBT type = NBT.get(args[4].substring(5));
+            if (type == null || type == NBT.END || type == NBT.LIST) {
+              System.out.println("Error: Unknown type");
+              return;
+            }
+            newTag = new NBTList(type);
+          } else {
+            NBT type = NBT.get(args[4]);
+            if (type == null || type == NBT.END) {
+              System.out.println("Error: Unknown type");
+              return;
+            }
+            try {
+              newTag = type.getInstance();
+            } catch (Exception e) {
+              System.out.println("Error: " + e.getClass().getSimpleName() + " (" + e.getMessage() + ")");
+              return;
+            }
+          }
+          newTag.rename(args[3]);
+          ((NBTCompound) tag).put(newTag);
+          index = 5;
+        } else {
+          System.out.println("Error: Wrong number of arguments");
+        }
+      } else if (tag.type() == NBT.LIST) {
+        NBTList<NBTag> list = (NBTList<NBTag>) tag;
+        try {
+          newTag = list.listType().getInstance();
+        } catch (Exception e) {
+          System.out.println("Error: " + e.getClass().getSimpleName() + " (" + e.getMessage() + ")");
           return;
         }
-        String value = args[3];
+        list.add(newTag);
+      } else {
+        System.out.println("Error: Can't add tags to " + tag.getClass().getSimpleName());
+        return;
+      }
+      if (args.length > index) {
+        String value = args[index];
         try {
-          tag.set(value);
+          newTag.set(value);
         } catch (NumberFormatException e) {
           System.out.println("Error: Wrong format (" + e.getMessage() + ")");
           return;
         }
-        try {
-          file.save(args[0]);
-        } catch (IOException e) {
-          System.out.println("Error: File couldn't be saved (" + e.getMessage() + ")");
-        }
-      } else {
-        System.out.println("Error: Wrong number of arguments");
       }
-    } else if (command.equals("add")) {
-      NBTag newTag = null;
-      if (args.length >= 3) {
-        NBTag tag = tryGetTag(args[2], file.root());
-        if (tag == null) {
-          return;
-        }
-        int index = 3;
-        if (tag.type() == NBT.COMPOUND) {
-          if (args.length >= 5) {
-            String typeString = args[4].toLowerCase();
-            if (typeString.equals("list")) {
-              System.out.println("Error: Use list.<type> for list tags (e.g. list.string)");
-              return;
-            } else if (typeString.startsWith("list.")) {
-              NBT type = NBT.get(args[4].substring(5));
-              if (type == null || type == NBT.END || type == NBT.LIST) {
-                System.out.println("Error: Unknown type");
-                return;
-              }
-              newTag = new NBTList(type);
-            } else {
-              NBT type = NBT.get(args[4]);
-              if (type == null || type == NBT.END) {
-                System.out.println("Error: Unknown type");
-                return;
-              }
-              try {
-                newTag = type.getInstance();
-              } catch (Exception e) {
-                System.out.println("Error: " + e.getClass().getSimpleName() + " (" + e.getMessage() + ")");
-                return;
-              }
-            }
-            newTag.rename(args[3]);
-            ((NBTCompound) tag).put(newTag);
-            index = 5;
-          } else {
-            System.out.println("Error: Wrong number of arguments");
-          }
-        } else if (tag.type() == NBT.LIST) {
-          NBTList<NBTag> list = (NBTList<NBTag>) tag;
-          try {
-            newTag = list.listType().getInstance();
-          } catch (Exception e) {
-            System.out.println("Error: " + e.getClass().getSimpleName() + " (" + e.getMessage() + ")");
-            return;
-          }
-          list.add(newTag);
-        } else {
-          System.out.println("Error: Can't add tags to " + tag.getClass().getSimpleName());
-          return;
-        }
-        if (args.length > index) {
-          String value = args[index];
-          try {
-            newTag.set(value);
-          } catch (NumberFormatException e) {
-            System.out.println("Error: Wrong format (" + e.getMessage() + ")");
-            return;
-          }
-        }
-        try {
-          file.save(args[0]);
-        } catch (IOException e) {
-          System.out.println("Error: File couldn't be saved (" + e.getMessage() + ")");
-        }
-      } else {
-        System.out.println("Error: Wrong number of arguments");
-      }
+      trySave(file, args[0]);
+    } else {
+      System.out.println("Error: Wrong number of arguments");
+    }
+  }
+
+  private static void trySave(NBTFile file, String filename) {
+    try {
+      file.save(filename);
+    } catch (IOException e) {
+      System.out.println("Error: File couldn't be saved (" + e.getMessage() + ")");
     }
   }
 
