@@ -37,13 +37,13 @@ import java.util.IllegalFormatException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import simpleserver.Authenticator.AuthRequest;
 import simpleserver.Color;
 import simpleserver.Coordinate;
-import simpleserver.Coordinate.Dimension;
 import simpleserver.Group;
 import simpleserver.Player;
 import simpleserver.Server;
+import simpleserver.Authenticator.AuthRequest;
+import simpleserver.Coordinate.Dimension;
 import simpleserver.command.LocalSayCommand;
 import simpleserver.command.PlayerListCommand;
 import simpleserver.config.data.Chests.Chest;
@@ -195,8 +195,8 @@ public class StreamTunnel {
                 player.addTMessage(Color.RED, "You were logged in as guest.");
               }
               name = server.authenticator.getFreeGuestName();
-              nameSet = player.setName(name);
               player.setGuest(true);
+              nameSet = player.setName(name);
             }
           } else {
             nameSet = player.setName(name);

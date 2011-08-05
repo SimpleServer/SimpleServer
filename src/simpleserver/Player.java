@@ -31,9 +31,9 @@ import java.util.TimerTask;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import simpleserver.Coordinate.Dimension;
-import simpleserver.bot.BotController.ConnectException;
 import simpleserver.bot.Giver;
 import simpleserver.bot.Teleporter;
+import simpleserver.bot.BotController.ConnectException;
 import simpleserver.command.ExternalCommand;
 import simpleserver.command.PlayerCommand;
 import simpleserver.config.KitList.Kit;
@@ -166,7 +166,7 @@ public class Player {
       return false;
     }
 
-    if (server.options.getBoolean("useWhitelist")
+    if (!guest && server.options.getBoolean("useWhitelist")
         && !server.whitelist.isWhitelisted(name)) {
       kick(t("You are not whitelisted!"));
       return false;
