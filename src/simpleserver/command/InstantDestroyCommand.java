@@ -25,7 +25,7 @@ import simpleserver.Player;
 
 public class InstantDestroyCommand extends AbstractCommand implements PlayerCommand {
   public InstantDestroyCommand() {
-    super("idbehold", "Make tools work instantly for yourself");
+    super("idbehold");
   }
 
   public void execute(Player player, String message) {

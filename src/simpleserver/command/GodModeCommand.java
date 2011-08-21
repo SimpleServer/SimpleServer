@@ -25,7 +25,7 @@ import simpleserver.Player;
 
 public class GodModeCommand extends AbstractCommand implements PlayerCommand {
   public GodModeCommand() {
-    super("iddqd", "Make yourself invulnerable to other players attacks");
+    super("iddqd");
   }
 
   public void execute(Player player, String message) {

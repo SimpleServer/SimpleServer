@@ -27,7 +27,7 @@ import simpleserver.Server;
 public class SaveCommand extends AbstractCommand implements PlayerCommand,
     ServerCommand {
   public SaveCommand() {
-    super("save", "Store configuration to disk and force a map save");
+    super("save");
   }
 
   public void execute(Player player, String message) {

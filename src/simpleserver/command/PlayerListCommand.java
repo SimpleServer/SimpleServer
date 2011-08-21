@@ -27,7 +27,7 @@ import simpleserver.Server;
 
 public class PlayerListCommand extends AbstractCommand implements PlayerCommand {
   public PlayerListCommand() {
-    super("who", "Display online players names");
+    super("who");
   }
 
   public void execute(Player player, String message) {

@@ -32,7 +32,7 @@ import simpleserver.nbt.NBTString;
 
 public class HomeCommand extends AbstractCommand implements PlayerCommand {
   public HomeCommand() {
-    super("home [set|delete|public|private|ilist|list|invite|uninvite] [name]", "Teleport to and manage your home");
+    super("home [set|delete|public|private|ilist|list|invite|uninvite] [name]");
   }
 
   public void execute(Player player, String message) {

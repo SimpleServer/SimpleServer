@@ -20,8 +20,6 @@
  */
 package simpleserver.command;
 
-import static simpleserver.lang.Translations.t;
-
 import java.util.Collection;
 
 import simpleserver.Color;
@@ -32,10 +30,9 @@ import simpleserver.Server;
 public abstract class AbstractCommand implements Command {
   protected final String name;
   protected final String help;
-  protected final String commandCode;
   protected CommandParser parser;
 
-  protected AbstractCommand(String name, String commandCode) {
+  protected AbstractCommand(String name) {
     help = name;
 
     if (name != null) {
@@ -46,19 +43,14 @@ public abstract class AbstractCommand implements Command {
     }
 
     this.name = name;
-    this.commandCode = commandCode;
   }
 
   public String getName() {
     return name;
   }
 
-  public String getHelpText(String prefix) {
-    if (help != null) {
-      return Color.DARK_GREEN + prefix + help + " : " + Color.WHITE + t(commandCode);
-    } else {
-      return t(commandCode);
-    }
+  public String getName(String prefix) {
+    return Color.DARK_GREEN + prefix + help;
   }
 
   public boolean shouldPassThroughToConsole(Server server) {

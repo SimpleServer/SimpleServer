@@ -25,7 +25,7 @@ import simpleserver.Player;
 
 public class ReadCommand extends AbstractCommand implements PlayerCommand {
   public ReadCommand() {
-    super("read DOCUMENT", "display a specified text document");
+    super("read DOCUMENT");
   }
 
   public void execute(Player player, String message) {

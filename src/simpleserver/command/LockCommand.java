@@ -28,7 +28,7 @@ import simpleserver.Player.Action;
 
 public class LockCommand extends AbstractCommand implements PlayerCommand {
   public LockCommand() {
-    super("lock [name|list]", "Create or list locked chests");
+    super("lock [name|list]");
   }
 
   public void execute(Player player, String message) {

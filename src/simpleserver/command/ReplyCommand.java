@@ -25,7 +25,7 @@ import simpleserver.Player;
 
 public class ReplyCommand extends AbstractCommand implements PlayerCommand {
   public ReplyCommand() {
-    super("reply MESSAGE", "Sends a message to the player that last told you something");
+    super("reply MESSAGE");
   }
 
   public void execute(Player player, String message) {

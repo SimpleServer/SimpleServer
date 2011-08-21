@@ -25,7 +25,7 @@ import simpleserver.Player;
 
 public class TellCommand extends OnlinePlayerArgCommand implements PlayerCommand {
   public TellCommand() {
-    super("tell PLAYER MESSAGE...", "Send a message to the named player");
+    super("tell PLAYER MESSAGE...");
   }
 
   @Override

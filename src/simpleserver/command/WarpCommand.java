@@ -26,7 +26,7 @@ import simpleserver.config.data.Warp;
 
 public class WarpCommand extends AbstractCommand implements PlayerCommand {
   public WarpCommand() {
-    super("warp [list|remove|add] [name]", "Use and manage waypoints");
+    super("warp [list|remove|add] [name]");
   }
 
   public void execute(Player player, String message) {

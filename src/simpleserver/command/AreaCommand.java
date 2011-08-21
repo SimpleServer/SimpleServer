@@ -26,7 +26,7 @@ import simpleserver.config.PermissionConfig;
 
 public class AreaCommand extends AbstractCommand implements PlayerCommand {
   public AreaCommand() {
-    super("area", "Show the name of current area");
+    super("area");
   }
 
   public void execute(Player player, String message) {

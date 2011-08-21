@@ -25,7 +25,7 @@ import simpleserver.Player;
 
 public class WhitelistCommand extends PlayerArgCommand {
   public WhitelistCommand() {
-    super("whitelist PLAYER", "Add player to server access list");
+    super("whitelist PLAYER");
   }
 
   @Override

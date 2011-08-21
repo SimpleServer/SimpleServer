@@ -23,7 +23,5 @@ package simpleserver.command;
 import simpleserver.Player;
 
 public interface PlayerCommand extends Command {
-  public String getHelpText(String prefix);
-
   public void execute(Player player, String message);
 }

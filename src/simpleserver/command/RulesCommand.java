@@ -25,7 +25,7 @@ import simpleserver.Player;
 
 public class RulesCommand extends AbstractCommand implements PlayerCommand {
   public RulesCommand() {
-    super("rules", "Display the server rules");
+    super("rules");
   }
 
   public void execute(Player player, String message) {

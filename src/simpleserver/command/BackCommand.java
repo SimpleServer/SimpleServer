@@ -25,7 +25,7 @@ import simpleserver.Player;
 
 public class BackCommand extends AbstractCommand implements PlayerCommand {
   public BackCommand() {
-    super("back", "teleports you back to the position you died");
+    super("back");
   }
 
   public void execute(Player player, String message) {

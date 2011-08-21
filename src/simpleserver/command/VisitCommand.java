@@ -25,7 +25,7 @@ import simpleserver.Player;
 
 public class VisitCommand extends OnlinePlayerArgCommand {
   public VisitCommand() {
-    super("visit PLAYER", "Teleport to the player if he agrees with ok");
+    super("visit PLAYER");
   }
 
   @Override

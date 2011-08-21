@@ -25,7 +25,7 @@ import simpleserver.Player;
 
 public class KitCommand extends AbstractCommand implements PlayerCommand {
   public KitCommand() {
-    super("kit [KIT]", "Display all kits or give yourself the named kit");
+    super("kit [KIT]");
   }
 
   public void execute(Player player, String message) {

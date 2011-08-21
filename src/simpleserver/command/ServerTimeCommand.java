@@ -27,7 +27,7 @@ import simpleserver.Player;
 
 public class ServerTimeCommand extends AbstractCommand implements PlayerCommand {
   public ServerTimeCommand() {
-    super("servertime", "Display the real-world time of the server");
+    super("servertime");
   }
 
   public void execute(Player player, String message) {

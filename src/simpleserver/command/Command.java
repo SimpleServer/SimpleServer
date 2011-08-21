@@ -25,5 +25,7 @@ import simpleserver.Player;
 public interface Command {
   public String getName();
 
+  public String getName(String prefix);
+
   public void usage(Player player);
 }

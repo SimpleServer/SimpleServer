@@ -27,7 +27,7 @@ import simpleserver.Server;
 
 public class BanIPCommand extends AbstractCommand implements PlayerCommand {
   public BanIPCommand() {
-    super("banip IPADDRESS", "Kick and ban players with this IP");
+    super("banip IPADDRESS");
   }
 
   public void execute(Player player, String message) {

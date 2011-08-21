@@ -27,7 +27,7 @@ import simpleserver.Server;
 
 public class BanCommand extends PlayerArgCommand {
   public BanCommand() {
-    super("ban PLAYER [REASON]", "Kick and ban the named player");
+    super("ban PLAYER [REASON]");
   }
 
   protected boolean allowed(Player player, String target) {

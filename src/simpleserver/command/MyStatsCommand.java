@@ -26,7 +26,7 @@ import simpleserver.Player;
 public class MyStatsCommand extends AbstractCommand implements PlayerCommand {
 
   public MyStatsCommand() {
-    super("mystats", "Display your statistics");
+    super("mystats");
   }
 
   public void execute(Player player, String message) {

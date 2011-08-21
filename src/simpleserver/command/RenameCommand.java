@@ -25,7 +25,7 @@ import simpleserver.Player;
 
 public class RenameCommand extends OnlinePlayerArgCommand {
   public RenameCommand() {
-    super("rename PLAYER RENAME", "Constantly rename a player.", false);
+    super("rename PLAYER RENAME", false);
   }
 
   @Override

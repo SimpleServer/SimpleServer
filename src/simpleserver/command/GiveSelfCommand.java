@@ -25,7 +25,7 @@ import simpleserver.Player;
 
 public class GiveSelfCommand extends GiveCommand implements PlayerCommand {
   public GiveSelfCommand() {
-    super("give ITEM[:DAMAGE] [AMOUNT]", "Spawn items for yourself");
+    super("give ITEM[:DAMAGE] [AMOUNT]");
   }
 
   public void execute(Player player, String message) {

@@ -26,7 +26,7 @@ import simpleserver.Time;
 
 public abstract class TimeCommand extends AbstractCommand {
   public TimeCommand() {
-    super("time [set] [number|day|night|unfreeze] [freeze]", "Set or freeze time");
+    super("time [set] [number|day|night|unfreeze] [freeze]");
   }
 
   private void usage() {

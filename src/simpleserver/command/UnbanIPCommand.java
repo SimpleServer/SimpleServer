@@ -25,7 +25,7 @@ import simpleserver.Player;
 
 public class UnbanIPCommand extends AbstractCommand implements PlayerCommand {
   public UnbanIPCommand() {
-    super("unbanip IPADDRESS", "Remove the IP address from the ban list");
+    super("unbanip IPADDRESS");
   }
 
   public void execute(Player player, String message) {

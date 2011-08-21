@@ -28,7 +28,7 @@ import simpleserver.Server;
 
 public class SetIPGroupCommand extends SetGroupCommand implements ServerCommand {
   public SetIPGroupCommand() {
-    super("setipgroup IP|Player", "Set the group ID of an IP address");
+    super("setipgroup IP|Player");
   }
 
   @Override

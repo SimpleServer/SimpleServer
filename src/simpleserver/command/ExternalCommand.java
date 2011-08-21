@@ -20,15 +20,16 @@
  */
 package simpleserver.command;
 
+import simpleserver.Color;
 import simpleserver.Player;
 
 public class ExternalCommand extends AbstractCommand implements PlayerCommand {
   public ExternalCommand() {
-    super("external", "External command");
+    super("external");
   }
 
   public ExternalCommand(String name) {
-    super(name, "External command");
+    super(name);
   }
 
   public void execute(Player player, String message) {
@@ -36,5 +37,6 @@ public class ExternalCommand extends AbstractCommand implements PlayerCommand {
 
   @Override
   public void usage(Player player) {
+    player.addTMessage(Color.GRAY, "External command");
   }
 }

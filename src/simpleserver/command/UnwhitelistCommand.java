@@ -25,7 +25,7 @@ import simpleserver.Player;
 
 public class UnwhitelistCommand extends PlayerArgCommand {
   public UnwhitelistCommand() {
-    super("unwhitelist PLAYER", "Remove player from server access list");
+    super("unwhitelist PLAYER");
   }
 
   @Override

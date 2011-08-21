@@ -25,7 +25,7 @@ import simpleserver.Player;
 
 public class SpawnCommand extends AbstractCommand implements PlayerCommand {
   public SpawnCommand() {
-    super("spawn", "Teleport to spawn");
+    super("spawn");
   }
 
   public void execute(Player player, String message) {

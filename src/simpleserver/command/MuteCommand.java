@@ -27,7 +27,7 @@ import simpleserver.Server;
 
 public class MuteCommand extends PlayerArgCommand {
   public MuteCommand() {
-    super("mute PLAYER", "Block the named player from normal chat");
+    super("mute PLAYER");
   }
 
   @Override

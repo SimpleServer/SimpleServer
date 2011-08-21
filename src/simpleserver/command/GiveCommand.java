@@ -29,8 +29,8 @@ import simpleserver.config.GiveAliasList.Item;
 public abstract class GiveCommand extends AbstractCommand {
   protected Player executor;
 
-  public GiveCommand(String name, String usage) {
-    super(name, usage);
+  public GiveCommand(String name) {
+    super(name);
   }
 
   public void execute(String[] arguments, Player target, String logName) {

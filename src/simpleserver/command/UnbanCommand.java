@@ -25,7 +25,7 @@ import simpleserver.Player;
 
 public class UnbanCommand extends PlayerArgCommand {
   public UnbanCommand() {
-    super("unban PLAYER", "Remove the named player from the ban list");
+    super("unban PLAYER");
   }
 
   @Override

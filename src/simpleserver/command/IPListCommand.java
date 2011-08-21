@@ -27,7 +27,7 @@ import simpleserver.Server;
 public class IPListCommand extends AbstractCommand implements PlayerCommand,
     ServerCommand {
   public IPListCommand() {
-    super("listips", "Display the name and IP of each connected player");
+    super("listips");
   }
 
   public void execute(Player player, String message) {

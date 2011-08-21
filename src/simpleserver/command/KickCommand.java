@@ -26,7 +26,7 @@ import simpleserver.Player;
 
 public class KickCommand extends OnlinePlayerArgCommand {
   public KickCommand() {
-    super("kick PLAYER [REASON]", "Kick the named player from the server");
+    super("kick PLAYER [REASON]");
   }
 
   protected boolean allowed(Player player, Player target) {

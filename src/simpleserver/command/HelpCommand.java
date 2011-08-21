@@ -25,7 +25,7 @@ import simpleserver.Player;
 
 public class HelpCommand extends AbstractCommand implements PlayerCommand {
   public HelpCommand() {
-    super("help [COMMAND]", "List commands or get help for one command");
+    super("help [COMMAND]");
   }
 
   public void execute(Player player, String message) {
@@ -38,7 +38,8 @@ public class HelpCommand extends AbstractCommand implements PlayerCommand {
         commandName = prefix + commandName;
       }
       PlayerCommand command = parser.getPlayerCommand(commandName);
-      player.addMessage(command.getHelpText(prefix));
+      player.addMessage(command.getName(prefix));
+      command.usage(player);
 
       String[] aliases = player.getServer().permissions.getCommandAliases(command.getName());
       if (aliases.length > 0) {
@@ -49,9 +50,6 @@ public class HelpCommand extends AbstractCommand implements PlayerCommand {
           line.append(" ");
         }
         player.addTCaptionedMessage("Aliases", line.toString());
-      }
-      if (message.endsWith("-e")) {
-        command.usage(player);
       }
     } else {
       StringBuffer line = new StringBuffer();
@@ -75,7 +73,6 @@ public class HelpCommand extends AbstractCommand implements PlayerCommand {
       player.addTCaptionedMessage("Available Commands", line.toString());
 
       player.addTMessage(Color.GRAY, "Say %s command %s for details of a specific command.", Color.WHITE + prefix + "help", Color.GRAY);
-      player.addTMessage(Color.GRAY, "Say %s command %s for even more help for a command.", Color.WHITE + prefix + "help", "-e" + Color.GRAY);
 
       // additional custom help text from helptext.txt
       String[] helplines = player.getServer().helptext.getHelpText().split("\n");
@@ -88,6 +85,7 @@ public class HelpCommand extends AbstractCommand implements PlayerCommand {
 
   @Override
   public void usage(Player player) {
-    execute(player, parser.commandPrefix() + "help");
+    player.addTMessage(Color.GRAY, "List all commands or get help information for a specific command");
+    // FIXME Needed? // execute(player, parser.commandPrefix() + "help");
   }
 }

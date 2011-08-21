@@ -28,7 +28,7 @@ import simpleserver.Server;
 public class InvalidCommand extends AbstractCommand implements PlayerCommand,
     ServerCommand {
   public InvalidCommand() {
-    super(null, "No such command!");
+    super(null);
   }
 
   public void execute(Player player, String message) {
@@ -43,8 +43,8 @@ public class InvalidCommand extends AbstractCommand implements PlayerCommand,
   }
 
   @Override
-  public String getHelpText(String prefix) {
-    return Color.RED + t(commandCode);
+  public String getName(String prefix) {
+    return Color.RED + t("No such command!");
   }
 
   @Override

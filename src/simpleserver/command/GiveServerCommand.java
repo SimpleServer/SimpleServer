@@ -25,7 +25,7 @@ import simpleserver.Server;
 
 public class GiveServerCommand extends GiveCommand implements ServerCommand {
   public GiveServerCommand() {
-    super("give", "Spawn items for players");
+    super("give");
   }
 
   public void execute(Server server, String message) {

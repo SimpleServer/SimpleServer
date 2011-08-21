@@ -27,7 +27,7 @@ import simpleserver.Player;
 public class LoginCommand extends AbstractCommand implements PlayerCommand {
 
   public LoginCommand() {
-    super("login PLAYER PASSWORD", "Login using CustAuth.");
+    super("login PLAYER PASSWORD");
   }
 
   public void execute(Player player, String message) {

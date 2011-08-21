@@ -25,7 +25,7 @@ import simpleserver.Player;
 
 public class AllowVisitCommand extends AbstractCommand implements PlayerCommand {
   public AllowVisitCommand() {
-    super("ok PLAYER", "Agree a visit request");
+    super("ok PLAYER");
   }
 
   public void execute(Player player, String message) {

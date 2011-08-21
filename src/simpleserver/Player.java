@@ -31,9 +31,9 @@ import java.util.TimerTask;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import simpleserver.Coordinate.Dimension;
+import simpleserver.bot.BotController.ConnectException;
 import simpleserver.bot.Giver;
 import simpleserver.bot.Teleporter;
-import simpleserver.bot.BotController.ConnectException;
 import simpleserver.command.ExternalCommand;
 import simpleserver.command.PlayerCommand;
 import simpleserver.config.KitList.Kit;
@@ -462,7 +462,7 @@ public class Player {
     if (server.permissions.commandShouldBeExecuted(command.getName())) {
       if (message.endsWith(" help")/* && !message.startsWith(prefix + "help")*/) {
         PlayerCommand helpCommand = server.getCommandParser().getPlayerCommand(prefix + "help");
-        helpCommand.execute(this, prefix + "help " + command.getName() + " -e");
+        helpCommand.execute(this, prefix + "help " + command.getName());
       } else {
         command.execute(this, message);
       }

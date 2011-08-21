@@ -26,7 +26,7 @@ import simpleserver.Server;
 
 public class TeleportCommand extends OnlinePlayerArgCommand {
   public TeleportCommand() {
-    super("teleport PLAYER1 PLAYER2", "Teleport the first player to the second");
+    super("teleport PLAYER1 PLAYER2");
   }
 
   @Override

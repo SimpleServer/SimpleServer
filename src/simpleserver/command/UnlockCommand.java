@@ -29,7 +29,7 @@ import simpleserver.config.data.Chests.Chest;
 
 public class UnlockCommand extends AbstractCommand implements PlayerCommand {
   public UnlockCommand() {
-    super("unlock [name]", "Unlocks locked chests");
+    super("unlock [name]");
   }
 
   public void execute(Player player, String message) {

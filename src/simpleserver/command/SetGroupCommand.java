@@ -26,11 +26,11 @@ import simpleserver.Server;
 
 public class SetGroupCommand extends PlayerArgCommand implements ServerCommand {
   public SetGroupCommand() {
-    super("setgroup PLAYER GROUP", "Set the group ID of the named player");
+    super("setgroup PLAYER GROUP");
   }
 
-  public SetGroupCommand(String name, String commandCode) {
-    super(name, commandCode);
+  public SetGroupCommand(String name) {
+    super(name);
   }
 
   protected boolean allowed(Player player, int group, String target) {

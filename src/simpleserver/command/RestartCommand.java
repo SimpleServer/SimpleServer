@@ -26,7 +26,7 @@ import simpleserver.Server;
 
 public class RestartCommand extends AbstractCommand implements PlayerCommand, ServerCommand {
   public RestartCommand() {
-    super("restart", "Stop the Minecraft server and start it again");
+    super("restart");
   }
 
   public void execute(Player player, String message) {

@@ -27,7 +27,7 @@ import simpleserver.Player;
 public class RegisterCommand extends AbstractCommand implements PlayerCommand {
 
   public RegisterCommand() {
-    super("register [OLD PASSWORD] NEW_PASSWORD NEW_PASSWORD", "Set or change password for CustAuth.");
+    super("register [OLD PASSWORD] NEW_PASSWORD NEW_PASSWORD");
   }
 
   public void execute(Player player, String message) {

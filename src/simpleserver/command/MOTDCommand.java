@@ -25,7 +25,7 @@ import simpleserver.Player;
 
 public class MOTDCommand extends AbstractCommand implements PlayerCommand {
   public MOTDCommand() {
-    super("motd", "Display the message of the day");
+    super("motd");
   }
 
   public void execute(Player player, String message) {

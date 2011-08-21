@@ -26,8 +26,8 @@ import simpleserver.Player;
 
 public abstract class PlayerArgCommand extends AbstractCommand implements
     PlayerCommand {
-  protected PlayerArgCommand(String name, String commandCode) {
-    super(name, commandCode);
+  protected PlayerArgCommand(String name) {
+    super(name);
   }
 
   public void execute(Player player, String message) {
@@ -53,7 +53,7 @@ public abstract class PlayerArgCommand extends AbstractCommand implements
   }
 
   @Override
-  public String getHelpText(String prefix) {
-    return super.getHelpText(prefix) + " " + t("(case-insensitive, name prefix works for online players)");
+  public String getName(String prefix) {
+    return super.getName(prefix) + " " + t("(case-insensitive, name prefix works for online players)");
   }
 }

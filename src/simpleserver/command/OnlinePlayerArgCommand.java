@@ -28,13 +28,12 @@ public abstract class OnlinePlayerArgCommand extends AbstractCommand implements
     PlayerCommand {
   private final boolean playerOptional;
 
-  protected OnlinePlayerArgCommand(String name, String commandCode) {
-    this(name, commandCode, false);
+  protected OnlinePlayerArgCommand(String name) {
+    this(name, false);
   }
 
-  protected OnlinePlayerArgCommand(String name, String commandCode,
-                                   boolean playerOptional) {
-    super(name, commandCode);
+  protected OnlinePlayerArgCommand(String name, boolean playerOptional) {
+    super(name);
 
     this.playerOptional = playerOptional;
   }
@@ -66,7 +65,7 @@ public abstract class OnlinePlayerArgCommand extends AbstractCommand implements
   }
 
   @Override
-  public String getHelpText(String prefix) {
-    return super.getHelpText(prefix) + " " + t("(case-insensitive, name prefix works for online players)");
+  public String getName(String prefix) {
+    return super.getName(prefix) + " " + t("(case-insensitive, name prefix works for online players)");
   }
 }

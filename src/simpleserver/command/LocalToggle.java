@@ -26,7 +26,7 @@ import simpleserver.Player;
 
 public class LocalToggle extends AbstractCommand implements PlayerCommand {
   public LocalToggle() {
-    super("localtoggle [on|off]", "Toggle local chat mode");
+    super("localtoggle [on|off]");
   }
 
   public void execute(Player player, String message) {

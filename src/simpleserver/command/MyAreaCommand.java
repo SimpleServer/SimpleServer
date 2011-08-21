@@ -26,7 +26,7 @@ import simpleserver.config.PermissionConfig;
 
 public class MyAreaCommand extends AbstractCommand implements PlayerCommand {
   public MyAreaCommand() {
-    super("myarea [start|end|save|unsave|rename]", "Manage your personal area");
+    super("myarea [start|end|save|unsave|rename]");
   }
 
   private boolean areaSizeOk(Player player) {

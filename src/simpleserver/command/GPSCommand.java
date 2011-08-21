@@ -26,7 +26,7 @@ import simpleserver.Player;
 
 public class GPSCommand extends OnlinePlayerArgCommand {
   public GPSCommand() {
-    super("gps [PLAYER]", "Display block coordinates of named player or yourself", true);
+    super("gps [PLAYER]", true);
   }
 
   @Override

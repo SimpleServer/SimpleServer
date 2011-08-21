@@ -25,7 +25,7 @@ import simpleserver.Player;
 
 public class LocalSayCommand extends AbstractCommand implements PlayerCommand {
   public LocalSayCommand() {
-    super("local MESSAGE", "Send a chat message to nearby players");
+    super("local MESSAGE");
   }
 
   public void execute(Player player, String message) {
