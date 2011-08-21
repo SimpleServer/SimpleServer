@@ -23,7 +23,6 @@ package simpleserver.command;
 import simpleserver.Player;
 
 public class ExternalCommand extends AbstractCommand implements PlayerCommand {
-
   public ExternalCommand() {
     super("external", "External command");
   }
@@ -33,5 +32,9 @@ public class ExternalCommand extends AbstractCommand implements PlayerCommand {
   }
 
   public void execute(Player player, String message) {
+  }
+
+  @Override
+  public void usage(Player player) {
   }
 }

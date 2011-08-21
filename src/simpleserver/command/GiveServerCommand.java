@@ -20,10 +20,10 @@
  */
 package simpleserver.command;
 
+import simpleserver.Player;
 import simpleserver.Server;
 
 public class GiveServerCommand extends GiveCommand implements ServerCommand {
-
   public GiveServerCommand() {
     super("give", "Spawn items for players");
   }
@@ -40,5 +40,9 @@ public class GiveServerCommand extends GiveCommand implements ServerCommand {
   @Override
   protected void tError(String message, Object... args) {
     System.out.println(String.format(message, args));
+  }
+
+  @Override
+  public void usage(Player player) {
   }
 }

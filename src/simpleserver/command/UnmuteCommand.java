@@ -21,6 +21,7 @@
 package simpleserver.command;
 
 import static simpleserver.lang.Translations.t;
+import simpleserver.Color;
 import simpleserver.Player;
 import simpleserver.Server;
 
@@ -37,5 +38,10 @@ public class UnmuteCommand extends PlayerArgCommand {
     server.adminLog("Admin " + player.getName() + " unmuted player:\t " + name);
     String msg = t("Player %s has been unmuted!", name);
     server.runCommand("say", msg);
+  }
+
+  @Override
+  public void usage(Player player) {
+    player.addTMessage(Color.GRAY, "Allow the muted player to chat in the regular world chat again");
   }
 }

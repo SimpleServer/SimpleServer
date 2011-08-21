@@ -20,11 +20,11 @@
  */
 package simpleserver.command;
 
+import simpleserver.Color;
 import simpleserver.Player;
 import simpleserver.Server;
 
-public class RestartCommand extends AbstractCommand implements PlayerCommand,
-    ServerCommand {
+public class RestartCommand extends AbstractCommand implements PlayerCommand, ServerCommand {
   public RestartCommand() {
     super("restart", "Stop the Minecraft server and start it again");
   }
@@ -38,5 +38,10 @@ public class RestartCommand extends AbstractCommand implements PlayerCommand,
 
   public void execute(Server server, String message) {
     server.restart();
+  }
+
+  @Override
+  public void usage(Player player) {
+    player.addTMessage(Color.GRAY, "Restart the server");
   }
 }

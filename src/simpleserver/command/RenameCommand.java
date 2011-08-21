@@ -24,7 +24,6 @@ import simpleserver.Color;
 import simpleserver.Player;
 
 public class RenameCommand extends OnlinePlayerArgCommand {
-
   public RenameCommand() {
     super("rename PLAYER RENAME", "Constantly rename a player.", false);
   }
@@ -38,7 +37,11 @@ public class RenameCommand extends OnlinePlayerArgCommand {
     player.addTMessage(Color.GRAY, "Player %s was successfully renamed to %s.", target.getName(), renameName);
 
     target.addTMessage(Color.GRAY, "Starting with your next login you're renamed to %s.", renameName);
-
   }
 
+  @Override
+  public void usage(Player player) {
+    player.addTMessage(Color.GRAY, "Change the name of %s to %s", Color.WHITE + "PLAYER" + Color.GRAY,
+                       Color.WHITE + "RENAME" + Color.GRAY);
+  }
 }

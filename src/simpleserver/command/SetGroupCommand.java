@@ -26,8 +26,7 @@ import simpleserver.Server;
 
 public class SetGroupCommand extends PlayerArgCommand implements ServerCommand {
   public SetGroupCommand() {
-    super("setgroup PLAYER GROUP",
-          "Set the group ID of the named player");
+    super("setgroup PLAYER GROUP", "Set the group ID of the named player");
   }
 
   public SetGroupCommand(String name, String commandCode) {
@@ -103,5 +102,11 @@ public class SetGroupCommand extends PlayerArgCommand implements ServerCommand {
   protected void setGroup(Server server, int group, String target) {
     server.permissions.setPlayerGroup(target, group);
     System.out.println("[SimpleServer] Player " + target + "'s group was set to " + new Integer(group).toString() + "!");
+  }
+
+  @Override
+  public void usage(Player player) {
+    player.addTMessage(Color.GRAY, "Change the group ID of a player");
+    player.addTMessage(Color.GRAY, "To know the IDs of each group, ask the server owner or refer to the permissions.xml file");
   }
 }

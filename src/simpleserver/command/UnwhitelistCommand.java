@@ -32,8 +32,12 @@ public class UnwhitelistCommand extends PlayerArgCommand {
   protected void executeWithTarget(Player player, String message, String name) {
     player.getServer().whitelist.removeName(name);
 
-    player.getServer().adminLog("User " + player.getName()
-                                    + " unwhitelisted player:\t " + name);
+    player.getServer().adminLog("User " + player.getName() + " unwhitelisted player:\t " + name);
     player.addTMessage(Color.GRAY, "Player %s was unwhitelisted!", name);
+  }
+
+  @Override
+  public void usage(Player player) {
+    player.addTMessage(Color.GRAY, "Remove the player from the whitelist");
   }
 }

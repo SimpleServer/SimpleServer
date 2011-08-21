@@ -53,4 +53,9 @@ public class BanIPCommand extends AbstractCommand implements PlayerCommand {
       player.addTMessage(Color.RED, "No player or IP specified.");
     }
   }
+
+  @Override
+  public void usage(Player player) {
+    player.addTMessage(Color.GRAY, "Disallow all players with the IP address access to the server");
+  }
 }

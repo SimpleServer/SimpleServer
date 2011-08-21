@@ -32,7 +32,11 @@ public class AreaCommand extends AbstractCommand implements PlayerCommand {
   public void execute(Player player, String message) {
     PermissionConfig perm = player.getServer().permissions;
 
-    player.addTMessage(Color.GRAY, "Current area: %s %s",
-                       Color.WHITE, perm.getCurrentArea(player));
+    player.addTMessage(Color.GRAY, "Current area: %s %s", Color.WHITE, perm.getCurrentArea(player));
+  }
+
+  @Override
+  public void usage(Player player) {
+    player.addTMessage(Color.GRAY, "Get information about which area you're in");
   }
 }

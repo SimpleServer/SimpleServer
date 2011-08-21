@@ -20,11 +20,11 @@
  */
 package simpleserver.command;
 
+import simpleserver.Color;
 import simpleserver.Player;
 import simpleserver.Server;
 
-public class StopCommand extends AbstractCommand implements PlayerCommand,
-    ServerCommand {
+public class StopCommand extends AbstractCommand implements PlayerCommand, ServerCommand {
   public StopCommand() {
     super("stop", "Shutdown the entire server");
   }
@@ -35,12 +35,16 @@ public class StopCommand extends AbstractCommand implements PlayerCommand,
   }
 
   public void execute(Player player, String message) {
-    player.getServer().adminLog("User " + player.getName()
-                                    + " stopped the server!");
+    player.getServer().adminLog("User " + player.getName() + " stopped the server!");
     player.getServer().stop();
   }
 
   public void execute(Server server, String message) {
     server.stop();
+  }
+
+  @Override
+  public void usage(Player player) {
+    player.addTMessage(Color.GRAY, "Stop the server and save the map");
   }
 }

@@ -20,6 +20,7 @@
  */
 package simpleserver.command;
 
+import simpleserver.Color;
 import simpleserver.Player;
 
 public class AllowVisitCommand extends AbstractCommand implements PlayerCommand {
@@ -29,5 +30,10 @@ public class AllowVisitCommand extends AbstractCommand implements PlayerCommand 
 
   public void execute(Player player, String message) {
     player.handleVisitRequests();
+  }
+
+  @Override
+  public void usage(Player player) {
+    player.addTMessage(Color.GRAY, "If someone has sent you a visit request in the last 10 seconds, this command accepts that request");
   }
 }

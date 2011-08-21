@@ -44,4 +44,9 @@ public class GPSCommand extends OnlinePlayerArgCommand {
                        (int) target.z(), Color.GRAY, Color.WHITE, (int) target.y(), Color.GRAY,
                        Color.WHITE, target.getDimension());
   }
+
+  @Override
+  public void usage(Player player) {
+    player.addTMessage(Color.GRAY, "Show your current latitude (x), longitude (z), altitude (y) and dimension.");
+  }
 }

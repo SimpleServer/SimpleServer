@@ -46,4 +46,12 @@ public class LocalToggle extends AbstractCommand implements PlayerCommand {
     String mode = (player.localChat()) ? t("enabled") : t("disabled");
     player.addTMessage(Color.GRAY, "Local chat %s", mode);
   }
+
+  @Override
+  public void usage(Player player) {
+    String localtoggle = parser.commandPrefix() + "localtoggle";
+    player.addTMessage(Color.GRAY, "To just switch the value, use %s", Color.WHITE + localtoggle);
+    player.addTMessage(Color.GRAY, "To switch to a chosen value, use %s or %s",
+                       Color.WHITE + localtoggle + " on" + Color.GRAY, Color.WHITE + localtoggle + " off");
+  }
 }

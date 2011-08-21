@@ -24,7 +24,6 @@ import simpleserver.Color;
 import simpleserver.Player;
 
 public class ReadCommand extends AbstractCommand implements PlayerCommand {
-
   public ReadCommand() {
     super("read DOCUMENT", "display a specified text document");
   }
@@ -45,4 +44,8 @@ public class ReadCommand extends AbstractCommand implements PlayerCommand {
     }
   }
 
+  @Override
+  public void usage(Player player) {
+    player.addTMessage(Color.GRAY, "Display a text document on server");
+  }
 }

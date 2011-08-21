@@ -24,7 +24,6 @@ import simpleserver.Color;
 import simpleserver.Player;
 
 public class BackCommand extends AbstractCommand implements PlayerCommand {
-
   public BackCommand() {
     super("back", "teleports you back to the position you died");
   }
@@ -39,5 +38,10 @@ public class BackCommand extends AbstractCommand implements PlayerCommand {
 
   private boolean allowBack(Player player) {
     return (player.getDeathPlace() != null);
+  }
+
+  @Override
+  public void usage(Player player) {
+    player.addTMessage(Color.GRAY, "Teleport yourself back to the position you died at");
   }
 }

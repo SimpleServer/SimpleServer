@@ -33,12 +33,7 @@ public class WarpCommand extends AbstractCommand implements PlayerCommand {
     String arguments[] = extractArguments(message);
     Warp warp = player.getServer().data.warp;
     if (arguments.length == 0) {
-      String warpCommand = commandPrefix() + "warp";
-      player.addTMessage(Color.GRAY, "Usage:");
-      player.addTMessage(Color.GRAY, "%s name: teleport to waypoint", warpCommand);
-      player.addTMessage(Color.GRAY, "%s: list waypoints", warpCommand + " list");
-      player.addTMessage(Color.GRAY, "%s name: add waypoint", warpCommand + " add");
-      player.addTMessage(Color.GRAY, "%s name: remove waypoint", warpCommand + " remove");
+      usage(player);
       return;
     }
     String command = arguments[0];
@@ -76,5 +71,14 @@ public class WarpCommand extends AbstractCommand implements PlayerCommand {
       }
       player.teleportWithWarmup(warp.get(waypoint));
     }
+  }
+
+  @Override
+  public void usage(Player player) {
+    String warpCommand = commandPrefix() + "warp";
+    player.addTMessage(Color.GRAY, "To teleport to a waypoint, use %s name", Color.WHITE + warpCommand + Color.GRAY);
+    player.addTMessage(Color.GRAY, "To see a list of all waypoints, use %s", Color.WHITE + warpCommand + " list" + Color.GRAY);
+    player.addTMessage(Color.GRAY, "To add a new waypoint, use %s name", Color.WHITE + warpCommand + " add" + Color.GRAY);
+    player.addTMessage(Color.GRAY, "To remove a waypoint, use %s name", Color.WHITE + warpCommand + " remove" + Color.GRAY);
   }
 }

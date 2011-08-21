@@ -63,4 +63,9 @@ public class BanCommand extends PlayerArgCommand {
   protected void noTargetSpecified(Player player, String message) {
     player.addTMessage(Color.RED, "No player or reason specified.");
   }
+
+  @Override
+  public void usage(Player player) {
+    player.addTMessage(Color.GRAY, "Disallow the player access to the server");
+  }
 }

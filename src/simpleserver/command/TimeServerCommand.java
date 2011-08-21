@@ -20,6 +20,8 @@
  */
 package simpleserver.command;
 
+import simpleserver.Player;
+
 public class TimeServerCommand extends TimeCommand implements ServerCommand {
   @Override
   protected void captionedInfo(String caption, String message, Object... args) {
@@ -54,5 +56,9 @@ public class TimeServerCommand extends TimeCommand implements ServerCommand {
   @Override
   protected void tInfo(String message) {
     info(message);
+  }
+
+  @Override
+  public void usage(Player player) {
   }
 }

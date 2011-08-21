@@ -21,6 +21,7 @@
 package simpleserver.command;
 
 import static simpleserver.lang.Translations.t;
+import simpleserver.Color;
 import simpleserver.Player;
 import simpleserver.Server;
 
@@ -37,5 +38,10 @@ public class PlayerListCommand extends AbstractCommand implements PlayerCommand 
     }
     list.delete(list.length() - 2, list.length());
     player.addCaptionedMessage(t("Connected Players (%s)", server.numPlayers()), list.toString());
+  }
+
+  @Override
+  public void usage(Player player) {
+    player.addTMessage(Color.GRAY, "Show the amount of online players and all the player names");
   }
 }

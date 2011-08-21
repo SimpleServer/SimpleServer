@@ -20,6 +20,10 @@
  */
 package simpleserver.command;
 
+import simpleserver.Player;
+
 public interface Command {
   public String getName();
+
+  public void usage(Player player);
 }

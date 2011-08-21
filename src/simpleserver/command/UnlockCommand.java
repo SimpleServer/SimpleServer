@@ -50,4 +50,12 @@ public class UnlockCommand extends AbstractCommand implements PlayerCommand {
       }
     }
   }
+
+  @Override
+  public void usage(Player player) {
+    String unlock = parser.commandPrefix() + "unlock";
+    player.addTMessage(Color.GRAY, "To unlock the locked chest, use %s and then open the chest", Color.WHITE + unlock + Color.GRAY);
+    player.addTMessage(Color.GRAY, "To unlock a named chest, just use %s name", Color.WHITE + unlock + Color.GRAY);
+    player.addTMessage(Color.GRAY, "Admins with rights can also unlock a locked chest with the first method");
+  }
 }

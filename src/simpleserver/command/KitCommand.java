@@ -39,4 +39,9 @@ public class KitCommand extends AbstractCommand implements PlayerCommand {
       player.getServer().kits.listKits(player);
     }
   }
+
+  @Override
+  public void usage(Player player) {
+    player.addTMessage(Color.GRAY, "See or give the server preset kits");
+  }
 }

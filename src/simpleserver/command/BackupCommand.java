@@ -39,4 +39,9 @@ public class BackupCommand extends AbstractCommand implements PlayerCommand,
     System.out.println("Forcing backup!");
     server.forceBackup();
   }
+
+  @Override
+  public void usage(Player player) {
+    player.addTMessage(Color.GRAY, "Save the map and make a backup of it and the settings");
+  }
 }

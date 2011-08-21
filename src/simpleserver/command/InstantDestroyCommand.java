@@ -23,8 +23,7 @@ package simpleserver.command;
 import simpleserver.Color;
 import simpleserver.Player;
 
-public class InstantDestroyCommand extends AbstractCommand implements
-    PlayerCommand {
+public class InstantDestroyCommand extends AbstractCommand implements PlayerCommand {
   public InstantDestroyCommand() {
     super("idbehold", "Make tools work instantly for yourself");
   }
@@ -36,5 +35,11 @@ public class InstantDestroyCommand extends AbstractCommand implements
     } else {
       player.addTMessage(Color.WHITE, "Instant destroy Disabled!");
     }
+  }
+
+  @Override
+  public void usage(Player player) {
+    player.addTMessage(Color.RED, "This command is out-dated because of a Minecraft update!");
+    player.addTMessage(Color.GRAY, "Because of that, some blocks (e.g. stone, sand, bedrock) will be destroyed fast, while others (e.g. obsidian) will take a long time to get destroyed");
   }
 }

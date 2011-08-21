@@ -39,4 +39,11 @@ public class RconCommand extends AbstractCommand implements PlayerCommand {
       player.addTMessage(Color.RED, "No rcon command specified.");
     }
   }
+
+  @Override
+  public void usage(Player player) {
+    String rcon = parser.commandPrefix() + "rcon";
+    player.addTMessage(Color.GRAY, "Send a command directly to the server command-line console");
+    player.addTMessage(Color.GRAY, "An example of usage: %s", Color.WHITE + rcon + " op " + player.getName());
+  }
 }

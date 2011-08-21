@@ -24,10 +24,8 @@ import simpleserver.Color;
 import simpleserver.Player;
 
 public class ReplyCommand extends AbstractCommand implements PlayerCommand {
-
   public ReplyCommand() {
-    super("reply MESSAGE",
-          "Sends a message to the player that last told you something");
+    super("reply MESSAGE", "Sends a message to the player that last told you something");
   }
 
   public void execute(Player player, String message) {
@@ -40,5 +38,10 @@ public class ReplyCommand extends AbstractCommand implements PlayerCommand {
     } else {
       player.addTMessage(Color.RED, "Nobody sent you a message yet.");
     }
+  }
+
+  @Override
+  public void usage(Player player) {
+    player.addTMessage(Color.GRAY, "Send a reply message to the last player who wrote you a whisper");
   }
 }

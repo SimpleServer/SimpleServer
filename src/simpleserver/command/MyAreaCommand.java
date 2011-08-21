@@ -26,13 +26,11 @@ import simpleserver.config.PermissionConfig;
 
 public class MyAreaCommand extends AbstractCommand implements PlayerCommand {
   public MyAreaCommand() {
-    super("myarea [start|end|save|unsave|rename]",
-          "Manage your personal area");
+    super("myarea [start|end|save|unsave|rename]", "Manage your personal area");
   }
 
   private boolean areaSizeOk(Player player) {
-    return (Math.abs(player.areastart.x() - player.areaend.x()) <= 50)
-          && (Math.abs(player.areastart.y() - player.areaend.y()) <= 50);
+    return (Math.abs(player.areastart.x() - player.areaend.x()) <= 50) && (Math.abs(player.areastart.y() - player.areaend.y()) <= 50);
   }
 
   public void execute(Player player, String message) {
@@ -100,5 +98,19 @@ public class MyAreaCommand extends AbstractCommand implements PlayerCommand {
     } else {
       player.addTMessage(Color.RED, "You entered an invalid argument.");
     }
+  }
+
+  @Override
+  public void usage(Player player) {
+    String myarea = commandPrefix() + "myarea";
+
+    if (!player.getServer().permissions.playerHasArea(player)) {
+      player.addTMessage(Color.GRAY, "To create your area, use %s in one of the house's corners and use %s in the opposite",
+                         Color.WHITE + myarea + " start" + Color.GRAY, Color.WHITE + myarea + " end" + Color.GRAY);
+      player.addTMessage(Color.GRAY, "After setting corner points, use %s to save the area on server", Color.WHITE + myarea + " save" + Color.GRAY);
+    } else {
+      player.addTMessage(Color.GRAY, "To delete your current area, use %s", Color.WHITE + myarea + " unsave");
+    }
+    player.addTMessage(Color.GRAY, "To rename your area, use %s name", Color.WHITE + myarea + " rename" + Color.GRAY);
   }
 }
