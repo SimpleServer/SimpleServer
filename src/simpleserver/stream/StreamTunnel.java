@@ -849,6 +849,14 @@ public class StreamTunnel {
         write(packetId);
         copyNBytes(5);
         break;
+      case (byte) 0xd3: // Red Power (mod by Eloraam)
+        write(packetId);
+        copyNBytes(1);
+        copyVLC();
+        copyVLC();
+        copyVLC();
+        copyNBytes((int) copyVLC());
+        break;
       case (byte) 0xe6: // ModLoaderMP by SDK
         write(packetId);
         write(in.readInt()); // mod
@@ -883,6 +891,20 @@ public class StreamTunnel {
     }
     packetFinished();
     lastPacket = packetId;
+  }
+
+  private long copyVLC() throws IOException {
+    long value = 0;
+    int shift = 0;
+    while (true) {
+      int i = write(in.readByte());
+      value |= (i & 0x7F) << shift;
+      if ((i & 0x80) == 0) {
+        break;
+      }
+      shift += 7;
+    }
+    return value;
   }
 
   private String readUTF16() throws IOException {
