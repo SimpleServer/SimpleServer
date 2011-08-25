@@ -25,6 +25,7 @@ import simpleserver.Player;
 import simpleserver.Server;
 import simpleserver.bot.BotController.ConnectException;
 import simpleserver.config.GiveAliasList.Item;
+import simpleserver.config.GiveAliasList.Suggestion;
 
 public abstract class GiveCommand extends AbstractCommand {
   protected Player executor;
@@ -48,8 +49,13 @@ public abstract class GiveCommand extends AbstractCommand {
       } else {
         Item item = target.getServer().giveAliasList.getItemId(request[0]);
         if (item == null) {
-          tError("Can't find item %s", request[0]);
-          return;
+          Suggestion suggestion = target.getServer().giveAliasList.findWithLevenshtein(request[0]);
+          if (suggestion.distance > 4 || suggestion.distance * 2 > request[0].length()) {
+            tError("Can't find item %s", request[0]);
+            return;
+          }
+          item = target.getServer().giveAliasList.getItemId(suggestion.name);
+          tError("Can't find item %s, giving %s instead", request[0], suggestion.name);
         }
         id = item.id;
         damage = item.damage;

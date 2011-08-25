@@ -20,6 +20,8 @@
  */
 package simpleserver.config;
 
+import static simpleserver.util.DamerauLevenshtein.distance;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -40,18 +42,44 @@ public class GiveAliasList extends PropertiesConfig {
     itemAlias = itemAlias.toLowerCase();
     Item item = aliases.get(itemAlias);
 
-    for (String suffix : suffixes) {
-      if (item != null) {
-        break;
-      }
-
-      if (itemAlias.endsWith(suffix)) {
-        int prefixLength = itemAlias.length() - suffix.length();
-        item = aliases.get(itemAlias.substring(0, prefixLength));
-      }
+    if (item == null) {
+      item = findWithSuffix(itemAlias);
     }
 
     return item;
+  }
+
+  private Item findWithSuffix(String find) {
+    for (String suffix : suffixes) {
+      if (find.endsWith(suffix)) {
+        int prefixLength = find.length() - suffix.length();
+        if (aliases.containsKey(find.substring(0, prefixLength))) {
+          return aliases.get(find.substring(0, prefixLength));
+        }
+      }
+    }
+    return null;
+  }
+
+  public Suggestion findWithLevenshtein(String find) {
+    int bestDistance = 100;
+    String bestItem = null;
+    for (String name : aliases.keySet()) {
+      int distance = distance(name, find);
+      if (distance < bestDistance) {
+        bestItem = name;
+        bestDistance = distance;
+      }
+      for (String suffix : suffixes) {
+        distance = distance(name + suffix, find);
+        if (distance < bestDistance) {
+          bestItem = name;
+          bestDistance = distance;
+        }
+      }
+    }
+
+    return new Suggestion(bestItem, bestDistance);
   }
 
   @Override
@@ -88,6 +116,16 @@ public class GiveAliasList extends PropertiesConfig {
     public Item(int id, short damage) {
       this.id = id;
       this.damage = damage;
+    }
+  }
+
+  public static class Suggestion {
+    public String name;
+    public int distance;
+
+    public Suggestion(String a, int b) {
+      name = a;
+      distance = b;
     }
   }
 }
