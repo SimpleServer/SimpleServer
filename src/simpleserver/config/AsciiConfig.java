@@ -28,9 +28,10 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+
+import simpleserver.util.UnicodeReader;
 
 public abstract class AsciiConfig extends AbstractConfig {
   protected AsciiConfig(String filename) {
@@ -68,7 +69,7 @@ public abstract class AsciiConfig extends AbstractConfig {
 
     File inFile = getFile();
     try {
-      BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(inFile), "UTF-8"));
+      BufferedReader reader = new BufferedReader(new UnicodeReader(new FileInputStream(inFile), "UTF-8"));
       try {
         String line;
         while ((line = reader.readLine()) != null) {

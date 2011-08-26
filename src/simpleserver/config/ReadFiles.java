@@ -26,10 +26,10 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.Hashtable;
 
 import simpleserver.Resource;
+import simpleserver.util.UnicodeReader;
 
 public class ReadFiles implements Resource {
   private final static String FOLDER = "simpleserver";
@@ -54,7 +54,7 @@ public class ReadFiles implements Resource {
     String docName = fullName.substring(0, fullName.length() - 4);
 
     try {
-      BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(inFile), "UTF-8"));
+      BufferedReader reader = new BufferedReader(new UnicodeReader(new FileInputStream(inFile), "UTF-8"));
       try {
         StringBuilder docText = new StringBuilder();
         String line;
