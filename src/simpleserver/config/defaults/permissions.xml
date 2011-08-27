@@ -31,12 +31,8 @@
     -->
     <commands>
       <command name="area" allow="0+" />
-<<<<<<< HEAD
-      <command name="areasay" aliases="a" allow="1+"/>
-      <command name="back" allow="4,5" />
-=======
       <command name="areasay" aliases="a" allow="0+"/>
->>>>>>> added /chat command, improved chatRooms
+      <command name="back" allow="4,5" />
       <command name="backup" allow="4,5" />
       <command name="ban" allow="4,5" />
       <command name="banip" allow="4,5" />
