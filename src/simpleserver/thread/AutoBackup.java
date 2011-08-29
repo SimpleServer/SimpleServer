@@ -111,7 +111,8 @@ public class AutoBackup {
   }
 
   private long lastBackupAge() {
-    return age(newestBackup());
+    long age = age(newestBackup());
+    return (age >= 0) ? age : Long.MAX_VALUE;
   }
 
   private void purgeOldBackups() {
@@ -292,7 +293,7 @@ public class AutoBackup {
   private static long age(File file) {
     try {
       if (file == null) {
-        return 0;
+        return -1;
       } else {
         return System.currentTimeMillis() - date(file);
       }
