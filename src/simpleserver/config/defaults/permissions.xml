@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1" ?>
-<!DOCTYPE config SYSTEM "permissions.dtd">
+<!DOCTYPE config>
 <config>
 
   <!-- Group & member definitions (world wide) -->

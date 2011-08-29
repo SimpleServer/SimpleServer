@@ -37,7 +37,7 @@ public abstract class AbstractConfig implements Resource {
   protected AbstractConfig(String filename) {
     this.filename = filename;
 
-    loadHeader();
+    // loadHeader();
   }
 
   public abstract void save();
@@ -100,10 +100,12 @@ public abstract class AbstractConfig implements Resource {
     try {
       header = readFully(headerStream);
     } finally {
-      try {
-        headerStream.close();
-      } catch (IOException e) {
-        e.printStackTrace();
+      if (headerStream != null) {
+        try {
+          headerStream.close();
+        } catch (IOException e) {
+          e.printStackTrace();
+        }
       }
     }
 

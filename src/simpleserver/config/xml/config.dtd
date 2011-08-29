@@ -1,0 +1,83 @@
+<!ELEMENT config ( property | group | player | ip | command | allblocks | block | chests | area | permission )*>
+<!ELEMENT property (#PCDATA | true | false)*>
+<!ELEMENT group ( warmup | cooldown | ignoreChestLocks | showTitle | ignoreAreas | forwardUnknownCommands | color )*>
+<!ELEMENT player (#PCDATA)>
+<!ELEMENT ip (#PCDATA)>
+<!ELEMENT command ( rename | alias | forward | forwardonly | hidden | argument )*>
+<!ELEMENT allblocks EMPTY>
+<!ELEMENT block EMPTY>
+<!ELEMENT chests EMPTY>
+<!ELEMENT area ( area | allblocks | block | chests | command | permission )*>
+<!ELEMENT permission (#PCDATA)>
+
+<!ELEMENT warmup (#PCDATA)>
+<!ELEMENT cooldown (#PCDATA)>
+<!ELEMENT ignoreChestLocks EMPTY>
+<!ELEMENT ignoreAreas EMPTY>
+<!ELEMENT showTitle EMPTY>
+<!ELEMENT forwardUnknownCommands EMPTY>
+
+<!ELEMENT rename (#PCDATA)>
+<!ELEMENT alias (#PCDATA)>
+<!ELEMENT forward EMPTY>
+<!ELEMENT forwardonly EMPTY>
+<!ELEMENT hidden EMPTY>
+<!ELEMENT argument (#PCDATA)>
+
+<!ELEMENT true EMPTY>
+<!ELEMENT false EMPTY>
+
+<!ATTLIST property
+  name NMTOKEN #REQUIRED
+>
+<!ATTLIST group
+  id NMTOKEN #REQUIRED
+  name CDATA #IMPLIED 
+  color NMTOKEN #IMPLIED
+  showTitle NMTOKEN #IMPLIED
+  ignoreChestlocks NMTOKEN #IMPLIED
+  ignoreAreas NMTOKEN #IMPLIED
+  forwardUnknownCommands NMTOKEN #IMPLIED
+  warmup NMTOKEN #IMPLIED
+  cooldown NMTOKEN #IMPLIED
+>
+<!ATTLIST player
+  group NMTOKEN #REQUIRED
+>
+<!ATTLIST ip
+  group NMTOKEN #REQUIRED
+>
+<!ATTLIST command
+  name NMTOKEN #REQUIRED
+  allow CDATA #IMPLIED
+  forward NMTOKEN #IMPLIED
+  hidden NMTOKEN #IMPLIED
+  rename NMTOKEN #IMPLIED
+>
+<!ATTLIST argument
+  allow CDATA #REQUIRED
+>
+<!ATTLIST block
+  id NMTOKEN #REQUIRED
+  place CDATA #IMPLIED
+  give CDATA #IMPLIED
+>
+<!ATTLIST allblocks
+  place CDATA #IMPLIED
+  destroy CDATA #IMPLIED
+  use CDATA #IMPLIED
+  take CDATA #IMPLIED
+  give CDATA #IMPLIED
+>
+<!ATTLIST chests
+  allow CDATA #IMPLIED
+>
+<!ATTLIST area
+  name CDATA #REQUIRED
+  start CDATA #REQUIRED
+  end CDATA #REQUIRED
+  owner NMTOKEN #IMPLIED
+>
+<!ATTLIST permission
+  allow CDATA #REQUIRED
+>

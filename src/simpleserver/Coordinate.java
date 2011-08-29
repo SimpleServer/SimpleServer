@@ -125,6 +125,11 @@ public class Coordinate {
     return hashCode;
   }
 
+  @Override
+  public String toString() {
+    return String.format("%d,%d,%d", x, y, z);
+  }
+
   public NBTCompound tag() {
     NBTCompound tag = new NBTCompound("coordinate");
     tag.put(new NBTInt("x", x));
