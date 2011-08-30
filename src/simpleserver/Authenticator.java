@@ -100,7 +100,7 @@ public class Authenticator {
   }
 
   public boolean allowGuestJoin() {
-    return server.options.getBoolean("custAuth");
+    return server.options.getBoolean("custAuth") || !server.options.getBoolean("onlineMode");
   }
 
   public boolean allowLogin() {
