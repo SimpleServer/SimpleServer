@@ -20,56 +20,44 @@
  */
 package simpleserver.config.xml;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
-import org.xml.sax.SAXException;
-import org.xml.sax.helpers.AttributesImpl;
+public class PlayerStorage implements Storage {
+  private Map<String, PlayerConfig> players = new HashMap<String, PlayerConfig>();
 
-public class Ip extends XMLTag {
-  public InetAddress address;
-  public int group;
-
-  private String addressString;
-
-  public Ip() {
-    super("ip");
+  public void add(PlayerConfig player) {
+    players.put(player.name, player);
   }
 
-  public Ip(InetAddress address, int group) {
-    this();
-    this.address = address;
-    this.group = group;
-  }
-
-  @Override
-  protected void setAttribute(String name, String value) throws SAXException {
-    if (name.equals("group")) {
-      group = getInt(value);
+  public void setGroup(String name, int group) {
+    if (contains(name)) {
+      get(name).group = group;
+    } else {
+      players.put(name, new PlayerConfig(name, group));
     }
   }
 
-  @Override
-  protected void finish() throws SAXException {
-    try {
-      address = InetAddress.getByName(addressString);
-    } catch (UnknownHostException e) {
-      throw new SAXException("Bad IP format: " + addressString);
+  public void remove(String name) {
+    if (contains(name)) {
+      players.remove(name);
     }
   }
 
-  @Override
-  protected void content(String content) {
-    addressString = (addressString == null) ? content.toLowerCase() : addressString + content.toLowerCase();
+  public boolean contains(String name) {
+    return players.containsKey(name);
   }
 
-  @Override
-  protected String saveContent() {
-    return address.getHostAddress();
+  public PlayerConfig get(String name) {
+    return contains(name) ? players.get(name) : null;
   }
 
-  @Override
-  protected void saveAttributes(AttributesImpl attributes) {
-    addAttribute(attributes, "group", Integer.toString(group));
+  public Iterator<PlayerConfig> iterator() {
+    return players.values().iterator();
+  }
+
+  public void add(XMLTag child) {
+    add((PlayerConfig) child);
   }
 }

@@ -39,7 +39,7 @@ public abstract class XMLTag implements Cloneable {
     this.tag = tag;
   }
 
-  public void addChild(XMLTag child) {
+  void addChild(XMLTag child) {
     if (childs == null) {
       childs = new LinkedList<XMLTag>();
     }
@@ -119,7 +119,7 @@ public abstract class XMLTag implements Cloneable {
     addAttribute(attributes, name, Integer.toString(value));
   }
 
-  void save(ContentHandler handler) throws SAXException {
+  protected void save(ContentHandler handler) throws SAXException {
     AttributesImpl attributes = new AttributesImpl();
     saveAttributes(attributes);
     handler.startElement("", "", tag, attributes);

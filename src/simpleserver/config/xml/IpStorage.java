@@ -21,55 +21,44 @@
 package simpleserver.config.xml;
 
 import java.net.InetAddress;
-import java.net.UnknownHostException;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
-import org.xml.sax.SAXException;
-import org.xml.sax.helpers.AttributesImpl;
+public class IpStorage implements Storage {
+  private Map<InetAddress, Ip> ips = new HashMap<InetAddress, Ip>();
 
-public class Ip extends XMLTag {
-  public InetAddress address;
-  public int group;
-
-  private String addressString;
-
-  public Ip() {
-    super("ip");
+  public void add(Ip ip) {
+    ips.put(ip.address, ip);
   }
 
-  public Ip(InetAddress address, int group) {
-    this();
-    this.address = address;
-    this.group = group;
-  }
-
-  @Override
-  protected void setAttribute(String name, String value) throws SAXException {
-    if (name.equals("group")) {
-      group = getInt(value);
+  public void setGroup(InetAddress ip, int group) {
+    if (contains(ip)) {
+      get(ip).group = group;
+    } else {
+      ips.put(ip, new Ip(ip, group));
     }
   }
 
-  @Override
-  protected void finish() throws SAXException {
-    try {
-      address = InetAddress.getByName(addressString);
-    } catch (UnknownHostException e) {
-      throw new SAXException("Bad IP format: " + addressString);
+  public void remove(InetAddress ip) {
+    if (contains(ip)) {
+      ips.remove(ip);
     }
   }
 
-  @Override
-  protected void content(String content) {
-    addressString = (addressString == null) ? content.toLowerCase() : addressString + content.toLowerCase();
+  public boolean contains(InetAddress ip) {
+    return ips.containsKey(ip);
   }
 
-  @Override
-  protected String saveContent() {
-    return address.getHostAddress();
+  public Ip get(InetAddress ip) {
+    return contains(ip) ? ips.get(ip) : null;
   }
 
-  @Override
-  protected void saveAttributes(AttributesImpl attributes) {
-    addAttribute(attributes, "group", Integer.toString(group));
+  public Iterator<Ip> iterator() {
+    return ips.values().iterator();
+  }
+
+  public void add(XMLTag child) {
+    add((Ip) child);
   }
 }

@@ -31,6 +31,12 @@ public class PlayerConfig extends XMLTag {
     super("player");
   }
 
+  public PlayerConfig(String name, int group) {
+    this();
+    this.name = name;
+    this.group = group;
+  }
+
   @Override
   protected void setAttribute(String name, String value) throws SAXException {
     if (name.equals("group")) {

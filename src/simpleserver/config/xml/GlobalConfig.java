@@ -117,7 +117,7 @@ public class GlobalConfig extends AbstractConfig {
     OutputFormat of = new OutputFormat("XML", "ISO-8859-1", true);
     of.setIndent(1);
     of.setIndenting(true);
-    of.setDoctype(null, "http://somewhere/config.dtd");
+    of.setDoctype(null, "http://somewhere/config.dtd ");
     XMLSerializer serializer = new XMLSerializer(fos, of);
     ContentHandler hd;
     try {
@@ -134,6 +134,7 @@ public class GlobalConfig extends AbstractConfig {
 
   public static final void main(String[] args) {
     GlobalConfig conf = new GlobalConfig();
+    conf.load();
     long start = new Date().getTime();
     conf.load();
     long end = new Date().getTime();

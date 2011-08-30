@@ -20,28 +20,10 @@
  */
 package simpleserver.config.xml;
 
-import java.io.IOException;
+import java.util.Iterator;
 
-import org.xml.sax.ContentHandler;
-import org.xml.sax.SAXException;
-import org.xml.sax.helpers.AttributesImpl;
+public interface Storage {
+  void add(XMLTag child);
 
-import com.sun.org.apache.xml.internal.serialize.XMLSerializer;
-
-public class Config extends StorageContainer {
-
-  public PlayerStorage players;
-  public IpStorage ips;
-
-  public Config() {
-    super("config");
-    addStorage("player", players = new PlayerStorage());
-    addStorage("ip", ips = new IpStorage());
-  }
-
-  protected void save(ContentHandler handler, XMLSerializer serializer) throws SAXException, IOException {
-    handler.startElement("", "", tag, new AttributesImpl());
-    saveChilds(handler);
-    handler.endElement("", "", tag);
-  }
+  public Iterator<? extends XMLTag> iterator();
 }

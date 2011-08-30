@@ -20,56 +20,41 @@
  */
 package simpleserver.config.xml;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
+import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
-import org.xml.sax.helpers.AttributesImpl;
 
-public class Ip extends XMLTag {
-  public InetAddress address;
-  public int group;
+public abstract class StorageContainer extends XMLTag {
+  private Map<String, Storage> storages = new HashMap<String, Storage>();
 
-  private String addressString;
-
-  public Ip() {
-    super("ip");
+  StorageContainer(String tag) {
+    super(tag);
   }
 
-  public Ip(InetAddress address, int group) {
-    this();
-    this.address = address;
-    this.group = group;
+  void addStorage(String tag, Storage storage) {
+    storages.put(tag, storage);
   }
 
   @Override
-  protected void setAttribute(String name, String value) throws SAXException {
-    if (name.equals("group")) {
-      group = getInt(value);
+  void addChild(XMLTag child) {
+    if (storages.containsKey(child.tag)) {
+      storages.get(child.tag).add(child);
+    } else {
+      super.addChild(child);
     }
   }
 
   @Override
-  protected void finish() throws SAXException {
-    try {
-      address = InetAddress.getByName(addressString);
-    } catch (UnknownHostException e) {
-      throw new SAXException("Bad IP format: " + addressString);
+  protected void saveChilds(ContentHandler handler) throws SAXException {
+    for (Storage storage : storages.values()) {
+      Iterator<? extends XMLTag> it = storage.iterator();
+      while (it.hasNext()) {
+        it.next().save(handler);
+      }
     }
-  }
-
-  @Override
-  protected void content(String content) {
-    addressString = (addressString == null) ? content.toLowerCase() : addressString + content.toLowerCase();
-  }
-
-  @Override
-  protected String saveContent() {
-    return address.getHostAddress();
-  }
-
-  @Override
-  protected void saveAttributes(AttributesImpl attributes) {
-    addAttribute(attributes, "group", Integer.toString(group));
+    super.saveChilds(handler);
   }
 }
