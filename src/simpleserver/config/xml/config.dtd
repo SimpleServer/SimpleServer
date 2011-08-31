@@ -58,7 +58,7 @@
   allow CDATA #REQUIRED
 >
 <!ATTLIST block
-  id NMTOKEN #REQUIRED
+  id CDATA #REQUIRED
   place CDATA #IMPLIED
   give CDATA #IMPLIED
 >

@@ -20,26 +20,24 @@
  */
 package simpleserver.config.xml;
 
-import org.xml.sax.helpers.AttributesImpl;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
-class Chests extends XMLTag {
-  String allow = "*";
+public class ChestsStorage extends Storage {
+  public Chests chests;
 
-  private static final String ALLOW = "allow";
-
-  Chests() {
-    super("chests");
+  @Override
+  void add(XMLTag child) {
+    chests = (Chests) child;
   }
 
   @Override
-  void setAttribute(String name, String value) {
-    if (name.equals(ALLOW)) {
-      allow = value;
+  Iterator<Chests> iterator() {
+    List<Chests> list = new ArrayList<Chests>();
+    if (chests != null) {
+      list.add(chests);
     }
-  }
-
-  @Override
-  void saveAttributes(AttributesImpl attributes) {
-    addAttribute(attributes, ALLOW, allow);
+    return list.iterator();
   }
 }

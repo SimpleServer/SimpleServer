@@ -36,12 +36,12 @@ public class AllBlocks extends XMLTag {
   private static final String GIVE = "give";
   private static final String TAKE = "take";
 
-  public AllBlocks() {
+  AllBlocks() {
     super("allblocks");
   }
 
   @Override
-  protected void setAttribute(String name, String value) throws SAXException {
+  void setAttribute(String name, String value) throws SAXException {
     if (name.equals(PLACE)) {
       place = value;
     } else if (name.equals(DESTROY)) {
@@ -56,7 +56,7 @@ public class AllBlocks extends XMLTag {
   }
 
   @Override
-  protected void saveAttributes(AttributesImpl attributes) {
+  void saveAttributes(AttributesImpl attributes) {
     if (place != null) {
       addAttribute(attributes, PLACE, place);
     }

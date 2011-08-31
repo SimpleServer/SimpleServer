@@ -22,8 +22,21 @@ package simpleserver.config.xml;
 
 import java.util.Iterator;
 
-public interface Storage {
-  void add(XMLTag child);
+import org.xml.sax.SAXException;
 
-  public Iterator<? extends XMLTag> iterator();
+abstract class Storage {
+  abstract void add(XMLTag child) throws SAXException;
+
+  abstract Iterator<? extends XMLTag> iterator();
+
+  void finish() {
+  }
+
+  int getInt(String value) throws SAXException {
+    try {
+      return Integer.valueOf(value);
+    } catch (NumberFormatException e) {
+      throw new SAXException("Not a valid number: " + value);
+    }
+  }
 }

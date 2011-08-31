@@ -29,17 +29,28 @@ import org.xml.sax.helpers.AttributesImpl;
 import com.sun.org.apache.xml.internal.serialize.XMLSerializer;
 
 public class Config extends StorageContainer {
-
+  public PropertyStorage properties;
   public PlayerStorage players;
   public IpStorage ips;
+  public GroupStorage groups;
+  public CommandStorage commands;
+  public AllBlocksStorage allblocks;
+  public BlockStorage blocks;
+  public ChestsStorage chests;
 
-  public Config() {
+  Config() {
     super("config");
+    addStorage("property", properties = new PropertyStorage());
     addStorage("player", players = new PlayerStorage());
     addStorage("ip", ips = new IpStorage());
+    addStorage("group", groups = new GroupStorage());
+    addStorage("command", commands = new CommandStorage());
+    addStorage("allblocks", allblocks = new AllBlocksStorage());
+    addStorage("block", blocks = new BlockStorage());
+    addStorage("chests", chests = new ChestsStorage());
   }
 
-  protected void save(ContentHandler handler, XMLSerializer serializer) throws SAXException, IOException {
+  void save(ContentHandler handler, XMLSerializer serializer) throws SAXException, IOException {
     handler.startElement("", "", tag, new AttributesImpl());
     saveChilds(handler);
     handler.endElement("", "", tag);

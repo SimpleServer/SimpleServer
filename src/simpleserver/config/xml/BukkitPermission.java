@@ -22,35 +22,35 @@ package simpleserver.config.xml;
 
 import org.xml.sax.helpers.AttributesImpl;
 
-public class BukkitPermission extends XMLTag {
-  public String node;
-  public String allow;
+class BukkitPermission extends XMLTag {
+  String node;
+  String allow;
 
   private static final String ALLOW = "allow";
 
-  public BukkitPermission() {
+  BukkitPermission() {
     super("permission");
   }
 
   @Override
-  protected void setAttribute(String name, String value) {
+  void setAttribute(String name, String value) {
     if (name.equals(ALLOW)) {
       allow = value;
     }
   }
 
   @Override
-  protected void content(String content) {
+  void content(String content) {
     node = (node == null) ? content : node + content;
   }
 
   @Override
-  protected String saveContent() {
+  String saveContent() {
     return node;
   }
 
   @Override
-  protected void saveAttributes(AttributesImpl attributes) {
+  void saveAttributes(AttributesImpl attributes) {
     addAttribute(attributes, ALLOW, allow);
   }
 

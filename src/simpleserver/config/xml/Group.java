@@ -42,7 +42,7 @@ public class Group extends XMLTag {
   private static final String COOLDOWN = "cooldown";
   private static final String WARMUP = "warmup";
 
-  public Group() {
+  Group() {
     super("group");
     acceptAttribute(COOLDOWN);
     acceptAttribute(WARMUP);
@@ -53,7 +53,7 @@ public class Group extends XMLTag {
   }
 
   @Override
-  protected void setAttribute(String name, String value) throws SAXException {
+  void setAttribute(String name, String value) throws SAXException {
     if (name.equals("id")) {
       id = getInt(value);
     } else if (name.equals(IGNORE_CHESTS)) {
@@ -72,7 +72,7 @@ public class Group extends XMLTag {
   }
 
   @Override
-  protected void saveAttributeElements(ContentHandler handler) throws SAXException {
+  void saveAttributeElements(ContentHandler handler) throws SAXException {
     if (ignoreChestLocks) {
       saveAttributeElement(handler, IGNORE_CHESTS);
     }
@@ -91,7 +91,7 @@ public class Group extends XMLTag {
   }
 
   @Override
-  protected void saveAttributes(AttributesImpl attributes) {
+  void saveAttributes(AttributesImpl attributes) {
     addAttribute(attributes, "id", Integer.toString(id));
   }
 }

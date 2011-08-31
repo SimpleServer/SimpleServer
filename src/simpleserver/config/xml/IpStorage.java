@@ -25,7 +25,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-public class IpStorage implements Storage {
+public class IpStorage extends Storage {
   private Map<InetAddress, Ip> ips = new HashMap<InetAddress, Ip>();
 
   public void add(Ip ip) {
@@ -54,10 +54,12 @@ public class IpStorage implements Storage {
     return contains(ip) ? ips.get(ip) : null;
   }
 
+  @Override
   public Iterator<Ip> iterator() {
     return ips.values().iterator();
   }
 
+  @Override
   public void add(XMLTag child) {
     add((Ip) child);
   }

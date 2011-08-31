@@ -42,7 +42,7 @@ import com.sun.org.apache.xml.internal.serialize.XMLSerializer;
 public class GlobalConfig extends AbstractConfig {
   public Config config;
 
-  protected GlobalConfig() {
+  public GlobalConfig() {
     super("config.xml");
   }
 
@@ -133,15 +133,26 @@ public class GlobalConfig extends AbstractConfig {
   }
 
   public static final void main(String[] args) {
+    getMemory();
     GlobalConfig conf = new GlobalConfig();
     conf.load();
     long start = new Date().getTime();
     conf.load();
     long end = new Date().getTime();
     System.out.println("Loading time: " + (end - start) + "ms");
+    getMemory();
     conf.save();
     start = new Date().getTime();
     System.out.println("Saving time: " + (start - end) + "ms");
+    conf = null;
+    getMemory();
   }
 
+  private static final void getMemory() {
+    Runtime runtime = Runtime.getRuntime();
+    runtime.gc();
+    long total = runtime.totalMemory() / 1000;
+    long free = runtime.freeMemory() / 1000;
+    System.out.println(String.format("Total memory: %d MB  free: %d MB  used: %d KB", total / 1000, free / 1000, (total - free)));
+  }
 }

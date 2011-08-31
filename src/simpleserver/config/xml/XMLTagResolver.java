@@ -34,16 +34,16 @@ import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.DefaultHandler;
 
-public class XMLTagResolver extends DefaultHandler {
+class XMLTagResolver extends DefaultHandler {
   private HashMap<String, XMLTag> tags = new HashMap<String, XMLTag>();
   private Stack<XMLTag> stack = new Stack<XMLTag>();
   private Config root;
 
-  public XMLTagResolver() throws SAXException {
+  XMLTagResolver() throws SAXException {
     loadTags();
   }
 
-  public Config root() {
+  Config root() {
     return root;
   }
 
@@ -55,16 +55,12 @@ public class XMLTagResolver extends DefaultHandler {
     } catch (SAXException e) {
       if (root != null && stack.peek().acceptChildAttribute(qName)) {
         tag = new AttributeElement(qName);
-        stack.push(tag);
-        return;
       } else {
         throw e;
       }
     }
     if (root == null) {
       root = (Config) tag;
-    } else {
-      stack.peek().addChild(tag);
     }
     stack.push(tag);
     tag.setAttributes(atts);
@@ -74,8 +70,11 @@ public class XMLTagResolver extends DefaultHandler {
   public void endElement(String uri, String name, String qName) throws SAXException {
     XMLTag tag = stack.pop();
     tag.finish();
+    tag.clean();
     if (tag instanceof AttributeElement) {
       stack.peek().setAttribute(((AttributeElement) tag).name, ((AttributeElement) tag).value);
+    } else if (!stack.isEmpty()) {
+      stack.peek().addChild(tag);
     }
   }
 
@@ -122,29 +121,29 @@ public class XMLTagResolver extends DefaultHandler {
 
       XMLTag instance;
       try {
-        instance = tag.getConstructor().newInstance();
+        instance = tag.getDeclaredConstructor().newInstance();
       } catch (Exception e) {
-        throw new SAXException("Unable to load tags (" + tag.getSimpleName() + ")");
+        throw new SAXException("Unable to load tag \"" + tag.getSimpleName() + "\" (after " + tags.size() + " tags)");
       }
       tags.put(instance.tag, instance);
     }
   }
 
   private static class AttributeElement extends XMLTag {
-    public String name;
-    public String value;
+    String name;
+    String value;
 
-    public AttributeElement() {
+    AttributeElement() {
       super(null);
     }
 
-    public AttributeElement(String name) {
+    AttributeElement(String name) {
       this();
       this.name = name.toLowerCase();
     }
 
     @Override
-    protected void content(String content) {
+    void content(String content) {
       if (value == null) {
         value = content;
       } else {

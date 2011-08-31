@@ -22,33 +22,33 @@ package simpleserver.config.xml;
 
 import org.xml.sax.helpers.AttributesImpl;
 
-public class Argument extends XMLTag {
-  public String allow;
-  public String argument;
+class Argument extends XMLTag {
+  String allow;
+  String argument;
 
-  public Argument() {
+  Argument() {
     super("argument");
   }
 
   @Override
-  protected void setAttribute(String name, String value) {
+  void setAttribute(String name, String value) {
     if (name.equals("allow")) {
       allow = value;
     }
   }
 
   @Override
-  protected void content(String content) {
+  void content(String content) {
     argument = (argument == null) ? content : argument + content;
   }
 
   @Override
-  protected String saveContent() {
+  String saveContent() {
     return argument;
   }
 
   @Override
-  protected void saveAttributes(AttributesImpl attributes) {
+  void saveAttributes(AttributesImpl attributes) {
     addAttribute(attributes, "allow", allow);
   }
 }

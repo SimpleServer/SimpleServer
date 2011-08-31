@@ -20,26 +20,32 @@
  */
 package simpleserver.config.xml;
 
-import org.xml.sax.helpers.AttributesImpl;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
-class Chests extends XMLTag {
-  String allow = "*";
+public class CommandStorage extends Storage {
+  private Map<String, CommandConfig> commands = new HashMap<String, CommandConfig>();
 
-  private static final String ALLOW = "allow";
+  void add(CommandConfig command) {
+    commands.put(command.name, command);
+  }
 
-  Chests() {
-    super("chests");
+  public boolean contains(String name) {
+    return commands.containsKey(name);
+  }
+
+  public CommandConfig get(String name) {
+    return contains(name) ? commands.get(name) : null;
   }
 
   @Override
-  void setAttribute(String name, String value) {
-    if (name.equals(ALLOW)) {
-      allow = value;
-    }
+  Iterator<CommandConfig> iterator() {
+    return commands.values().iterator();
   }
 
   @Override
-  void saveAttributes(AttributesImpl attributes) {
-    addAttribute(attributes, ALLOW, allow);
+  void add(XMLTag child) {
+    add((CommandConfig) child);
   }
 }

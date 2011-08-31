@@ -24,18 +24,24 @@ import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
-public class Property extends XMLTag {
-  public String name;
-  public String value;
+class Property extends XMLTag {
+  String name;
+  String value;
 
-  public Property() {
+  Property() {
     super("property");
     acceptAttribute("true");
     acceptAttribute("false");
   }
 
+  Property(String name, String value) {
+    super("property");
+    this.name = name;
+    this.value = value;
+  }
+
   @Override
-  protected void setAttribute(String name, String value) {
+  void setAttribute(String name, String value) {
     if (name.equals("name")) {
       this.name = value;
     } else if (name.equals("true") || name.equals("false")) {
@@ -44,29 +50,29 @@ public class Property extends XMLTag {
   }
 
   @Override
-  protected void content(String content) {
+  void content(String content) {
     value = (value == null) ? content : value + content;
   }
 
   @Override
-  protected void finish() {
+  void finish() {
     String lowvalue = value.toLowerCase();
-    if (lowvalue.equals("true") || lowvalue.equals("1") || lowvalue.equals("yes") ||
+    if (lowvalue.equals("true") || lowvalue.equals("yes") ||
           lowvalue.equals("on")) {
       value = "true";
-    } else if (lowvalue.equals("false") || lowvalue.equals("not") || lowvalue.equals("0") ||
+    } else if (lowvalue.equals("false") || lowvalue.equals("not") ||
           lowvalue.equals("no") || lowvalue.equals("off")) {
       value = "false";
     }
   }
 
   @Override
-  protected String saveContent() {
+  String saveContent() {
     return (isBoolean()) ? null : value;
   }
 
   @Override
-  protected void saveAttributeElements(ContentHandler handler) throws SAXException {
+  void saveAttributeElements(ContentHandler handler) throws SAXException {
     if (isBoolean()) {
       saveAttributeElement(handler, value);
     }
@@ -77,7 +83,7 @@ public class Property extends XMLTag {
   }
 
   @Override
-  protected void saveAttributes(AttributesImpl attributes) {
+  void saveAttributes(AttributesImpl attributes) {
     addAttribute(attributes, "name", name);
   }
 }

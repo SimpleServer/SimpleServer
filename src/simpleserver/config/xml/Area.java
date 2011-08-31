@@ -31,7 +31,7 @@ public class Area extends XMLTag {
   public Coordinate end;
   public String owner;
 
-  public Area() {
+  Area() {
     super("area");
   }
 
@@ -41,7 +41,7 @@ public class Area extends XMLTag {
   private static final String OWNER = "owner";
 
   @Override
-  protected void setAttribute(String name, String value) throws SAXException {
+  void setAttribute(String name, String value) throws SAXException {
     if (name.equals(NAME)) {
       this.name = value;
     } else if (name.equals(START)) {
@@ -53,7 +53,7 @@ public class Area extends XMLTag {
     }
   }
 
-  private Coordinate getCoord(String value, int defaultY) throws SAXException {
+  private static Coordinate getCoord(String value, int defaultY) throws SAXException {
     String[] parts = value.split(",");
     if (parts.length < 2 || parts.length > 3) {
       throw new SAXException("Malformed coordinate: " + value);
@@ -73,7 +73,7 @@ public class Area extends XMLTag {
   }
 
   @Override
-  protected void saveAttributes(AttributesImpl attributes) {
+  void saveAttributes(AttributesImpl attributes) {
     addAttribute(attributes, NAME, name);
     addAttribute(attributes, START, start.toString());
     addAttribute(attributes, END, end.toString());

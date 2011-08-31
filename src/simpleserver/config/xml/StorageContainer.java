@@ -20,15 +20,15 @@
  */
 package simpleserver.config.xml;
 
-import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
-public abstract class StorageContainer extends XMLTag {
-  private Map<String, Storage> storages = new HashMap<String, Storage>();
+abstract class StorageContainer extends XMLTag {
+  private Map<String, Storage> storages = new LinkedHashMap<String, Storage>();
 
   StorageContainer(String tag) {
     super(tag);
@@ -39,7 +39,14 @@ public abstract class StorageContainer extends XMLTag {
   }
 
   @Override
-  void addChild(XMLTag child) {
+  void finish() {
+    for (Storage storage : storages.values()) {
+      storage.finish();
+    }
+  }
+
+  @Override
+  void addChild(XMLTag child) throws SAXException {
     if (storages.containsKey(child.tag)) {
       storages.get(child.tag).add(child);
     } else {
@@ -48,7 +55,7 @@ public abstract class StorageContainer extends XMLTag {
   }
 
   @Override
-  protected void saveChilds(ContentHandler handler) throws SAXException {
+  void saveChilds(ContentHandler handler) throws SAXException {
     for (Storage storage : storages.values()) {
       Iterator<? extends XMLTag> it = storage.iterator();
       while (it.hasNext()) {

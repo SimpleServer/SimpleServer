@@ -26,31 +26,31 @@ import java.net.UnknownHostException;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
-public class Ip extends XMLTag {
-  public InetAddress address;
-  public int group;
+class Ip extends XMLTag {
+  InetAddress address;
+  int group;
 
   private String addressString;
 
-  public Ip() {
+  Ip() {
     super("ip");
   }
 
-  public Ip(InetAddress address, int group) {
+  Ip(InetAddress address, int group) {
     this();
     this.address = address;
     this.group = group;
   }
 
   @Override
-  protected void setAttribute(String name, String value) throws SAXException {
+  void setAttribute(String name, String value) throws SAXException {
     if (name.equals("group")) {
       group = getInt(value);
     }
   }
 
   @Override
-  protected void finish() throws SAXException {
+  void finish() throws SAXException {
     try {
       address = InetAddress.getByName(addressString);
     } catch (UnknownHostException e) {
@@ -59,17 +59,17 @@ public class Ip extends XMLTag {
   }
 
   @Override
-  protected void content(String content) {
+  void content(String content) {
     addressString = (addressString == null) ? content.toLowerCase() : addressString + content.toLowerCase();
   }
 
   @Override
-  protected String saveContent() {
+  String saveContent() {
     return address.getHostAddress();
   }
 
   @Override
-  protected void saveAttributes(AttributesImpl attributes) {
+  void saveAttributes(AttributesImpl attributes) {
     addAttribute(attributes, "group", Integer.toString(group));
   }
 }

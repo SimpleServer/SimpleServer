@@ -24,16 +24,16 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-public class PlayerStorage implements Storage {
+public class PlayerStorage extends Storage {
   private Map<String, PlayerConfig> players = new HashMap<String, PlayerConfig>();
 
-  public void add(PlayerConfig player) {
+  void add(PlayerConfig player) {
     players.put(player.name, player);
   }
 
-  public void setGroup(String name, int group) {
+  public void set(String name, int group) {
     if (contains(name)) {
-      get(name).group = group;
+      players.get(name).group = group;
     } else {
       players.put(name, new PlayerConfig(name, group));
     }
@@ -49,15 +49,17 @@ public class PlayerStorage implements Storage {
     return players.containsKey(name);
   }
 
-  public PlayerConfig get(String name) {
-    return contains(name) ? players.get(name) : null;
+  public int get(String name) {
+    return contains(name) ? players.get(name).group : 0;
   }
 
-  public Iterator<PlayerConfig> iterator() {
+  @Override
+  Iterator<PlayerConfig> iterator() {
     return players.values().iterator();
   }
 
-  public void add(XMLTag child) {
+  @Override
+  void add(XMLTag child) {
     add((PlayerConfig) child);
   }
 }

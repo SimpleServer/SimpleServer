@@ -23,23 +23,23 @@ package simpleserver.config.xml;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
-public class Block extends XMLTag {
-  public int id;
-  public String place;
-  public String give;
+class Block extends XMLTag {
+  String id;
+  String place;
+  String give;
 
   private static final String ID = "id";
   private static final String PLACE = "place";
   private static final String GIVE = "give";
 
-  public Block() {
+  Block() {
     super("block");
   }
 
   @Override
-  protected void setAttribute(String name, String value) throws SAXException {
+  void setAttribute(String name, String value) throws SAXException {
     if (name.equals(ID)) {
-      id = getInt(value);
+      id = value;
     } else if (name.equals(PLACE)) {
       place = value;
     } else if (name.equals(GIVE)) {
@@ -48,7 +48,14 @@ public class Block extends XMLTag {
   }
 
   @Override
-  protected void saveAttributes(AttributesImpl attributes) {
+  void finish() throws SAXException {
+    if (id == null) {
+      throw new SAXException("ID attribute is required for block elements.");
+    }
+  }
+
+  @Override
+  void saveAttributes(AttributesImpl attributes) {
     addAttribute(attributes, ID, id);
     if (place != null) {
       addAttribute(attributes, PLACE, place);

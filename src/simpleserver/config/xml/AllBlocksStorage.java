@@ -20,26 +20,43 @@
  */
 package simpleserver.config.xml;
 
-import org.xml.sax.helpers.AttributesImpl;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
-class Chests extends XMLTag {
-  String allow = "*";
-
-  private static final String ALLOW = "allow";
-
-  Chests() {
-    super("chests");
-  }
+public class AllBlocksStorage extends Storage {
+  public AllBlocks blocks;
 
   @Override
-  void setAttribute(String name, String value) {
-    if (name.equals(ALLOW)) {
-      allow = value;
+  void add(XMLTag child) {
+    AllBlocks blocks = (AllBlocks) child;
+    if (this.blocks == null) {
+      this.blocks = blocks;
+    } else {
+      if (blocks.place != null) {
+        this.blocks.place = blocks.place;
+      }
+      if (blocks.destroy != null) {
+        this.blocks.destroy = blocks.destroy;
+      }
+      if (blocks.use != null) {
+        this.blocks.use = blocks.use;
+      }
+      if (blocks.take != null) {
+        this.blocks.take = blocks.take;
+      }
+      if (blocks.give != null) {
+        this.blocks.give = blocks.give;
+      }
     }
   }
 
   @Override
-  void saveAttributes(AttributesImpl attributes) {
-    addAttribute(attributes, ALLOW, allow);
+  Iterator<AllBlocks> iterator() {
+    List<AllBlocks> list = new ArrayList<AllBlocks>();
+    if (blocks != null) {
+      list.add(blocks);
+    }
+    return list.iterator();
   }
 }

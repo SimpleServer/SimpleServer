@@ -30,23 +30,23 @@ import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
-public abstract class XMLTag implements Cloneable {
+abstract class XMLTag implements Cloneable {
   final String tag;
   protected Collection<XMLTag> childs;
   private Set<String> acceptedAttributes;
 
-  public XMLTag(String tag) {
+  XMLTag(String tag) {
     this.tag = tag;
   }
 
-  void addChild(XMLTag child) {
+  void addChild(XMLTag child) throws SAXException {
     if (childs == null) {
       childs = new LinkedList<XMLTag>();
     }
     childs.add(child);
   }
 
-  protected void saveChilds(ContentHandler handler) throws SAXException {
+  void saveChilds(ContentHandler handler) throws SAXException {
     saveAttributeElements(handler);
     if (childs != null) {
       for (XMLTag child : childs) {
@@ -61,26 +61,30 @@ public abstract class XMLTag implements Cloneable {
     }
   }
 
-  protected void setAttribute(String name, String value) throws SAXException {
+  void setAttribute(String name, String value) throws SAXException {
   }
 
-  protected void content(String content) {
+  void content(String content) {
   }
 
-  protected void saveAttributes(AttributesImpl attributes) {
+  void saveAttributes(AttributesImpl attributes) {
   }
 
-  protected void saveAttributeElements(ContentHandler handler) throws SAXException {
+  void saveAttributeElements(ContentHandler handler) throws SAXException {
   }
 
-  protected String saveContent() {
+  String saveContent() {
     return null;
   }
 
-  protected void finish() throws SAXException {
+  void finish() throws SAXException {
   }
 
-  protected void saveAttributeElement(ContentHandler handler, String name, String content) throws SAXException {
+  void clean() {
+    acceptedAttributes = null;
+  }
+
+  void saveAttributeElement(ContentHandler handler, String name, String content) throws SAXException {
     handler.startElement("", "", name, new AttributesImpl());
     if (content != null) {
       handler.characters(content.toCharArray(), 0, content.length());
@@ -88,22 +92,22 @@ public abstract class XMLTag implements Cloneable {
     handler.endElement("", "", name);
   }
 
-  protected void saveAttributeElement(ContentHandler handler, String name) throws SAXException {
+  void saveAttributeElement(ContentHandler handler, String name) throws SAXException {
     saveAttributeElement(handler, name, null);
   }
 
-  protected boolean acceptChildAttribute(String name) {
+  boolean acceptChildAttribute(String name) {
     return acceptedAttributes != null && acceptedAttributes.contains(name.toLowerCase());
   }
 
-  protected void acceptAttribute(String name) {
+  void acceptAttribute(String name) {
     if (acceptedAttributes == null) {
       acceptedAttributes = new HashSet<String>();
     }
     acceptedAttributes.add(name.toLowerCase());
   }
 
-  protected int getInt(String value) throws SAXException {
+  static int getInt(String value) throws SAXException {
     try {
       return Integer.valueOf(value);
     } catch (NumberFormatException e) {
@@ -111,11 +115,11 @@ public abstract class XMLTag implements Cloneable {
     }
   }
 
-  protected void addAttribute(AttributesImpl attributes, String name, String value) {
+  void addAttribute(AttributesImpl attributes, String name, String value) {
     attributes.addAttribute("", "", name, "CDATA", value);
   }
 
-  protected void addAttribute(AttributesImpl attributes, String name, int value) {
+  void addAttribute(AttributesImpl attributes, String name, int value) {
     addAttribute(attributes, name, Integer.toString(value));
   }
 

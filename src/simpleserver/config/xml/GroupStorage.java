@@ -20,26 +20,32 @@
  */
 package simpleserver.config.xml;
 
-import org.xml.sax.helpers.AttributesImpl;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
-class Chests extends XMLTag {
-  String allow = "*";
+public class GroupStorage extends Storage {
+  private Map<Integer, Group> groups = new HashMap<Integer, Group>();
 
-  private static final String ALLOW = "allow";
+  public Group get(int id) {
+    return contains(id) ? groups.get(id) : null;
+  }
 
-  Chests() {
-    super("chests");
+  void add(Group group) {
+    groups.put(group.id, group);
+  }
+
+  public boolean contains(int id) {
+    return groups.containsKey(id);
   }
 
   @Override
-  void setAttribute(String name, String value) {
-    if (name.equals(ALLOW)) {
-      allow = value;
-    }
+  Iterator<Group> iterator() {
+    return groups.values().iterator();
   }
 
   @Override
-  void saveAttributes(AttributesImpl attributes) {
-    addAttribute(attributes, ALLOW, allow);
+  void add(XMLTag child) {
+    add((Group) child);
   }
 }

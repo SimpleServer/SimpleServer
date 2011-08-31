@@ -23,39 +23,39 @@ package simpleserver.config.xml;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
-public class PlayerConfig extends XMLTag {
-  public String name;
-  public int group;
+class PlayerConfig extends XMLTag {
+  String name;
+  int group;
 
-  public PlayerConfig() {
+  PlayerConfig() {
     super("player");
   }
 
-  public PlayerConfig(String name, int group) {
+  PlayerConfig(String name, int group) {
     this();
     this.name = name;
     this.group = group;
   }
 
   @Override
-  protected void setAttribute(String name, String value) throws SAXException {
+  void setAttribute(String name, String value) throws SAXException {
     if (name.equals("group")) {
       group = getInt(value);
     }
   }
 
   @Override
-  protected void content(String content) {
+  void content(String content) {
     name = (name == null) ? content.toLowerCase() : name + content.toLowerCase();
   }
 
   @Override
-  protected String saveContent() {
+  String saveContent() {
     return name;
   }
 
   @Override
-  protected void saveAttributes(AttributesImpl attributes) {
+  void saveAttributes(AttributesImpl attributes) {
     addAttribute(attributes, "group", Integer.toString(group));
   }
 }

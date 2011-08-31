@@ -20,26 +20,50 @@
  */
 package simpleserver.config.xml;
 
-import org.xml.sax.helpers.AttributesImpl;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
-class Chests extends XMLTag {
-  String allow = "*";
+public class PropertyStorage extends Storage {
+  private Map<String, Property> properties = new HashMap<String, Property>();
 
-  private static final String ALLOW = "allow";
-
-  Chests() {
-    super("chests");
+  void add(Property property) {
+    properties.put(property.name, property);
   }
 
-  @Override
-  void setAttribute(String name, String value) {
-    if (name.equals(ALLOW)) {
-      allow = value;
+  public void set(String name, String value) {
+    if (contains(name)) {
+      properties.get(name).value = value;
+    } else {
+      properties.put(name, new Property(name, value));
     }
   }
 
+  public void set(String name, boolean value) {
+    set(name, value ? "true" : "false");
+  }
+
+  public void remove(String name) {
+    if (contains(name)) {
+      properties.remove(name);
+    }
+  }
+
+  public boolean contains(String name) {
+    return properties.containsKey(name);
+  }
+
+  public String get(String name) {
+    return contains(name) ? properties.get(name).value : null;
+  }
+
   @Override
-  void saveAttributes(AttributesImpl attributes) {
-    addAttribute(attributes, ALLOW, allow);
+  Iterator<Property> iterator() {
+    return properties.values().iterator();
+  }
+
+  @Override
+  void add(XMLTag child) {
+    add((Property) child);
   }
 }
