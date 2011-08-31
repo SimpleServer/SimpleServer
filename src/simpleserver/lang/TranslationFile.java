@@ -24,10 +24,11 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import simpleserver.util.UnicodeReader;
 
 public class TranslationFile {
   private static final String resourceLocation = "translations";
@@ -64,7 +65,7 @@ public class TranslationFile {
     }
 
     try {
-      reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), "UTF-8"));
+      reader = new BufferedReader(new UnicodeReader(new FileInputStream(file), "UTF-8"));
 
       String contents = "";
       String currentLine;
@@ -90,7 +91,7 @@ public class TranslationFile {
     BufferedReader reader = null;
 
     try {
-      reader = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream(resourceLocation + "/" + filename), "UTF-8"));
+      reader = new BufferedReader(new UnicodeReader(getClass().getResourceAsStream(resourceLocation + "/" + filename), "UTF-8"));
 
       String contents = "";
       String currentLine;
