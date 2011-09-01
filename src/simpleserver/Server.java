@@ -394,7 +394,6 @@ public class Server {
     adminLog = new AdminLog();
     errorLog = new ErrorLog();
     connectionLog = new ConnectionLog();
-    messageLog = new MessageLog(options.get("logMessageFormat"), options.getBoolean("logMessages"));
 
     commandParser = new CommandParser(options, permissions);
   }
@@ -423,6 +422,8 @@ public class Server {
     playerList = new PlayerList(options);
     requestTracker = new RequestTracker(this);
     messager = new Messager(this);
+
+    messageLog = new MessageLog(options.get("logMessageFormat"), options.getBoolean("logMessages"));
 
     minecraft = new MinecraftWrapper(this, options, systemInput);
     if (!minecraft.prepareServerJar()) {
