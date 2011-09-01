@@ -50,6 +50,8 @@ import simpleserver.lang.Translations;
 import simpleserver.log.AdminLog;
 import simpleserver.log.ConnectionLog;
 import simpleserver.log.ErrorLog;
+import simpleserver.log.MessageLog;
+import simpleserver.message.Chat;
 import simpleserver.message.Messager;
 import simpleserver.minecraft.MinecraftWrapper;
 import simpleserver.nbt.WorldFile;
@@ -99,6 +101,7 @@ public class Server {
   private AdminLog adminLog;
   private ErrorLog errorLog;
   private ConnectionLog connectionLog;
+  private MessageLog messageLog;
   private SystemInputQueue systemInput;
 
   private MinecraftWrapper minecraft;
@@ -332,6 +335,10 @@ public class Server {
     connectionLog.addMessage(type, socket, comments);
   }
 
+  public void messageLog(Chat chat, String message) {
+    messageLog.addMessage(chat, message);
+  }
+
   public boolean isRestarting() {
     return restart;
   }
@@ -387,6 +394,7 @@ public class Server {
     adminLog = new AdminLog();
     errorLog = new ErrorLog();
     connectionLog = new ConnectionLog();
+    messageLog = new MessageLog(options.get("logMessageFormat"));
 
     commandParser = new CommandParser(options, permissions);
   }
@@ -396,6 +404,7 @@ public class Server {
     adminLog.stop();
     errorLog.stop();
     connectionLog.stop();
+    messageLog.stop();
     time.unfreeze();
     bots.cleanup();
   }

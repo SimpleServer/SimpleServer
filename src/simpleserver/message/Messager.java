@@ -52,6 +52,9 @@ public class Messager {
     if (server.options.getBoolean("forwardChat")) {
       forwardToServer(chat, message);
     }
+    if (server.options.getBoolean("logMessages")) {
+      server.messageLog(chat, message);
+    }
 
     if (recieverCount == 0) {
       chat.noRecieverFound();
