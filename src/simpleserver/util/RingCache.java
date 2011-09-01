@@ -25,11 +25,13 @@ import java.lang.reflect.Array;
 public class RingCache<E> {
   private E[] items;
   private final int capacity;
+  private final int minusOneMod;
   private int writeIndex = 0;
 
   @SuppressWarnings("unchecked")
   public RingCache(Class<E> c, int capacity) {
     this.capacity = capacity;
+    minusOneMod = capacity - 1;
     items = (E[]) Array.newInstance(c, capacity);
   }
 
@@ -43,7 +45,7 @@ public class RingCache<E> {
   }
 
   public E getLast() {
-    return items[(writeIndex + (capacity - 1)) % capacity];
+    return items[(writeIndex + minusOneMod) % capacity];
   }
 
   public E getOldest() {
@@ -51,15 +53,13 @@ public class RingCache<E> {
     while (items[i] == null && i != writeIndex) {
       i = (i + 1) % capacity;
     }
-
     return items[i];
   }
 
   public boolean has(String item) {
-    int modAdder = capacity - 1;
     int end = writeIndex;
-    int start = (end + modAdder) % capacity;
-    for (int i = start; i != end; i = (i + modAdder) % capacity) {
+    int start = (end + minusOneMod) % capacity;
+    for (int i = start; i != end; i = (i + minusOneMod) % capacity) {
       if (items[i] != null && items[i].equals(item)) {
         return true;
       }
