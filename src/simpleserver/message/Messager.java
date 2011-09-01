@@ -20,15 +20,18 @@
  */
 package simpleserver.message;
 
-import java.util.Hashtable;
+import java.util.LinkedList;
 
 import simpleserver.Player;
 import simpleserver.Server;
+import simpleserver.util.RingCache;
 
 public class Messager {
-  private Server server;
+  private static final int MESSAGE_SIZE = 60;
+  private static final int MAXIMUM_MESSAGE_SIZE = 119;
 
-  private Hashtable<String, Integer> forwardedMessages = new Hashtable<String, Integer>();
+  private Server server;
+  private RingCache<String> forwardedMessages = new RingCache<String>(String.class, 10);
 
   public Messager(Server server) {
     this.server = server;
@@ -46,34 +49,61 @@ public class Messager {
       }
     }
 
+    if (server.options.getBoolean("forwardChat")) {
+      forwardToServer(chat, message);
+    }
+
     if (recieverCount == 0) {
       chat.noRecieverFound();
       return;
-    }
-
-    if (server.options.getBoolean("forwardChat")) {
-      forwardToServer(chat, message);
     }
   }
 
   private void forwardToServer(Chat chat, String message) {
     Player sender = chat.getSender();
-    String forwardMessage = String.format(server.options.get("msgForwardFormat"), message, chat);
+    String forwardMessage = String.format(server.options.get("msgForwardFormat"), chat, message);
 
-    forwardedMessages.put(String.format("<%s> %s", sender.getName(), forwardMessage), server.numPlayers());
-    sender.forwardMessage(forwardMessage);
+    for (String msgPart : warpMessage(forwardMessage)) {
+      forwardedMessages.put(String.format("<%s> %s", sender.getName(), msgPart));
+      sender.forwardMessage(msgPart);
+    }
   }
 
   public boolean wasForwarded(String message) {
-    if (forwardedMessages.containsKey(message)) {
-      int toSuppress = forwardedMessages.get(message) - 1;
-      if (toSuppress > 0) {
-        forwardedMessages.put(message, toSuppress);
-      } else {
-        forwardedMessages.remove(message);
+    return forwardedMessages.has(message);
+  }
+
+  private LinkedList<String> warpMessage(String message) {
+    LinkedList<String> messages = new LinkedList<String>();
+
+    if (message.length() > 0) {
+      while (message.length() > MESSAGE_SIZE) {
+        int end = MESSAGE_SIZE - 1;
+        while (end > 0 && message.charAt(end) != ' ') {
+          end--;
+        }
+        if (end == 0) {
+          end = MESSAGE_SIZE;
+        } else {
+          end++;
+        }
+
+        if (end > 0 && message.charAt(end) == '\u00a7') {
+          end--;
+        }
+
+        messages.add(message.substring(0, end).trim());
+        message = message.substring(end);
       }
-      return true;
+
+      int end = message.length();
+      if (message.length() > 0 && message.charAt(end - 1) == '\u00a7') {
+        end--;
+      }
+      if (end > 0) {
+        messages.add(message.substring(0, end).trim());
+      }
     }
-    return false;
+    return messages;
   }
 }
