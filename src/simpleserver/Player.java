@@ -79,6 +79,7 @@ public class Player {
 
   private AbstractChat chatType;
   private Queue<String> messages = new ConcurrentLinkedQueue<String>();
+  private Queue<String> forwardMessages = new ConcurrentLinkedQueue<String>();
   private Queue<PlayerVisitRequest> visitreqs = new ConcurrentLinkedQueue<PlayerVisitRequest>();
 
   private Coordinate chestPlaced;
@@ -263,7 +264,11 @@ public class Player {
   }
 
   public void forwardMessage(String message) {
-    clientToServer.forwardMessage(message);
+    forwardMessages.add(message);
+  }
+
+  public boolean hasForwardMessages() {
+    return !forwardMessages.isEmpty();
   }
 
   public boolean hasMessages() {
@@ -309,6 +314,10 @@ public class Player {
   public void addTCaptionedMessage(String caption, String format, Object... args) {
     addMessage("%s%s: %s%s", Color.GRAY, t(caption),
                Color.WHITE, String.format(format, args));
+  }
+
+  public String getForwardMessage() {
+    return forwardMessages.remove();
   }
 
   public String getMessage() {

@@ -1102,14 +1102,6 @@ public class StreamTunnel {
     }
   }
 
-  public void forwardMessage(String message) {
-    try {
-      sendMessagePacket(message);
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-  }
-
   private void packetFinished() throws IOException {
     if (EXPENSIVE_DEBUG_LOGGING) {
       inputDumper.packetFinished();
@@ -1140,6 +1132,10 @@ public class StreamTunnel {
             if (isServerTunnel) {
               while (player.hasMessages()) {
                 sendMessage(player.getMessage());
+              }
+            } else {
+              while (player.hasForwardMessages()) {
+                sendMessage(player.getForwardMessage());
               }
             }
 

@@ -59,7 +59,6 @@ public class RingCache<E> {
     int modAdder = capacity - 1;
     int end = writeIndex;
     int start = (end + modAdder) % capacity;
-    System.out.println("comparing: " + item);
     for (int i = start; i != end; i = (i + modAdder) % capacity) {
       if (items[i] != null && items[i].equals(item)) {
         return true;
