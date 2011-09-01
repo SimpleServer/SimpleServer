@@ -28,7 +28,6 @@ import simpleserver.util.RingCache;
 
 public class Messager {
   private static final int MESSAGE_SIZE = 60;
-  private static final int MAXIMUM_MESSAGE_SIZE = 119;
 
   private Server server;
   private RingCache<String> forwardedMessages = new RingCache<String>(String.class, 10);

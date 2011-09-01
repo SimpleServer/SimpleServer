@@ -394,7 +394,7 @@ public class Server {
     adminLog = new AdminLog();
     errorLog = new ErrorLog();
     connectionLog = new ConnectionLog();
-    messageLog = new MessageLog(options.get("logMessageFormat"));
+    messageLog = new MessageLog(options.get("logMessageFormat"), options.getBoolean("logMessages"));
 
     commandParser = new CommandParser(options, permissions);
   }

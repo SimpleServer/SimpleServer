@@ -25,15 +25,17 @@ import simpleserver.message.Chat;
 public class MessageLog extends AbstractLog {
   private final String logFormat;
 
-  public MessageLog(String format) {
-    super("messages");
+  public MessageLog(String format, boolean enabled) {
+    super("messages", enabled);
 
     logFormat = format;
   }
 
   public void addMessage(Chat chat, String message) {
-    String logMsg = String.format(logFormat, chat.getSender().getName(), chat.toString(), message);
-    super.addMessage(logMsg);
+    if (enabled) {
+      String logMsg = String.format(logFormat, chat.getSender().getName(), chat.toString(), message);
+      super.addMessage(logMsg);
+    }
   }
 
 }

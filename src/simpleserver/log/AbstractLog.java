@@ -30,6 +30,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 public class AbstractLog {
   private String name;
+  protected final boolean enabled;
   private BlockingQueue<String> queue;
   private FileOutputStream stream;
   private Logger logger;
@@ -39,33 +40,43 @@ public class AbstractLog {
 
   private volatile boolean run = true;
 
-  protected AbstractLog(String name) {
+  protected AbstractLog(String name, boolean enabled) {
     this.name = name;
+    this.enabled = enabled;
+    if (enabled) {
+      queue = new LinkedBlockingQueue<String>();
+      try {
+        filename = getLogFile();
+        stream = new FileOutputStream(filename, true);
+      } catch (FileNotFoundException e) {
+        System.out.println("[SimpleServer] " + e);
+        System.out.println("[SimpleServer] Unable to open " + name
+            + " log for writing!");
+        return;
+      }
 
-    queue = new LinkedBlockingQueue<String>();
-    try {
-      filename = getLogFile();
-      stream = new FileOutputStream(filename, true);
-    } catch (FileNotFoundException e) {
-      System.out.println("[SimpleServer] " + e);
-      System.out.println("[SimpleServer] Unable to open " + name
-          + " log for writing!");
-      return;
+      logger = new Logger();
+      logger.start();
+      logger.setName("Logger-" + name);
     }
+  }
 
-    logger = new Logger();
-    logger.start();
-    logger.setName("Logger-" + name);
+  protected AbstractLog(String name) {
+    this(name, true);
   }
 
   protected void addMessage(String message) {
-    logEmpty = false;
-    queue.add(String.format("%tF %1$tT\t%2$s\n", new Date(), message));
+    if (enabled) {
+      logEmpty = false;
+      queue.add(String.format("%tF %1$tT\t%2$s\n", new Date(), message));
+    }
   }
 
   public void stop() {
     run = false;
-    logger.interrupt();
+    if (enabled) {
+      logger.interrupt();
+    }
   }
 
   private File getLogFile() {

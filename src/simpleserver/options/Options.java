@@ -36,11 +36,11 @@ public class Options extends AbstractOptions {
   public void load() {
     super.load();
 
-    if (get("msgFormat").equals("")) {
-      set("msgFormat", defaultOptions.getProperty("msgFormat"));
-    }
-    if (get("msgTitleFormat").equals("")) {
-      set("msgTitleFormat", defaultOptions.getProperty("msgTitleFormat"));
+    String[] fallbackIfEmpty = new String[] { "msgFormat", "msgTitleFormat", "msgForwardFormat", "logMessageFormat" };
+    for (String entry : fallbackIfEmpty) {
+      if (get(entry).equals("")) {
+        set(entry, defaultOptions.getProperty(entry));
+      }
     }
 
     if (getInt("internalPort") == getInt("port")) {
