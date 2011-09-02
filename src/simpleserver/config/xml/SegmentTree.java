@@ -20,8 +20,10 @@
  */
 package simpleserver.config.xml;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
@@ -29,21 +31,44 @@ import java.util.TreeSet;
 
 public class SegmentTree<E> {
   private Node root;
-  private List<Segment> segments = new LinkedList<Segment>();
+  private List<HyperSegment> segments = new LinkedList<HyperSegment>();
+  private NodeCache cache = new NodeCache();
   private boolean built = false;
+  private int dimensions;
 
-  public void add(int start, int end, E object) {
+  public int cacheCounter;
+
+  public SegmentTree(int dimensions) {
+    this.dimensions = dimensions;
+  }
+
+  public void add(int[] start, int[] end, E object) {
     if (!built) {
-      segments.add(new Segment(start, end, object));
+      segments.add(new HyperSegment(start, end, object));
     }
   }
 
   public void build() {
-    long start = new Date().getTime();
+    root = build(segments, 0);
+  }
+
+  public List<E> get(int... point) {
+    return root.find(point);
+  }
+
+  private Node build(List<HyperSegment> segments, int dimension) {
+    System.out.println("Dimension: " + (dimension + 1));
+
+    if (segments.size() == 1 && cache.contains(segments.get(0), dimension)) {
+      System.out.println("CACHED " + segments.get(0) + "\n");
+      cacheCounter++;
+      return cache.get(segments.get(0), dimension);
+    }
 
     // find all end points
     TreeSet<Integer> points = new TreeSet<Integer>();
-    for (Segment segment : segments) {
+    for (HyperSegment hyperSegment : segments) {
+      Segment segment = hyperSegment.segments[dimension];
       points.add(segment.start);
       points.add(segment.end);
     }
@@ -54,19 +79,31 @@ public class SegmentTree<E> {
       leaves.add(new Node(points.pollFirst(), points.first()));
     }
 
+    if (leaves.isEmpty()) {
+      leaves.add(new Node(points.first(), points.first()));
+    }
+
     // build tree
-    root = createTree(leaves, 0, leaves.size() - 1);
+    Node root = createTree(leaves, 0, leaves.size() - 1);
 
     // insert segments
-    for (Segment segment : segments) {
-      root.insertSegment(segment);
+    for (HyperSegment segment : segments) {
+      root.insertSegment(segment.segments[dimension]);
     }
 
     // show result
-    System.out.println("time: " + (new Date().getTime() - start) + "ms");
     System.out.println(root);
 
-    built = true;
+    // build higher dimensions
+    if (++dimension < dimensions) {
+      root.buildDimension(dimension);
+    }
+
+    if (segments.size() == 1) {
+      cache.put(root, segments.get(0), dimension - 1);
+    }
+
+    return root;
   }
 
   private Node createTree(List<Node> leaves, int start, int end) {
@@ -81,15 +118,60 @@ public class SegmentTree<E> {
   }
 
   public static void main(String[] args) {
-    SegmentTree<Integer> tree = new SegmentTree<Integer>();
+    int d = 3;
+    int n = 100;
+    int m = 100;
+
+    SegmentTree<String> tree = new SegmentTree<String>(d);
     Random random = new Random();
-    int n = 1000;
     for (int i = 0; i < n; i++) {
-      int start = random.nextInt(100);
-      int end = random.nextInt(100);
-      tree.add(start, end, i);
+      int[] start = new int[d];
+      int[] end = new int[d];
+      System.out.print(i + ": ");
+      StringBuilder str = new StringBuilder();
+      for (int j = 0; j < d; j++) {
+        start[j] = random.nextInt(100);
+        end[j] = random.nextInt(100);
+        str.append("(" + start[j] + " - " + end[j] + ") ");
+      }
+      System.out.println(str);
+      tree.add(start, end, str.toString());
     }
+    System.out.println();
+
+    long memory = getMemory();
+    long start = new Date().getTime();
     tree.build();
+    long buildTime = (new Date().getTime() - start);
+    memory = getMemory() - memory;
+
+    start = new Date().getTime();
+    for (int i = 0; i < m; i++) {
+      int[] point = new int[d];
+      System.out.println("\nLooking for ");
+      for (int j = 0; j < d; j++) {
+        point[j] = random.nextInt(100);
+        if (j != 0) {
+          System.out.print('/');
+        }
+        System.out.print(point[j]);
+      }
+      System.out.println();
+      List<String> result = tree.get(point);
+      for (String obj : result) {
+        System.out.println(obj);
+      }
+    }
+    System.out.println("\nMemory used: " + memory + "KB");
+    System.out.println("Nodes saved through caching: " + tree.cacheCounter);
+    System.out.println("Total build time: " + buildTime + "ms");
+    System.out.println("Total query time: " + (new Date().getTime() - start) + "ms");
+  }
+
+  private static final long getMemory() {
+    Runtime runtime = Runtime.getRuntime();
+    runtime.gc();
+    return (runtime.totalMemory() - runtime.freeMemory()) / 1000;
   }
 
   private class Node {
@@ -99,11 +181,51 @@ public class SegmentTree<E> {
     Node left;
     Node right;
 
-    List<Segment> segments = new ArrayList<Segment>();
+    Node nextDimension;
 
-    public Node(int start, int end) {
+    List<HyperSegment> segments = new ArrayList<HyperSegment>();
+
+    Node(int start, int end) {
       this.start = start;
       this.end = end;
+    }
+
+    void buildDimension(int dimension) {
+      if (!segments.isEmpty()) {
+        nextDimension = build(segments, dimension);
+      }
+      if (left != null) {
+        left.buildDimension(dimension);
+      }
+      if (right != null) {
+        right.buildDimension(dimension);
+      }
+    }
+
+    List<E> find(int[] point) {
+      List<E> list = new LinkedList();
+      find(point, list, 0);
+      return list;
+    }
+
+    void find(int[] point, List<E> list, int dimension) {
+      if (point[dimension] >= end || point[dimension] < start) {
+        return;
+      } else {
+        if (dimension == dimensions - 1) {
+          for (HyperSegment segment : segments) {
+            list.add(segment.object);
+          }
+        } else if (nextDimension != null) {
+          nextDimension.find(point, list, dimension + 1);
+        }
+        if (left != null) {
+          left.find(point, list, dimension);
+        }
+        if (right != null) {
+          right.find(point, list, dimension);
+        }
+      }
     }
 
     @Override
@@ -121,12 +243,9 @@ public class SegmentTree<E> {
       str.append(end);
       if (!segments.isEmpty()) {
         str.append(" <=");
-        for (Segment segment : segments) {
-          str.append(" (");
-          str.append(segment.start);
-          str.append(" - ");
-          str.append(segment.end);
-          str.append(")");
+        for (HyperSegment segment : segments) {
+          str.append(' ');
+          str.append(segment);
         }
       }
       str.append('\n');
@@ -141,7 +260,7 @@ public class SegmentTree<E> {
 
     public void insertSegment(Segment segment) {
       if (segment.start <= start && segment.end >= end) {
-        segments.add(segment);
+        segments.add(segment.parent);
       } else {
         if (left != null) {
           left.insertSegment(segment);
@@ -153,15 +272,76 @@ public class SegmentTree<E> {
     }
   }
 
-  private class Segment {
+  private class HyperSegment {
     E object;
+    Segment[] segments;
+
+    HyperSegment(int[] start, int[] end, E object) {
+      this.object = object;
+      segments = (Segment[]) Array.newInstance(Segment.class, dimensions);
+      for (int d = 0; d < dimensions; d++) {
+        if (start[d] <= end[d]) {
+          segments[d] = new Segment(start[d], end[d], this);
+        } else {
+          segments[d] = new Segment(end[d], start[d], this);
+        }
+      }
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder str = new StringBuilder();
+      str.append('[');
+      for (Segment segment : segments) {
+        str.append(segment);
+      }
+      str.append(']');
+      return str.toString();
+    }
+  }
+
+  private class Segment {
+    HyperSegment parent;
     int start;
     int end;
 
-    public Segment(int start, int end, E object) {
+    Segment(int start, int end, HyperSegment parent) {
       this.start = start;
       this.end = end;
-      this.object = object;
+      this.parent = parent;
+    }
+
+    @Override
+    public String toString() {
+      return "(" + start + " - " + end + ")";
+    }
+  }
+
+  private class NodeCache {
+    private HashMap<Segment, Node> cache = new HashMap<Segment, Node>();
+
+    boolean contains(Segment segment) {
+      return cache.containsKey(segment);
+    }
+
+    boolean contains(HyperSegment segment, int dimension) {
+      return contains(segment.segments[dimension]);
+    }
+
+    void put(Node node, Segment segment) {
+      cache.put(segment, node);
+    }
+
+    public void put(Node node, HyperSegment segment, int dimension) {
+      put(node, segment.segments[dimension]);
+    }
+
+    Node get(Segment segment) {
+      return cache.get(segment);
+    }
+
+    Node get(HyperSegment segment, int dimension) {
+      return get(segment.segments[dimension]);
     }
   }
 }
