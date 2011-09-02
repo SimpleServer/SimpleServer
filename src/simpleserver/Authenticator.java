@@ -410,7 +410,7 @@ public class Authenticator {
     }
 
     public static int banTime(int level) {
-      return (int) Math.pow(2, level) / 10;
+      return (int) Math.pow(2, level);
     }
   }
 
