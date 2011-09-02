@@ -50,6 +50,8 @@ public class SegmentTree<E> {
 
   public void build() {
     root = build(segments, 0);
+    cache = null;
+    built = true;
   }
 
   public List<E> get(int... point) {
@@ -119,7 +121,7 @@ public class SegmentTree<E> {
 
   public static void main(String[] args) {
     int d = 3;
-    int n = 100;
+    int n = 10;
     int m = 100;
 
     SegmentTree<String> tree = new SegmentTree<String>(d);
@@ -130,8 +132,16 @@ public class SegmentTree<E> {
       System.out.print(i + ": ");
       StringBuilder str = new StringBuilder();
       for (int j = 0; j < d; j++) {
-        start[j] = random.nextInt(100);
-        end[j] = random.nextInt(100);
+        if (j != 0) {
+          start[j] = random.nextInt(1000);
+          end[j] = random.nextInt(1000);
+        } else if (random.nextInt(100) < 20) {
+          start[j] = random.nextInt(100);
+          end[j] = random.nextInt(100);
+        } else {
+          start[j] = 0;
+          end[j] = 128;
+        }
         str.append("(" + start[j] + " - " + end[j] + ") ");
       }
       System.out.println(str);
