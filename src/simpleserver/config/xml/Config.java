@@ -37,9 +37,21 @@ public class Config extends StorageContainer {
   public AllBlocksStorage allblocks;
   public BlockStorage blocks;
   public ChestsStorage chests;
+  AreaStorage localAreas;
+  public GlobalAreaStorage areas;
 
   Config() {
     super("config");
+  }
+
+  @Override
+  void finish() {
+    areas.buildTree();
+  }
+
+  @Override
+  void addStorages() {
+    areas = GlobalAreaStorage.newInstance();
     addStorage("property", properties = new PropertyStorage());
     addStorage("player", players = new PlayerStorage());
     addStorage("ip", ips = new IpStorage());
@@ -48,6 +60,7 @@ public class Config extends StorageContainer {
     addStorage("allblocks", allblocks = new AllBlocksStorage());
     addStorage("block", blocks = new BlockStorage());
     addStorage("chests", chests = new ChestsStorage());
+    addStorage("area", localAreas = new AreaStorage());
   }
 
   void save(ContentHandler handler, XMLSerializer serializer) throws SAXException, IOException {

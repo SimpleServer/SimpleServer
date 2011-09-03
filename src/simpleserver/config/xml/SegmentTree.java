@@ -22,12 +22,11 @@ package simpleserver.config.xml;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Random;
-import java.util.TreeSet;
+import java.util.TreeMap;
+import java.util.Map.Entry;
 
 public class SegmentTree<E> {
   private Node root;
@@ -35,8 +34,6 @@ public class SegmentTree<E> {
   private NodeCache cache = new NodeCache();
   private boolean built = false;
   private int dimensions;
-
-  public int cacheCounter;
 
   public SegmentTree(int dimensions) {
     this.dimensions = dimensions;
@@ -59,30 +56,31 @@ public class SegmentTree<E> {
   }
 
   private Node build(List<HyperSegment> segments, int dimension) {
-    System.out.println("Dimension: " + (dimension + 1));
-
     if (segments.size() == 1 && cache.contains(segments.get(0), dimension)) {
-      System.out.println("CACHED " + segments.get(0) + "\n");
-      cacheCounter++;
       return cache.get(segments.get(0), dimension);
     }
 
     // find all end points
-    TreeSet<Integer> points = new TreeSet<Integer>();
+    TreeMap<Integer, Boolean> points = new TreeMap<Integer, Boolean>();
     for (HyperSegment hyperSegment : segments) {
       Segment segment = hyperSegment.segments[dimension];
-      points.add(segment.start);
-      points.add(segment.end);
+      points.put(segment.start, false);
+      points.put(segment.end, segment.start == segment.end);
     }
 
     // create leaves
     List<Node> leaves = new LinkedList<Node>();
     while (points.size() > 1) {
-      leaves.add(new Node(points.pollFirst(), points.first()));
+      int point = points.firstKey();
+      if (points.remove(point)) {
+        leaves.add(new Node(point, point));
+      }
+      leaves.add(new Node(point, points.firstKey()));
     }
 
-    if (leaves.isEmpty()) {
-      leaves.add(new Node(points.first(), points.first()));
+    Entry<Integer, Boolean> lastPoint = points.firstEntry();
+    if (lastPoint.getValue()) {
+      leaves.add(new Node(lastPoint.getKey(), lastPoint.getKey()));
     }
 
     // build tree
@@ -92,9 +90,6 @@ public class SegmentTree<E> {
     for (HyperSegment segment : segments) {
       root.insertSegment(segment.segments[dimension]);
     }
-
-    // show result
-    System.out.println(root);
 
     // build higher dimensions
     if (++dimension < dimensions) {
@@ -117,71 +112,6 @@ public class SegmentTree<E> {
     node.left = createTree(leaves, start, middle);
     node.right = createTree(leaves, middle + 1, end);
     return node;
-  }
-
-  public static void main(String[] args) {
-    int d = 3;
-    int n = 10;
-    int m = 100;
-
-    SegmentTree<String> tree = new SegmentTree<String>(d);
-    Random random = new Random();
-    for (int i = 0; i < n; i++) {
-      int[] start = new int[d];
-      int[] end = new int[d];
-      System.out.print(i + ": ");
-      StringBuilder str = new StringBuilder();
-      for (int j = 0; j < d; j++) {
-        if (j != 0) {
-          start[j] = random.nextInt(1000);
-          end[j] = random.nextInt(1000);
-        } else if (random.nextInt(100) < 20) {
-          start[j] = random.nextInt(100);
-          end[j] = random.nextInt(100);
-        } else {
-          start[j] = 0;
-          end[j] = 128;
-        }
-        str.append("(" + start[j] + " - " + end[j] + ") ");
-      }
-      System.out.println(str);
-      tree.add(start, end, str.toString());
-    }
-    System.out.println();
-
-    long memory = getMemory();
-    long start = new Date().getTime();
-    tree.build();
-    long buildTime = (new Date().getTime() - start);
-    memory = getMemory() - memory;
-
-    start = new Date().getTime();
-    for (int i = 0; i < m; i++) {
-      int[] point = new int[d];
-      System.out.println("\nLooking for ");
-      for (int j = 0; j < d; j++) {
-        point[j] = random.nextInt(100);
-        if (j != 0) {
-          System.out.print('/');
-        }
-        System.out.print(point[j]);
-      }
-      System.out.println();
-      List<String> result = tree.get(point);
-      for (String obj : result) {
-        System.out.println(obj);
-      }
-    }
-    System.out.println("\nMemory used: " + memory + "KB");
-    System.out.println("Nodes saved through caching: " + tree.cacheCounter);
-    System.out.println("Total build time: " + buildTime + "ms");
-    System.out.println("Total query time: " + (new Date().getTime() - start) + "ms");
-  }
-
-  private static final long getMemory() {
-    Runtime runtime = Runtime.getRuntime();
-    runtime.gc();
-    return (runtime.totalMemory() - runtime.freeMemory()) / 1000;
   }
 
   private class Node {
@@ -213,13 +143,13 @@ public class SegmentTree<E> {
     }
 
     List<E> find(int[] point) {
-      List<E> list = new LinkedList();
+      List<E> list = new LinkedList<E>();
       find(point, list, 0);
       return list;
     }
 
     void find(int[] point, List<E> list, int dimension) {
-      if (point[dimension] >= end || point[dimension] < start) {
+      if (point[dimension] > end || point[dimension] < start) {
         return;
       } else {
         if (dimension == dimensions - 1) {
@@ -236,36 +166,6 @@ public class SegmentTree<E> {
           right.find(point, list, dimension);
         }
       }
-    }
-
-    @Override
-    public String toString() {
-      return toString(0);
-    }
-
-    public String toString(int in) {
-      StringBuilder str = new StringBuilder();
-      for (int i = 0; i < in; i++) {
-        str.append(' ');
-      }
-      str.append(start);
-      str.append(" - ");
-      str.append(end);
-      if (!segments.isEmpty()) {
-        str.append(" <=");
-        for (HyperSegment segment : segments) {
-          str.append(' ');
-          str.append(segment);
-        }
-      }
-      str.append('\n');
-      if (left != null) {
-        str.append(left.toString(in + 1));
-      }
-      if (right != null) {
-        str.append(right.toString(in + 1));
-      }
-      return str.toString();
     }
 
     public void insertSegment(Segment segment) {
@@ -297,17 +197,6 @@ public class SegmentTree<E> {
         }
       }
     }
-
-    @Override
-    public String toString() {
-      StringBuilder str = new StringBuilder();
-      str.append('[');
-      for (Segment segment : segments) {
-        str.append(segment);
-      }
-      str.append(']');
-      return str.toString();
-    }
   }
 
   private class Segment {
@@ -319,11 +208,6 @@ public class SegmentTree<E> {
       this.start = start;
       this.end = end;
       this.parent = parent;
-    }
-
-    @Override
-    public String toString() {
-      return "(" + start + " - " + end + ")";
     }
   }
 

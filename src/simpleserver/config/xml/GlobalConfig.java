@@ -27,6 +27,9 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Date;
+import java.util.List;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.xml.sax.ContentHandler;
 import org.xml.sax.InputSource;
@@ -34,6 +37,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.XMLReaderFactory;
 
+import simpleserver.Coordinate;
 import simpleserver.config.AbstractConfig;
 
 import com.sun.org.apache.xml.internal.serialize.OutputFormat;
@@ -41,6 +45,7 @@ import com.sun.org.apache.xml.internal.serialize.XMLSerializer;
 
 public class GlobalConfig extends AbstractConfig {
   public Config config;
+  public static final Lock lock = new ReentrantLock();
 
   public GlobalConfig() {
     super("config.xml");
@@ -48,6 +53,7 @@ public class GlobalConfig extends AbstractConfig {
 
   @Override
   public void load() {
+    lock.lock();
     try {
       copyDefaults();
     } catch (IOException e1) {
@@ -60,6 +66,7 @@ public class GlobalConfig extends AbstractConfig {
     } catch (SAXException e) {
       // TODO Auto-generated catch block
       e.printStackTrace();
+      lock.unlock();
       return;
     }
     XMLTagResolver handler;
@@ -77,10 +84,12 @@ public class GlobalConfig extends AbstractConfig {
       xml.setEntityResolver(handler);
       xml.parse(new InputSource(new FileReader(getFile())));
     } catch (Exception e) {
-      // TODO Auto-generated catch block
       e.printStackTrace();
+      lock.unlock();
+      return;
     }
     processTags(handler.root());
+    lock.unlock();
   }
 
   private void processTags(Config root) {
@@ -107,11 +116,13 @@ public class GlobalConfig extends AbstractConfig {
 
   @Override
   public void save() {
+    lock.lock();
     FileOutputStream fos;
     try {
       fos = new FileOutputStream(new File("test.xml"));
     } catch (FileNotFoundException e) {
       e.printStackTrace();
+      lock.unlock();
       return;
     }
     OutputFormat of = new OutputFormat("XML", "ISO-8859-1", true);
@@ -129,6 +140,8 @@ public class GlobalConfig extends AbstractConfig {
       fos.close();
     } catch (Exception e) {
       e.printStackTrace();
+    } finally {
+      lock.unlock();
     }
   }
 
@@ -139,12 +152,28 @@ public class GlobalConfig extends AbstractConfig {
     long start = new Date().getTime();
     conf.load();
     long end = new Date().getTime();
-    System.out.println("Loading time: " + (end - start) + "ms");
+    System.out.println("\nLoading time: " + (end - start) + " ms");
     getMemory();
     conf.save();
     start = new Date().getTime();
-    System.out.println("Saving time: " + (start - end) + "ms");
+    System.out.println("\nSaving time: " + (start - end) + " ms");
+
+    int n = 10000;
+    List<Area> areas = null;
+    for (int i = 0; i < n; i++) {
+      areas = conf.config.areas.get(new Coordinate(9, 11, 13));
+    }
+    start = new Date().getTime();
+    System.out.println("\nQuery time: " + (start - end) + " ms");
+    System.out.println("That is " + ((start - end) / (float) n) + " ms per query!!!");
+    System.out.println("\nActive areas at given coordinate:");
+    for (Area area : areas) {
+      System.out.println(area.name);
+    }
+
+    System.out.println();
     conf = null;
+    areas = null;
     getMemory();
   }
 

@@ -39,63 +39,31 @@ abstract class XMLTag implements Cloneable {
     this.tag = tag;
   }
 
-  void addChild(XMLTag child) throws SAXException {
-    if (childs == null) {
-      childs = new LinkedList<XMLTag>();
-    }
-    childs.add(child);
+  // hooks
+  void init() {
   }
 
-  void saveChilds(ContentHandler handler) throws SAXException {
-    saveAttributeElements(handler);
-    if (childs != null) {
-      for (XMLTag child : childs) {
-        child.save(handler);
-      }
-    }
+  void loadedAttributes() {
   }
 
-  void setAttributes(Attributes attributes) throws SAXException {
-    for (int i = 0; i < attributes.getLength(); i++) {
-      setAttribute(attributes.getLocalName(i).toLowerCase(), attributes.getValue(i));
-    }
+  void finish() throws SAXException {
   }
 
+  // load data
   void setAttribute(String name, String value) throws SAXException {
   }
 
   void content(String content) {
   }
 
+  // save data
   void saveAttributes(AttributesImpl attributes) {
   }
 
   void saveAttributeElements(ContentHandler handler) throws SAXException {
   }
 
-  String saveContent() {
-    return null;
-  }
-
-  void finish() throws SAXException {
-  }
-
-  void clean() {
-    acceptedAttributes = null;
-  }
-
-  void saveAttributeElement(ContentHandler handler, String name, String content) throws SAXException {
-    handler.startElement("", "", name, new AttributesImpl());
-    if (content != null) {
-      handler.characters(content.toCharArray(), 0, content.length());
-    }
-    handler.endElement("", "", name);
-  }
-
-  void saveAttributeElement(ContentHandler handler, String name) throws SAXException {
-    saveAttributeElement(handler, name, null);
-  }
-
+  // setup
   boolean acceptChildAttribute(String name) {
     return acceptedAttributes != null && acceptedAttributes.contains(name.toLowerCase());
   }
@@ -107,6 +75,7 @@ abstract class XMLTag implements Cloneable {
     acceptedAttributes.add(name.toLowerCase());
   }
 
+  // helper
   static int getInt(String value) throws SAXException {
     try {
       return Integer.valueOf(value);
@@ -115,12 +84,28 @@ abstract class XMLTag implements Cloneable {
     }
   }
 
-  void addAttribute(AttributesImpl attributes, String name, String value) {
-    attributes.addAttribute("", "", name, "CDATA", value);
+  // internal methods
+  XMLTag callInit() {
+    init();
+    return this;
   }
 
-  void addAttribute(AttributesImpl attributes, String name, int value) {
-    addAttribute(attributes, name, Integer.toString(value));
+  void clean() {
+    acceptedAttributes = null;
+  }
+
+  void setAttributes(Attributes attributes) throws SAXException {
+    for (int i = 0; i < attributes.getLength(); i++) {
+      setAttribute(attributes.getLocalName(i).toLowerCase(), attributes.getValue(i));
+    }
+    loadedAttributes();
+  }
+
+  void addChild(XMLTag child) throws SAXException {
+    if (childs == null) {
+      childs = new LinkedList<XMLTag>();
+    }
+    childs.add(child);
   }
 
   protected void save(ContentHandler handler) throws SAXException {
@@ -135,8 +120,41 @@ abstract class XMLTag implements Cloneable {
     handler.endElement("", "", tag);
   }
 
+  String saveContent() {
+    return null;
+  }
+
+  void saveChilds(ContentHandler handler) throws SAXException {
+    saveAttributeElements(handler);
+    if (childs != null) {
+      for (XMLTag child : childs) {
+        child.save(handler);
+      }
+    }
+  }
+
+  void saveAttributeElement(ContentHandler handler, String name, String content) throws SAXException {
+    handler.startElement("", "", name, new AttributesImpl());
+    if (content != null) {
+      handler.characters(content.toCharArray(), 0, content.length());
+    }
+    handler.endElement("", "", name);
+  }
+
+  void saveAttributeElement(ContentHandler handler, String name) throws SAXException {
+    saveAttributeElement(handler, name, null);
+  }
+
+  void addAttribute(AttributesImpl attributes, String name, String value) {
+    attributes.addAttribute("", "", name, "CDATA", value);
+  }
+
+  void addAttribute(AttributesImpl attributes, String name, int value) {
+    addAttribute(attributes, name, Integer.toString(value));
+  }
+
   @Override
   public XMLTag clone() throws CloneNotSupportedException {
-    return (XMLTag) super.clone();
+    return ((XMLTag) super.clone()).callInit();
   }
 }

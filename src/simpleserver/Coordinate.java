@@ -64,6 +64,10 @@ public class Coordinate {
     this(x, (byte) y, z, dimension);
   }
 
+  public Coordinate(int x, int y, int z) {
+    this(x, (byte) y, z);
+  }
+
   public int x() {
     return x;
   }

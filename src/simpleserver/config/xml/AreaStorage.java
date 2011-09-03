@@ -20,56 +20,28 @@
  */
 package simpleserver.config.xml;
 
+import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.List;
 
-import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
-abstract class StorageContainer extends XMLTag {
-  private Map<String, Storage> storages;
+public class AreaStorage extends Storage {
+  private GlobalAreaStorage globalStorage = GlobalAreaStorage.getInstance();
+  private List<Area> localStorage = new ArrayList<Area>();
 
-  StorageContainer(String tag) {
-    super(tag);
-  }
-
-  abstract void addStorages();
-
-  @Override
-  void init() {
-    storages = new LinkedHashMap<String, Storage>();
-    addStorages();
-  }
-
-  void addStorage(String tag, Storage storage) {
-    storages.put(tag, storage);
+  void setOwner(Area owner) {
+    globalStorage.add(owner);
   }
 
   @Override
-  void finish() {
-    for (Storage storage : storages.values()) {
-      storage.finish();
-    }
+  void add(XMLTag child) throws SAXException {
+    localStorage.add((Area) child);
   }
 
   @Override
-  void addChild(XMLTag child) throws SAXException {
-    if (storages.containsKey(child.tag)) {
-      storages.get(child.tag).add(child);
-    } else {
-      super.addChild(child);
-    }
+  Iterator<? extends XMLTag> iterator() {
+    return localStorage.iterator();
   }
 
-  @Override
-  void saveChilds(ContentHandler handler) throws SAXException {
-    for (Storage storage : storages.values()) {
-      Iterator<? extends XMLTag> it = storage.iterator();
-      while (it.hasNext()) {
-        it.next().save(handler);
-      }
-    }
-    super.saveChilds(handler);
-  }
 }
