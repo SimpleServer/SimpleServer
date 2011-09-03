@@ -158,10 +158,12 @@ public class GlobalConfig extends AbstractConfig {
     start = new Date().getTime();
     System.out.println("\nSaving time: " + (start - end) + " ms");
 
-    int n = 10000;
+    int n = 100000;
     List<Area> areas = null;
+    areas = conf.config.areas.get(new Coordinate(7, 0, 8));
+    start = new Date().getTime();
     for (int i = 0; i < n; i++) {
-      areas = conf.config.areas.get(new Coordinate(9, 11, 13));
+      areas = conf.config.areas.get(new Coordinate(7, 0, 8));
     }
     start = new Date().getTime();
     System.out.println("\nQuery time: " + (start - end) + " ms");

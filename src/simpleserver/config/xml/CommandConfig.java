@@ -27,13 +27,15 @@ import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
-public class CommandConfig extends XMLTag {
+public class CommandConfig extends StorageContainer {
   public String name;
   public String originalName;
   public List<String> aliases;
   public Forwarding forwarding = Forwarding.NONE;
   public String allow = "*";
   public boolean hidden;
+
+  private ArgumentStorage arguments;
 
   private static final String NAME = "name";
   private static final String ALLOW = "allow";
@@ -50,6 +52,11 @@ public class CommandConfig extends XMLTag {
     acceptAttribute(FORWARD);
     acceptAttribute(FORWARD_ONLY);
     acceptAttribute(HIDDEN);
+  }
+
+  @Override
+  void addStorages() {
+    addStorage("argument", arguments = new ArgumentStorage());
   }
 
   @Override

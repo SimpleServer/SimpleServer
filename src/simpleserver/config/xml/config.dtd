@@ -77,6 +77,7 @@
   start CDATA #REQUIRED
   end CDATA #REQUIRED
   owner NMTOKEN #IMPLIED
+  priority NMTOKEN #IMPLIED
 >
 <!ATTLIST permission
   allow CDATA #REQUIRED

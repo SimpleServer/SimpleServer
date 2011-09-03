@@ -31,6 +31,10 @@ public class Area extends StorageContainer implements Comparable<Area> {
   public Coordinate end;
   public String owner;
 
+  public CommandStorage commands;
+  public AllBlocksStorage allblocks;
+  public BlockStorage blocks;
+  public ChestsStorage chests;
   AreaStorage areas;
 
   int position;
@@ -42,6 +46,7 @@ public class Area extends StorageContainer implements Comparable<Area> {
   private static final String START = "start";
   private static final String END = "end";
   private static final String OWNER = "owner";
+  private static final String PRIORITY = "priority";
 
   Area() {
     super("area");
@@ -50,6 +55,10 @@ public class Area extends StorageContainer implements Comparable<Area> {
   @Override
   void addStorages() {
     addStorage("area", areas = new AreaStorage());
+    addStorage("command", commands = new CommandStorage());
+    addStorage("allblocks", allblocks = new AllBlocksStorage());
+    addStorage("block", blocks = new BlockStorage());
+    addStorage("chests", chests = new ChestsStorage());
   }
 
   @Override
@@ -72,6 +81,8 @@ public class Area extends StorageContainer implements Comparable<Area> {
       end = getCoord(value, 128);
     } else if (name.equals(OWNER)) {
       owner = value;
+    } else if (name.equals(PRIORITY)) {
+      priority = getInt(value);
     }
   }
 
@@ -92,14 +103,19 @@ public class Area extends StorageContainer implements Comparable<Area> {
   }
 
   public int compareTo(Area area) {
-    int compared;
-    if ((compared = new Integer(level).compareTo(area.level)) != 0) {
-      return compared;
+    if (level < area.level) {
+      return -1;
+    } else if (level > area.level) {
+      return 1;
+    } else if (area.priority < priority) {
+      return -1;
+    } else if (area.priority > priority) {
+      return 1;
+    } else if (position < area.position) {
+      return -1;
+    } else {
+      return 1;
     }
-    if ((compared = -new Integer(priority).compareTo(area.priority)) != 0) {
-      return compared;
-    }
-    return new Integer(position).compareTo(area.position);
   }
 
   private static Coordinate getCoord(String value, int defaultY) throws SAXException {
