@@ -24,6 +24,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import simpleserver.Player;
+
 public class PlayerStorage extends Storage {
   private Map<String, PlayerConfig> players = new HashMap<String, PlayerConfig>();
 
@@ -49,8 +51,12 @@ public class PlayerStorage extends Storage {
     return players.containsKey(name);
   }
 
-  public int get(String name) {
-    return contains(name) ? players.get(name).group : 0;
+  public Integer get(String name) {
+    return contains(name) ? players.get(name).group : null;
+  }
+
+  public Integer get(Player player) {
+    return get(player.getName().toLowerCase());
   }
 
   @Override

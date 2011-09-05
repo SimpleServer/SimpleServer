@@ -145,6 +145,10 @@ abstract class XMLTag implements Cloneable {
     saveAttributeElement(handler, name, null);
   }
 
+  void addAttribute(AttributesImpl attributes, String name, Object value) {
+    addAttribute(attributes, name, value.toString());
+  }
+
   void addAttribute(AttributesImpl attributes, String name, String value) {
     attributes.addAttribute("", "", name, "CDATA", value);
   }

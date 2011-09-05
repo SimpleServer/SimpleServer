@@ -25,8 +25,8 @@ import org.xml.sax.helpers.AttributesImpl;
 
 class Block extends XMLTag {
   String id;
-  String place;
-  String give;
+  Permission place;
+  Permission give;
 
   private static final String ID = "id";
   private static final String PLACE = "place";
@@ -41,9 +41,9 @@ class Block extends XMLTag {
     if (name.equals(ID)) {
       id = value;
     } else if (name.equals(PLACE)) {
-      place = value;
+      place = new Permission(value);
     } else if (name.equals(GIVE)) {
-      give = value;
+      give = new Permission(value);
     }
   }
 

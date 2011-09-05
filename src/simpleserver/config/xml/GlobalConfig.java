@@ -46,6 +46,7 @@ import com.sun.org.apache.xml.internal.serialize.XMLSerializer;
 public class GlobalConfig extends AbstractConfig {
   public Config config;
   public static final Lock lock = new ReentrantLock();
+  public boolean loadsuccess;
 
   public GlobalConfig() {
     super("config.xml");
@@ -54,6 +55,7 @@ public class GlobalConfig extends AbstractConfig {
   @Override
   public void load() {
     lock.lock();
+    loadsuccess = false;
     try {
       copyDefaults();
     } catch (IOException e1) {
@@ -89,6 +91,7 @@ public class GlobalConfig extends AbstractConfig {
       return;
     }
     processTags(handler.root());
+    loadsuccess = true;
     lock.unlock();
   }
 

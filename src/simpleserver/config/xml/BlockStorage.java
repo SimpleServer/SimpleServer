@@ -45,10 +45,10 @@ public class BlockStorage extends Storage {
       if (numbers.length > 2 || numbers.length < 1) {
         throw new SAXException("Invalid block id: " + block.id);
       }
-      int start = getInt(numbers[0]);
+      int start = getIntValue(numbers[0]);
       int end = start;
       if (numbers.length == 2) {
-        end = getInt(numbers[1]);
+        end = getIntValue(numbers[1]);
       }
 
       Entry<Integer, Interval> nearInterval = intervals.higherEntry(start - 1);

@@ -32,7 +32,7 @@ public class CommandConfig extends StorageContainer {
   public String originalName;
   public List<String> aliases;
   public Forwarding forwarding = Forwarding.NONE;
-  public String allow = "*";
+  public Permission allow;
   public boolean hidden;
 
   private ArgumentStorage arguments;
@@ -60,11 +60,18 @@ public class CommandConfig extends StorageContainer {
   }
 
   @Override
+  void finish() {
+    if (allow == null) {
+      allow = new Permission();
+    }
+  }
+
+  @Override
   void setAttribute(String name, String value) throws SAXException {
     if (name.equals(NAME)) {
       this.name = originalName = value;
     } else if (name.equals(ALLOW)) {
-      allow = value;
+      allow = new Permission(value);
     } else if (name.equals(FORWARD)) {
       forwarding = Forwarding.BOTH;
     } else if (name.equals(FORWARD_ONLY)) {

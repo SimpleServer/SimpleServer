@@ -26,6 +26,8 @@ import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
+import simpleserver.Player;
+
 import com.sun.org.apache.xml.internal.serialize.XMLSerializer;
 
 public class Config extends StorageContainer {
@@ -67,5 +69,23 @@ public class Config extends StorageContainer {
     handler.startElement("", "", tag, new AttributesImpl());
     saveChilds(handler);
     handler.endElement("", "", tag);
+  }
+
+  public Group getGroup(Player player) throws SAXException {
+    Integer playerGroup = players.get(player);
+    Integer ipGroup = ips.get(player);
+    int groupid;
+    if (playerGroup == null && ipGroup == null) {
+      groupid = properties.getInt("defaultGroup");
+    } else if (playerGroup == null || playerGroup < ipGroup) {
+      groupid = ipGroup;
+    } else {
+      groupid = playerGroup;
+    }
+    Group group = groups.get(groupid);
+    if (group == null) {
+      throw new SAXException("The group with ID " + groupid + " does not exist.");
+    }
+    return group;
   }
 }

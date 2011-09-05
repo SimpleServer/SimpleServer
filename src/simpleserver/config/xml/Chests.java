@@ -20,10 +20,11 @@
  */
 package simpleserver.config.xml;
 
+import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
 class Chests extends XMLTag {
-  String allow = "*";
+  Permission allow;
 
   private static final String ALLOW = "allow";
 
@@ -32,9 +33,16 @@ class Chests extends XMLTag {
   }
 
   @Override
-  void setAttribute(String name, String value) {
+  void finish() {
+    if (allow == null) {
+      allow = new Permission();
+    }
+  }
+
+  @Override
+  void setAttribute(String name, String value) throws SAXException {
     if (name.equals(ALLOW)) {
-      allow = value;
+      allow = new Permission(value);
     }
   }
 

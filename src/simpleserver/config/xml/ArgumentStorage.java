@@ -20,36 +20,26 @@
  */
 package simpleserver.config.xml;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 import org.xml.sax.SAXException;
-import org.xml.sax.helpers.AttributesImpl;
 
-class Argument extends XMLTag {
-  Permission allow;
-  String argument;
-
-  Argument() {
-    super("argument");
-  }
+public class ArgumentStorage extends Storage {
+  private List<Argument> arguments;
 
   @Override
-  void setAttribute(String name, String value) throws SAXException {
-    if (name.equals("allow")) {
-      allow = new Permission(value);
+  void add(XMLTag child) throws SAXException {
+    if (arguments == null) {
+      arguments = new ArrayList<Argument>();
     }
+    arguments.add((Argument) child);
   }
 
   @Override
-  void content(String content) {
-    argument = (argument == null) ? content : argument + content;
+  Iterator<Argument> iterator() {
+    return arguments == null ? new ArrayList<Argument>().iterator() : arguments.iterator();
   }
 
-  @Override
-  String saveContent() {
-    return argument;
-  }
-
-  @Override
-  void saveAttributes(AttributesImpl attributes) {
-    addAttribute(attributes, "allow", allow);
-  }
 }

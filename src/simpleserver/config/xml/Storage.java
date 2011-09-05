@@ -32,7 +32,7 @@ abstract class Storage {
   void finish() {
   }
 
-  int getInt(String value) throws SAXException {
+  static int getIntValue(String value) throws SAXException {
     try {
       return Integer.valueOf(value);
     } catch (NumberFormatException e) {

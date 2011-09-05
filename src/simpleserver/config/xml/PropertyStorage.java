@@ -24,6 +24,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import org.xml.sax.SAXException;
+
 public class PropertyStorage extends Storage {
   private Map<String, Property> properties = new HashMap<String, Property>();
 
@@ -55,6 +57,10 @@ public class PropertyStorage extends Storage {
 
   public String get(String name) {
     return contains(name) ? properties.get(name).value : null;
+  }
+
+  public int getInt(String name) throws SAXException {
+    return getIntValue(get(name));
   }
 
   @Override

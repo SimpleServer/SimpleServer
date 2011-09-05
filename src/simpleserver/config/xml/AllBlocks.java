@@ -24,11 +24,11 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
 public class AllBlocks extends XMLTag {
-  public String place;
-  public String destroy;
-  public String use;
-  public String take;
-  public String give;
+  public Permission place;
+  public Permission destroy;
+  public Permission use;
+  public Permission take;
+  public Permission give;
 
   private static final String PLACE = "place";
   private static final String DESTROY = "destroy";
@@ -43,15 +43,15 @@ public class AllBlocks extends XMLTag {
   @Override
   void setAttribute(String name, String value) throws SAXException {
     if (name.equals(PLACE)) {
-      place = value;
+      place = new Permission(value);
     } else if (name.equals(DESTROY)) {
-      destroy = value;
+      destroy = new Permission(value);
     } else if (name.equals(USE)) {
-      use = value;
+      use = new Permission(value);
     } else if (name.equals(GIVE)) {
-      give = value;
+      give = new Permission(value);
     } else if (name.equals(TAKE)) {
-      take = value;
+      take = new Permission(value);
     }
   }
 

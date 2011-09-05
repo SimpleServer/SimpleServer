@@ -25,6 +25,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import simpleserver.Player;
+
 public class IpStorage extends Storage {
   private Map<InetAddress, Ip> ips = new HashMap<InetAddress, Ip>();
 
@@ -52,6 +54,10 @@ public class IpStorage extends Storage {
 
   public Ip get(InetAddress ip) {
     return contains(ip) ? ips.get(ip) : null;
+  }
+
+  public Integer get(Player player) {
+    return get(player.getInetAddress()).group;
   }
 
   @Override

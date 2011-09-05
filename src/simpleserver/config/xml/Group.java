@@ -52,6 +52,14 @@ public class Group extends XMLTag {
     acceptAttribute(SHOW_TITLE);
   }
 
+  public int warmup() {
+    return warmup * 1000;
+  }
+
+  public int cooldown() {
+    return cooldown * 1000;
+  }
+
   @Override
   void setAttribute(String name, String value) throws SAXException {
     if (name.equals("id")) {
