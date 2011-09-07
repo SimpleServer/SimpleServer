@@ -36,14 +36,15 @@ import java.io.OutputStream;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import simpleserver.Authenticator.AuthRequest;
 import simpleserver.Color;
 import simpleserver.Coordinate;
-import simpleserver.Coordinate.Dimension;
 import simpleserver.Player;
 import simpleserver.Server;
+import simpleserver.Authenticator.AuthRequest;
+import simpleserver.Coordinate.Dimension;
 import simpleserver.command.PlayerListCommand;
 import simpleserver.config.data.Chests.Chest;
+import simpleserver.config.xml.Config.BlockPermission;
 
 public class StreamTunnel {
   private static final boolean EXPENSIVE_DEBUG_LOGGING = Boolean.getBoolean("EXPENSIVE_DEBUG_LOGGING");
@@ -355,19 +356,20 @@ public class StreamTunnel {
 
           coordinate = new Coordinate(x, y, z, player);
 
-          boolean[] perms = server.permissions.getPlayerBlockPermissions(player, coordinate, 0);
-          if (!perms[2] && status == 0) {
+          BlockPermission perm = server.config.blockPermission(player, coordinate);
+
+          if (!perm.use && status == 0) {
             player.addTMessage(Color.RED, "You can not use this block here!");
             break;
           }
-          if (!perms[1] && status == 2) {
+          if (!perm.destroy && status == BLOCK_DESTROYED_STATUS) {
             player.addTMessage(Color.RED, "You can not destroy this block!");
             break;
           }
 
           boolean locked = server.data.chests.isLocked(coordinate);
 
-          if (!locked || player.isAdmin()) {
+          if (!locked || player.ignoresChestLocks() || server.data.chests.canOpen(player, coordinate)) {
             if (locked && status == BLOCK_DESTROYED_STATUS) {
               server.data.chests.releaseLock(coordinate);
               server.data.save();
@@ -416,12 +418,12 @@ public class StreamTunnel {
         boolean writePacket = true;
         boolean drop = false;
 
-        boolean[] perms = server.permissions.getPlayerBlockPermissions(player, coordinate, dropItem);
+        BlockPermission perm = server.config.blockPermission(player, coordinate, dropItem);
 
         if (isServerTunnel || server.data.chests.isChest(coordinate)) {
           // continue
-        } else if ((dropItem != -1 && !perms[0]) || (dropItem == -1 && !perms[2])) {
-          if (dropItem == -1) {
+        } else if ((dropItem != -1 && !perm.place) || !perm.use) {
+          if (!perm.use) {
             player.addTMessage(Color.RED, "You can not use this block here!");
           } else {
             player.addTMessage(Color.RED, "You can not place this block here!");
@@ -699,10 +701,10 @@ public class StreamTunnel {
             }
             server.data.save();
           }
-          if (!server.permissions.canOpenChests(player, player.openedChest()) || (adjacent != null && !server.permissions.canOpenChests(player, adjacent.coordinate))) {
+          if (!server.config.blockPermission(player, player.openedChest()).chest || (adjacent != null && !server.config.blockPermission(player, adjacent.coordinate).chest)) {
             player.addTMessage(Color.RED, "You can't use chests here");
             break;
-          } else if (server.data.chests.canOpen(player, player.openedChest()) || player.isAdmin()) {
+          } else if (server.data.chests.canOpen(player, player.openedChest()) || player.ignoresChestLocks()) {
             if (server.data.chests.isLocked(player.openedChest())) {
               if (player.isAttemptingUnlock()) {
                 server.data.chests.unlock(player.openedChest());

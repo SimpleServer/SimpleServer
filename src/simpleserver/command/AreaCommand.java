@@ -20,9 +20,11 @@
  */
 package simpleserver.command;
 
+import java.util.List;
+
 import simpleserver.Color;
 import simpleserver.Player;
-import simpleserver.config.PermissionConfig;
+import simpleserver.config.xml.Area;
 
 public class AreaCommand extends AbstractCommand implements PlayerCommand {
   public AreaCommand() {
@@ -30,9 +32,17 @@ public class AreaCommand extends AbstractCommand implements PlayerCommand {
   }
 
   public void execute(Player player, String message) {
-    PermissionConfig perm = player.getServer().permissions;
+    List<Area> areas = player.getServer().config.areas(player.position());
+    StringBuilder str = new StringBuilder();
+    for (Area area : areas) {
+      str.append(area.name);
+      str.append(", ");
+    }
+    if (!areas.isEmpty()) {
+      str.delete(0, str.length() - 2);
+    }
 
     player.addTMessage(Color.GRAY, "Current area: %s %s",
-                       Color.WHITE, perm.getCurrentArea(player));
+                       Color.WHITE, str.toString());
   }
 }

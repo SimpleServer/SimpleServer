@@ -24,9 +24,9 @@ import static simpleserver.lang.Translations.t;
 
 import java.util.IllegalFormatException;
 
-import simpleserver.Group;
 import simpleserver.Player;
 import simpleserver.Server;
+import simpleserver.config.xml.Group;
 
 public class GlobalChat extends AbstractChat {
 
@@ -51,15 +51,15 @@ public class GlobalChat extends AbstractChat {
     Server server = sender.getServer();
 
     String prefix = "";
-    String color = "f";
+    char color = 'f';
     String title = "";
     String format = server.options.get("msgFormat");
     Group group = sender.getGroup();
 
     if (group != null) {
-      color = group.getColor();
-      if (group.showTitle()) {
-        title = group.getName();
+      color = group.color;
+      if (group.showTitle) {
+        title = group.name;
         format = server.options.get("msgTitleFormat");
       }
     }

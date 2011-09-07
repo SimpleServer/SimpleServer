@@ -20,9 +20,13 @@
  */
 package simpleserver.command;
 
+import static simpleserver.lang.Translations.t;
 import simpleserver.Color;
 import simpleserver.Player;
-import simpleserver.config.PermissionConfig;
+import simpleserver.config.xml.Area;
+import simpleserver.config.xml.Config;
+import simpleserver.config.xml.DimensionConfig;
+import simpleserver.config.xml.Config.AreaStoragePair;
 
 public class MyAreaCommand extends AbstractCommand implements PlayerCommand {
   public MyAreaCommand() {
@@ -32,11 +36,12 @@ public class MyAreaCommand extends AbstractCommand implements PlayerCommand {
 
   private boolean areaSizeOk(Player player) {
     return (Math.abs(player.areastart.x() - player.areaend.x()) <= 50)
-          && (Math.abs(player.areastart.y() - player.areaend.y()) <= 50);
+          && (Math.abs(player.areastart.y() - player.areaend.y()) <= 50)
+          && player.areaend.dimension() == player.areastart.dimension();
   }
 
   public void execute(Player player, String message) {
-    PermissionConfig perm = player.getServer().permissions;
+    Config config = player.getServer().config;
     String arguments[] = extractArguments(message);
 
     if (arguments.length == 0) {
@@ -53,14 +58,6 @@ public class MyAreaCommand extends AbstractCommand implements PlayerCommand {
       player.areaend = player.areaend.setY((byte) 0); // no height limit
       player.addTMessage(Color.GRAY, "End coordinate set.");
     } else if (arguments[0].equals("save")) {
-      if (perm.playerHasArea(player)) {
-        player.addTMessage(Color.RED, "New area can not be saved before you remove your old one!");
-        return;
-      }
-      if (!perm.getCurrentArea(player).equals("")) {
-        player.addTMessage(Color.RED, "You can not create your area within an existing area!");
-        return;
-      }
       if (player.areastart == null || player.areaend == null) {
         player.addTMessage(Color.RED, "Define start and end coordinates for your area first!");
         return;
@@ -69,36 +66,58 @@ public class MyAreaCommand extends AbstractCommand implements PlayerCommand {
         player.addTMessage(Color.RED, "Your area is allowed to have a maximum size of 50x50!");
         return;
       }
-
-      perm.createPlayerArea(player);
+      if (player.getServer().config.playerArea(player) != null) {
+        player.addTMessage(Color.RED, "New area can not be saved before you remove your old one!");
+        return;
+      }
+      /*
+       * TODO: Awesome area overlap detection
+       * 
+      if (!perm.getCurrentArea(player).equals("")) {
+        player.addTMessage(Color.RED, "You can not create your area within an existing area!");
+        return;
+      }
+      */
+      createPlayerArea(player);
       player.addTMessage(Color.GRAY, "Your area has been saved!");
     } else if (arguments[0].equals("unsave")) {
-      if (!perm.playerHasArea(player)) {
+      AreaStoragePair area = config.playerArea(player);
+      if (area == null) {
         player.addTMessage(Color.RED, "You currently have no personal area which can be removed!");
         return;
       }
 
-      perm.removePlayerArea(player);
+      area.storage.remove(area.area);
       player.addTMessage(Color.GRAY, "Your area has been removed!");
     } else if (arguments[0].equals("rename")) {
-      if (!perm.playerHasArea(player)) {
+      AreaStoragePair area = config.playerArea(player);
+      if (area == null) {
         player.addTMessage(Color.RED, "You currently have no personal area which can be renamed!");
         return;
       }
 
       String label = extractArgument(message, 1);
       if (label != null) {
-        if (perm.hasAreaWithName(label)) {
-          player.addTMessage(Color.RED, "An area with that name already exists!");
-        } else {
-          perm.renamePlayerArea(player, label);
-          player.addTMessage(Color.GRAY, "Your area has been renamed!");
-        }
+        area.area.name = label;
+        player.addTMessage(Color.GRAY, "Your area has been renamed!");
       } else {
         player.addTMessage(Color.RED, "Please supply an area name.");
       }
     } else {
       player.addTMessage(Color.RED, "You entered an invalid argument.");
     }
+  }
+
+  private void createPlayerArea(Player player) {
+    Config config = player.getServer().config;
+    DimensionConfig dimension = config.dimensions.get(player.areastart.dimension());
+    if (dimension == null) {
+      dimension = config.dimensions.add(player.areastart.dimension());
+    }
+    Area area = new Area(t("%s's area", player.getName()), player.areastart, player.areaend);
+    area.owner = player.getName().toLowerCase();
+
+    dimension.add(area);
+    player.getServer().saveConfig();
   }
 }

@@ -27,10 +27,10 @@ import org.xml.sax.SAXException;
 abstract class Storage {
   abstract void add(XMLTag child) throws SAXException;
 
-  abstract Iterator<? extends XMLTag> iterator();
-
   void finish() {
   }
+
+  abstract Iterator<? extends XMLTag> iterator();
 
   static int getIntValue(String value) throws SAXException {
     try {

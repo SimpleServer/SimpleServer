@@ -32,7 +32,7 @@ public class BanCommand extends PlayerArgCommand {
 
   protected boolean allowed(Player player, String target) {
     Server server = player.getServer();
-    if (server.permissions.getNameGroup(target) >= player.getGroupId()) {
+    if (server.config.players.get(target) >= player.getGroupId()) {
       player.addTMessage(Color.RED, "You cannot ban players that are in your group or higher!");
       return false;
     }

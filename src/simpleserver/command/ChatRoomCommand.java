@@ -21,10 +21,10 @@
 package simpleserver.command;
 
 import simpleserver.Color;
-import simpleserver.Coordinate.Dimension;
-import simpleserver.Group;
 import simpleserver.Player;
-import simpleserver.config.PermissionConfig;
+import simpleserver.Coordinate.Dimension;
+import simpleserver.config.xml.Config;
+import simpleserver.config.xml.Group;
 import simpleserver.message.AreaChat;
 import simpleserver.message.DimensionChat;
 import simpleserver.message.GlobalChat;
@@ -60,22 +60,30 @@ public class ChatRoomCommand extends AbstractCommand implements PlayerCommand {
     } else if (mode.equals("group")) {
       Group group = player.getGroup();
 
-      PermissionConfig perm = player.getServer().permissions;
+      Config config = player.getServer().config;
 
       if (args.length > 1) {
         try {
           int groupId = Integer.parseInt(args[1]);
-          if (perm.getGroup(groupId) != null) {
-            group = perm.getGroup(groupId);
+          if (config.groups.contains(groupId)) {
+            group = config.groups.get(groupId);
+          } else {
+            throw new NumberFormatException("Group doesn't exist");
           }
         } catch (NumberFormatException e) {
+          player.addTMessage(Color.RED, "Invalid group ID");
         }
       }
 
       player.setChat(new GroupChat(player, group));
     } else if (mode.equals("area")) {
 
-      player.setChat(new AreaChat(player));
+      AreaChat room = new AreaChat(player);
+      if (room.noArea()) {
+        player.addTMessage(Color.RED, "You are in no area at the moment");
+      } else {
+        player.setChat(room);
+      }
     } else if (mode.equals("local")) {
 
       player.setChat(new LocalChat(player));

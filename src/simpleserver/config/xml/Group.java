@@ -27,6 +27,7 @@ import org.xml.sax.helpers.AttributesImpl;
 public class Group extends XMLTag {
   public int id;
   public String name;
+  public char color;
 
   public boolean ignoreChestLocks;
   public boolean ignoreAreas;
@@ -35,6 +36,9 @@ public class Group extends XMLTag {
   public int cooldown;
   public int warmup;
 
+  private static final String ID = "id";
+  private static final String NAME = "name";
+  private static final String COLOR = "color";
   private static final String IGNORE_CHESTS = "ignorechestlocks";
   private static final String IGNORE_AREAS = "ignoreareas";
   private static final String FORWARD_UNKNOWN = "forwardunknowncommands";
@@ -62,8 +66,12 @@ public class Group extends XMLTag {
 
   @Override
   void setAttribute(String name, String value) throws SAXException {
-    if (name.equals("id")) {
+    if (name.equals(ID)) {
       id = getInt(value);
+    } else if (name.equals(NAME)) {
+      name = value;
+    } else if (name.equals(COLOR)) {
+      color = value.charAt(0);
     } else if (name.equals(IGNORE_CHESTS)) {
       ignoreChestLocks = true;
     } else if (name.equals(IGNORE_AREAS)) {
@@ -100,6 +108,8 @@ public class Group extends XMLTag {
 
   @Override
   void saveAttributes(AttributesImpl attributes) {
-    addAttribute(attributes, "id", Integer.toString(id));
+    addAttribute(attributes, ID, id);
+    addAttribute(attributes, NAME, name);
+    addAttribute(attributes, COLOR, color);
   }
 }

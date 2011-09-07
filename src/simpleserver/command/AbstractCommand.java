@@ -52,18 +52,16 @@ public abstract class AbstractCommand implements Command {
     return name;
   }
 
+  public boolean hidden() {
+    return false;
+  }
+
   public String getHelpText(String prefix) {
     if (help != null) {
       return Color.DARK_GREEN + prefix + help + " : " + Color.WHITE + t(commandCode);
     } else {
       return t(commandCode);
     }
-  }
-
-  public boolean shouldPassThroughToConsole(Server server) {
-    return (server.permissions.commandShouldPassThroughToMod(getName())
-        || server.options.getBoolean("forwardAllCommands"))
-        && server.options.contains("alternateJarFile");
   }
 
   protected String[] extractArguments(String message, int startOffset) {
@@ -124,5 +122,9 @@ public abstract class AbstractCommand implements Command {
 
   public void setParser(CommandParser parser) {
     this.parser = parser;
+  }
+
+  public boolean shouldPassThroughToConsole(Server server) {
+    return false;
   }
 }

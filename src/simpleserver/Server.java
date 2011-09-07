@@ -40,12 +40,13 @@ import simpleserver.config.IPBanList;
 import simpleserver.config.KitList;
 import simpleserver.config.MOTD;
 import simpleserver.config.MuteList;
-import simpleserver.config.PermissionConfig;
 import simpleserver.config.ReadFiles;
 import simpleserver.config.RobotList;
 import simpleserver.config.Rules;
 import simpleserver.config.WhiteList;
 import simpleserver.config.data.GlobalData;
+import simpleserver.config.xml.Config;
+import simpleserver.config.xml.GlobalConfig;
 import simpleserver.lang.Translations;
 import simpleserver.log.AdminLog;
 import simpleserver.log.ConnectionLog;
@@ -87,10 +88,10 @@ public class Server {
   public GlobalData data;
   private RobotList robots;
   public ReadFiles docs;
+  public Config config;
+  private GlobalConfig globalConfig;
 
   private SecureRandom random = new SecureRandom();
-
-  public PermissionConfig permissions;
 
   public PlayerList playerList;
   public Authenticator authenticator;
@@ -179,10 +180,6 @@ public class Server {
     return Long.toHexString(random.nextLong());
   }
 
-  public boolean cmdAllowed(String cmd, Player p) {
-    return permissions.playerCommandAllowed(cmd, p);
-  }
-
   public int numPlayers() {
     return playerList.size();
   }
@@ -230,13 +227,18 @@ public class Server {
     }
   }
 
-  public void loadResources() {
+  public boolean loadResources() {
     for (Resource resource : resources) {
       resource.load();
     }
     if (playerList != null) {
-      playerList.updatePlayerGroups(); // reflect changes of permission.xml
-      // without player relogin
+      playerList.updatePlayerGroups();
+    }
+
+    if (globalConfig.loadsuccess) {
+      config = globalConfig.config;
+    } else {
+      System.out.println("[SimpleServer] Syntax error in comfig.xml! Config was not reloaded.");
     }
 
     if (!Translations.getInstance().setLanguage(options.get("serverLanguage"))) {
@@ -245,12 +247,18 @@ public class Server {
     }
 
     addressFactory.toggle(!options.getBoolean("disableAddressFactory"));
+
+    return globalConfig.loadsuccess;
   }
 
   public void saveResources() {
     for (Resource resource : resources) {
       resource.save();
     }
+  }
+
+  public void saveConfig() {
+    globalConfig.save();
   }
 
   public String findName(String prefix) {
@@ -373,13 +381,13 @@ public class Server {
   private void initialize() {
     resources = new LinkedList<Resource>();
 
-    resources.add(permissions = new PermissionConfig(this));
+    resources.add(globalConfig = new GlobalConfig());
     resources.add(options = new Options());
     resources.add(robots = new RobotList());
     resources.add(motd = new MOTD());
     resources.add(rules = new Rules());
     resources.add(helptext = new HelpText());
-    resources.add(kits = new KitList(this));
+    resources.add(kits = new KitList());
     resources.add(ipBans = new IPBanList());
     resources.add(whitelist = new WhiteList());
     resources.add(mutelist = new MuteList());
@@ -395,7 +403,7 @@ public class Server {
     errorLog = new ErrorLog();
     connectionLog = new ConnectionLog();
 
-    commandParser = new CommandParser(options, permissions);
+    commandParser = new CommandParser(options);
   }
 
   private void cleanup() {
@@ -413,8 +421,8 @@ public class Server {
 
     loadResources();
 
-    if (permissions.loadsuccess == false) {
-      System.out.println("[SimpleServer] Syntax error in permissions.xml! Emergency shutdown...");
+    if (!globalConfig.loadsuccess) {
+      System.out.println("[SimpleServer] Syntax error in comfig.xml! Emergency shutdown...");
       System.exit(1);
     }
 

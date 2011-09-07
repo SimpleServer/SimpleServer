@@ -31,7 +31,7 @@ import java.util.Map.Entry;
 public class SegmentTree<E> {
   private Node root;
   private List<HyperSegment> segments = new LinkedList<HyperSegment>();
-  private NodeCache cache = new NodeCache();
+  private NodeCache cache;
   private boolean built = false;
   private int dimensions;
 
@@ -40,12 +40,26 @@ public class SegmentTree<E> {
   }
 
   public void add(int[] start, int[] end, E object) {
-    if (!built) {
-      segments.add(new HyperSegment(start, end, object));
+    segments.add(new HyperSegment(start, end, object));
+    if (built) {
+      build();
+    }
+  }
+
+  public void remove(E object) {
+    for (HyperSegment segment : segments) {
+      if (segment.object == object) {
+        segments.remove(segment);
+        if (built) {
+          build();
+        }
+        return;
+      }
     }
   }
 
   public void build() {
+    cache = new NodeCache();
     root = build(segments, 0);
     cache = null;
     built = true;

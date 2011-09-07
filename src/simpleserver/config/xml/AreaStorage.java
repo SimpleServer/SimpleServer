@@ -24,24 +24,27 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.xml.sax.SAXException;
-
-public class AreaStorage extends Storage {
-  private GlobalAreaStorage globalStorage = GlobalAreaStorage.getInstance();
+public class AreaStorage extends Storage implements Iterable<Area> {
+  private DimensionAreaStorage globalStorage = DimensionAreaStorage.getInstance();
   private List<Area> localStorage = new ArrayList<Area>();
 
   void setOwner(Area owner) {
-    globalStorage.add(owner);
+    globalStorage.addTag(owner);
   }
 
   @Override
-  void add(XMLTag child) throws SAXException {
+  void add(XMLTag child) {
     localStorage.add((Area) child);
   }
 
   @Override
-  Iterator<? extends XMLTag> iterator() {
+  public Iterator<Area> iterator() {
     return localStorage.iterator();
+  }
+
+  public void remove(Area area) {
+    localStorage.remove(area);
+    globalStorage.remove(area);
   }
 
 }

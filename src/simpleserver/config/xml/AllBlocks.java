@@ -34,7 +34,6 @@ public class AllBlocks extends XMLTag {
   private static final String DESTROY = "destroy";
   private static final String USE = "use";
   private static final String GIVE = "give";
-  private static final String TAKE = "take";
 
   AllBlocks() {
     super("allblocks");
@@ -50,8 +49,6 @@ public class AllBlocks extends XMLTag {
       use = new Permission(value);
     } else if (name.equals(GIVE)) {
       give = new Permission(value);
-    } else if (name.equals(TAKE)) {
-      take = new Permission(value);
     }
   }
 
@@ -65,9 +62,6 @@ public class AllBlocks extends XMLTag {
     }
     if (use != null) {
       addAttribute(attributes, USE, use);
-    }
-    if (take != null) {
-      addAttribute(attributes, TAKE, take);
     }
     if (give != null) {
       addAttribute(attributes, GIVE, give);

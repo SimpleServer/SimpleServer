@@ -20,8 +20,14 @@
  */
 package simpleserver.command;
 
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
+
 import simpleserver.Color;
 import simpleserver.Player;
+import simpleserver.config.xml.CommandConfig;
+import simpleserver.config.xml.PermissionContainer;
 
 public class HelpCommand extends AbstractCommand implements PlayerCommand {
   public HelpCommand() {
@@ -40,8 +46,8 @@ public class HelpCommand extends AbstractCommand implements PlayerCommand {
       PlayerCommand command = parser.getPlayerCommand(commandName);
       player.addMessage(command.getHelpText(prefix));
 
-      String[] aliases = player.getServer().permissions.getCommandAliases(command.getName());
-      if (aliases.length > 0) {
+      List<String> aliases = player.getServer().config.commands.get(command.getName()).aliases;
+      if (!aliases.isEmpty()) {
         StringBuffer line = new StringBuffer();
         for (String alias : aliases) {
           line.append(commandPrefix());
@@ -51,21 +57,29 @@ public class HelpCommand extends AbstractCommand implements PlayerCommand {
         player.addTCaptionedMessage("Aliases", line.toString());
       }
     } else {
-      StringBuffer line = new StringBuffer();
+      List<PermissionContainer> containers = player.getServer().config.containers(player.position());
+      Set<CommandConfig> commands = new TreeSet<CommandConfig>();
 
+      for (PermissionContainer container : containers) {
+        for (CommandConfig command : container.commands) {
+          if (command.allow.contains(player)) {
+            commands.add(command);
+          }
+        }
+      }
+
+      StringBuffer line = new StringBuffer();
       String prefix = commandPrefix();
 
-      for (Object cmd : player.getServer().permissions.getAllCommands()) {
-        String commandName = cmd.toString();
-        parser.getPlayerCommand(commandName);
+      for (CommandConfig cmd : commands) {
+        Command command = parser.getPlayerCommand(cmd.originalName);
 
-        if (player.getServer().permissions.commandIsHidden(commandName)
-            || !player.commandAllowed(commandName)) {
+        if (cmd.hidden || command.hidden()) {
           continue;
         }
 
         line.append(prefix);
-        line.append(commandName);
+        line.append(cmd.name);
         line.append(" ");
       }
 
@@ -76,9 +90,11 @@ public class HelpCommand extends AbstractCommand implements PlayerCommand {
 
       // additional custom help text from helptext.txt
       String[] helplines = player.getServer().helptext.getHelpText().split("\n");
-      player.addMessage(" ");
-      for (String l : helplines) {
-        player.addMessage(Color.WHITE, l);
+      if (helplines.length > 0) {
+        player.addMessage(" ");
+        for (String l : helplines) {
+          player.addMessage(Color.WHITE, l);
+        }
       }
     }
   }

@@ -20,43 +20,46 @@
  */
 package simpleserver.config.xml;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import org.xml.sax.SAXException;
+import org.xml.sax.helpers.AttributesImpl;
 
-public class CommandStorage extends Storage implements Iterable<CommandConfig> {
-  private Map<String, CommandConfig> commands = new HashMap<String, CommandConfig>();
+import simpleserver.Coordinate.Dimension;
 
-  void add(CommandConfig command) {
-    commands.put(command.name, command);
-  }
+public class DimensionConfig extends PermissionContainer {
+  Dimension dimension;
+  AreaStorage topAreas;
+  public DimensionAreaStorage areas;
 
-  public boolean contains(String name) {
-    return commands.containsKey(name);
-  }
-
-  public CommandConfig get(String name) {
-    return contains(name) ? commands.get(name) : null;
-  }
-
-  public Iterator<CommandConfig> iterator() {
-    return commands.values().iterator();
+  DimensionConfig() {
+    super("dimension");
   }
 
   @Override
-  void add(XMLTag child) {
-    add((CommandConfig) child);
+  void finish() {
+    areas.buildTree();
   }
 
-  public CommandConfig getTopConfig(String name) {
-    if (commands.containsKey(name)) {
-      return commands.get(name);
+  @Override
+  void addStorages() {
+    areas = DimensionAreaStorage.newInstance();
+    addStorage("area", topAreas = new AreaStorage());
+    super.addStorages();
+  }
+
+  @Override
+  void setAttribute(String name, String value) throws SAXException {
+    if (name.equals("name")) {
+      dimension = Dimension.get(value);
     }
-    for (CommandConfig command : commands.values()) {
-      if (command.aliases.contains(name)) {
-        return command;
-      }
-    }
-    return null;
+  }
+
+  @Override
+  void saveAttributes(AttributesImpl attributes) {
+    addAttribute(attributes, "name", dimension);
+  }
+
+  public void add(Area area) {
+    topAreas.add(area);
+    areas.add(area);
   }
 }

@@ -20,9 +20,10 @@
  */
 package simpleserver.command;
 
-import simpleserver.Group;
+import simpleserver.Color;
 import simpleserver.Player;
-import simpleserver.config.PermissionConfig;
+import simpleserver.config.xml.Config;
+import simpleserver.config.xml.Group;
 import simpleserver.message.Chat;
 import simpleserver.message.GroupChat;
 
@@ -40,18 +41,21 @@ public class GroupSayCommand extends MessageCommand implements PlayerCommand {
 
     Group group = sender.getGroup();
     chatMessage = message;
-
-    PermissionConfig perm = sender.getServer().permissions;
+    Config config = sender.getServer().config;
 
     String[] arguments = extractArguments(message);
     if (arguments.length > 1) {
       try {
         int groupId = Integer.parseInt(arguments[0]);
-        if (perm.getGroup(groupId) != null) {
-          group = perm.getGroup(groupId);
+        if (config.groups.contains(groupId)) {
+          group = config.groups.get(groupId);
           chatMessage = extractArgument(message);
+        } else {
+          throw new NumberFormatException("Group doesn't exist");
         }
       } catch (NumberFormatException e) {
+        sender.addTMessage(Color.RED, "Invalid group ID");
+        return null;
       }
     }
 

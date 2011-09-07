@@ -42,7 +42,7 @@ public class Permission {
   private TreeMap<Integer, Integer> allowedGroups = new TreeMap<Integer, Integer>();
   private TreeMap<Integer, Integer> disallowedGroups = new TreeMap<Integer, Integer>();
 
-  Permission(String permission) throws SAXException {
+  public Permission(String permission) throws SAXException {
     if (permission.equals("-")) {
       return;
     }

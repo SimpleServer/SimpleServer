@@ -20,43 +20,23 @@
  */
 package simpleserver.config.xml;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
 
-public class CommandStorage extends Storage implements Iterable<CommandConfig> {
-  private Map<String, CommandConfig> commands = new HashMap<String, CommandConfig>();
+public abstract class PermissionContainer extends StorageContainer {
 
-  void add(CommandConfig command) {
-    commands.put(command.name, command);
+  PermissionContainer(String tag) {
+    super(tag);
   }
 
-  public boolean contains(String name) {
-    return commands.containsKey(name);
-  }
-
-  public CommandConfig get(String name) {
-    return contains(name) ? commands.get(name) : null;
-  }
-
-  public Iterator<CommandConfig> iterator() {
-    return commands.values().iterator();
-  }
+  public CommandStorage commands;
+  public AllBlocksStorage allblocks;
+  public BlockStorage blocks;
+  public ChestsStorage chests;
 
   @Override
-  void add(XMLTag child) {
-    add((CommandConfig) child);
-  }
-
-  public CommandConfig getTopConfig(String name) {
-    if (commands.containsKey(name)) {
-      return commands.get(name);
-    }
-    for (CommandConfig command : commands.values()) {
-      if (command.aliases.contains(name)) {
-        return command;
-      }
-    }
-    return null;
+  void addStorages() {
+    addStorage("command", commands = new CommandStorage());
+    addStorage("allblocks", allblocks = new AllBlocksStorage());
+    addStorage("block", blocks = new BlockStorage());
+    addStorage("chests", chests = new ChestsStorage());
   }
 }

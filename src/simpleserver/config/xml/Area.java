@@ -25,16 +25,12 @@ import org.xml.sax.helpers.AttributesImpl;
 
 import simpleserver.Coordinate;
 
-public class Area extends StorageContainer implements Comparable<Area> {
+public class Area extends PermissionContainer implements Comparable<Area> {
   public String name;
   public Coordinate start;
   public Coordinate end;
   public String owner;
 
-  public CommandStorage commands;
-  public AllBlocksStorage allblocks;
-  public BlockStorage blocks;
-  public ChestsStorage chests;
   AreaStorage areas;
 
   int position;
@@ -52,13 +48,19 @@ public class Area extends StorageContainer implements Comparable<Area> {
     super("area");
   }
 
+  public Area(String name, Coordinate start, Coordinate end) {
+    this();
+    this.name = name;
+    this.start = start;
+    this.end = end;
+    position = Integer.MAX_VALUE;
+    level = 0;
+  }
+
   @Override
   void addStorages() {
     addStorage("area", areas = new AreaStorage());
-    addStorage("command", commands = new CommandStorage());
-    addStorage("allblocks", allblocks = new AllBlocksStorage());
-    addStorage("block", blocks = new BlockStorage());
-    addStorage("chests", chests = new ChestsStorage());
+    super.addStorages();
   }
 
   @Override
@@ -68,7 +70,7 @@ public class Area extends StorageContainer implements Comparable<Area> {
 
   @Override
   void finish() {
-    GlobalAreaStorage.getInstance().decreaseLevel();
+    DimensionAreaStorage.getInstance().decreaseLevel();
   }
 
   @Override

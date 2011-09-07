@@ -28,28 +28,26 @@ import java.util.List;
 
 import simpleserver.Coordinate;
 
-public class GlobalAreaStorage {
-  private static GlobalAreaStorage lastInstance;
+public class DimensionAreaStorage {
+  private static DimensionAreaStorage lastInstance;
 
-  static GlobalAreaStorage newInstance() {
-    return lastInstance = new GlobalAreaStorage();
+  static DimensionAreaStorage newInstance() {
+    return lastInstance = new DimensionAreaStorage();
   }
 
-  static GlobalAreaStorage getInstance() {
+  static DimensionAreaStorage getInstance() {
     return lastInstance;
   }
 
   private SegmentTree<Area> tree = new SegmentTree<Area>(3);
   private Deque<Area> positions = new LinkedList<Area>();
 
-  private GlobalAreaStorage() {
+  private DimensionAreaStorage() {
     positions.push(null);
   }
 
-  public void add(Area area) {
-    tree.add(new int[] { area.start.y(), area.start.x(), area.start.z() },
-             new int[] { area.end.y(), area.end.x(), area.end.z() },
-             area);
+  void addTag(Area area) {
+    add(area);
 
     int position = 0;
     Area parent = null;
@@ -65,6 +63,16 @@ public class GlobalAreaStorage {
     area.setInfo(position, positions.size(), parent);
     positions.push(area);
     positions.push(null);
+  }
+
+  public void add(Area area) {
+    tree.add(new int[] { area.start.y(), area.start.x(), area.start.z() },
+             new int[] { area.end.y(), area.end.x(), area.end.z() },
+             area);
+  }
+
+  public void remove(Area area) {
+    tree.remove(area);
   }
 
   public List<Area> get(Coordinate coord) {

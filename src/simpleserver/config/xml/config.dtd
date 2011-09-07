@@ -1,12 +1,13 @@
-<!ELEMENT config ( property | group | player | ip | command | allblocks | block | chests | area | permission )*>
-<!ELEMENT property (#PCDATA | true | false)*>
+<!ELEMENT config ( property | group | player | ip | command | allblocks | block | chests | dimension | permission )*>
+<!ELEMENT property ( #PCDATA | true | false )*>
 <!ELEMENT group ( warmup | cooldown | ignoreChestLocks | showTitle | ignoreAreas | forwardUnknownCommands | color )*>
-<!ELEMENT player (#PCDATA)>
-<!ELEMENT ip (#PCDATA)>
+<!ELEMENT player ( #PCDATA )>
+<!ELEMENT ip ( #PCDATA )>
 <!ELEMENT command ( rename | alias | forward | forwardonly | hidden | argument )*>
 <!ELEMENT allblocks EMPTY>
 <!ELEMENT block EMPTY>
 <!ELEMENT chests EMPTY>
+<!ELEMENT dimension ( area | allblocks | block | chests | command | permission )+>
 <!ELEMENT area ( area | allblocks | block | chests | command | permission )*>
 <!ELEMENT permission (#PCDATA)>
 
@@ -66,11 +67,13 @@
   place CDATA #IMPLIED
   destroy CDATA #IMPLIED
   use CDATA #IMPLIED
-  take CDATA #IMPLIED
   give CDATA #IMPLIED
 >
 <!ATTLIST chests
   allow CDATA #IMPLIED
+>
+<!ATTLIST dimension
+  name NMTOKEN #REQUIRED
 >
 <!ATTLIST area
   name CDATA #REQUIRED

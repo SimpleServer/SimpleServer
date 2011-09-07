@@ -21,48 +21,38 @@
 package simpleserver.config.xml;
 
 import java.io.IOException;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Stack;
 
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
+import simpleserver.Coordinate;
 import simpleserver.Player;
 
 import com.sun.org.apache.xml.internal.serialize.XMLSerializer;
 
-public class Config extends StorageContainer {
+public class Config extends PermissionContainer {
   public PropertyStorage properties;
   public PlayerStorage players;
   public IpStorage ips;
   public GroupStorage groups;
-  public CommandStorage commands;
-  public AllBlocksStorage allblocks;
-  public BlockStorage blocks;
-  public ChestsStorage chests;
-  AreaStorage localAreas;
-  public GlobalAreaStorage areas;
+  public DimensionStorage dimensions;
 
   Config() {
     super("config");
   }
 
   @Override
-  void finish() {
-    areas.buildTree();
-  }
-
-  @Override
   void addStorages() {
-    areas = GlobalAreaStorage.newInstance();
     addStorage("property", properties = new PropertyStorage());
     addStorage("player", players = new PlayerStorage());
     addStorage("ip", ips = new IpStorage());
     addStorage("group", groups = new GroupStorage());
-    addStorage("command", commands = new CommandStorage());
-    addStorage("allblocks", allblocks = new AllBlocksStorage());
-    addStorage("block", blocks = new BlockStorage());
-    addStorage("chests", chests = new ChestsStorage());
-    addStorage("area", localAreas = new AreaStorage());
+    super.addStorages();
+    addStorage("dimension", dimensions = new DimensionStorage());
   }
 
   void save(ContentHandler handler, XMLSerializer serializer) throws SAXException, IOException {
@@ -87,5 +77,138 @@ public class Config extends StorageContainer {
       throw new SAXException("The group with ID " + groupid + " does not exist.");
     }
     return group;
+  }
+
+  public AreaStoragePair playerArea(Player player) {
+    String name = player.getName().toLowerCase();
+    for (DimensionConfig dim : dimensions) {
+      Stack<AreaStorage> stack = new Stack<AreaStorage>();
+      stack.add(dim.topAreas);
+      while (!stack.isEmpty()) {
+        for (Area area : stack.peek()) {
+          if (area.owner == name) {
+            return new AreaStoragePair(stack.peek(), area);
+          }
+          stack.add(area.areas);
+        }
+        stack.pop();
+      }
+    }
+    return null;
+  }
+
+  public static class AreaStoragePair {
+    public AreaStorage storage;
+    public Area area;
+
+    public AreaStoragePair(AreaStorage storage, Area area) {
+      this.storage = storage;
+      this.area = area;
+    }
+  }
+
+  public List<Area> areas(Coordinate coordinate) {
+    DimensionConfig dim = dimensions.get(coordinate.dimension());
+    if (dim != null) {
+      return dim.areas.get(coordinate);
+    }
+    return null;
+  }
+
+  public List<PermissionContainer> containers(Coordinate coordinate) {
+    List<PermissionContainer> containers = new LinkedList<PermissionContainer>();
+
+    containers.add(this);
+
+    DimensionConfig dim = dimensions.get(coordinate.dimension());
+    if (dim != null) {
+      containers.add(dim);
+      containers.addAll(dim.areas.get(coordinate));
+    }
+
+    return containers;
+  }
+
+  public Permission getCommandPermission(String name, Coordinate coordinate) {
+    Permission perm = null;
+    for (PermissionContainer container : containers(coordinate)) {
+      if (container.commands.contains(name)) {
+        perm = container.commands.get(name).allow;
+      }
+    }
+    return perm == null ? new Permission() : perm;
+  }
+
+  public BlockPermission blockPermission(Player player, Coordinate coordinate) {
+    return blockPermission(player, coordinate, 0);
+  }
+
+  public BlockPermission blockPermission(Player player, Coordinate coordinate, int id) {
+    BlockPermission perm = new BlockPermission();
+
+    for (PermissionContainer area : containers(coordinate)) {
+      perm.add(area.allblocks.blocks);
+      if (id > 0) {
+        perm.add(area.blocks.get(id));
+      }
+      perm.add(area.chests.chests);
+    }
+
+    perm.finish(player);
+    return perm;
+  }
+
+  public static class BlockPermission {
+    public boolean place;
+    public boolean destroy;
+    public boolean use;
+    public boolean give;
+    public boolean chest;
+
+    private Permission placePerm;
+    private Permission destroyPerm;
+    private Permission usePerm;
+    private Permission givePerm;
+    private Permission chestPerm;
+
+    void add(AllBlocks allblocks) {
+      if (allblocks != null) {
+        if (allblocks.place != null) {
+          placePerm = allblocks.place;
+        }
+        if (allblocks.destroy != null) {
+          destroyPerm = allblocks.destroy;
+        }
+        if (allblocks.use != null) {
+          usePerm = allblocks.use;
+        }
+        if (allblocks.give != null) {
+          givePerm = allblocks.give;
+        }
+      }
+    }
+
+    void add(Chests chests) {
+      chestPerm = chests.allow;
+    }
+
+    void add(Block block) {
+      if (block != null) {
+        if (block.place != null) {
+          placePerm = block.place;
+        }
+        if (block.give != null) {
+          givePerm = block.give;
+        }
+      }
+    }
+
+    void finish(Player player) {
+      place = placePerm == null ? true : placePerm.contains(player);
+      destroy = destroyPerm == null ? true : destroyPerm.contains(player);
+      give = givePerm == null ? true : givePerm.contains(player);
+      use = usePerm == null ? true : usePerm.contains(player);
+      chest = chestPerm == null ? true : chestPerm.contains(player);
+    }
   }
 }

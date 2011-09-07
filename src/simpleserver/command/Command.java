@@ -22,4 +22,6 @@ package simpleserver.command;
 
 public interface Command {
   public String getName();
+
+  public boolean hidden();
 }

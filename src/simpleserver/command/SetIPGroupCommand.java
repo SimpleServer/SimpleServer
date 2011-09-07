@@ -20,6 +20,7 @@
  */
 package simpleserver.command;
 
+import java.net.InetAddress;
 import java.util.regex.Pattern;
 
 import simpleserver.Color;
@@ -35,30 +36,46 @@ public class SetIPGroupCommand extends SetGroupCommand implements ServerCommand 
   @Override
   protected void setGroup(Player player, int group, String target) {
     Server server = player.getServer();
-    Player targetPlayer = player.getServer().findPlayer(target);
-    if (targetPlayer != null) {
-      target = targetPlayer.getIPAddress();
-    } else if (!Pattern.matches("^(\\d{1,3}\\.){3}\\d{1,3}$", target)) {
+    InetAddress ip;
+    try {
+      ip = getIP(server, target);
+    } catch (Exception e) {
       player.addTMessage(Color.RED, "You must specify a user or a valid IP!");
       return;
     }
-    server.permissions.setIPGroup(target, group);
+
+    server.config.ips.setGroup(ip, group);
+    server.saveConfig();
 
     player.addTMessage(Color.GRAY, "Group of %s was set to %s!", target, group);
     server.adminLog("User " + player.getName() + " set IP's group:\t "
         + target + "\t(" + group + ")");
   }
 
+  private InetAddress getIP(Server server, String value) throws Exception {
+    Player targetPlayer = server.findPlayer(value);
+    InetAddress ip;
+    if (targetPlayer != null) {
+      ip = targetPlayer.getInetAddress();
+    } else if (!Pattern.matches("^(\\d{1,3}\\.){3}\\d{1,3}$", value)) {
+      throw new Exception();
+    } else {
+      ip = InetAddress.getByName(value);
+    }
+    return ip;
+  }
+
   @Override
   protected void setGroup(Server server, int group, String target) {
-    Player targetPlayer = server.findPlayer(target);
-    if (targetPlayer != null) {
-      target = targetPlayer.getIPAddress();
-    } else if (!Pattern.matches("^(\\d{1,3}\\.){3}\\d{1,3}$", target)) {
+    InetAddress ip;
+    try {
+      ip = getIP(server, target);
+    } catch (Exception e) {
       System.out.println("[SimpleServer] You must specify a user or a valid IP!");
       return;
     }
-    server.permissions.setIPGroup(target, group);
+    server.config.ips.setGroup(ip, group);
+    server.saveConfig();
     System.out.println("[SimpleServer] Group of " + target + " was set to " + group + "!");
   }
 }

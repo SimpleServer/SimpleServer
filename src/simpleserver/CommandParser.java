@@ -31,10 +31,8 @@ import org.reflections.scanners.SubTypesScanner;
 
 import simpleserver.command.AbstractCommand;
 import simpleserver.command.Command;
-import simpleserver.command.ExternalCommand;
 import simpleserver.command.PlayerCommand;
 import simpleserver.command.ServerCommand;
-import simpleserver.config.PermissionConfig;
 import simpleserver.options.Options;
 
 @SuppressWarnings("unchecked")
@@ -44,11 +42,9 @@ public class CommandParser {
   private final Map<String, ServerCommand> serverCommands;
   private final Map<Class, ServerCommand> serverCommandClasses;
   private final Options options;
-  private final PermissionConfig permissions;
 
-  public CommandParser(Options options, PermissionConfig permissions) {
+  public CommandParser(Options options) {
     this.options = options;
-    this.permissions = permissions;
 
     playerCommands = new HashMap<String, PlayerCommand>();
     playerCommandClasses = new HashMap<Class, PlayerCommand>();
@@ -66,26 +62,12 @@ public class CommandParser {
     }
   }
 
-  public PlayerCommand getPlayerCommand(String message) {
-    if (message.startsWith(commandPrefix())) {
-      PlayerCommand command = playerCommands.get(extractName(message, 1));
-      if (command == null) {
-        if (options.contains("alternateJarFile")) {
-          return new ExternalCommand(extractName(message, 1));
-        } else {
-          System.out.println("Illegal command configuration for: " + message);
-          command = playerCommands.get(null);
-        }
-      }
-
-      return command;
-    }
-
-    return null;
+  public PlayerCommand getPlayerCommand(String name) {
+    return playerCommands.get(name);
   }
 
-  public ServerCommand getServerCommand(String message) {
-    return serverCommands.get(extractName(message, 0));
+  public ServerCommand getServerCommand(String name) {
+    return serverCommands.get(name);
   }
 
   public ServerCommand getServerCommand(Class<? extends ServerCommand> c) {
@@ -106,16 +88,6 @@ public class CommandParser {
     } else {
       return "!";
     }
-  }
-
-  private String extractName(String message, int offset) {
-    int splitIndex = message.indexOf(" ");
-    if (splitIndex == -1) {
-      splitIndex = message.length();
-    }
-
-    String name = message.substring(offset, splitIndex).toLowerCase();
-    return permissions.lookupCommand(name);
   }
 
   private <T extends Command> void loadCommands(Class<T> type, Map<String, T> commands, Map<Class, T> commandClasses) {

@@ -30,14 +30,20 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import org.xml.sax.SAXException;
+
 import simpleserver.Coordinate.Dimension;
-import simpleserver.bot.BotController.ConnectException;
 import simpleserver.bot.Giver;
 import simpleserver.bot.Teleporter;
+import simpleserver.bot.BotController.ConnectException;
 import simpleserver.command.ExternalCommand;
 import simpleserver.command.PlayerCommand;
 import simpleserver.config.KitList.Kit;
 import simpleserver.config.data.Stats.StatField;
+import simpleserver.config.xml.CommandConfig;
+import simpleserver.config.xml.Group;
+import simpleserver.config.xml.Permission;
+import simpleserver.config.xml.CommandConfig.Forwarding;
 import simpleserver.message.AbstractChat;
 import simpleserver.message.Chat;
 import simpleserver.message.GlobalChat;
@@ -390,13 +396,6 @@ public class Player {
     return groupObject;
   }
 
-  public boolean isAdmin() {
-    if (groupObject != null) {
-      return groupObject.isAdmin();
-    }
-    return false;
-  }
-
   public void setGuest(boolean guest) {
     this.guest = guest;
   }
@@ -415,6 +414,14 @@ public class Player {
 
   public String getIPAddress() {
     return extsocket.getInetAddress().getHostAddress();
+  }
+
+  public InetAddress getInetAddress() {
+    return extsocket.getInetAddress();
+  }
+
+  public boolean ignoresChestLocks() {
+    return groupObject.ignoreChestLocks;
   }
 
   private void setDeathPlace(Position deathPosition) {
@@ -470,27 +477,42 @@ public class Player {
       message = lastCommand;
     }
 
-    PlayerCommand command = server.getCommandParser().getPlayerCommand(message);
+    String commandName = message.split(" ")[0];
+    CommandConfig config = server.config.commands.getTopConfig(commandName);
+    String originalName = config == null ? commandName : config.originalName;
+
+    PlayerCommand command;
+    if (config == null) {
+      command = server.getCommandParser().getPlayerCommand(commandName);
+      if (command != null && !command.hidden()) {
+        command = null;
+      }
+    } else {
+      command = server.getCommandParser().getPlayerCommand(originalName);
+    }
+
     if (command == null) {
-      return false;
+      if (groupObject.forwardUnknownCommands) {
+        command = new ExternalCommand(commandName);
+      } else {
+        command = server.getCommandParser().getPlayerCommand((String) null);
+      }
     }
 
-    boolean invalidCommand = command.getName() == null;
-
-    if (!invalidCommand && !commandAllowed(command.getName())) {
-      addTMessage(Color.RED, "Insufficient permission.");
-      return true;
+    if (config != null) {
+      Permission permission = server.config.getCommandPermission(config.name, position.coordinate());
+      if (!permission.contains(this)) {
+        addTMessage(Color.RED, "Insufficient permission.");
+        return true;
+      }
     }
 
-    if (server.permissions.commandShouldBeExecuted(command.getName())) {
+    if (config != null && !(command instanceof ExternalCommand) && config.forwarding != Forwarding.ONLY) {
       command.execute(this, message);
     }
     lastCommand = message;
 
-    return !((server.permissions.commandShouldPassThroughToMod(command.getName())
-            || server.options.getBoolean("forwardAllCommands")
-            || invalidCommand || command instanceof ExternalCommand)
-            && server.options.contains("alternateJarFile") && getGroup().getForwardsCommands());
+    return !((command instanceof ExternalCommand) || config == null || config.forwarding != Forwarding.NONE || server.options.getBoolean("forwardAllCommands"));
   }
 
   public void execute(Class<? extends PlayerCommand> c) {
@@ -499,10 +521,6 @@ public class Player {
 
   public void execute(Class<? extends PlayerCommand> c, String arguments) {
     server.getCommandParser().getPlayerCommand(c).execute(this, "a " + arguments);
-  }
-
-  public boolean commandAllowed(String command) {
-    return server.permissions.playerCommandAllowed(command, this);
   }
 
   public void teleportTo(Player target) {
@@ -570,8 +588,14 @@ public class Player {
   }
 
   public void updateGroup() {
-    group = server.permissions.getPlayerGroup(this);
-    groupObject = server.permissions.getGroup(group);
+    try {
+      groupObject = server.config.getGroup(this);
+    } catch (SAXException e) {
+      System.out.println("[SimpleServer] A player could not be assigned to any group. (" + e + ")");
+      kick("You could not be asigned to any group.");
+      return;
+    }
+    group = groupObject.id;
   }
 
   public void placedBlock() {
@@ -762,7 +786,7 @@ public class Player {
   }
 
   private int cooldownLeft() {
-    int cooldown = getGroup().getCooldownMillis();
+    int cooldown = getGroup().cooldown();
     if (lastTeleport > System.currentTimeMillis() - cooldown) {
       return (int) (cooldown - System.currentTimeMillis() + lastTeleport);
     } else {
@@ -781,7 +805,7 @@ public class Player {
     } else if (cooldown > 0) {
       addTMessage(Color.RED, "You have to wait %d seconds before you can teleport again.", cooldown / 1000);
     } else {
-      int warmup = getGroup().getWarmupMillis();
+      int warmup = getGroup().warmup();
       if (warmup > 0) {
         lastTeleport = -1;
         Timer timer = new Timer();

@@ -36,7 +36,7 @@ public class SetGroupCommand extends PlayerArgCommand implements ServerCommand {
 
   protected boolean allowed(Player player, int group, String target) {
     Server server = player.getServer();
-    if (player.getGroupId() <= server.permissions.getNameGroup(target)) {
+    if (player.getGroupId() <= server.config.players.get(target)) {
       player.addTMessage(Color.RED, "You cannot set the group of this user!");
       return false;
     }
@@ -74,7 +74,8 @@ public class SetGroupCommand extends PlayerArgCommand implements ServerCommand {
 
   protected void setGroup(Player player, int group, String target) {
     Server server = player.getServer();
-    server.permissions.setPlayerGroup(target, group);
+    server.config.players.set(target, group);
+    server.saveConfig();
 
     player.addTMessage(Color.GRAY, "Player %s's group was set to %s!",
                        target, new Integer(group).toString());
@@ -101,7 +102,8 @@ public class SetGroupCommand extends PlayerArgCommand implements ServerCommand {
   }
 
   protected void setGroup(Server server, int group, String target) {
-    server.permissions.setPlayerGroup(target, group);
+    server.config.players.set(target, group);
+    server.saveConfig();
     System.out.println("[SimpleServer] Player " + target + "'s group was set to " + new Integer(group).toString() + "!");
   }
 }

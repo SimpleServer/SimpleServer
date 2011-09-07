@@ -27,7 +27,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Date;
-import java.util.List;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -37,7 +36,6 @@ import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.XMLReaderFactory;
 
-import simpleserver.Coordinate;
 import simpleserver.config.AbstractConfig;
 
 import com.sun.org.apache.xml.internal.serialize.OutputFormat;
@@ -161,7 +159,7 @@ public class GlobalConfig extends AbstractConfig {
     start = new Date().getTime();
     System.out.println("\nSaving time: " + (start - end) + " ms");
 
-    int n = 100000;
+    /*int n = 100000;
     List<Area> areas = null;
     areas = conf.config.areas.get(new Coordinate(7, 0, 8));
     start = new Date().getTime();
@@ -174,11 +172,11 @@ public class GlobalConfig extends AbstractConfig {
     System.out.println("\nActive areas at given coordinate:");
     for (Area area : areas) {
       System.out.println(area.name);
-    }
+    }*/
 
     System.out.println();
     conf = null;
-    areas = null;
+    // areas = null;
     getMemory();
   }
 

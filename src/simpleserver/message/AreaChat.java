@@ -20,33 +20,54 @@
  */
 package simpleserver.message;
 
+import java.util.List;
+
 import simpleserver.Color;
 import simpleserver.Player;
-import simpleserver.config.PermissionConfig;
+import simpleserver.config.xml.Area;
+import simpleserver.config.xml.Config;
 
 public class AreaChat extends AbstractChat {
 
-  PermissionConfig perm;
+  private Config config;
+  private List<Area> areas;
 
   public AreaChat(Player sender) {
-    // TODO: notice that area is changed when walking around...
     super(sender);
 
-    perm = sender.getServer().permissions;
-    chatRoom = perm.getCurrentArea(sender);
+    config = sender.getServer().config;
+    areas = config.areas(sender.position());
+    if (!areas.isEmpty()) {
+      chatRoom = areas.get(0).name;
+    }
   }
 
   @Override
   protected boolean sendToPlayer(Player reciever) {
-    return !perm.getCurrentArea(sender).isEmpty() && (perm.getCurrentArea(reciever) == perm.getCurrentArea(sender));
+    if (reciever == sender) {
+      return true;
+    } else if (areas.isEmpty()) {
+      return false;
+    }
+    List<Area> recAreas = config.areas(reciever.position());
+    for (Area area : recAreas) {
+      if (areas.contains(area)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   @Override
   public void noRecieverFound() {
-    if (perm.getCurrentArea(sender).isEmpty()) {
+    if (noArea()) {
       sender.addTMessage(Color.RED, "You are in no area at the moment");
     } else {
       sender.addTMessage(Color.RED, "Nobody is in this area to hear you");
     }
+  }
+
+  public boolean noArea() {
+    return areas.isEmpty();
   }
 }

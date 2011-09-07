@@ -24,18 +24,18 @@ import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import org.xml.sax.SAXException;
+
 import simpleserver.Color;
 import simpleserver.Player;
-import simpleserver.Server;
 import simpleserver.bot.BotController.ConnectException;
+import simpleserver.config.xml.Permission;
 
 import com.google.common.collect.ImmutableList;
 
 public class KitList extends PropertiesConfig {
-  private final Server server;
-
   public static final class Kit {
-    public final String groups;
+    public final Permission perm;
     public final ImmutableList<Entry> items;
 
     public static final class Entry {
@@ -66,24 +66,23 @@ public class KitList extends PropertiesConfig {
       }
     }
 
-    public Kit(String groups, ImmutableList<Entry> items) {
-      this.groups = groups;
+    public Kit(String perm, ImmutableList<Entry> items) throws SAXException {
+      this.perm = new Permission(perm);
       this.items = items;
     }
   }
 
   private ConcurrentMap<String, Kit> kits;
 
-  public KitList(Server parent) {
+  public KitList() {
     super("kit-list.txt");
 
-    server = parent;
     kits = new ConcurrentHashMap<String, Kit>();
   }
 
   public boolean giveKit(Player player, String kitName) {
     Kit kit = kits.get(kitName.toLowerCase());
-    if ((kit != null) && (server.permissions.includesPlayer(kit.groups, player))) {
+    if ((kit != null) && (kit.perm.contains(player))) {
       try {
         player.give(kit);
       } catch (ConnectException e) {
@@ -98,7 +97,7 @@ public class KitList extends PropertiesConfig {
     StringBuilder kitList = new StringBuilder();
     for (String name : kits.keySet()) {
       Kit kit = kits.get(name);
-      if (server.permissions.includesPlayer(kit.groups, player)) {
+      if (kit.perm.contains(player)) {
         kitList.append(name);
         kitList.append(", ");
       }
@@ -164,11 +163,17 @@ public class KitList extends PropertiesConfig {
         items.add(new Kit.Entry(block, damage, amount));
       }
 
-      Kit kit = new Kit(options[0], items.build());
+      Kit kit;
+      try {
+        kit = new Kit(options[0], items.build());
+      } catch (SAXException e) {
+        System.out.println("Invalid permission for kit " + options[0] + ": " + e.getMessage());
+        continue;
+      }
       kits.put(entry.getKey().toString().toLowerCase(), kit);
 
       if (legacy) {
-        StringBuilder convertedEntry = new StringBuilder(kit.groups);
+        StringBuilder convertedEntry = new StringBuilder(kit.perm.toString());
         for (Kit.Entry item : kit.items) {
           convertedEntry.append("|" + item.item);
           if (item.damage != 0) {

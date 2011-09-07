@@ -27,6 +27,11 @@ public class AllowVisitCommand extends AbstractCommand implements PlayerCommand 
     super("ok PLAYER", "Agree a visit request");
   }
 
+  @Override
+  public boolean hidden() {
+    return true;
+  }
+
   public void execute(Player player, String message) {
     player.handleVisitRequests();
   }

@@ -27,7 +27,7 @@ import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
-public class CommandConfig extends StorageContainer {
+public class CommandConfig extends StorageContainer implements Comparable<CommandConfig> {
   public String name;
   public String originalName;
   public List<String> aliases;
@@ -114,10 +114,13 @@ public class CommandConfig extends StorageContainer {
     addAttribute(attributes, ALLOW, allow);
   }
 
+  public int compareTo(CommandConfig command) {
+    return originalName.compareTo(command.originalName);
+  }
+
   public static enum Forwarding {
     NONE,
     BOTH,
     ONLY;
   }
-
 }
