@@ -129,11 +129,11 @@ public class Config extends PermissionContainer {
     return containers;
   }
 
-  public Permission getCommandPermission(String name, Coordinate coordinate) {
+  public Permission getCommandPermission(String name, String args, Coordinate coordinate) {
     Permission perm = null;
     for (PermissionContainer container : containers(coordinate)) {
       if (container.commands.contains(name)) {
-        perm = container.commands.get(name).allow;
+        perm = container.commands.get(name).allow(args);
       }
     }
     return perm == null ? new Permission() : perm;

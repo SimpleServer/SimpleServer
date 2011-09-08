@@ -475,9 +475,12 @@ public class Player {
     // Repeat last command
     if (message.equals(server.getCommandParser().commandPrefix() + "!")) {
       message = lastCommand;
+    } else {
+      lastCommand = message;
     }
 
     String commandName = message.split(" ")[0];
+    String args = message.substring(commandName.length() + 1);
     CommandConfig config = server.config.commands.getTopConfig(commandName);
     String originalName = config == null ? commandName : config.originalName;
 
@@ -500,7 +503,7 @@ public class Player {
     }
 
     if (config != null) {
-      Permission permission = server.config.getCommandPermission(config.name, position.coordinate());
+      Permission permission = server.config.getCommandPermission(config.name, args, position.coordinate());
       if (!permission.contains(this)) {
         addTMessage(Color.RED, "Insufficient permission.");
         return true;
@@ -510,7 +513,6 @@ public class Player {
     if (config != null && !(command instanceof ExternalCommand) && config.forwarding != Forwarding.ONLY) {
       command.execute(this, message);
     }
-    lastCommand = message;
 
     return !((command instanceof ExternalCommand) || config == null || config.forwarding != Forwarding.NONE || server.options.getBoolean("forwardAllCommands"));
   }

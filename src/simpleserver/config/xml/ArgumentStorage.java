@@ -37,9 +37,17 @@ public class ArgumentStorage extends Storage {
     arguments.add((Argument) child);
   }
 
+  Permission permission(String args) {
+    for (Argument arg : arguments) {
+      if (args.startsWith(arg.argument)) {
+        return arg.allow;
+      }
+    }
+    return null;
+  }
+
   @Override
   Iterator<Argument> iterator() {
     return arguments == null ? new ArrayList<Argument>().iterator() : arguments.iterator();
   }
-
 }

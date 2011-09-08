@@ -114,6 +114,11 @@ public class CommandConfig extends StorageContainer implements Comparable<Comman
     addAttribute(attributes, ALLOW, allow);
   }
 
+  public Permission allow(String args) {
+    Permission perm = arguments.permission(args);
+    return perm == null ? allow : perm;
+  }
+
   public int compareTo(CommandConfig command) {
     return originalName.compareTo(command.originalName);
   }
