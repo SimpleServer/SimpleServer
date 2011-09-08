@@ -36,7 +36,7 @@ public class AreaChat extends AbstractChat {
     super(sender);
 
     config = sender.getServer().config;
-    areas = config.areas(sender.position());
+    areas = config.dimensions.areas(sender.position());
     if (!areas.isEmpty()) {
       chatRoom = areas.get(0).name;
     }
@@ -49,7 +49,7 @@ public class AreaChat extends AbstractChat {
     } else if (areas.isEmpty()) {
       return false;
     }
-    List<Area> recAreas = config.areas(reciever.position());
+    List<Area> recAreas = config.dimensions.areas(reciever.position());
     for (Area area : recAreas) {
       if (areas.contains(area)) {
         return true;

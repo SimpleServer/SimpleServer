@@ -27,6 +27,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Date;
+import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -36,6 +37,8 @@ import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.XMLReaderFactory;
 
+import simpleserver.Coordinate;
+import simpleserver.Coordinate.Dimension;
 import simpleserver.config.AbstractConfig;
 
 import com.sun.org.apache.xml.internal.serialize.OutputFormat;
@@ -159,20 +162,20 @@ public class GlobalConfig extends AbstractConfig {
     start = new Date().getTime();
     System.out.println("\nSaving time: " + (start - end) + " ms");
 
-    /*int n = 100000;
-    List<Area> areas = null;
-    areas = conf.config.areas.get(new Coordinate(7, 0, 8));
-    start = new Date().getTime();
-    for (int i = 0; i < n; i++) {
-      areas = conf.config.areas.get(new Coordinate(7, 0, 8));
-    }
-    start = new Date().getTime();
-    System.out.println("\nQuery time: " + (start - end) + " ms");
-    System.out.println("That is " + ((start - end) / (float) n) + " ms per query!!!");
-    System.out.println("\nActive areas at given coordinate:");
+    Area[] areas = new Area[] { new Area("a", new Coordinate(-5, 0, -5), new Coordinate(1, 127, 1)),
+                                new Area("b", new Coordinate(1, 0, 1), new Coordinate(1, 0, 1)),
+                                new Area("c", new Coordinate(16, 0, 16), new Coordinate(18, 8, 18)),
+                                new Area("d", new Coordinate(100, 0, 100), new Coordinate(100, 0, 100))
+    };
+
     for (Area area : areas) {
+      Set<Area> overlaps = conf.config.dimensions.get(Dimension.EARTH).areas.overlaps(area);
       System.out.println(area.name);
-    }*/
+      for (Area overlap : overlaps) {
+        System.out.print(overlap.name + ", ");
+      }
+      System.out.println();
+    }
 
     System.out.println();
     conf = null;

@@ -22,10 +22,13 @@ package simpleserver.config.xml;
 
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.xml.sax.SAXException;
 
+import simpleserver.Coordinate;
 import simpleserver.Coordinate.Dimension;
 
 public class DimensionStorage extends Storage implements Iterable<DimensionConfig> {
@@ -47,6 +50,22 @@ public class DimensionStorage extends Storage implements Iterable<DimensionConfi
 
   public DimensionConfig get(Dimension dimension) {
     return dimensions.get(dimension);
+  }
+
+  public List<Area> areas(Coordinate coordinate) {
+    DimensionConfig dim = get(coordinate.dimension());
+    if (dim != null) {
+      return dim.areas.get(coordinate);
+    }
+    return null;
+  }
+
+  public Set<Area> overlaps(Area area) {
+    DimensionConfig dim = get(area.start.dimension());
+    if (dim != null) {
+      return dim.areas.overlaps(area);
+    }
+    return null;
   }
 
   public DimensionConfig add(Dimension dimension) {

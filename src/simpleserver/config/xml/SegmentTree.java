@@ -23,8 +23,10 @@ package simpleserver.config.xml;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.Map.Entry;
 
@@ -67,6 +69,14 @@ public class SegmentTree<E> {
 
   public List<E> get(int... point) {
     return root.find(point);
+  }
+
+  public Set<E> overlaps(int[] start, int[] end) {
+    return overlaps(new HyperSegment(start, end, null));
+  }
+
+  private Set<E> overlaps(HyperSegment segment) {
+    return root.overlaps(segment);
   }
 
   private Node build(List<HyperSegment> segments, int dimension) {
@@ -178,6 +188,32 @@ public class SegmentTree<E> {
         }
         if (right != null) {
           right.find(point, list, dimension);
+        }
+      }
+    }
+
+    public Set<E> overlaps(HyperSegment segment) {
+      Set<E> set = new HashSet<E>();
+      overlaps(segment, set, 0);
+      return set;
+    }
+
+    private void overlaps(HyperSegment segment, Set<E> set, int dimension) {
+      if (segment.segments[dimension].start > end || segment.segments[dimension].end < start) {
+        return;
+      } else {
+        if (dimension == dimensions - 1) {
+          for (HyperSegment s : segments) {
+            set.add(s.object);
+          }
+        } else if (nextDimension != null) {
+          nextDimension.overlaps(segment, set, dimension + 1);
+        }
+        if (left != null) {
+          left.overlaps(segment, set, dimension);
+        }
+        if (right != null) {
+          right.overlaps(segment, set, dimension);
         }
       }
     }

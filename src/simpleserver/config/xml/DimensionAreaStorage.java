@@ -25,6 +25,7 @@ import java.util.Collections;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import simpleserver.Coordinate;
 
@@ -73,6 +74,11 @@ public class DimensionAreaStorage {
 
   public void remove(Area area) {
     tree.remove(area);
+  }
+
+  public Set<Area> overlaps(Area area) {
+    return tree.overlaps(new int[] { area.start.y(), area.start.x(), area.start.z() },
+                         new int[] { area.end.y(), area.end.x(), area.end.z() });
   }
 
   public List<Area> get(Coordinate coord) {

@@ -21,6 +21,9 @@
 package simpleserver.command;
 
 import static simpleserver.lang.Translations.t;
+
+import java.util.Set;
+
 import simpleserver.Color;
 import simpleserver.Player;
 import simpleserver.config.xml.Area;
@@ -70,15 +73,20 @@ public class MyAreaCommand extends AbstractCommand implements PlayerCommand {
         player.addTMessage(Color.RED, "New area can not be saved before you remove your old one!");
         return;
       }
-      /*
-       * TODO: Awesome area overlap detection
-       * 
-      if (!perm.getCurrentArea(player).equals("")) {
-        player.addTMessage(Color.RED, "You can not create your area within an existing area!");
+      Area area = createPlayerArea(player);
+      Set<Area> overlaps = config.dimensions.overlaps(area);
+      if (overlaps != null) {
+        player.addTMessage(Color.RED, "Your area overlaps with other areas and could therefore not be saved!");
+        StringBuilder str = new StringBuilder();
+        for (Area overlap : overlaps) {
+          str.append(overlap.name);
+          str.append(", ");
+        }
+        str.delete(str.length() - 2, str.length() - 1);
+        player.addTCaptionedMessage("Overlapping areas", "%s", str);
         return;
       }
-      */
-      createPlayerArea(player);
+      saveArea(area, player);
       player.addTMessage(Color.GRAY, "Your area has been saved!");
     } else if (arguments[0].equals("unsave")) {
       AreaStoragePair area = config.playerArea(player);
@@ -108,15 +116,18 @@ public class MyAreaCommand extends AbstractCommand implements PlayerCommand {
     }
   }
 
-  private void createPlayerArea(Player player) {
-    Config config = player.getServer().config;
-    DimensionConfig dimension = config.dimensions.get(player.areastart.dimension());
-    if (dimension == null) {
-      dimension = config.dimensions.add(player.areastart.dimension());
-    }
+  private Area createPlayerArea(Player player) {
     Area area = new Area(t("%s's area", player.getName()), player.areastart, player.areaend);
     area.owner = player.getName().toLowerCase();
 
+    return area;
+  }
+
+  private void saveArea(Area area, Player player) {
+    DimensionConfig dimension = player.getServer().config.dimensions.get(area.start.dimension());
+    if (dimension == null) {
+      dimension = player.getServer().config.dimensions.add(area.start.dimension());
+    }
     dimension.add(area);
     player.getServer().saveConfig();
   }

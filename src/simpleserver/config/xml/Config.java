@@ -107,14 +107,6 @@ public class Config extends PermissionContainer {
     }
   }
 
-  public List<Area> areas(Coordinate coordinate) {
-    DimensionConfig dim = dimensions.get(coordinate.dimension());
-    if (dim != null) {
-      return dim.areas.get(coordinate);
-    }
-    return null;
-  }
-
   public List<PermissionContainer> containers(Coordinate coordinate) {
     List<PermissionContainer> containers = new LinkedList<PermissionContainer>();
 

@@ -32,7 +32,7 @@ public class AreaCommand extends AbstractCommand implements PlayerCommand {
   }
 
   public void execute(Player player, String message) {
-    List<Area> areas = player.getServer().config.areas(player.position());
+    List<Area> areas = player.getServer().config.dimensions.areas(player.position());
     StringBuilder str = new StringBuilder();
     for (Area area : areas) {
       str.append(area.name);
