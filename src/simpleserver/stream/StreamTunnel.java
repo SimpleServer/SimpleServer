@@ -356,15 +356,17 @@ public class StreamTunnel {
 
           coordinate = new Coordinate(x, y, z, player);
 
-          BlockPermission perm = server.config.blockPermission(player, coordinate);
+          if (!player.getGroup().ignoreAreas) {
+            BlockPermission perm = server.config.blockPermission(player, coordinate);
 
-          if (!perm.use && status == 0) {
-            player.addTMessage(Color.RED, "You can not use this block here!");
-            break;
-          }
-          if (!perm.destroy && status == BLOCK_DESTROYED_STATUS) {
-            player.addTMessage(Color.RED, "You can not destroy this block!");
-            break;
+            if (!perm.use && status == 0) {
+              player.addTMessage(Color.RED, "You can not use this block here!");
+              break;
+            }
+            if (!perm.destroy && status == BLOCK_DESTROYED_STATUS) {
+              player.addTMessage(Color.RED, "You can not destroy this block!");
+              break;
+            }
           }
 
           boolean locked = server.data.chests.isLocked(coordinate);
@@ -422,7 +424,7 @@ public class StreamTunnel {
 
         if (isServerTunnel || server.data.chests.isChest(coordinate)) {
           // continue
-        } else if ((dropItem != -1 && !perm.place) || !perm.use) {
+        } else if (!player.getGroup().ignoreAreas && ((dropItem != -1 && !perm.place) || !perm.use)) {
           if (!perm.use) {
             player.addTMessage(Color.RED, "You can not use this block here!");
           } else {
@@ -701,7 +703,7 @@ public class StreamTunnel {
             }
             server.data.save();
           }
-          if (!server.config.blockPermission(player, player.openedChest()).chest || (adjacent != null && !server.config.blockPermission(player, adjacent.coordinate).chest)) {
+          if (!player.getGroup().ignoreAreas && (!server.config.blockPermission(player, player.openedChest()).chest || (adjacent != null && !server.config.blockPermission(player, adjacent.coordinate).chest))) {
             player.addTMessage(Color.RED, "You can't use chests here");
             break;
           } else if (server.data.chests.canOpen(player, player.openedChest()) || player.ignoresChestLocks()) {

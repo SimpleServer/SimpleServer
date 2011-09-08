@@ -468,6 +468,8 @@ public class Player {
   }
 
   public boolean parseCommand(String message) {
+    // TODO: Handle aliases of external commands
+
     if (closed) {
       return true;
     }
