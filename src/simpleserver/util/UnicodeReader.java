@@ -75,20 +75,22 @@ public class UnicodeReader extends Reader {
     int read = pushbackReader.read(bom, 0, BOM_SIZE);
     int unread = 0;
 
-    Set<String> encodings = BOMS.keySet();
-    Iterator<String> itr = encodings.iterator();
-    while (itr.hasNext()) {
-      String currentEncoding = itr.next();
-      byte[] currentBOM = BOMS.get(currentEncoding);
-      if (arrayStartsWith(bom, currentBOM)) {
-        encoding = currentEncoding;
-        unread = currentBOM.length;
-        break;
+    if (read > 0) {
+      Set<String> encodings = BOMS.keySet();
+      Iterator<String> itr = encodings.iterator();
+      while (itr.hasNext()) {
+        String currentEncoding = itr.next();
+        byte[] currentBOM = BOMS.get(currentEncoding);
+        if (arrayStartsWith(bom, currentBOM)) {
+          encoding = currentEncoding;
+          unread = currentBOM.length;
+          break;
+        }
       }
-    }
 
-    if (unread <= 4) {
-      pushbackReader.unread(bom, unread, read - unread);
+      if (unread <= BOM_SIZE && unread > 0) {
+        pushbackReader.unread(bom, unread, read - unread);
+      }
     }
     if (encoding == null) {
       reader = new InputStreamReader(pushbackReader);
