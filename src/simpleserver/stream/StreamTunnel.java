@@ -146,6 +146,7 @@ public class StreamTunnel {
     switch (packetId) {
       case 0x00: // Keep Alive
         write(packetId);
+        write(in.readInt()); // random number that is returned form server
         break;
       case 0x01: // Login Request/Response
         write(packetId);
@@ -164,11 +165,17 @@ public class StreamTunnel {
           write(player.getName());
           write(in.readLong());
         }
+
+        write(in.readInt());
+
         dimension = in.readByte();
         if (isServerTunnel) {
           player.setDimension(Dimension.get(dimension));
         }
         write(dimension);
+
+        write(in.readByte());
+        write(in.readByte());
         break;
       case 0x02: // Handshake
         String name = readUTF16();
@@ -218,6 +225,7 @@ public class StreamTunnel {
         break;
       case 0x03: // Chat Message
         String message = readUTF16();
+
         Matcher joinMatcher = JOIN_PATTERN.matcher(message);
         if (isServerTunnel && joinMatcher.find()) {
           if (server.bots.ninja(joinMatcher.group(1))) {
@@ -274,8 +282,8 @@ public class StreamTunnel {
 
           player.sendMessage(message);
         }
-
         break;
+
       case 0x04: // Time Update
         write(packetId);
         long time = in.readLong();
@@ -306,15 +314,21 @@ public class StreamTunnel {
         write(packetId);
         write(user);
         write(target);
-        write(in.readBoolean());
+        copyNBytes(1);
         break;
-      case 0x08: // Update Health
+      case 0x08: // Update Health, changed in 1.8 (added food and expirience?)
         write(packetId);
         player.updateHealth(write(in.readShort()));
+        player.getHealth();
+        write(in.readShort());
+        write(in.readFloat());
         break;
-      case 0x09: // Respawn
+      case 0x09: // Respawn, changed in 1.8 added byte, short and long
         write(packetId);
         player.setDimension(Dimension.get(write(in.readByte())));
+        write(in.readByte());
+        write(in.readShort());
+        write(in.readLong());
         break;
       case 0x0a: // Player
         write(packetId);
@@ -335,7 +349,7 @@ public class StreamTunnel {
         copyPlayerLocation();
         copyNBytes(1);
         break;
-      case 0x0c: // Player Look
+      case 0x0c: // Player Look (12)
         write(packetId);
         copyPlayerLook();
         copyNBytes(1);
@@ -622,6 +636,25 @@ public class StreamTunnel {
 
         copyUnknownBlob();
         break;
+      case 0x29: // new in 1.8, add status effect (41)
+        write(packetId);
+        write(in.readInt());
+        write(in.readByte());
+        write(in.readByte());
+        write(in.readShort());
+        break;
+      case 0x2a: // new in 1.8, remove status effect (42)
+        write(packetId);
+        write(in.readInt());
+        write(in.readByte());
+        break;
+      case 0x2b: // new in 1.8 (43)
+        write(packetId);
+        write(in.readByte());
+        write(in.readByte());
+        write(in.readShort());
+        break;
+
       case 0x32: // Pre-Chunk
         write(packetId);
         copyNBytes(9);
@@ -680,15 +713,17 @@ public class StreamTunnel {
         write(in.readInt());
         write(in.readInt());
         break;
-      case 0x46: // Invalid Bed
+      case 0x46: // (70) Invalid state, changed in 1.8 (added serverMode byte)
         write(packetId);
-        copyNBytes(1);
+        write(in.readByte());
+        write(in.readByte());
         break;
       case 0x47: // Thunder
         write(packetId);
         copyNBytes(17);
         break;
       case 0x64: // Open window
+        boolean allow = true;
         byte id = in.readByte();
         byte invtype = in.readByte();
         String typeString = in.readUTF();
@@ -705,7 +740,7 @@ public class StreamTunnel {
           }
           if (!player.getGroup().ignoreAreas && (!server.config.blockPermission(player, player.openedChest()).chest || (adjacent != null && !server.config.blockPermission(player, adjacent.coordinate).chest))) {
             player.addTMessage(Color.RED, "You can't use chests here");
-            break;
+            allow = false;
           } else if (server.data.chests.canOpen(player, player.openedChest()) || player.ignoresChestLocks()) {
             if (server.data.chests.isLocked(player.openedChest())) {
               if (player.isAttemptingUnlock()) {
@@ -727,14 +762,19 @@ public class StreamTunnel {
 
           } else {
             player.addTMessage(Color.RED, "This chest is locked!");
-            break;
+            allow = false;
           }
         }
-        write(packetId);
-        write(id);
-        write(invtype);
-        write8(typeString);
-        write(unknownByte);
+        if (!allow) {
+          write((byte) 0x65);
+          write(id);
+        } else {
+          write(packetId);
+          write(id);
+          write(invtype);
+          write8(typeString);
+          write(unknownByte);
+        }
         break;
       case 0x65:
         write(packetId);
@@ -800,6 +840,13 @@ public class StreamTunnel {
         write(in.readShort());
         write(in.readByte());
         break;
+      case 0x6b: // 1.8 (107)
+        write(packetId);
+        write(in.readShort());
+        write(in.readShort());
+        write(in.readShort());
+        write(in.readShort());
+        break;
       case (byte) 0x82: // Update Sign
         write(packetId);
         write(in.readInt());
@@ -827,6 +874,12 @@ public class StreamTunnel {
         write(packetId);
         copyNBytes(5);
         break;
+      case (byte) 0xc9: // (201) 1.8, playerList
+        write(packetId);
+        write(readUTF16());
+        write(in.readByte());
+        write(in.readShort());
+        break;
       case (byte) 0xd3: // Red Power (mod by Eloraam)
         write(packetId);
         copyNBytes(1);
@@ -846,7 +899,11 @@ public class StreamTunnel {
           copyNBytes(write(in.readInt()));
         }
         break;
+      case (byte) 0xfe: // 1.8, poll server status (254)
+        write(packetId);
+        break;
       case (byte) 0xff: // Disconnect/Kick
+        // server list answer 'serverText§playerOnline§maxPlayers'
         write(packetId);
         String reason = readUTF16();
         write(reason);
@@ -862,13 +919,19 @@ public class StreamTunnel {
             flushAll();
           }
         } else {
-          throw new IOException("Unable to parse unknown " + streamType
-              + " packet 0x" + Integer.toHexString(packetId) + " for player "
-              + player.getName() + " (after 0x" + Integer.toHexString(lastPacket));
+          if (lastPacket != null) {
+            throw new IOException("Unable to parse unknown " + streamType
+                + " packet 0x" + Integer.toHexString(packetId) + " for player "
+                + player.getName() + " (after 0x" + Integer.toHexString(lastPacket));
+          } else {
+            throw new IOException("Unable to parse unknown " + streamType
+                                  + " packet 0x" + Integer.toHexString(packetId) + " for player "
+                                  + player.getName());
+          }
         }
     }
     packetFinished();
-    lastPacket = packetId;
+    lastPacket = (packetId == 0x00) ? lastPacket : packetId;
   }
 
   private long copyVLC() throws IOException {
@@ -1100,7 +1163,7 @@ public class StreamTunnel {
       return;
     }
     if (message.length() > 0) {
-      write(0x03);
+      write((byte) 0x03);
       write(message);
       packetFinished();
     }
@@ -1148,7 +1211,7 @@ public class StreamTunnel {
             if (run && !player.isRobot()) {
               System.out.println("[SimpleServer] " + e);
               System.out.println("[SimpleServer] " + streamType
-                  + " error handling traffic for " + player.getIPAddress());
+                  + " error handling traffic for " + player.getIPAddress() + " (" + Integer.toHexString(lastPacket) + ")");
             }
             break;
           }
