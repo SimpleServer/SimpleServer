@@ -29,16 +29,14 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.concurrent.locks.ReentrantLock;
 
+import simpleserver.Coordinate.Dimension;
 import simpleserver.Position;
 import simpleserver.Server;
-import simpleserver.Coordinate.Dimension;
 
 public class Bot {
-  private static final int VERSION = 14;
+  private static final int VERSION = 15;
 
   protected String name;
   protected Server server;
@@ -51,7 +49,6 @@ public class Bot {
   protected DataInputStream in;
   protected DataOutputStream out;
 
-  private Timer timer;
   ReentrantLock writeLock;
   protected Position position;
   protected BotController controller;
@@ -79,8 +76,6 @@ public class Bot {
 
     connected = true;
     new Tunneler().start();
-    timer = new Timer();
-    timer.schedule(new KeepAlive(), 0, 30 * 1000);
 
     handshake();
   }
@@ -90,6 +85,13 @@ public class Bot {
   }
 
   protected void positionUpdate() throws IOException {
+  }
+
+  private void keepAlive(int keepAliveId) throws IOException {
+    writeLock.lock();
+    out.writeByte(0x0);
+    out.writeInt(keepAliveId);
+    writeLock.unlock();
   }
 
   private void handshake() throws IOException {
@@ -114,6 +116,9 @@ public class Bot {
     out.writeInt(VERSION);
     write(name);
     out.writeLong(0);
+    out.writeInt(0);
+    out.writeByte(0);
+    out.writeByte(0);
     out.writeByte(0);
     writeLock.unlock();
   }
@@ -122,6 +127,9 @@ public class Bot {
     writeLock.lock();
     out.writeByte(9);
     out.writeByte(position.dimension.index());
+    out.writeByte(0);
+    out.writeShort(128);
+    out.writeLong(0);
     writeLock.unlock();
   }
 
@@ -164,7 +172,10 @@ public class Bot {
         in.readInt();
         readUTF16();
         in.readLong();
+        in.readInt();
         position.dimension = Dimension.get(in.readByte());
+        in.readByte();
+        in.readByte();
         break;
       case 0x0d: // Player Position & Look
         double x = in.readDouble();
@@ -202,6 +213,7 @@ public class Bot {
         break;
 
       case 0x00: // Keep Alive
+        keepAlive(in.readInt());
         break;
       case 0x03: // Chat Message
         readUTF16();
@@ -226,6 +238,8 @@ public class Bot {
         break;
       case 0x08: // Update Health
         health = in.readShort();
+        in.readShort();
+        in.readFloat();
         if (health <= 0) {
           dead = true;
           respawn();
@@ -233,6 +247,9 @@ public class Bot {
         break;
       case 0x09: // Respawn
         position.dimension = Dimension.get(in.readByte());
+        in.readByte();
+        in.readShort();
+        in.readLong();
         break;
       case 0x0a: // Player
         in.readByte();
@@ -347,6 +364,21 @@ public class Bot {
         in.readInt();
         readUnknownBlob();
         break;
+      case 0x29: // new in 1.8, add status effect (41)
+        in.readInt();
+        in.readByte();
+        in.readByte();
+        in.readShort();
+        break;
+      case 0x2a: // new in 1.8, remove status effect (42)
+        in.readInt();
+        in.readByte();
+        break;
+      case 0x2b: // experience
+        in.readByte();
+        in.readByte();
+        in.readShort();
+        break;
       case 0x32: // Pre-Chunk
         readNBytes(9);
         break;
@@ -383,7 +415,7 @@ public class Bot {
         in.readInt();
         break;
       case 0x46: // Invalid Bed
-        readNBytes(1);
+        readNBytes(2);
         break;
       case 0x47: // Thunder
         readNBytes(17);
@@ -434,10 +466,16 @@ public class Bot {
         in.readShort();
         in.readShort();
         break;
-      case 0x6a:
+      case 0x6a: // item transaction
         in.readByte();
         in.readShort();
         in.readByte();
+        break;
+      case 0x6b: // creative item get
+        in.readShort();
+        in.readShort();
+        in.readShort();
+        in.readShort();
         break;
       case (byte) 0x82: // Update Sign
         in.readInt();
@@ -457,6 +495,11 @@ public class Bot {
       case (byte) 0xc8: // Statistic
         readNBytes(5);
         break;
+      case (byte) 0xc9: // User list
+        readUTF16();
+        in.readBoolean();
+        in.readShort();
+        break;
       case (byte) 0xe6: // ModLoaderMP by SDK
         in.readInt(); // mod
         in.readInt(); // packet id
@@ -466,6 +509,8 @@ public class Bot {
         for (int i = 0; i < sizeString; i++) {
           readNBytes(in.readInt());
         }
+        break;
+      case (byte) 0xfe:
         break;
       default:
         error("Unable to handle packet 0x" + Integer.toHexString(packetId)
@@ -543,7 +588,6 @@ public class Bot {
   }
 
   protected void die() {
-    timer.cancel();
     connected = false;
     if (controller != null) {
       controller.remove(this);
@@ -578,22 +622,6 @@ public class Bot {
           out.flush();
         } catch (IOException e) {
           error("Soket closed");
-        }
-      }
-    }
-  }
-
-  private final class KeepAlive extends TimerTask {
-    @Override
-    public void run() {
-      if (connected) {
-        writeLock.lock();
-        try {
-          out.writeByte(0x0);
-        } catch (IOException e) {
-          error("KeepAlive failed");
-        } finally {
-          writeLock.unlock();
         }
       }
     }
