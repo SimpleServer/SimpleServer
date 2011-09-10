@@ -38,6 +38,7 @@
       <command name="banip" allow="4,5" />
       <command name="chat" aliases="c" allow="1+"/>
       <command name="dimension" aliases="d" allow="0+" />
+      <command name="gamemode" allow="4+" />
       <command name="give" allow="3-5" />
       <command name="giveplayer" allow="4,5" />
       <command name="global" allow="0+" />
