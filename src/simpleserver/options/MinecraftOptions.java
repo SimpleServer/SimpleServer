@@ -46,7 +46,9 @@ public class MinecraftOptions extends AbstractOptions {
     options.setProperty("pvp", simpleServerOptions.get("pvp"));
     options.setProperty("view-distance", simpleServerOptions.get("viewDistance"));
     options.setProperty("allow-nether", simpleServerOptions.get("allowNether"));
-    options.setProperty("world-seed", simpleServerOptions.get("worldSeed"));
+    options.setProperty("level-seed", simpleServerOptions.get("worldSeed"));
+    options.setProperty("gamemode", simpleServerOptions.get("gameMode"));
+    options.setProperty("motd", simpleServerOptions.get("serverDescription"));
 
     super.save();
   }
