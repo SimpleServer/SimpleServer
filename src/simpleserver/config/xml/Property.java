@@ -56,13 +56,17 @@ class Property extends XMLTag {
 
   @Override
   void finish() {
-    String lowvalue = value.toLowerCase();
-    if (lowvalue.equals("true") || lowvalue.equals("yes") ||
+    if (value == null) {
+      value = "";
+    } else {
+      String lowvalue = value.toLowerCase();
+      if (lowvalue.equals("true") || lowvalue.equals("yes") ||
           lowvalue.equals("on")) {
-      value = "true";
-    } else if (lowvalue.equals("false") || lowvalue.equals("not") ||
+        value = "true";
+      } else if (lowvalue.equals("false") || lowvalue.equals("not") ||
           lowvalue.equals("no") || lowvalue.equals("off")) {
-      value = "false";
+        value = "false";
+      }
     }
   }
 

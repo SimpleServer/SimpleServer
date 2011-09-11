@@ -139,7 +139,7 @@ class XMLTagResolver extends DefaultHandler {
 
     AttributeElement(String name) {
       this();
-      this.name = name.toLowerCase();
+      this.name = name;
     }
 
     @Override

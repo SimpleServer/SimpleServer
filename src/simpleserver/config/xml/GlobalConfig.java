@@ -101,9 +101,9 @@ public class GlobalConfig extends AbstractConfig {
   }
 
   private void copyDefaults() throws IOException {
-    File xml = new File("simpleserver", "permissions.xml");
+    File xml = new File("simpleserver", filename);
     if (!xml.exists()) {
-      copyFile(getResourceStream(), xml);
+      copyFile(getClass().getResourceAsStream(filename), xml);
     }
   }
 
@@ -132,8 +132,9 @@ public class GlobalConfig extends AbstractConfig {
     OutputFormat of = new OutputFormat("XML", "UTF-8", true);
     of.setIndent(1);
     of.setIndenting(true);
+    of.setLineWidth(200);
     of.setDoctype(null, "http://somewhere/config.dtd ");
-    XMLSerializer serializer = new XMLSerializer(fos, of);
+    XMLSerializer serializer = new ConfigSerializer(fos, of);
     ContentHandler hd;
     try {
       hd = serializer.asContentHandler();

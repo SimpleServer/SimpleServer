@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE config SYSTEM "http://somewhere/config.dtd ">
+<config>
+    <property name="announceRestart">true</property>
+	<property name="useXincgc">true</property>
+	<property name="logMessages">true</property>
+	<property name="autoSaveMins">5</property>
+	<property name="gameMode">0</property>
+	<property name="freezeTime"></property>
+	<property name="maxPlayers">16</property>
+	<property name="keepBackupHours">24</property>
+	<property name="msgWrap">true</property>
+	<property name="announceSave">true</property>
+	<property name="overwriteArguments">false</property>
+	<property name="spawnMonsters">true</property>
+	<property name="port">25565</property>
+	<property name="levelName">world</property>
+	<property name="msgForwardFormat">%2$s</property>
+	<property name="defaultGroup">1</property>
+	<property name="rconPassword"></property>
+	<property name="announceBackup">true</property>
+	<property name="custAuth">false</property>
+	<property name="useMsgFormats">true</property>
+	<property name="autoSave">false</property>
+	<property name="worldSeed"></property>
+	<property name="spawnAnimals">true</property>
+	<property name="localChatRadius">30</property>
+	<property name="viewDistance">10</property>
+	<property name="memory">1024</property>
+	<property name="serverDescription">A server running SimpleServer</property>
+	<property name="internalPort">25566</property>
+	<property name="c10tArgs"></property>
+	<property name="chatConsoleToOps">false</property>
+	<property name="rconPort">25500</property>
+	<property name="onlineMode">true</property>
+	<property name="autoRestart">false</property>
+	<property name="showListOnConnect">false</property>
+	<property name="pvp">true</property>
+	<property name="telnetPassword"></property>
+	<property name="autoBackupMins">30</property>
+	<property name="alternateJarFile"></property>
+	<property name="autoBackup">true</property>
+	<property name="useSlashes">true</property>
+	<property name="enableTelnet">false</property>
+	<property name="serverLanguage">en</property>
+	<property name="logMessageFormat">%1$s-&gt;%2$s\: %3$s</property>
+	<property name="c10tMins">60</property>
+	<property name="autoRestartMins">240</property>
+	<property name="allowFlight">false</property>
+	<property name="telnetPort">25505</property>
+	<property name="msgTitleFormat">§%3$s&lt;[%2$s]%1$s&gt;§f</property>
+	<property name="exitOnFailure">true</property>
+	<property name="javaArguments"></property>
+	<property name="allowNether">true</property>
+	<property name="msgFormat">§%3$s&lt;%1$s&gt;§f</property>
+	<property name="forwardAllCommands">false</property>
+	<property name="debug">false</property>
+	<property name="forwardChat">false</property>
+	<property name="ipAddress">0.0.0.0</property>
+	<property name="enableRcon">false</property>
+	<property name="useWhitelist">false</property>
+	<property name="defaultGroup">1</property>
+	
+	<ip group="5">127.0.0.1</ip>
+	
+	<group id="0" name="Guest" color="f">
+		<showTitle />
+	</group>
+	<group id="1" name="Player" color="f" />
+	<group id="2" name="Trusted" color="9" />
+	<group id="3" name="Mod" color="9">
+		<ignoreChestLocks />
+	</group>
+	<group id="4" name="Admin" color="2">
+		<ignoreChestLocks />
+		<ignoreAreas />
+	</group>
+	<group id="5" name="Owner" color="3">
+		<ignoreChestLocks />
+		<ignoreAreas />
+	</group>
+	
+	<command name="area" allow="0+" />
+	<command name="areasay" allow="0+">
+		<alias>a</alias>
+	</command>
+	<command name="back" allow="4+" />
+	<command name="backup" allow="4+" />
+	<command name="ban" allow="4+" />
+	<command name="banip" allow="4+" />
+	<command name="chat" allow="1+">
+		<alias>c</alias>
+	</command>
+	<command name="dimension" allow="0+">
+		<alias>d</alias>
+	</command>
+	<command name="gamemode" allow="4+" />
+	<command name="give" allow="3+" />
+	<command name="giveplayer" allow="4+" />
+	<command name="global" allow="0+" />
+	<command name="gps" allow="3+" />
+	<command name="group" allow="0+">
+		<alias>g</alias>
+	</command>
+	<command name="help" allow="0+">
+		<alias>commands</alias>
+	</command>
+	<command name="home" allow="1+" />
+	<command name="iddqd" allow="4+" />
+	<command name="kick" allow="3+" />
+	<command name="kit" allow="1+">
+		<alias>kits</alias>
+	</command>
+	<command name="listips" allow="3+" />
+	<command name="local" allow="0+">
+		<alias>l</alias>
+	</command>
+	<command name="lock" allow="1+" />
+	<command name="login" allow="0+" />
+	<command name="motd" allow="0+" />
+	<command name="mute" allow="3+" />
+	<command name="myarea" allow="2+" />
+	<command name="mystats" allow="1+" />
+	<command name="register" allow="1+">
+		<alias>passwd</alias>
+	</command>
+	<command name="rcon" allow="5+" />
+	<command name="read" allow="0+" />
+	<command name="reload" allow="4+">
+		<forward />
+	</command>
+	<command name="reply" allow="1+">
+		<alias>r</alias>
+	</command>
+	<command name="restart" allow="4+" />
+	<command name="rules" allow="0+" />
+	<command name="save" allow="4+">
+		<forward />
+	</command>
+	<command name="servertime" allow="0+" />
+	<command name="setgroup" allow="4+" />
+	<command name="setipgroup" allow="4+" />
+	<command name="spawn" allow="3+" />
+	<command name="stop" allow="-" />
+	<command name="teleport" allow="4+">
+		<alias>tp</alias>
+	</command>
+	<command name="tell" allow="1+">
+		<alias>t</alias>
+	</command>
+	<command name="time" allow="4+" />
+	<command name="unban" allow="4+" />
+	<command name="unbanip" allow="4+" />
+	<command name="unlock" allow="1+" />
+	<command name="unmute" allow="3+" />
+	<command name="unwhitelist" allow="3+" />
+	<command name="visit" allow="3+" />
+	<command name="warp" allow="3+" />
+	<command name="warpmeto" allow="3+">
+		<alias>tpto</alias>
+	</command>
+	<command name="warptome" allow="3+" />
+	<command name="whitelist" allow="3+" />
+	<command name="who" allow="0+">
+		<alias>list</alias>
+	</command>
+	
+	<allblocks destroy="1+" place="1+" use="1+" />
+</config>

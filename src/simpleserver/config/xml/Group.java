@@ -39,10 +39,10 @@ public class Group extends XMLTag {
   private static final String ID = "id";
   private static final String NAME = "name";
   private static final String COLOR = "color";
-  private static final String IGNORE_CHESTS = "ignorechestlocks";
-  private static final String IGNORE_AREAS = "ignoreareas";
-  private static final String FORWARD_UNKNOWN = "forwardunknowncommands";
-  private static final String SHOW_TITLE = "showtitle";
+  private static final String IGNORE_CHESTS = "ignoreChestLocks";
+  private static final String IGNORE_AREAS = "ignoreAreas";
+  private static final String FORWARD_UNKNOWN = "forwardUnknownCommands";
+  private static final String SHOW_TITLE = "showTitle";
   private static final String COOLDOWN = "cooldown";
   private static final String WARMUP = "warmup";
 
@@ -69,7 +69,7 @@ public class Group extends XMLTag {
     if (name.equals(ID)) {
       id = getInt(value);
     } else if (name.equals(NAME)) {
-      name = value;
+      this.name = value;
     } else if (name.equals(COLOR)) {
       color = value.charAt(0);
     } else if (name.equals(IGNORE_CHESTS)) {
