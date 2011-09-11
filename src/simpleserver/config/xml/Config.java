@@ -87,7 +87,7 @@ public class Config extends PermissionContainer {
       while (!stack.isEmpty()) {
         AreaStorage storage = stack.pop();
         for (Area area : storage) {
-          if (area.owner == name) {
+          if (area.owner.equals(name)) {
             return new AreaStoragePair(storage, area);
           }
           stack.add(area.areas);

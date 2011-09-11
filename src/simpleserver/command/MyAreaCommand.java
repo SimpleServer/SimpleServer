@@ -48,7 +48,7 @@ public class MyAreaCommand extends AbstractCommand implements PlayerCommand {
     String arguments[] = extractArguments(message);
 
     if (arguments.length == 0) {
-      player.addTMessage(Color.RED, "Error! Command requires argument!");
+      player.addTCaptionedMessage("Usage", commandPrefix() + "myarea [start|end|save|unsave|rename]");
       return;
     }
 

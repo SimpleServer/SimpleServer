@@ -231,14 +231,15 @@ public class Server {
     for (Resource resource : resources) {
       resource.load();
     }
-    if (playerList != null) {
-      playerList.updatePlayerGroups();
-    }
 
     if (globalConfig.loadsuccess) {
       config = globalConfig.config;
     } else {
       System.out.println("[SimpleServer] Syntax error in comfig.xml! Config was not reloaded.");
+    }
+
+    if (playerList != null) {
+      playerList.updatePlayerGroups();
     }
 
     if (!Translations.getInstance().setLanguage(options.get("serverLanguage"))) {

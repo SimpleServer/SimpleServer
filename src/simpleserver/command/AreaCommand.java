@@ -34,6 +34,10 @@ public class AreaCommand extends AbstractCommand implements PlayerCommand {
   public void execute(Player player, String message) {
     List<Area> areas = player.getServer().config.dimensions.areas(player.position());
     StringBuilder str = new StringBuilder();
+    if (areas == null || areas.isEmpty()) {
+      player.addTMessage(Color.GRAY, "You are currently in no areas");
+      return;
+    }
     for (Area area : areas) {
       str.append(area.name);
       str.append(", ");
@@ -42,7 +46,6 @@ public class AreaCommand extends AbstractCommand implements PlayerCommand {
       str.delete(str.length() - 2, str.length() - 1);
     }
 
-    player.addTMessage(Color.GRAY, "Current area: %s %s",
-                       Color.WHITE, str.toString());
+    player.addTCaptionedMessage("Current areas", str.toString());
   }
 }

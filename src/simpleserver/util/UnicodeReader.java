@@ -88,7 +88,7 @@ public class UnicodeReader extends Reader {
         }
       }
 
-      if (unread <= BOM_SIZE && unread > 0) {
+      if (unread <= BOM_SIZE) {
         pushbackReader.unread(bom, unread, read - unread);
       }
     }

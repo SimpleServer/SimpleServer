@@ -40,10 +40,14 @@ public class HelpCommand extends AbstractCommand implements PlayerCommand {
     if (arguments.length > 0) {
       String prefix = commandPrefix();
       String commandName = arguments[0];
-      if (!commandName.startsWith(prefix)) {
-        commandName = prefix + commandName;
+      if (commandName.startsWith(prefix)) {
+        commandName = commandName.substring(1);
       }
       PlayerCommand command = parser.getPlayerCommand(commandName);
+      if (command == null) {
+        player.addTMessage(Color.RED, "No such command");
+        return;
+      }
       player.addMessage(command.getHelpText(prefix));
 
       List<String> aliases = player.getServer().config.commands.get(command.getName()).aliases;

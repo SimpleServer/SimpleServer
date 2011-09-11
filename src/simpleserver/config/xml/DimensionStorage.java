@@ -73,6 +73,7 @@ public class DimensionStorage extends Storage implements Iterable<DimensionConfi
     DimensionConfig newDimension = new DimensionConfig();
     newDimension.dimension = dimension;
     newDimension.init();
+    newDimension.finish();
     dimensions.put(dimension, newDimension);
     return newDimension;
   }

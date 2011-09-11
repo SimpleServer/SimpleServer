@@ -44,6 +44,8 @@ public class ConfigSerializer extends XMLSerializer {
     captions.put("command", "Commands");
     captions.put("allblocks", "Blocks");
     captions.put("block", "Blocks");
+    captions.put("dimension", "Dimensions");
+    captions.put("area", "Areas");
   }
 
   public ConfigSerializer(FileOutputStream fos, OutputFormat of) {
