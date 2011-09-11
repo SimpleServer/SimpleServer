@@ -514,11 +514,11 @@ public class Player {
       }
     }
 
-    if (config != null && !(command instanceof ExternalCommand) && config.forwarding != Forwarding.ONLY) {
+    if (!(command instanceof ExternalCommand) && (config == null || config.forwarding != Forwarding.ONLY)) {
       command.execute(this, message);
     }
 
-    return !((command instanceof ExternalCommand) || config == null || config.forwarding != Forwarding.NONE || server.options.getBoolean("forwardAllCommands"));
+    return !((command instanceof ExternalCommand) || (config != null && config.forwarding != Forwarding.NONE) || server.options.getBoolean("forwardAllCommands"));
   }
 
   public void execute(Class<? extends PlayerCommand> c) {

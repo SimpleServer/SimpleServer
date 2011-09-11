@@ -75,6 +75,7 @@ public class StreamTunnel {
   private volatile long lastRead;
   private volatile boolean run = true;
   private Byte lastPacket;
+  private char commandPrefix;
 
   public StreamTunnel(InputStream in, OutputStream out, boolean isServerTunnel,
                       Player player) {
@@ -87,6 +88,7 @@ public class StreamTunnel {
 
     this.player = player;
     server = player.getServer();
+    commandPrefix = server.options.getBoolean("useSlashes") ? '/' : '!';
 
     DataInputStream dIn = new DataInputStream(new BufferedInputStream(in));
     DataOutputStream dOut = new DataOutputStream(new BufferedOutputStream(out));
@@ -270,14 +272,13 @@ public class StreamTunnel {
             break;
           }
 
-          if (player.parseCommand(message)) {
-            break;
-          }
-
-          if (message.startsWith("/") || message.startsWith("!")) {
+          if (message.charAt(0) == commandPrefix) {
+            if (player.parseCommand(message)) {
+              break;
+            }
             write(packetId);
-            write(message);
-            break;
+            write('/' + message.substring(1));
+            return;
           }
 
           player.sendMessage(message);
@@ -951,9 +952,7 @@ public class StreamTunnel {
   private String readUTF16() throws IOException {
     short length = in.readShort();
     byte[] bytes = new byte[length * 2 + 2];
-    for (short i = 0; i < length * 2; i++) {
-      bytes[i + 2] = in.readByte();
-    }
+    in.readFully(bytes, 2, length * 2);
     bytes[0] = (byte) 0xfffffffe;
     bytes[1] = (byte) 0xffffffff;
     return new String(bytes, "UTF-16");
@@ -1069,17 +1068,8 @@ public class StreamTunnel {
   }
 
   private String write(String s) throws IOException {
-    byte[] bytes = s.getBytes("UTF-16");
-    if (s.length() == 0) {
-      write((byte) 0x00);
-      write((byte) 0x00);
-      return s;
-    }
-    bytes[0] = (byte) ((s.length() >> 8) & 0xFF);
-    bytes[1] = (byte) ((s.length() & 0xFF));
-    for (byte b : bytes) {
-      write(b);
-    }
+    write((short) s.length());
+    out.writeChars(s);
     return s;
   }
 
