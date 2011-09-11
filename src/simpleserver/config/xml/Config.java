@@ -181,7 +181,9 @@ public class Config extends PermissionContainer {
     }
 
     void add(Chests chests) {
-      chestPerm = chests.allow;
+      if (chests != null) {
+        chestPerm = chests.allow;
+      }
     }
 
     void add(Block block) {

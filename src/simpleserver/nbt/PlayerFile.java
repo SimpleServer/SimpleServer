@@ -29,6 +29,11 @@ import simpleserver.Server;
 import simpleserver.Coordinate.Dimension;
 
 public class PlayerFile {
+  public enum GameMode {
+    SURVIVAL,
+    CREATIVE;
+  }
+
   private String filename;
   private NBTFile nbt;
 
@@ -56,6 +61,14 @@ public class PlayerFile {
   public void setPosition(Position position) {
     setPosition(position.x, position.y, position.z, position.dimension);
     setLook(position.yaw, position.pitch);
+  }
+
+  public GameMode getGameMode() {
+    return GameMode.values()[nbt.root().getInt("playerGameType").get()];
+  }
+
+  public void setGameMode(GameMode mode) {
+    nbt.root().put(new NBTInt("playerGameType", mode.ordinal()));
   }
 
   public void setPosition(double x, double y, double z, Dimension dimension) {
