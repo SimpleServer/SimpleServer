@@ -113,7 +113,7 @@ public class Permission {
 
   private static boolean contains(TreeMap<Integer, Integer> ranges, int value) {
     Entry<Integer, Integer> entry = ranges.lowerEntry(value + 1);
-    return entry != null && entry.getValue() <= value;
+    return entry != null && entry.getValue() >= value;
   }
 
   @Override

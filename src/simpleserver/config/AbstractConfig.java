@@ -37,7 +37,7 @@ public abstract class AbstractConfig implements Resource {
   protected AbstractConfig(String filename) {
     this.filename = filename;
 
-    // loadHeader();
+    loadHeader();
   }
 
   public abstract void save();

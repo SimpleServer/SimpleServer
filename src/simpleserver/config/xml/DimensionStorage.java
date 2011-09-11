@@ -20,6 +20,7 @@
  */
 package simpleserver.config.xml;
 
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -65,12 +66,13 @@ public class DimensionStorage extends Storage implements Iterable<DimensionConfi
     if (dim != null) {
       return dim.areas.overlaps(area);
     }
-    return null;
+    return new HashSet<Area>(0);
   }
 
   public DimensionConfig add(Dimension dimension) {
     DimensionConfig newDimension = new DimensionConfig();
     newDimension.dimension = dimension;
+    newDimension.init();
     dimensions.put(dimension, newDimension);
     return newDimension;
   }

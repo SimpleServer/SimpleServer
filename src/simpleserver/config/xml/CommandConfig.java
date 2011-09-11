@@ -119,6 +119,10 @@ public class CommandConfig extends StorageContainer implements Comparable<Comman
     return perm == null ? allow : perm;
   }
 
+  public boolean alias(String alias) {
+    return aliases != null && aliases.contains(alias);
+  }
+
   public int compareTo(CommandConfig command) {
     return originalName.compareTo(command.originalName);
   }

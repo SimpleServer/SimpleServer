@@ -38,8 +38,8 @@ public class MyAreaCommand extends AbstractCommand implements PlayerCommand {
   }
 
   private boolean areaSizeOk(Player player) {
-    return (Math.abs(player.areastart.x() - player.areaend.x()) <= 50)
-          && (Math.abs(player.areastart.y() - player.areaend.y()) <= 50)
+    return (Math.abs(player.areastart.x() - player.areaend.x()) < 50)
+          && (Math.abs(player.areastart.z() - player.areaend.z()) < 50)
           && player.areaend.dimension() == player.areastart.dimension();
   }
 
@@ -58,7 +58,7 @@ public class MyAreaCommand extends AbstractCommand implements PlayerCommand {
       player.addTMessage(Color.GRAY, "Start coordinate set.");
     } else if (arguments[0].equals("end")) {
       player.areaend = player.position();
-      player.areaend = player.areaend.setY((byte) 0); // no height limit
+      player.areaend = player.areaend.setY((byte) 127); // no height limit
       player.addTMessage(Color.GRAY, "End coordinate set.");
     } else if (arguments[0].equals("save")) {
       if (player.areastart == null || player.areaend == null) {
@@ -75,7 +75,7 @@ public class MyAreaCommand extends AbstractCommand implements PlayerCommand {
       }
       Area area = createPlayerArea(player);
       Set<Area> overlaps = config.dimensions.overlaps(area);
-      if (overlaps != null) {
+      if (!overlaps.isEmpty()) {
         player.addTMessage(Color.RED, "Your area overlaps with other areas and could therefore not be saved!");
         StringBuilder str = new StringBuilder();
         for (Area overlap : overlaps) {

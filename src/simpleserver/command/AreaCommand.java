@@ -39,7 +39,7 @@ public class AreaCommand extends AbstractCommand implements PlayerCommand {
       str.append(", ");
     }
     if (!areas.isEmpty()) {
-      str.delete(0, str.length() - 2);
+      str.delete(str.length() - 2, str.length() - 1);
     }
 
     player.addTMessage(Color.GRAY, "Current area: %s %s",

@@ -39,6 +39,7 @@ public class CommandStorage extends Storage implements Iterable<CommandConfig> {
     return contains(name) ? commands.get(name) : null;
   }
 
+  @Override
   public Iterator<CommandConfig> iterator() {
     return commands.values().iterator();
   }
@@ -53,7 +54,7 @@ public class CommandStorage extends Storage implements Iterable<CommandConfig> {
       return commands.get(name);
     }
     for (CommandConfig command : commands.values()) {
-      if (command.aliases.contains(name)) {
+      if (command.alias(name)) {
         return command;
       }
     }

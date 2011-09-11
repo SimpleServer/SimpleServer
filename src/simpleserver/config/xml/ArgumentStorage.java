@@ -38,6 +38,9 @@ public class ArgumentStorage extends Storage {
   }
 
   Permission permission(String args) {
+    if (arguments == null) {
+      return null;
+    }
     for (Argument arg : arguments) {
       if (args.startsWith(arg.argument)) {
         return arg.allow;

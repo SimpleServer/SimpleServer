@@ -123,13 +123,13 @@ public class GlobalConfig extends AbstractConfig {
     lock.lock();
     FileOutputStream fos;
     try {
-      fos = new FileOutputStream(new File("test.xml"));
+      fos = new FileOutputStream(getFile());
     } catch (FileNotFoundException e) {
       e.printStackTrace();
       lock.unlock();
       return;
     }
-    OutputFormat of = new OutputFormat("XML", "ISO-8859-1", true);
+    OutputFormat of = new OutputFormat("XML", "UTF-8", true);
     of.setIndent(1);
     of.setIndenting(true);
     of.setDoctype(null, "http://somewhere/config.dtd ");
@@ -189,5 +189,9 @@ public class GlobalConfig extends AbstractConfig {
     long total = runtime.totalMemory() / 1000;
     long free = runtime.freeMemory() / 1000;
     System.out.println(String.format("Total memory: %d MB  free: %d MB  used: %d KB", total / 1000, free / 1000, (total - free)));
+  }
+
+  @Override
+  protected void loadHeader() {
   }
 }

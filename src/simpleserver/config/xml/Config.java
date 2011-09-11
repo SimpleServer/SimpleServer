@@ -85,13 +85,13 @@ public class Config extends PermissionContainer {
       Stack<AreaStorage> stack = new Stack<AreaStorage>();
       stack.add(dim.topAreas);
       while (!stack.isEmpty()) {
-        for (Area area : stack.peek()) {
+        AreaStorage storage = stack.pop();
+        for (Area area : storage) {
           if (area.owner == name) {
-            return new AreaStoragePair(stack.peek(), area);
+            return new AreaStoragePair(storage, area);
           }
           stack.add(area.areas);
         }
-        stack.pop();
       }
     }
     return null;

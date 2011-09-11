@@ -57,7 +57,7 @@ public class IpStorage extends Storage {
   }
 
   public Integer get(Player player) {
-    return get(player.getInetAddress()).group;
+    return contains(player.getInetAddress()) ? get(player.getInetAddress()).group : null;
   }
 
   @Override

@@ -55,6 +55,7 @@ public class Area extends PermissionContainer implements Comparable<Area> {
     this.end = end;
     position = Integer.MAX_VALUE;
     level = 0;
+    init();
   }
 
   @Override
@@ -80,7 +81,7 @@ public class Area extends PermissionContainer implements Comparable<Area> {
     } else if (name.equals(START)) {
       start = getCoord(value, 0);
     } else if (name.equals(END)) {
-      end = getCoord(value, 128);
+      end = getCoord(value, 127);
     } else if (name.equals(OWNER)) {
       owner = value;
     } else if (name.equals(PRIORITY)) {

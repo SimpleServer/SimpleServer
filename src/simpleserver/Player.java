@@ -191,6 +191,8 @@ public class Player {
     this.name = name;
     updateGroup();
 
+    addMessage(Integer.toString(group));
+
     watchdog.setName("PlayerWatchdog-" + name);
     server.connectionLog("player", extsocket, name);
 
@@ -481,8 +483,8 @@ public class Player {
       lastCommand = message;
     }
 
-    String commandName = message.split(" ")[0];
-    String args = message.substring(commandName.length() + 1);
+    String commandName = message.split(" ")[0].substring(1);
+    String args = commandName.length() == message.length() ? "" : message.substring(commandName.length() + 1);
     CommandConfig config = server.config.commands.getTopConfig(commandName);
     String originalName = config == null ? commandName : config.originalName;
 

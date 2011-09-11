@@ -47,7 +47,7 @@ public class HelpCommand extends AbstractCommand implements PlayerCommand {
       player.addMessage(command.getHelpText(prefix));
 
       List<String> aliases = player.getServer().config.commands.get(command.getName()).aliases;
-      if (!aliases.isEmpty()) {
+      if (aliases != null) {
         StringBuffer line = new StringBuffer();
         for (String alias : aliases) {
           line.append(commandPrefix());
@@ -73,8 +73,9 @@ public class HelpCommand extends AbstractCommand implements PlayerCommand {
 
       for (CommandConfig cmd : commands) {
         Command command = parser.getPlayerCommand(cmd.originalName);
+        System.out.println(cmd.name);
 
-        if (cmd.hidden || command.hidden()) {
+        if (cmd.hidden || (command != null && command.hidden())) {
           continue;
         }
 
