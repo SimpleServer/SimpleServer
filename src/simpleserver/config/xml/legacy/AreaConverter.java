@@ -59,9 +59,11 @@ public class AreaConverter extends TagConverter {
     coords = parts[0].split(",");
     Coordinate end;
     if (coords.length == 2) {
-      end = new Coordinate(getInt(coords[0]), 0, getInt(coords[1]));
-    } else {
+      end = new Coordinate(getInt(coords[0]), 127, getInt(coords[1]));
+    } else if (coords.length >= 3) {
       end = new Coordinate(getInt(coords[0]), getInt(coords[1]), getInt(coords[2]));
+    } else {
+      throw new SAXException("Invalid coordinate: " + parts[0]);
     }
 
     if (!((Config) stack.firstElement()).dimensions.contains(dimension)) {

@@ -102,6 +102,9 @@ public class Permission {
     }
     String[] parts = permission.split(";");
     for (String group : parts[0].split(",")) {
+      if (group.length() == 0) {
+        continue;
+      }
       boolean allow = true;
       if (group.startsWith("!") || group.startsWith("~") || group.startsWith("¬")) {
         allow = false;

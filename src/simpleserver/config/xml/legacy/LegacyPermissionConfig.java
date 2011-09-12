@@ -25,7 +25,6 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 
 import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.XMLReaderFactory;
 
@@ -45,7 +44,7 @@ public class LegacyPermissionConfig {
     XMLReader xml;
     try {
       xml = XMLReaderFactory.createXMLReader();
-    } catch (SAXException e) {
+    } catch (Exception e) {
       // TODO Auto-generated catch block
       e.printStackTrace();
       return null;
@@ -54,7 +53,7 @@ public class LegacyPermissionConfig {
     LegacyTagResolver handler;
     try {
       handler = new LegacyTagResolver();
-    } catch (SAXException e) {
+    } catch (Exception e) {
       e.printStackTrace();
       return null;
     }
@@ -67,6 +66,7 @@ public class LegacyPermissionConfig {
       xml.setEntityResolver(handler);
       xml.parse(new InputSource(new FileReader(file)));
     } catch (FileNotFoundException e) {
+      e.printStackTrace();
       return null;
     } catch (Exception e) {
       e.printStackTrace();

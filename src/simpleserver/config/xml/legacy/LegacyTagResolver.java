@@ -20,6 +20,7 @@
  */
 package simpleserver.config.xml.legacy;
 
+import java.io.IOException;
 import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.Map;
@@ -29,6 +30,7 @@ import java.util.Stack;
 import org.reflections.Reflections;
 import org.reflections.scanners.SubTypesScanner;
 import org.xml.sax.Attributes;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
@@ -85,6 +87,11 @@ class LegacyTagResolver extends DefaultHandler {
       }
       tags.put(instance.tag, instance);
     }
+  }
+
+  @Override
+  public InputSource resolveEntity(String name, String publicId) throws SAXException, IOException {
+    return new InputSource(getClass().getResourceAsStream("/simpleserver/config/defaults/permissions.dtd"));
   }
 
   public Config config() {
