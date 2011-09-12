@@ -92,6 +92,10 @@ public class SegmentTree<E> {
       points.put(segment.end, segment.start == segment.end);
     }
 
+    if (points.isEmpty()) {
+      return new Node(0, 0);
+    }
+
     // create leaves
     List<Node> leaves = new LinkedList<Node>();
     while (points.size() > 1) {

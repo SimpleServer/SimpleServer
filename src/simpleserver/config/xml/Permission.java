@@ -43,6 +43,60 @@ public class Permission {
   private TreeMap<Integer, Integer> disallowedGroups = new TreeMap<Integer, Integer>();
 
   public Permission(String permission) throws SAXException {
+    set(permission);
+  }
+
+  public Permission() {
+    allowedGroups.put(Integer.MIN_VALUE, Integer.MAX_VALUE);
+  }
+
+  public Permission(String allow, String disallow) throws SAXException {
+    if (disallow == null) {
+      disallow = "";
+    }
+    if (allow == null) {
+      allow = "";
+    }
+
+    String[] allowParts = allow.split(";");
+    String[] disallowParts = disallow.split(";");
+
+    StringBuilder perm = new StringBuilder(allowParts[0]);
+
+    for (String part : disallowParts[0].split(",")) {
+      if (part.length() == 0) {
+        continue;
+      }
+      perm.append(',');
+      perm.append('!');
+      perm.append(part);
+    }
+    if (allowParts[0].length() == 0) {
+      perm.deleteCharAt(0);
+    }
+
+    if (allowParts.length >= 2 || disallowParts.length >= 2) {
+      perm.append(';');
+
+      if (allowParts.length >= 2) {
+        perm.append(allowParts[1]);
+      }
+
+      if (disallowParts.length >= 2) {
+        for (String part : disallowParts[1].split(",")) {
+          if (perm.charAt(perm.length() - 1) != ';') {
+            perm.append(',');
+          }
+          perm.append('!');
+          perm.append(part);
+        }
+      }
+    }
+
+    set(perm.toString());
+  }
+
+  private void set(String permission) throws SAXException {
     if (permission.equals("-")) {
       return;
     }
@@ -95,10 +149,6 @@ public class Permission {
     if (allowedGroups.isEmpty() && allowedPlayers.isEmpty()) {
       allowedGroups.put(Integer.MIN_VALUE, Integer.MAX_VALUE);
     }
-  }
-
-  public Permission() {
-    allowedGroups.put(Integer.MIN_VALUE, Integer.MAX_VALUE);
   }
 
   public boolean contains(Player player) {

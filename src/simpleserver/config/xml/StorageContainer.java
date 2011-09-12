@@ -37,7 +37,7 @@ abstract class StorageContainer extends XMLTag {
   abstract void addStorages();
 
   @Override
-  void init() {
+  public void init() {
     storages = new LinkedHashMap<String, Storage>();
     addStorages();
   }
@@ -47,7 +47,7 @@ abstract class StorageContainer extends XMLTag {
   }
 
   @Override
-  void finish() {
+  public void finish() {
     for (Storage storage : storages.values()) {
       storage.finish();
     }

@@ -36,7 +36,7 @@ public class SetGroupCommand extends PlayerArgCommand implements ServerCommand {
 
   protected boolean allowed(Player player, int group, String target) {
     Server server = player.getServer();
-    if (player.getGroupId() <= server.config.players.get(target)) {
+    if (server.config.players.get(target) != null && player.getGroupId() <= server.config.players.get(target)) {
       player.addTMessage(Color.RED, "You cannot set the group of this user!");
       return false;
     }

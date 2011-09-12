@@ -37,7 +37,7 @@ public class BlockStorage extends Storage {
   }
 
   @Override
-  void add(XMLTag child) throws SAXException {
+  public void add(XMLTag child) throws SAXException {
     Block block = (Block) child;
     String[] parts = block.id.split(",");
     for (String interval : parts) {

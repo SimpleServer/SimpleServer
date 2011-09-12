@@ -20,7 +20,6 @@
  */
 package simpleserver.config.xml;
 
-
 public abstract class PermissionContainer extends StorageContainer {
 
   PermissionContainer(String tag) {

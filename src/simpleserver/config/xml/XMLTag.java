@@ -75,6 +75,12 @@ abstract class XMLTag implements Cloneable {
     acceptedAttributes.add(name.toLowerCase());
   }
 
+  public void fullInit() throws SAXException {
+    init();
+    loadedAttributes();
+    finish();
+  }
+
   // helper
   static int getInt(String value) throws SAXException {
     try {

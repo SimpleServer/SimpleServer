@@ -18,34 +18,31 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package simpleserver.config.xml;
+package simpleserver.config.xml.legacy;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.Stack;
 
-public class GroupStorage extends Storage {
-  private Map<Integer, Group> groups = new HashMap<Integer, Group>();
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
 
-  public Group get(int id) {
-    return contains(id) ? groups.get(id) : null;
-  }
+import simpleserver.config.xml.Block;
+import simpleserver.config.xml.Permission;
+import simpleserver.config.xml.PermissionContainer;
 
-  public void add(Group group) {
-    groups.put(group.id, group);
-  }
+public class BlockConverter extends TagConverter {
 
-  public boolean contains(int id) {
-    return groups.containsKey(id);
+  BlockConverter() {
+    super("block");
   }
 
   @Override
-  Iterator<Group> iterator() {
-    return groups.values().iterator();
+  void convert(Attributes attributes, Stack<PermissionContainer> stack) throws SAXException {
+    PermissionContainer container = stack.peek();
+    Block block = new Block(attributes.getValue("id"));
+    block.place = new Permission(attributes.getValue("allow"));
+    block.fullInit();
+
+    container.blocks.add(block);
   }
 
-  @Override
-  void add(XMLTag child) {
-    add((Group) child);
-  }
 }

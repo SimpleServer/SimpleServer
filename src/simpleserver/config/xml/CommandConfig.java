@@ -54,13 +54,18 @@ public class CommandConfig extends StorageContainer implements Comparable<Comman
     acceptAttribute(HIDDEN);
   }
 
+  public CommandConfig(String name) {
+    this();
+    this.name = originalName = name.toLowerCase();
+  }
+
   @Override
   void addStorages() {
     addStorage("argument", arguments = new ArgumentStorage());
   }
 
   @Override
-  void finish() {
+  public void finish() {
     if (allow == null) {
       allow = new Permission();
     }
@@ -69,7 +74,7 @@ public class CommandConfig extends StorageContainer implements Comparable<Comman
   @Override
   void setAttribute(String name, String value) throws SAXException {
     if (name.equals(NAME)) {
-      this.name = originalName = value;
+      this.name = originalName = value.toLowerCase();
     } else if (name.equals(ALLOW)) {
       allow = new Permission(value);
     } else if (name.equals(FORWARD)) {
@@ -82,7 +87,7 @@ public class CommandConfig extends StorageContainer implements Comparable<Comman
       if (aliases == null) {
         aliases = new ArrayList<String>();
       }
-      aliases.add(value);
+      aliases.add(value.toLowerCase());
     } else if (name.equals(RENAME)) {
       this.name = value;
     }

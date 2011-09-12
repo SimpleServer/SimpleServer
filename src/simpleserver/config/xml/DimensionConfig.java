@@ -35,7 +35,7 @@ public class DimensionConfig extends PermissionContainer {
   }
 
   @Override
-  void finish() {
+  public void finish() {
     areas.buildTree();
   }
 

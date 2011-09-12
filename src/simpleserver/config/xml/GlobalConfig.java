@@ -20,14 +20,12 @@
  */
 package simpleserver.config.xml;
 
-import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.Date;
-import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -37,9 +35,8 @@ import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.XMLReaderFactory;
 
-import simpleserver.Coordinate;
-import simpleserver.Coordinate.Dimension;
 import simpleserver.config.AbstractConfig;
+import simpleserver.config.xml.legacy.LegacyPermissionConfig;
 
 import com.sun.org.apache.xml.internal.serialize.OutputFormat;
 import com.sun.org.apache.xml.internal.serialize.XMLSerializer;
@@ -57,10 +54,26 @@ public class GlobalConfig extends AbstractConfig {
   public void load() {
     lock.lock();
     loadsuccess = false;
-    try {
-      copyDefaults();
-    } catch (IOException e1) {
-      System.out.println("Can't load stuff");
+
+    InputStream stream;
+
+    if (!getFile().exists()) {
+      Config config;
+      if ((config = LegacyPermissionConfig.load()) != null) {
+        this.config = config;
+        return;
+      } else {
+        stream = getClass().getResourceAsStream(filename);
+      }
+    } else {
+      try {
+        stream = new FileInputStream(getFile());
+      } catch (FileNotFoundException e) {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
+        lock.unlock();
+        return;
+      }
     }
 
     XMLReader xml;
@@ -85,7 +98,7 @@ public class GlobalConfig extends AbstractConfig {
     try {
       xml.setFeature("http://xml.org/sax/features/validation", true);
       xml.setEntityResolver(handler);
-      xml.parse(new InputSource(new FileReader(getFile())));
+      xml.parse(new InputSource(new InputStreamReader(stream)));
     } catch (Exception e) {
       e.printStackTrace();
       lock.unlock();
@@ -98,24 +111,6 @@ public class GlobalConfig extends AbstractConfig {
 
   private void processTags(Config root) {
     config = root;
-  }
-
-  private void copyDefaults() throws IOException {
-    File xml = new File("simpleserver", filename);
-    if (!xml.exists()) {
-      copyFile(getClass().getResourceAsStream(filename), xml);
-    }
-  }
-
-  private void copyFile(InputStream source, File dest) throws IOException {
-    FileOutputStream stream = new FileOutputStream(dest);
-    byte[] buffer = new byte[1024];
-    int len;
-    while ((len = source.read(buffer)) > 0) {
-      stream.write(buffer, 0, len);
-    }
-    stream.close();
-    source.close();
   }
 
   @Override
@@ -159,10 +154,12 @@ public class GlobalConfig extends AbstractConfig {
     long end = new Date().getTime();
     System.out.println("\nLoading time: " + (end - start) + " ms");
     getMemory();
-    conf.save();
     start = new Date().getTime();
-    System.out.println("\nSaving time: " + (start - end) + " ms");
+    conf.save();
+    end = new Date().getTime();
+    System.out.println("\nSaving time: " + (end - start) + " ms");
 
+    /*
     Area[] areas = new Area[] { new Area("a", new Coordinate(-5, 0, -5), new Coordinate(1, 127, 1)),
                                 new Area("b", new Coordinate(1, 0, 1), new Coordinate(1, 0, 1)),
                                 new Area("c", new Coordinate(16, 0, 16), new Coordinate(18, 8, 18)),
@@ -177,6 +174,7 @@ public class GlobalConfig extends AbstractConfig {
       }
       System.out.println();
     }
+    */
 
     System.out.println();
     conf = null;

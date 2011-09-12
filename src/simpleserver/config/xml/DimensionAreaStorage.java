@@ -40,6 +40,10 @@ public class DimensionAreaStorage {
     return lastInstance;
   }
 
+  public static void setInstance(DimensionAreaStorage instance) {
+    lastInstance = instance;
+  }
+
   private SegmentTree<Area> tree = new SegmentTree<Area>(3);
   private Deque<Area> positions = new LinkedList<Area>();
 

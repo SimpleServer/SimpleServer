@@ -34,6 +34,7 @@ public class PlayerStorage extends Storage {
   }
 
   public void set(String name, int group) {
+    name = name.toLowerCase();
     if (contains(name)) {
       players.get(name).group = group;
     } else {
@@ -42,21 +43,24 @@ public class PlayerStorage extends Storage {
   }
 
   public void remove(String name) {
+    name = name.toLowerCase();
     if (contains(name)) {
       players.remove(name);
     }
   }
 
   public boolean contains(String name) {
+    name = name.toLowerCase();
     return players.containsKey(name);
   }
 
   public Integer get(String name) {
+    name = name.toLowerCase();
     return contains(name) ? players.get(name).group : null;
   }
 
   public Integer get(Player player) {
-    return get(player.getName().toLowerCase());
+    return get(player.getName());
   }
 
   @Override

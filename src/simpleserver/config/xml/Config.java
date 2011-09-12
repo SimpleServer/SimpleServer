@@ -41,7 +41,7 @@ public class Config extends PermissionContainer {
   public GroupStorage groups;
   public DimensionStorage dimensions;
 
-  Config() {
+  public Config() {
     super("config");
   }
 

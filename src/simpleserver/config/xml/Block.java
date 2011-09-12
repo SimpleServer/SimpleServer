@@ -23,14 +23,19 @@ package simpleserver.config.xml;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
-class Block extends XMLTag {
-  String id;
-  Permission place;
-  Permission give;
+public class Block extends XMLTag {
+  public String id;
+  public Permission place;
+  public Permission give;
 
   private static final String ID = "id";
   private static final String PLACE = "place";
   private static final String GIVE = "give";
+
+  public Block(String id) {
+    this();
+    this.id = id;
+  }
 
   Block() {
     super("block");

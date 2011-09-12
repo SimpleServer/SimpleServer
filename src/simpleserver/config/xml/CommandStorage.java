@@ -27,7 +27,7 @@ import java.util.Map;
 public class CommandStorage extends Storage implements Iterable<CommandConfig> {
   private Map<String, CommandConfig> commands = new HashMap<String, CommandConfig>();
 
-  void add(CommandConfig command) {
+  public void add(CommandConfig command) {
     commands.put(command.name, command);
   }
 

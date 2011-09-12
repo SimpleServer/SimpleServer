@@ -483,7 +483,7 @@ public class Player {
       lastCommand = message;
     }
 
-    String commandName = message.split(" ")[0].substring(1);
+    String commandName = message.split(" ")[0].substring(1).toLowerCase();
     String args = commandName.length() == message.length() ? "" : message.substring(commandName.length() + 1);
     CommandConfig config = server.config.commands.getTopConfig(commandName);
     String originalName = config == null ? commandName : config.originalName;

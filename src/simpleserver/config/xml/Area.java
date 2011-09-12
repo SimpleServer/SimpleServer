@@ -31,7 +31,7 @@ public class Area extends PermissionContainer implements Comparable<Area> {
   public Coordinate end;
   public String owner;
 
-  AreaStorage areas;
+  public AreaStorage areas;
 
   int position;
   int priority;
@@ -70,7 +70,7 @@ public class Area extends PermissionContainer implements Comparable<Area> {
   }
 
   @Override
-  void finish() {
+  public void finish() {
     DimensionAreaStorage.getInstance().decreaseLevel();
   }
 

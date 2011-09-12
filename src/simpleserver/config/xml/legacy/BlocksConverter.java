@@ -18,34 +18,40 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package simpleserver.config.xml;
+package simpleserver.config.xml.legacy;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.Stack;
 
-public class GroupStorage extends Storage {
-  private Map<Integer, Group> groups = new HashMap<Integer, Group>();
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
 
-  public Group get(int id) {
-    return contains(id) ? groups.get(id) : null;
-  }
+import simpleserver.config.xml.AllBlocks;
+import simpleserver.config.xml.Permission;
+import simpleserver.config.xml.PermissionContainer;
 
-  public void add(Group group) {
-    groups.put(group.id, group);
-  }
+public class BlocksConverter extends TagConverter {
 
-  public boolean contains(int id) {
-    return groups.containsKey(id);
+  BlocksConverter() {
+    super("blocks");
   }
 
   @Override
-  Iterator<Group> iterator() {
-    return groups.values().iterator();
+  void convert(Attributes attributes, Stack<PermissionContainer> stack) throws SAXException {
+    PermissionContainer container = stack.peek();
+    AllBlocks blocks = new AllBlocks();
+    blocks.fullInit();
+
+    if (attributes.getIndex("allowDestroy") >= 0) {
+      blocks.destroy = new Permission(attributes.getValue("allowDestroy"));
+    }
+    if (attributes.getIndex("allowPlace") >= 0) {
+      blocks.place = new Permission(attributes.getValue("allowPlace"));
+    }
+    if (attributes.getIndex("allowUse") >= 0) {
+      blocks.use = new Permission(attributes.getValue("allowUse"));
+    }
+
+    container.allblocks.blocks = blocks;
   }
 
-  @Override
-  void add(XMLTag child) {
-    add((Group) child);
-  }
 }

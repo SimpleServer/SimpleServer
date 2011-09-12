@@ -37,6 +37,11 @@ public class AreaStorage extends Storage implements Iterable<Area> {
     localStorage.add((Area) child);
   }
 
+  public void add(Area area) {
+    localStorage.add(area);
+    globalStorage.add(area);
+  }
+
   @Override
   public Iterator<Area> iterator() {
     return localStorage.iterator();

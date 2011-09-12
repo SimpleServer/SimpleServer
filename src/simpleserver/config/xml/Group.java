@@ -56,6 +56,12 @@ public class Group extends XMLTag {
     acceptAttribute(SHOW_TITLE);
   }
 
+  public Group(int id, String name) {
+    this();
+    this.id = id;
+    this.name = name;
+  }
+
   public int warmup() {
     return warmup * 1000;
   }
@@ -69,7 +75,7 @@ public class Group extends XMLTag {
     if (name.equals(ID)) {
       id = getInt(value);
     } else if (name.equals(NAME)) {
-      this.name = value;
+      this.name = value.toLowerCase();
     } else if (name.equals(COLOR)) {
       color = value.charAt(0);
     } else if (name.equals(IGNORE_CHESTS)) {
@@ -110,6 +116,6 @@ public class Group extends XMLTag {
   void saveAttributes(AttributesImpl attributes) {
     addAttribute(attributes, ID, id);
     addAttribute(attributes, NAME, name);
-    addAttribute(attributes, COLOR, color);
+    addAttribute(attributes, COLOR, Character.toString(color));
   }
 }

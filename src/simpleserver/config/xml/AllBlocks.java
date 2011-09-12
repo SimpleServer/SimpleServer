@@ -35,7 +35,7 @@ public class AllBlocks extends XMLTag {
   private static final String USE = "use";
   private static final String GIVE = "give";
 
-  AllBlocks() {
+  public AllBlocks() {
     super("allblocks");
   }
 
