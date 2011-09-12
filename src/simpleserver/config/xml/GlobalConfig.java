@@ -107,6 +107,8 @@ public class GlobalConfig extends AbstractConfig {
     }
     processTags(handler.root());
     loadsuccess = true;
+
+    save();
     lock.unlock();
   }
 

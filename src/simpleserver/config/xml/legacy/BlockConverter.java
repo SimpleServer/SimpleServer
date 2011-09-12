@@ -39,7 +39,7 @@ public class BlockConverter extends TagConverter {
   void convert(Attributes attributes, Stack<PermissionContainer> stack) throws SAXException {
     PermissionContainer container = stack.peek();
     Block block = new Block(attributes.getValue("id"));
-    block.place = new Permission(attributes.getValue("allow"));
+    block.place = new Permission(attributes.getValue("allow"), attributes.getValue("disallow"));
     block.fullInit();
 
     container.blocks.add(block);

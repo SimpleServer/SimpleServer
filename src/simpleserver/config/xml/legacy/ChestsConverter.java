@@ -18,42 +18,30 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package simpleserver.config.xml;
+package simpleserver.config.xml.legacy;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.Stack;
 
-public class AllBlocksStorage extends Storage {
-  public AllBlocks blocks;
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
 
-  @Override
-  public void add(XMLTag child) {
-    AllBlocks blocks = (AllBlocks) child;
-    if (this.blocks == null) {
-      this.blocks = blocks;
-    } else {
-      if (blocks.place != null) {
-        this.blocks.place = blocks.place;
-      }
-      if (blocks.destroy != null) {
-        this.blocks.destroy = blocks.destroy;
-      }
-      if (blocks.use != null) {
-        this.blocks.use = blocks.use;
-      }
-      if (blocks.give != null) {
-        this.blocks.give = blocks.give;
-      }
-    }
+import simpleserver.config.xml.Chests;
+import simpleserver.config.xml.Permission;
+import simpleserver.config.xml.PermissionContainer;
+
+public class ChestsConverter extends TagConverter {
+
+  ChestsConverter() {
+    super("chests");
   }
 
   @Override
-  Iterator<AllBlocks> iterator() {
-    List<AllBlocks> list = new ArrayList<AllBlocks>();
-    if (blocks != null) {
-      list.add(blocks);
-    }
-    return list.iterator();
+  void convert(Attributes attributes, Stack<PermissionContainer> stack) throws SAXException {
+    PermissionContainer container = stack.peek();
+    Chests chests = new Chests(new Permission(attributes.getValue("allow"), attributes.getValue("disallow")));
+    chests.fullInit();
+
+    container.chests.chests = chests;
   }
+
 }

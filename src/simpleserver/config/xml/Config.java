@@ -67,7 +67,7 @@ public class Config extends PermissionContainer {
     int groupid;
     if (playerGroup == null && ipGroup == null) {
       groupid = properties.getInt("defaultGroup");
-    } else if (playerGroup == null || playerGroup < ipGroup) {
+    } else if (playerGroup == null || (ipGroup != null && playerGroup < ipGroup)) {
       groupid = ipGroup;
     } else {
       groupid = playerGroup;
@@ -87,7 +87,7 @@ public class Config extends PermissionContainer {
       while (!stack.isEmpty()) {
         AreaStorage storage = stack.pop();
         for (Area area : storage) {
-          if (area.owner.equals(name)) {
+          if (name.equals(area.owner)) {
             return new AreaStoragePair(storage, area);
           }
           stack.add(area.areas);

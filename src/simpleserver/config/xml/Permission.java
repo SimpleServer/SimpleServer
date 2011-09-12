@@ -71,7 +71,7 @@ public class Permission {
       perm.append('!');
       perm.append(part);
     }
-    if (allowParts[0].length() == 0) {
+    if (allowParts[0].length() == 0 && perm.length() > 0) {
       perm.deleteCharAt(0);
     }
 
@@ -94,6 +94,10 @@ public class Permission {
     }
 
     set(perm.toString());
+  }
+
+  public Permission(Player player) {
+    allowedPlayers.add(player.getName().toLowerCase());
   }
 
   private void set(String permission) throws SAXException {

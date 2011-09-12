@@ -126,8 +126,8 @@ public class MessageHandler {
   }
 
   public boolean parseCommand(String line) {
-    ServerCommand command = server.getCommandParser().getServerCommand(line);
-    if ((command != null) && (command.getClass() != InvalidCommand.class)) {
+    ServerCommand command = server.getCommandParser().getServerCommand(line.split(" ")[0]);
+    if ((command != null) && !(command instanceof InvalidCommand)) {
       command.execute(server, line);
       return !command.shouldPassThroughToConsole(server);
     }

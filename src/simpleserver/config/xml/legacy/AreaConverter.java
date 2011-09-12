@@ -76,7 +76,8 @@ public class AreaConverter extends TagConverter {
     if (attributes.getIndex("owner") >= 0) {
       area.owner = attributes.getValue("owner").toLowerCase();
     }
-    area.fullInit();
+    area.init();
+    area.finish();
 
     if (container instanceof Config) {
       ((Config) container).dimensions.get(dimension).add(area);

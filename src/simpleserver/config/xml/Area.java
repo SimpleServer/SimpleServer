@@ -56,6 +56,7 @@ public class Area extends PermissionContainer implements Comparable<Area> {
     position = Integer.MAX_VALUE;
     level = 0;
     init();
+    finish();
   }
 
   @Override
@@ -72,6 +73,7 @@ public class Area extends PermissionContainer implements Comparable<Area> {
   @Override
   public void finish() {
     DimensionAreaStorage.getInstance().decreaseLevel();
+    super.finish();
   }
 
   @Override

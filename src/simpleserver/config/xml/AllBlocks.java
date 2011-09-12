@@ -27,7 +27,6 @@ public class AllBlocks extends XMLTag {
   public Permission place;
   public Permission destroy;
   public Permission use;
-  public Permission take;
   public Permission give;
 
   private static final String PLACE = "place";

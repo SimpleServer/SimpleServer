@@ -23,13 +23,18 @@ package simpleserver.config.xml;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
-class Chests extends XMLTag {
+public class Chests extends XMLTag {
   Permission allow;
 
   private static final String ALLOW = "allow";
 
   Chests() {
     super("chests");
+  }
+
+  public Chests(Permission permission) {
+    this();
+    allow = permission;
   }
 
   @Override

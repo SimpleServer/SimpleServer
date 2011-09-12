@@ -109,7 +109,9 @@ public class DimensionAreaStorage {
   }
 
   void decreaseLevel() {
-    positions.pop();
+    if (positions != null && !positions.isEmpty()) {
+      positions.pop();
+    }
   }
 
   void buildTree() {

@@ -26,9 +26,12 @@ import java.util.Set;
 
 import simpleserver.Color;
 import simpleserver.Player;
+import simpleserver.config.xml.AllBlocks;
 import simpleserver.config.xml.Area;
+import simpleserver.config.xml.Chests;
 import simpleserver.config.xml.Config;
 import simpleserver.config.xml.DimensionConfig;
+import simpleserver.config.xml.Permission;
 import simpleserver.config.xml.Config.AreaStoragePair;
 
 public class MyAreaCommand extends AbstractCommand implements PlayerCommand {
@@ -119,7 +122,13 @@ public class MyAreaCommand extends AbstractCommand implements PlayerCommand {
   private Area createPlayerArea(Player player) {
     Area area = new Area(t("%s's area", player.getName()), player.areastart, player.areaend);
     area.owner = player.getName().toLowerCase();
-
+    Permission perm = new Permission(player);
+    AllBlocks blocks = new AllBlocks();
+    blocks.destroy = perm;
+    blocks.place = perm;
+    blocks.use = perm;
+    area.allblocks.blocks = blocks;
+    area.chests.chests = new Chests(perm);
     return area;
   }
 
