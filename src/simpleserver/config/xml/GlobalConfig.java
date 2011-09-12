@@ -23,9 +23,12 @@ package simpleserver.config.xml;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -55,65 +58,75 @@ public class GlobalConfig extends AbstractConfig {
     lock.lock();
     loadsuccess = false;
 
-    InputStream stream;
+    Config defaults;
+    try {
+      defaults = loadDefaults();
+    } catch (Exception e) {
+      System.out.println("[SimpleServer] Error while loading default config.xml");
+      e.printStackTrace();
+      lock.unlock();
+      return;
+    }
 
     if (!getFile().exists()) {
       Config config;
       if ((config = LegacyPermissionConfig.load()) != null) {
         this.config = config;
-        loadsuccess = true;
-        return;
+        System.out.println("[SimpleServer] Converted permisisons.xml to config.xml");
       } else {
-        stream = getClass().getResourceAsStream(filename);
+        this.config = defaults;
+        System.out.println("[SimpleServer] Loaded default config.xml");
       }
     } else {
       try {
-        stream = new FileInputStream(getFile());
-      } catch (FileNotFoundException e) {
-        // TODO Auto-generated catch block
-        e.printStackTrace();
+        config = load(new FileInputStream(getFile()));
+      } catch (Exception e) {
+        System.out.println("[SimpleServer] Error in config.xml: " + e);
         lock.unlock();
         return;
       }
+      completeConfig(config, defaults);
     }
-
-    XMLReader xml;
-    try {
-      xml = XMLReaderFactory.createXMLReader();
-    } catch (SAXException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-      lock.unlock();
-      return;
-    }
-    XMLTagResolver handler;
-    try {
-      handler = new XMLTagResolver();
-    } catch (SAXException e1) {
-      // TODO Auto-generated catch block
-      e1.printStackTrace();
-      return;
-    }
-    xml.setContentHandler(handler);
-    xml.setErrorHandler(handler);
-    try {
-      xml.setFeature("http://xml.org/sax/features/validation", true);
-      xml.setEntityResolver(handler);
-      xml.parse(new InputSource(new InputStreamReader(stream)));
-    } catch (Exception e) {
-      e.printStackTrace();
-      lock.unlock();
-      return;
-    }
-    processTags(handler.root());
-    loadsuccess = true;
 
     save();
+    loadsuccess = true;
     lock.unlock();
   }
 
-  private void processTags(Config root) {
-    config = root;
+  private Config loadDefaults() throws SAXException, IOException {
+    return load(getClass().getResourceAsStream(filename));
+  }
+
+  private Config load(InputStream stream) throws SAXException, IOException {
+    XMLReader xml = XMLReaderFactory.createXMLReader();
+    XMLTagResolver handler = new XMLTagResolver();
+    xml.setContentHandler(handler);
+    xml.setErrorHandler(handler);
+    xml.setFeature("http://xml.org/sax/features/validation", true);
+    xml.setEntityResolver(handler);
+    xml.parse(new InputSource(new InputStreamReader(stream)));
+
+    return handler.root();
+  }
+
+  private void completeConfig(Config config, Config defaults) {
+    // Properties
+    for (Property prop : defaults.properties) {
+      if (!config.properties.contains(prop.name)) {
+        config.properties.add(prop);
+      }
+    }
+
+    // Commands
+    Set<String> commands = new HashSet<String>();
+    for (CommandConfig cmd : config.commands) {
+      commands.add(cmd.originalName);
+    }
+    for (CommandConfig cmd : defaults.commands) {
+      if (!commands.contains(cmd.originalName)) {
+        config.commands.add(cmd);
+      }
+    }
   }
 
   @Override

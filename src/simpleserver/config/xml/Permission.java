@@ -110,7 +110,7 @@ public class Permission {
         continue;
       }
       boolean allow = true;
-      if (group.startsWith("!") || group.startsWith("~") || group.startsWith("¬")) {
+      if (group.startsWith("!") || group.startsWith("~") || group.startsWith("\u00ac")) {
         allow = false;
         group = group.substring(1);
       }
@@ -145,7 +145,7 @@ public class Permission {
 
     if (parts.length >= 2) {
       for (String player : parts[1].split(",")) {
-        if (player.startsWith("!") || player.startsWith("~") || player.startsWith("¬")) {
+        if (player.startsWith("!") || player.startsWith("~") || player.startsWith("\u00ac")) {
           disallowedPlayers.add(player.substring(1).toLowerCase());
         } else {
           allowedPlayers.add(player.toLowerCase());
@@ -180,7 +180,7 @@ public class Permission {
     if (str.equals("*,") && allowedPlayers.isEmpty()) {
       str = new StringBuilder();
     }
-    groupList(disallowedGroups, str, "¬");
+    groupList(disallowedGroups, str, "\u00ac");
     if (str.length() > 0) {
       str.deleteCharAt(str.length() - 1);
     }
@@ -191,7 +191,7 @@ public class Permission {
         str.append(',');
       }
       for (String player : disallowedPlayers) {
-        str.append('¬');
+        str.append('\u00ac');
         str.append(player);
         str.append(',');
       }

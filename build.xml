@@ -24,9 +24,9 @@
 
 	<target name="compile" depends="cleanbuild, copy-non-java-files">
 		<mkdir dir="bin" />
-		<javac srcdir="src" destdir="bin" source="1.5">
+		<javac srcdir="src" destdir="bin" debug="on">
 			<classpath refid="project-classpath" />
-			<compilerarg value="-Xlint" />
+			<compilerarg value="-Xlint:none" />
 		</javac>
 	</target>
 

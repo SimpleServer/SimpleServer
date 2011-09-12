@@ -59,7 +59,7 @@ class Property extends XMLTag {
     if (value == null) {
       value = "";
     } else {
-      String lowvalue = value.toLowerCase();
+      String lowvalue = value.trim().toLowerCase();
       if (lowvalue.equals("true") || lowvalue.equals("yes") ||
           lowvalue.equals("on")) {
         value = "true";

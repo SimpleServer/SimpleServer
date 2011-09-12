@@ -26,7 +26,7 @@ import java.util.Map;
 
 import org.xml.sax.SAXException;
 
-public class PropertyStorage extends Storage {
+public class PropertyStorage extends Storage implements Iterable<Property> {
   private Map<String, Property> properties = new HashMap<String, Property>();
 
   void add(Property property) {
@@ -64,7 +64,7 @@ public class PropertyStorage extends Storage {
   }
 
   @Override
-  Iterator<Property> iterator() {
+  public Iterator<Property> iterator() {
     return properties.values().iterator();
   }
 
