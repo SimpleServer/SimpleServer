@@ -61,6 +61,7 @@ public class GlobalConfig extends AbstractConfig {
       Config config;
       if ((config = LegacyPermissionConfig.load()) != null) {
         this.config = config;
+        loadsuccess = true;
         return;
       } else {
         stream = getClass().getResourceAsStream(filename);

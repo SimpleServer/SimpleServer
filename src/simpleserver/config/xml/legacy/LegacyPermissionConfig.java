@@ -40,6 +40,8 @@ public class LegacyPermissionConfig {
       return null;
     }
 
+    System.out.println("[SimpleServer] Converting permisisons.xml to config.xml");
+
     XMLReader xml;
     try {
       xml = XMLReaderFactory.createXMLReader();
