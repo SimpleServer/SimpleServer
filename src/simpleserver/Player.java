@@ -191,8 +191,6 @@ public class Player {
     this.name = name;
     updateGroup();
 
-    addMessage(Integer.toString(group));
-
     watchdog.setName("PlayerWatchdog-" + name);
     server.connectionLog("player", extsocket, name);
 

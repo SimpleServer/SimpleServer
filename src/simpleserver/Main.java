@@ -25,8 +25,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-import simpleserver.config.xml.GlobalConfig;
-
 public class Main {
   private static final String license = "SimpleServer -- Copyright (C) 2011 SimpleServer authors (see CONTRIBUTORS)";
   private static final String warranty = "This program is licensed under The MIT License.\nSee file LICENSE for details.";
@@ -81,9 +79,6 @@ public class Main {
         String[] copy = new String[args.length - 1];
         System.arraycopy(args, 1, copy, 0, args.length - 1);
         simpleserver.nbt.Main.main(copy);
-        return;
-      } else if (args[0].equals("xml")) {
-        GlobalConfig.main(args);
         return;
       }
     }

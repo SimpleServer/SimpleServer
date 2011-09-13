@@ -120,7 +120,9 @@
 	<command name="tell" allow="1+">
 		<alias>t</alias>
 	</command>
-	<command name="time" allow="4+" />
+	<command name="time" allow="0+">
+		<argument allow="4+">*</argument>
+	</command>
 	<command name="unban" allow="4+" />
 	<command name="unbanip" allow="4+" />
 	<command name="unlock" allow="1+" />

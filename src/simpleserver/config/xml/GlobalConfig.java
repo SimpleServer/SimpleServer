@@ -26,7 +26,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.locks.Lock;
@@ -40,33 +39,40 @@ import org.xml.sax.helpers.XMLReaderFactory;
 
 import simpleserver.config.AbstractConfig;
 import simpleserver.config.xml.legacy.LegacyPermissionConfig;
+import simpleserver.options.Options;
 
 import com.sun.org.apache.xml.internal.serialize.OutputFormat;
 import com.sun.org.apache.xml.internal.serialize.XMLSerializer;
 
 public class GlobalConfig extends AbstractConfig {
   public Config config;
-  public static final Lock lock = new ReentrantLock();
   public boolean loadsuccess;
+  private static final Lock lock = new ReentrantLock();
 
-  public GlobalConfig() {
+  private Options options;
+  private Config defaults;
+
+  public GlobalConfig(Options options) {
     super("config.xml");
-  }
+    this.options = options;
 
-  @Override
-  public void load() {
-    lock.lock();
-    loadsuccess = false;
-
-    Config defaults;
     try {
       defaults = loadDefaults();
     } catch (Exception e) {
       System.out.println("[SimpleServer] Error while loading default config.xml");
-      e.printStackTrace();
-      lock.unlock();
       return;
     }
+  }
+
+  @Override
+  public void load() {
+    loadsuccess = false;
+
+    if (defaults == null) {
+      return;
+    }
+
+    lock.lock();
 
     if (!getFile().exists()) {
       Config config;
@@ -90,7 +96,6 @@ public class GlobalConfig extends AbstractConfig {
     }
 
     config.properties.setDefaults(defaults.properties);
-    save();
     loadsuccess = true;
     lock.unlock();
   }
@@ -112,10 +117,23 @@ public class GlobalConfig extends AbstractConfig {
   }
 
   private void completeConfig(Config config, Config defaults) {
+    String[] fallbackIfEmpty = new String[] { "msgFormat", "msgTitleFormat", "msgForwardFormat", "logMessageFormat" };
+
     // Properties
     for (Property prop : defaults.properties) {
       if (!config.properties.contains(prop.name)) {
-        config.properties.add(prop);
+        if (options.contains(prop.name)) {
+          config.properties.set(prop.name, options.get(prop.name));
+        } else {
+          config.properties.add(prop);
+        }
+      }
+      options.remove(prop.name);
+    }
+
+    for (String prop : fallbackIfEmpty) {
+      if (config.properties.get(prop).equals("")) {
+        config.properties.set(prop, defaults.properties.get(prop));
       }
     }
 
@@ -161,51 +179,6 @@ public class GlobalConfig extends AbstractConfig {
     } finally {
       lock.unlock();
     }
-  }
-
-  public static final void main(String[] args) {
-    getMemory();
-    GlobalConfig conf = new GlobalConfig();
-    conf.load();
-    long start = new Date().getTime();
-    conf.load();
-    long end = new Date().getTime();
-    System.out.println("\nLoading time: " + (end - start) + " ms");
-    getMemory();
-    start = new Date().getTime();
-    conf.save();
-    end = new Date().getTime();
-    System.out.println("\nSaving time: " + (end - start) + " ms");
-
-    /*
-    Area[] areas = new Area[] { new Area("a", new Coordinate(-5, 0, -5), new Coordinate(1, 127, 1)),
-                                new Area("b", new Coordinate(1, 0, 1), new Coordinate(1, 0, 1)),
-                                new Area("c", new Coordinate(16, 0, 16), new Coordinate(18, 8, 18)),
-                                new Area("d", new Coordinate(100, 0, 100), new Coordinate(100, 0, 100))
-    };
-
-    for (Area area : areas) {
-      Set<Area> overlaps = conf.config.dimensions.get(Dimension.EARTH).areas.overlaps(area);
-      System.out.println(area.name);
-      for (Area overlap : overlaps) {
-        System.out.print(overlap.name + ", ");
-      }
-      System.out.println();
-    }
-    */
-
-    System.out.println();
-    conf = null;
-    // areas = null;
-    getMemory();
-  }
-
-  private static final void getMemory() {
-    Runtime runtime = Runtime.getRuntime();
-    runtime.gc();
-    long total = runtime.totalMemory() / 1000;
-    long free = runtime.freeMemory() / 1000;
-    System.out.println(String.format("Total memory: %d MB  free: %d MB  used: %d KB", total / 1000, free / 1000, (total - free)));
   }
 
   @Override

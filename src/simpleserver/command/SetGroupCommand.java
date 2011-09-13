@@ -69,6 +69,7 @@ public class SetGroupCommand extends PlayerArgCommand implements ServerCommand {
 
     if (allowed(player, group, target)) {
       setGroup(player, group, target);
+      player.getServer().updateGroup(target);
     }
   }
 
@@ -99,6 +100,7 @@ public class SetGroupCommand extends PlayerArgCommand implements ServerCommand {
     }
 
     setGroup(server, group, arguments[0]);
+    server.updateGroup(arguments[0]);
   }
 
   protected void setGroup(Server server, int group, String target) {

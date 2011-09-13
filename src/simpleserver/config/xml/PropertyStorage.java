@@ -69,7 +69,7 @@ public class PropertyStorage extends Storage implements Iterable<Property> {
         return false;
       }
     }
-    if (defaults != null) {
+    if (defaults != null && defaults != this) {
       return defaults.getBoolean(name);
     } else {
       return false;

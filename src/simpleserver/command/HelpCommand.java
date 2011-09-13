@@ -77,7 +77,6 @@ public class HelpCommand extends AbstractCommand implements PlayerCommand {
 
       for (CommandConfig cmd : commands) {
         Command command = parser.getPlayerCommand(cmd.originalName);
-        System.out.println(cmd.name);
 
         if (cmd.hidden || (command != null && command.hidden())) {
           continue;

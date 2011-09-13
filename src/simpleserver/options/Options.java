@@ -32,16 +32,13 @@ public class Options extends AbstractOptions {
     options.setProperty(option, value);
   }
 
+  public void remove(String name) {
+    options.remove(name);
+  }
+
   @Override
   public void load() {
     super.load();
-
-    String[] fallbackIfEmpty = new String[] { "msgFormat", "msgTitleFormat", "msgForwardFormat", "logMessageFormat" };
-    for (String entry : fallbackIfEmpty) {
-      if (get(entry).equals("")) {
-        set(entry, defaultOptions.getProperty(entry));
-      }
-    }
 
     if (getInt("internalPort") == getInt("port")) {
       System.out.println("OH NO! Your 'internalPort' and 'port' properties are the same! Edit simpleserver.properties and change them to different values. 'port' is recommended to be 25565, the default port of minecraft, and will be the port you actually connect to.");
@@ -58,5 +55,4 @@ public class Options extends AbstractOptions {
 
     System.out.println("Properties file not found. Created simpleserver.properties!");
   }
-
 }

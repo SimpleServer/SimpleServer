@@ -71,6 +71,10 @@ public class LegacyPermissionConfig {
       return null;
     }
 
+    File oldconf = new File("simpleserver", "oldconf");
+    oldconf.mkdir();
+    file.renameTo(new File(oldconf, "permissions.xml"));
+
     return handler.config();
   }
 }

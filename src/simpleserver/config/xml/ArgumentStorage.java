@@ -42,7 +42,7 @@ public class ArgumentStorage extends Storage {
       return null;
     }
     for (Argument arg : arguments) {
-      if (args.startsWith(arg.argument)) {
+      if (args.startsWith(arg.argument) || args.length() > 0 && arg.argument.equals("*")) {
         return arg.allow;
       }
     }

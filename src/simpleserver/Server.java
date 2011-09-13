@@ -249,6 +249,8 @@ public class Server {
 
     addressFactory.toggle(!config.properties.getBoolean("disableAddressFactory"));
 
+    saveResources();
+
     return globalConfig.loadsuccess;
   }
 
@@ -382,8 +384,8 @@ public class Server {
   private void initialize() {
     resources = new LinkedList<Resource>();
 
-    resources.add(globalConfig = new GlobalConfig());
     resources.add(options = new Options());
+    resources.add(globalConfig = new GlobalConfig(options));
     resources.add(robots = new RobotList());
     resources.add(motd = new MOTD());
     resources.add(rules = new Rules());

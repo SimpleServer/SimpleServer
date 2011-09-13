@@ -50,6 +50,7 @@ public class SetIPGroupCommand extends SetGroupCommand implements ServerCommand 
     player.addTMessage(Color.GRAY, "Group of %s was set to %s!", target, group);
     server.adminLog("User " + player.getName() + " set IP's group:\t "
         + target + "\t(" + group + ")");
+    server.updateGroups();
   }
 
   private InetAddress getIP(Server server, String value) throws Exception {
@@ -77,5 +78,6 @@ public class SetIPGroupCommand extends SetGroupCommand implements ServerCommand 
     server.config.ips.setGroup(ip, group);
     server.saveConfig();
     System.out.println("[SimpleServer] Group of " + target + " was set to " + group + "!");
+    server.updateGroups();
   }
 }
