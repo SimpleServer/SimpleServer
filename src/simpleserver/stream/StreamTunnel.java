@@ -178,7 +178,13 @@ public class StreamTunnel {
         // added in 1.8
         write(in.readByte());
         write(in.readByte());
-        write(in.readByte());
+        if (isServerTunnel) {
+          in.readByte();
+          write((byte) server.config.properties.getInt("maxPlayers"));
+        } else {
+          write(in.readByte());
+        }
+
         break;
       case 0x02: // Handshake
         String name = readUTF16();
