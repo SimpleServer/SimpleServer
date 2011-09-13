@@ -36,12 +36,12 @@ import java.io.OutputStream;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import simpleserver.Authenticator.AuthRequest;
 import simpleserver.Color;
 import simpleserver.Coordinate;
+import simpleserver.Coordinate.Dimension;
 import simpleserver.Player;
 import simpleserver.Server;
-import simpleserver.Authenticator.AuthRequest;
-import simpleserver.Coordinate.Dimension;
 import simpleserver.command.PlayerListCommand;
 import simpleserver.config.data.Chests.Chest;
 import simpleserver.config.xml.Config.BlockPermission;
@@ -175,7 +175,8 @@ public class StreamTunnel {
           player.setDimension(Dimension.get(dimension));
         }
         write(dimension);
-
+        // added in 1.8
+        write(in.readByte());
         write(in.readByte());
         write(in.readByte());
         break;
@@ -324,9 +325,10 @@ public class StreamTunnel {
         write(in.readShort());
         write(in.readFloat());
         break;
-      case 0x09: // Respawn, changed in 1.8 added byte, short and long
+      case 0x09: // Respawn, changed in 1.8 added 2 bytes, short and long
         write(packetId);
         player.setDimension(Dimension.get(write(in.readByte())));
+        write(in.readByte());
         write(in.readByte());
         write(in.readShort());
         write(in.readLong());
@@ -591,6 +593,14 @@ public class StreamTunnel {
         write(in.readInt());
         write(in.readInt());
         break;
+      case 0x1a: // 1.8p3, experience Orb spawn
+        write(packetId);
+        write(in.readInt());
+        write(in.readInt());
+        write(in.readInt());
+        write(in.readInt());
+        write(in.readShort());
+        break;
       case 0x1b: // ???
         write(packetId);
         copyNBytes(18);
@@ -727,7 +737,7 @@ public class StreamTunnel {
         boolean allow = true;
         byte id = in.readByte();
         byte invtype = in.readByte();
-        String typeString = in.readUTF();
+        String typeString = readUTF16();
         byte unknownByte = in.readByte();
         if (invtype == 0) {
           Chest adjacent = server.data.chests.adjacentChest(player.openedChest());
@@ -773,7 +783,7 @@ public class StreamTunnel {
           write(packetId);
           write(id);
           write(invtype);
-          write8(typeString);
+          write(typeString);
           write(unknownByte);
         }
         break;

@@ -31,12 +31,12 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.concurrent.locks.ReentrantLock;
 
+import simpleserver.Coordinate.Dimension;
 import simpleserver.Position;
 import simpleserver.Server;
-import simpleserver.Coordinate.Dimension;
 
 public class Bot {
-  private static final int VERSION = 15;
+  private static final int VERSION = 16;
 
   protected String name;
   protected Server server;
@@ -120,6 +120,7 @@ public class Bot {
     out.writeByte(0);
     out.writeByte(0);
     out.writeByte(0);
+    out.writeByte(0);
     writeLock.unlock();
   }
 
@@ -174,6 +175,7 @@ public class Bot {
         in.readLong();
         in.readInt();
         position.dimension = Dimension.get(in.readByte());
+        in.readByte();
         in.readByte();
         in.readByte();
         break;
@@ -247,6 +249,7 @@ public class Bot {
         break;
       case 0x09: // Respawn
         position.dimension = Dimension.get(in.readByte());
+        in.readByte();
         in.readByte();
         in.readShort();
         in.readLong();
@@ -329,6 +332,13 @@ public class Bot {
         in.readInt();
         in.readInt();
         in.readInt();
+        break;
+      case 0x1a:
+        in.readInt();
+        in.readInt();
+        in.readInt();
+        in.readInt();
+        in.readShort();
         break;
       case 0x1b: // ???
         readNBytes(18);
@@ -423,7 +433,7 @@ public class Bot {
       case 0x64: // Open window
         in.readByte();
         in.readByte();
-        in.readUTF();
+        readUTF16();
         in.readByte();
         break;
       case 0x65:

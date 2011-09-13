@@ -48,7 +48,7 @@ public class GameModeCommand extends AbstractCommand implements PlayerCommand {
       player.addTMessage(Color.RED, "Invalid number of arguments!");
       return;
     }
-    System.out.println(gameMode);
+
     if (gameMode != 0 && gameMode != 1) {
       player.addTMessage(Color.RED, "Invalid gameMode!");
       return;
