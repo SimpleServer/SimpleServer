@@ -31,6 +31,7 @@
 	<property name="debug">false</property>
 	<property name="defaultGroup">1</property>
 	<property name="maxPlayers">16</property>
+	<property name="serverDescription">A server running SimpleServer</property>
 	
 	<ip group="5">127.0.0.1</ip>
 	

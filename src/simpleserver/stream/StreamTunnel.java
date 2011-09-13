@@ -907,6 +907,12 @@ public class StreamTunnel {
         // server list answer 'serverText§playerOnline§maxPlayers'
         write(packetId);
         String reason = readUTF16();
+        if (reason.contains("\u00a7")) {
+          reason = String.format("%s\u00a7%s\u00a7%s",
+                                 server.config.properties.get("serverDescription"),
+                                 server.playerList.size(),
+                                 server.config.properties.getInt("maxPlayers"));
+        }
         write(reason);
         if (reason.startsWith("Took too long")) {
           server.addRobot(player);

@@ -61,12 +61,15 @@ public class PropertyStorage extends Storage implements Iterable<Property> {
   }
 
   public boolean getBoolean(String name) {
-    String value = properties.get(name).value;
-    if (value.equals("true")) {
-      return true;
-    } else if (value.equals("false")) {
-      return false;
-    } else if (defaults != null) {
+    if (contains(name)) {
+      String value = properties.get(name).value;
+      if (value.equals("true")) {
+        return true;
+      } else if (value.equals("false")) {
+        return false;
+      }
+    }
+    if (defaults != null) {
       return defaults.getBoolean(name);
     } else {
       return false;
