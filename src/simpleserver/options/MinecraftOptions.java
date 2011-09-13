@@ -38,7 +38,7 @@ public class MinecraftOptions extends AbstractOptions {
     options.setProperty("online-mode", "false");
     options.setProperty("white-list", "false");
     options.setProperty("server-port", simpleServerOptions.get("internalPort"));
-    options.setProperty("max-players", simpleServerOptions.get("maxPlayers"));
+    options.setProperty("max-players", "1024");
     options.setProperty("level-name", simpleServerOptions.get("levelName"));
     options.setProperty("spawn-animals", simpleServerOptions.get("spawnAnimals"));
     options.setProperty("spawn-monsters", simpleServerOptions.get("spawnMonsters"));
@@ -48,7 +48,7 @@ public class MinecraftOptions extends AbstractOptions {
     options.setProperty("allow-nether", simpleServerOptions.get("allowNether"));
     options.setProperty("level-seed", simpleServerOptions.get("worldSeed"));
     options.setProperty("gamemode", simpleServerOptions.get("gameMode"));
-    options.setProperty("motd", simpleServerOptions.get("serverDescription"));
+    options.setProperty("motd", "");
 
     super.save();
   }

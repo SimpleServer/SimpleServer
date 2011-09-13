@@ -54,7 +54,7 @@ public class MessageHandler {
       }
 
       String baseError = "[SimpleServer] Minecraft process stopped unexpectedly!";
-      if (server.options.getBoolean("exitOnFailure")) {
+      if (server.config.properties.getBoolean("exitOnFailure")) {
         System.out.println(baseError);
         server.stop();
       } else {
@@ -69,7 +69,7 @@ public class MessageHandler {
   }
 
   public void handleOutput(String line) {
-    if (!server.options.getBoolean("debug") && line.contains("\tat")) {
+    if (!server.config.properties.getBoolean("debug") && line.contains("\tat")) {
       return;
     }
 

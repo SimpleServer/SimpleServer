@@ -72,6 +72,7 @@ public class GlobalConfig extends AbstractConfig {
       Config config;
       if ((config = LegacyPermissionConfig.load()) != null) {
         this.config = config;
+        completeConfig(config, defaults);
         System.out.println("[SimpleServer] Converted permisisons.xml to config.xml");
       } else {
         this.config = defaults;
@@ -88,6 +89,7 @@ public class GlobalConfig extends AbstractConfig {
       completeConfig(config, defaults);
     }
 
+    config.properties.setDefaults(defaults.properties);
     save();
     loadsuccess = true;
     lock.unlock();
@@ -144,7 +146,7 @@ public class GlobalConfig extends AbstractConfig {
     of.setIndent(1);
     of.setIndenting(true);
     of.setLineWidth(200);
-    of.setDoctype(null, "http://somewhere/config.dtd ");
+    of.setDoctype(null, "http://simpleserver.ceilingcat.ch/resources/config.1.dtd");
     XMLSerializer serializer = new ConfigSerializer(fos, of);
     ContentHandler hd;
     try {

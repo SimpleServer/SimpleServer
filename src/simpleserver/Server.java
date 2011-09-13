@@ -242,12 +242,12 @@ public class Server {
       playerList.updatePlayerGroups();
     }
 
-    if (!Translations.getInstance().setLanguage(options.get("serverLanguage"))) {
+    if (!Translations.getInstance().setLanguage(config.properties.get("serverLanguage"))) {
       options.set("serverLanguage", "en");
       options.save();
     }
 
-    addressFactory.toggle(!options.getBoolean("disableAddressFactory"));
+    addressFactory.toggle(!config.properties.getBoolean("disableAddressFactory"));
 
     return globalConfig.loadsuccess;
   }
@@ -292,7 +292,7 @@ public class Server {
 
   public int localChat(Player player, String msg) {
     int localPlayers = 0;
-    int radius = options.getInt("localChatRadius");
+    int radius = config.properties.getInt("localChatRadius");
     for (Player friend : playerList.getArray()) {
       if (friend.distanceTo(player) < radius) {
         friend.addCaptionedMessage(t("%s says", player.getName()), msg);
@@ -428,11 +428,11 @@ public class Server {
     }
 
     authenticator = new Authenticator(this);
-    playerList = new PlayerList(options);
+    playerList = new PlayerList(this);
     requestTracker = new RequestTracker(this);
     messager = new Messager(this);
 
-    messageLog = new MessageLog(options.get("logMessageFormat"), options.getBoolean("logMessages"));
+    messageLog = new MessageLog(config.properties.get("logMessageFormat"), config.properties.getBoolean("logMessages"));
 
     minecraft = new MinecraftWrapper(this, options, systemInput);
     if (!minecraft.prepareServerJar()) {

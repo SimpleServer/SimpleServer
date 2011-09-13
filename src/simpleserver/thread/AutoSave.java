@@ -55,13 +55,13 @@ public class AutoSave {
 
   private boolean needsSave() {
     long maxAge = System.currentTimeMillis() - MILLISECONDS_PER_MINUTE
-        * server.options.getInt("autoSaveMins");
-    return server.options.getBoolean("autoSave") && maxAge > lastSave
+        * server.config.properties.getInt("autoSaveMins");
+    return server.config.properties.getBoolean("autoSave") && maxAge > lastSave
         && server.numPlayers() > 0 || forceSave;
   }
 
   public void announce(String message) {
-    if (server.options.getBoolean("announceSave")) {
+    if (server.config.properties.getBoolean("announceSave")) {
       server.runCommand("say", message);
     }
   }

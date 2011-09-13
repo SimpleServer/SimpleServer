@@ -31,9 +31,9 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.concurrent.locks.ReentrantLock;
 
-import simpleserver.Coordinate.Dimension;
 import simpleserver.Position;
 import simpleserver.Server;
+import simpleserver.Coordinate.Dimension;
 
 public class Bot {
   private static final int VERSION = 15;

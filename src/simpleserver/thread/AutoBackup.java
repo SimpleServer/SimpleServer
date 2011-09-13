@@ -77,7 +77,7 @@ public class AutoBackup {
   }
 
   private void backup() throws IOException {
-    if (server.options.getBoolean("announceBackup")) {
+    if (server.config.properties.getBoolean("announceBackup")) {
       System.out.println("[SimpleServer] Backing up server...");
     }
     announce(t("Backing up..."));
@@ -97,15 +97,15 @@ public class AutoBackup {
   }
 
   public void announce(String message) {
-    if (server.options.getBoolean("announceBackup")) {
+    if (server.config.properties.getBoolean("announceBackup")) {
       server.runCommand("say", message);
     }
   }
 
   private boolean needsBackup() {
     long backupPeriod = MILLISECONDS_PER_MINUTE
-        * server.options.getInt("autoBackupMins");
-    return server.options.getBoolean("autoBackup")
+        * server.config.properties.getInt("autoBackupMins");
+    return server.config.properties.getBoolean("autoBackup")
         && backupPeriod < lastBackupAge() && !pauseBackup
         || forceBackup;
   }
@@ -116,7 +116,7 @@ public class AutoBackup {
   }
 
   private void purgeOldBackups() {
-    long maxAge = MILLISECONDS_PER_HOUR * server.options.getInt("keepBackupHours");
+    long maxAge = MILLISECONDS_PER_HOUR * server.config.properties.getInt("keepBackupHours");
     File file;
     while (age(file = oldestBackup()) > maxAge) {
       deleteRecursively(file);
@@ -316,7 +316,7 @@ public class AutoBackup {
 
           server.autoSpaceCheck.check(true);
 
-          if (server.options.getBoolean("announceSave")) {
+          if (server.config.properties.getBoolean("announceSave")) {
             server.runCommand("say", t("Saving Map..."));
           }
           server.setSaving(true);

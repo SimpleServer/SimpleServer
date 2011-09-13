@@ -240,8 +240,8 @@ public class StreamTunnel {
           }
           break;
         }
-        if (isServerTunnel && server.options.getBoolean("useMsgFormats")) {
-          if (server.options.getBoolean("forwardChat") && server.getMessager().wasForwarded(message)) {
+        if (isServerTunnel && server.config.properties.getBoolean("useMsgFormats")) {
+          if (server.config.properties.getBoolean("forwardChat") && server.getMessager().wasForwarded(message)) {
             break;
           }
 
@@ -251,11 +251,11 @@ public class StreamTunnel {
           Matcher messageMatcher = MESSAGE_PATTERN.matcher(cleanMessage);
           if (messageMatcher.find()) {
 
-          } else if (cleanMessage.matches(CONSOLE_CHAT_PATTERN) && !server.options.getBoolean("chatConsoleToOps")) {
+          } else if (cleanMessage.matches(CONSOLE_CHAT_PATTERN) && !server.config.properties.getBoolean("chatConsoleToOps")) {
             break;
           }
 
-          if (server.options.getBoolean("msgWrap")) {
+          if (server.config.properties.getBoolean("msgWrap")) {
             sendMessage(message);
           } else {
             if (message.length() > MAXIMUM_MESSAGE_SIZE) {
@@ -337,7 +337,7 @@ public class StreamTunnel {
         if (!inGame && !isServerTunnel) {
           player.sendMOTD();
 
-          if (server.options.getBoolean("showListOnConnect")) {
+          if (server.config.properties.getBoolean("showListOnConnect")) {
             // display player list if enabled in config
             player.execute(PlayerListCommand.class);
           }

@@ -1,45 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE config SYSTEM "http://somewhere/config.dtd ">
+<!DOCTYPE config SYSTEM "http://simpleserver.ceilingcat.ch/resources/config.1.dtd">
 <config>
     <property name="announceRestart">true</property>
-	<property name="useXincgc">true</property>
 	<property name="logMessages">true</property>
 	<property name="autoSaveMins">5</property>
-	<property name="gameMode">0</property>
-	<property name="freezeTime"></property>
 	<property name="keepBackupHours">24</property>
 	<property name="msgWrap">true</property>
 	<property name="announceSave">true</property>
-	<property name="spawnMonsters">true</property>
 	<property name="msgForwardFormat">%2$s</property>
 	<property name="defaultGroup">1</property>
-	<property name="rconPassword"></property>
 	<property name="announceBackup">true</property>
 	<property name="useMsgFormats">true</property>
 	<property name="autoSave">false</property>
 	<property name="localChatRadius">30</property>
 	<property name="serverDescription">A server running SimpleServer</property>
-	<property name="c10tArgs"></property>
 	<property name="chatConsoleToOps">false</property>
 	<property name="autoRestart">false</property>
 	<property name="showListOnConnect">false</property>
-	<property name="telnetPassword"></property>
 	<property name="autoBackupMins">30</property>
 	<property name="autoBackup">true</property>
-	<property name="enableTelnet">false</property>
 	<property name="serverLanguage">en</property>
 	<property name="logMessageFormat">%1$s-&gt;%2$s\: %3$s</property>
-	<property name="c10tMins">60</property>
 	<property name="autoRestartMins">240</property>
-	<property name="telnetPort">25505</property>
 	<property name="msgTitleFormat">§%3$s&lt;[%2$s]%1$s&gt;§f</property>
 	<property name="exitOnFailure">true</property>
 	<property name="msgFormat">§%3$s&lt;%1$s&gt;§f</property>
 	<property name="forwardAllCommands">false</property>
 	<property name="forwardChat">false</property>
-	<property name="enableRcon">false</property>
 	<property name="useWhitelist">false</property>
+	<property name="debug">false</property>
 	<property name="defaultGroup">1</property>
+	<property name="maxPlayers">16</property>
 	
 	<ip group="5">127.0.0.1</ip>
 	

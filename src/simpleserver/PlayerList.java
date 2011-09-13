@@ -25,14 +25,12 @@ import static simpleserver.lang.Translations.t;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import simpleserver.options.Options;
-
 public class PlayerList {
-  private final Options options;
+  private final Server server;
   private final ConcurrentMap<String, Player> players;
 
-  public PlayerList(Options options) {
-    this.options = options;
+  public PlayerList(Server server) {
+    this.server = server;
     players = new ConcurrentHashMap<String, Player>();
   }
 
@@ -88,7 +86,7 @@ public class PlayerList {
   }
 
   public synchronized void addPlayer(Player player) {
-    if (players.size() < options.getInt("maxPlayers")) {
+    if (players.size() < server.config.properties.getInt("maxPlayers")) {
       players.put(player.getName().toLowerCase(), player);
     } else {
       Player playerToKick = null;

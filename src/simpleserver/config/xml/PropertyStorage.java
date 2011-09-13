@@ -28,9 +28,14 @@ import org.xml.sax.SAXException;
 
 public class PropertyStorage extends Storage implements Iterable<Property> {
   private Map<String, Property> properties = new HashMap<String, Property>();
+  private PropertyStorage defaults;
 
   void add(Property property) {
     properties.put(property.name, property);
+  }
+
+  void setDefaults(PropertyStorage storage) {
+    defaults = storage;
   }
 
   public void set(String name, String value) {
@@ -55,12 +60,33 @@ public class PropertyStorage extends Storage implements Iterable<Property> {
     return properties.containsKey(name);
   }
 
+  public boolean getBoolean(String name) {
+    String value = properties.get(name).value;
+    if (value.equals("true")) {
+      return true;
+    } else if (value.equals("false")) {
+      return false;
+    } else if (defaults != null) {
+      return defaults.getBoolean(name);
+    } else {
+      return false;
+    }
+  }
+
   public String get(String name) {
     return contains(name) ? properties.get(name).value : null;
   }
 
-  public int getInt(String name) throws SAXException {
-    return getIntValue(get(name));
+  public int getInt(String name) {
+    try {
+      return getIntValue(get(name));
+    } catch (SAXException e) {
+      if (defaults != null) {
+        return defaults.getInt(name);
+      } else {
+        return 0;
+      }
+    }
   }
 
   @Override

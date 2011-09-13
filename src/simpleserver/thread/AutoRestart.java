@@ -48,15 +48,15 @@ public class AutoRestart {
   }
 
   public void announce(String message) {
-    if (server.options.getBoolean("announceRestart")) {
+    if (server.config.properties.getBoolean("announceRestart")) {
       server.runCommand("say", message);
     }
   }
 
   private boolean needsRestart() {
     long maxAge = System.currentTimeMillis() - MILLISECONDS_PER_MINUTE
-        * server.options.getInt("autoRestartMins");
-    return server.options.getBoolean("autoRestart") && maxAge > lastRestart;
+        * server.config.properties.getInt("autoRestartMins");
+    return server.config.properties.getBoolean("autoRestart") && maxAge > lastRestart;
   }
 
   private final class Restarter extends Thread {

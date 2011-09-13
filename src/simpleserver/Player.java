@@ -133,7 +133,7 @@ public class Player {
         intsocket = new Socket(InetAddress.getByName(null), server.options.getInt("internalPort"));
       } catch (Exception E) {
         e.printStackTrace();
-        if (server.options.getBoolean("exitOnFailure")) {
+        if (server.config.properties.getBoolean("exitOnFailure")) {
           server.stop();
         } else {
           server.restart();
@@ -518,7 +518,7 @@ public class Player {
       command.execute(this, message);
     }
 
-    return !((command instanceof ExternalCommand) || (config != null && config.forwarding != Forwarding.NONE) || server.options.getBoolean("forwardAllCommands"));
+    return !((command instanceof ExternalCommand) || (config != null && config.forwarding != Forwarding.NONE) || server.config.properties.getBoolean("forwardAllCommands"));
   }
 
   public void execute(Class<? extends PlayerCommand> c) {

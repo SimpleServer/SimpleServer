@@ -48,10 +48,10 @@ public class Messager {
       }
     }
 
-    if (server.options.getBoolean("forwardChat")) {
+    if (server.config.properties.getBoolean("forwardChat")) {
       forwardToServer(chat, message);
     }
-    if (server.options.getBoolean("logMessages")) {
+    if (server.config.properties.getBoolean("logMessages")) {
       server.messageLog(chat, message);
     }
 
@@ -63,7 +63,7 @@ public class Messager {
 
   private void forwardToServer(Chat chat, String message) {
     Player sender = chat.getSender();
-    String forwardMessage = String.format(server.options.get("msgForwardFormat"), chat, message);
+    String forwardMessage = String.format(server.config.properties.get("msgForwardFormat"), chat, message);
 
     for (String msgPart : warpMessage(forwardMessage)) {
       forwardedMessages.put(String.format("<%s> %s", sender.getName(), msgPart));

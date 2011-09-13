@@ -31,7 +31,7 @@ public class LocalChat extends AbstractChat {
 
   public LocalChat(Player sender) {
     super(sender);
-    localChatRadius = sender.getServer().options.getInt("localChatRadius");
+    localChatRadius = sender.getServer().config.properties.getInt("localChatRadius");
     chatRoom = LOCAL_CHAT;
   }
 

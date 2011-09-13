@@ -53,14 +53,14 @@ public class GlobalChat extends AbstractChat {
     String prefix = "";
     char color = 'f';
     String title = "";
-    String format = server.options.get("msgFormat");
+    String format = server.config.properties.get("msgFormat");
     Group group = sender.getGroup();
 
     if (group != null) {
       color = group.color;
       if (group.showTitle) {
         title = group.name;
-        format = server.options.get("msgTitleFormat");
+        format = server.config.properties.get("msgTitleFormat");
       }
     }
 
