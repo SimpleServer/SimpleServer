@@ -24,7 +24,7 @@ import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
-class Property extends XMLTag {
+class Property extends XMLTag implements Comparable<Property> {
   String name;
   String value;
 
@@ -89,5 +89,9 @@ class Property extends XMLTag {
   @Override
   void saveAttributes(AttributesImpl attributes) {
     addAttribute(attributes, "name", name);
+  }
+
+  public int compareTo(Property property) {
+    return name.compareTo(property.name);
   }
 }

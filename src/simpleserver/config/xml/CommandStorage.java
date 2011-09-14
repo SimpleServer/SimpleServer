@@ -23,6 +23,7 @@ package simpleserver.config.xml;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.TreeSet;
 
 public class CommandStorage extends Storage implements Iterable<CommandConfig> {
   private Map<String, CommandConfig> commands = new HashMap<String, CommandConfig>();
@@ -41,7 +42,7 @@ public class CommandStorage extends Storage implements Iterable<CommandConfig> {
 
   @Override
   public Iterator<CommandConfig> iterator() {
-    return commands.values().iterator();
+    return new TreeSet<CommandConfig>(commands.values()).iterator();
   }
 
   @Override

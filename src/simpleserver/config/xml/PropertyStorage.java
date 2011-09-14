@@ -23,6 +23,7 @@ package simpleserver.config.xml;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.TreeSet;
 
 import org.xml.sax.SAXException;
 
@@ -94,7 +95,7 @@ public class PropertyStorage extends Storage implements Iterable<Property> {
 
   @Override
   public Iterator<Property> iterator() {
-    return properties.values().iterator();
+    return new TreeSet<Property>(properties.values()).iterator();
   }
 
   @Override
