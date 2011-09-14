@@ -75,7 +75,7 @@ public class Group extends XMLTag {
     if (name.equals(ID)) {
       id = getInt(value);
     } else if (name.equals(NAME)) {
-      this.name = value.toLowerCase();
+      this.name = value;
     } else if (name.equals(COLOR)) {
       color = value.charAt(0);
     } else if (name.equals(IGNORE_CHESTS)) {
