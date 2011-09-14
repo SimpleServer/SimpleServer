@@ -91,7 +91,7 @@ public class Statistics extends Thread {
       options.put("custAuth", server.options.getBoolean("custAuth"));
       options.put("maxPlayers", server.config.properties.getInt("maxPlayers"));
 
-      stats.put("registeredPlayers", server.config.players.count());
+      stats.put("registeredPlayers", server.data.players.count());
       stats.put("totalHours", server.data.players.stats.totalHours());
 
       JSONObject response = getRemoteJSONObject(data, "connect", Long.toHexString(seed));

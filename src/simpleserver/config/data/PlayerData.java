@@ -135,6 +135,10 @@ public class PlayerData implements Iterable<String> {
     return node.names().iterator();
   }
 
+  public int count() {
+    return node.size();
+  }
+
   public enum PlayerField {
     FULL_NAME, // String
     RENAME_NAME, // String
