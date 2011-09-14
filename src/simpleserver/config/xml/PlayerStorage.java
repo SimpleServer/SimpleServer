@@ -63,6 +63,10 @@ public class PlayerStorage extends Storage {
     return get(player.getName());
   }
 
+  public int count() {
+    return players.size();
+  }
+
   @Override
   Iterator<PlayerConfig> iterator() {
     return players.values().iterator();

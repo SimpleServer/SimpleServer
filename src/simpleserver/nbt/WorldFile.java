@@ -39,6 +39,10 @@ public class WorldFile {
     }
   }
 
+  public long seed() {
+    return data.getLong("RandomSeed").get();
+  }
+
   public Coordinate spawnPoint() {
     int x, y, z;
     try {

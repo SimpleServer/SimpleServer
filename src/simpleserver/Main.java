@@ -31,7 +31,7 @@ public class Main {
   private static final String baseVersion = "8.2.1";
   private static final boolean release = false;
   private static final String releaseState = "stable";
-  private static final String version;
+  public static final String version;
 
   static {
     String extendedVersion = baseVersion;

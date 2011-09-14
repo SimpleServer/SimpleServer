@@ -20,6 +20,7 @@
  */
 package simpleserver.config.data;
 
+import java.util.Iterator;
 import java.util.Set;
 
 import simpleserver.Player;
@@ -27,7 +28,7 @@ import simpleserver.nbt.NBTArray;
 import simpleserver.nbt.NBTCompound;
 import simpleserver.nbt.NBTString;
 
-public class PlayerData {
+public class PlayerData implements Iterable<String> {
   private NBTCompound node;
   public Stats stats = new Stats(this);
   public Homes homes = new Homes(this);
@@ -130,10 +131,13 @@ public class PlayerData {
     }
   }
 
+  public Iterator<String> iterator() {
+    return node.names().iterator();
+  }
+
   public enum PlayerField {
     FULL_NAME, // String
     RENAME_NAME, // String
     PW_HASH; // byte[]
   }
-
 }

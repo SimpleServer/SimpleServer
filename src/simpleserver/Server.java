@@ -65,6 +65,7 @@ import simpleserver.thread.AutoRestart;
 import simpleserver.thread.AutoRun;
 import simpleserver.thread.AutoSave;
 import simpleserver.thread.RequestTracker;
+import simpleserver.thread.Statistics;
 import simpleserver.thread.SystemInputQueue;
 
 public class Server {
@@ -114,6 +115,7 @@ public class Server {
   private AutoSave autosave;
   private AutoRestart autoRestart;
   public RequestTracker requestTracker;
+  private Statistics statistics;
 
   public long mapSeed;
 
@@ -415,6 +417,7 @@ public class Server {
     errorLog.stop();
     connectionLog.stop();
     messageLog.stop();
+    statistics.halt();
     time.unfreeze();
     bots.cleanup();
   }
@@ -460,8 +463,10 @@ public class Server {
     autoBackup = new AutoBackup(this);
     autosave = new AutoSave(this);
     autoRestart = new AutoRestart(this);
+    statistics = new Statistics(this);
     c10t = new AutoRun(this, options.get("c10tArgs"));
     if (options.contains("freezeTime")) {
+      // TODO: move freeze time to dat
       try {
         time.freeze(time.parse(options.get("freezeTime")));
       } catch (Exception e) {
@@ -470,6 +475,7 @@ public class Server {
     }
 
     bots.ready();
+    statistics.start();
   }
 
   private void shutdown() {

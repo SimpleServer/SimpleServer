@@ -60,6 +60,16 @@ public class Stats {
     }
   }
 
+  public int totalHours() {
+    int hours = 0;
+
+    for (String name : playerData) {
+      hours += getInt(name, StatField.PLAY_TIME.toString()).get();
+    }
+
+    return hours;
+  }
+
   private NBTInt getInt(String name, String key) {
     NBTCompound player = getStats(name);
     if (player.containsKey(key)) {
