@@ -17,7 +17,7 @@
 
 <!ATTLIST group
   id NMTOKEN #REQUIRED
-  name CDATA #IMPLIED 
+  name CDATA #REQUIRED 
   color NMTOKEN #IMPLIED
   showTitle NMTOKEN #IMPLIED
   ignoreChestlocks NMTOKEN #IMPLIED

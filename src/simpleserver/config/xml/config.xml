@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE config SYSTEM "http://simpleserver.ceilingcat.ch/resources/config.1.dtd">
 <config>
     <property name="announceRestart">true</property>

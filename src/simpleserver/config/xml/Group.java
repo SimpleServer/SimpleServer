@@ -27,7 +27,7 @@ import org.xml.sax.helpers.AttributesImpl;
 public class Group extends XMLTag {
   public int id;
   public String name;
-  public char color;
+  public char color = 'f';
 
   public boolean ignoreChestLocks;
   public boolean ignoreAreas;
@@ -77,7 +77,9 @@ public class Group extends XMLTag {
     } else if (name.equals(NAME)) {
       this.name = value;
     } else if (name.equals(COLOR)) {
-      color = value.charAt(0);
+      if (value.length() > 0) {
+        color = value.charAt(0);
+      }
     } else if (name.equals(IGNORE_CHESTS)) {
       ignoreChestLocks = true;
     } else if (name.equals(IGNORE_AREAS)) {

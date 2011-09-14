@@ -25,7 +25,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.locks.Lock;
@@ -40,6 +39,7 @@ import org.xml.sax.helpers.XMLReaderFactory;
 import simpleserver.config.AbstractConfig;
 import simpleserver.config.xml.legacy.LegacyPermissionConfig;
 import simpleserver.options.Options;
+import simpleserver.util.UnicodeReader;
 
 import com.sun.org.apache.xml.internal.serialize.OutputFormat;
 import com.sun.org.apache.xml.internal.serialize.XMLSerializer;
@@ -111,7 +111,7 @@ public class GlobalConfig extends AbstractConfig {
     xml.setErrorHandler(handler);
     xml.setFeature("http://xml.org/sax/features/validation", true);
     xml.setEntityResolver(handler);
-    xml.parse(new InputSource(new InputStreamReader(stream)));
+    xml.parse(new InputSource(new UnicodeReader(stream)));
 
     return handler.root();
   }
