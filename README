@@ -1,4 +1,4 @@
-Simple Server 8.2.3
+Simple Server 8.3.0
 An open source simple server tunnel for minecraft beta multiplayer servers.
 Copyright (c) 2011 SimpleServer authors (see CONTRIBUTORS)
 See LICENSE for details.
@@ -42,21 +42,27 @@ Added commands:
   reload     -- Reload all configuration files
   restart    -- Restart the server
   save       -- Save all configuration files
+  setgroup   -- Set group of palyer
   giveplayer -- Give a player items using the aliases defined in give-alias-list.txt
 
 In-game Commands:
 Commands are based on rank.  Say /help in game for a list of currently
 accessible commands.
   /area -- Show the name of current area
+  /areasay -- Send chat message to players in your area
+  /back -- Return to your death place
   /backup -- Backup the map
   /ban PLAYER [REASON] -- Kick and ban the named player
   /banip IPADDRESS -- Kick and ban players with this IP
+  /chat -- Select chat mode
+  /dimension -- Send chat message to players in your dimension
+  /gamemode -- Set game mode (survival or multiplayer)
   /give ITEM[:DAMAGE] [AMOUNT] -- Spawn items for yourself
   /giveplayer PLAYER ITEM [AMOUNT] -- Spawn items for another player
   /gps [PLAYER] -- Display block coordinates of named player or yourself
+  /group -- Send chat message to players in your group
   /help [COMMAND] -- List commands or get help for one command
   /home [COMMAND] [NAME] -- Use and modify homes
-  /idbehold -- Make tools work instantly for yourself
   /iddqd -- Make yourself invulnerable to other players attacks
   /kick PLAYER [REASON] -- Kick the named player from the server
   /kit [KIT] -- Display all kits or give yourself the named kit
@@ -69,7 +75,6 @@ accessible commands.
   /mute PLAYER -- Block the named player from normal chat
   /myarea [start|end|save|unsave|rename] -- Manage your personal area
   /mystats -- Display your statistics
-  /ok PLAYER -- Agree a visit request
   /rcon COMMAND ARGUMENTS... -- Execute a command on the server console
   /register [OLD PASSWORD] NEW_PASSWORD NEW_PASSWORD -- Set or change password for CustAuth.
   /reload -- Reread the configuration files from disk

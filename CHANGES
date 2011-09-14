@@ -1,3 +1,16 @@
+== 8.3.0 ==
+ * added support for Minecraft 1.8 
+ * improved XML parser
+ * improved chat system
+ * added automatic typo correction for item aliases
+ * added global statistics
+ * added argument based permissions for commands
+ * added data values for kits
+ * added /read command
+ * added /back command
+ * fixed backups
+ * fixed help
+
 == 8.2.3 ==
  * fixed chest locking bug
  * fixed tiny home command bug
