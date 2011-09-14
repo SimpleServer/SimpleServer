@@ -29,6 +29,7 @@ import java.util.zip.ZipFile;
 
 import simpleserver.Resource;
 import simpleserver.nbt.GZipNBTFile;
+import simpleserver.nbt.NBTInt;
 import simpleserver.thread.AutoBackup;
 
 public class GlobalData implements Resource {
@@ -103,5 +104,23 @@ public class GlobalData implements Resource {
     } catch (IOException e) {
       System.out.println("[ERROR] Writing simpleserver.dat failed");
     }
+  }
+
+  public int freezeTime() {
+    if (!nbt.root().containsKey("freezeTime")) {
+      return -1;
+    } else {
+      return nbt.root().getInt("freezeTime").get();
+    }
+  }
+
+  public void setFreezeTime(int time) {
+    nbt.root().put(new NBTInt("freezeTime", time));
+    save();
+  }
+
+  public void unsetFreezeTime() {
+    nbt.root().remove("freezeTime");
+    save();
   }
 }

@@ -94,28 +94,22 @@ public class Time {
     return false;
   }
 
-  public long parse(String time) throws NumberFormatException {
-    if (time.toLowerCase().equals("day")) {
+  public long parse(String i) throws NumberFormatException {
+    if (i.toLowerCase().equals("day")) {
       return DAY;
-    } else if (time.toLowerCase().equals("night")) {
+    } else if (i.toLowerCase().equals("night")) {
       return NIGHT;
     } else {
-      return Long.parseLong(time) % 24000;
+      return Long.parseLong(i) % 24000;
     }
   }
 
   private void save() {
-    String value;
     if (!frozen) {
-      value = "";
-    } else if (freezeTime == DAY) {
-      value = "day";
-    } else if (freezeTime == NIGHT) {
-      value = "night";
+      server.data.unsetFreezeTime();
     } else {
-      value = String.valueOf(freezeTime);
+      server.data.setFreezeTime((int) freezeTime);
     }
-    server.options.set("freezeTime", value);
   }
 
   private class TimeFreezer extends TimerTask {
