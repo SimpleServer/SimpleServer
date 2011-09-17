@@ -45,6 +45,8 @@ class Ip extends XMLTag {
   void setAttribute(String name, String value) throws SAXException {
     if (name.equals("group")) {
       group = getInt(value);
+    } else if (name.equals("address")) {
+      content(value);
     }
   }
 
@@ -63,12 +65,8 @@ class Ip extends XMLTag {
   }
 
   @Override
-  String saveContent() {
-    return address.getHostAddress();
-  }
-
-  @Override
   void saveAttributes(AttributeList attributes) {
+    attributes.setValue("address", address.getHostAddress());
     attributes.addAttribute("group", Integer.toString(group));
   }
 }

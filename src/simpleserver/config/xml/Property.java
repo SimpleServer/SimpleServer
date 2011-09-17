@@ -20,7 +20,6 @@
  */
 package simpleserver.config.xml;
 
-
 class Property extends XMLTag implements Comparable<Property> {
   String name;
   String value;
@@ -43,6 +42,8 @@ class Property extends XMLTag implements Comparable<Property> {
       this.name = value;
     } else if (name.equals("true") || name.equals("false")) {
       this.value = name;
+    } else if (name.equals("value")) {
+      content(value);
     }
   }
 
@@ -68,13 +69,9 @@ class Property extends XMLTag implements Comparable<Property> {
   }
 
   @Override
-  String saveContent() {
-    return value;
-  }
-
-  @Override
   void saveAttributes(AttributeList attributes) {
     attributes.addAttribute("name", name);
+    attributes.setValue("value", value);
   }
 
   public int compareTo(Property property) {

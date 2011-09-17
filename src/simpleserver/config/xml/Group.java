@@ -78,13 +78,13 @@ public class Group extends XMLTag {
       if (value.length() > 0) {
         color = value.charAt(0);
       }
-    } else if (name.equals(IGNORE_CHESTS)) {
+    } else if (name.equals(IGNORE_CHESTS) && (value == null || !value.equals("false"))) {
       ignoreChestLocks = true;
-    } else if (name.equals(IGNORE_AREAS)) {
+    } else if (name.equals(IGNORE_AREAS) && (value == null || !value.equals("false"))) {
       ignoreAreas = true;
-    } else if (name.equals(FORWARD_UNKNOWN)) {
+    } else if (name.equals(FORWARD_UNKNOWN) && (value == null || !value.equals("false"))) {
       forwardUnknownCommands = true;
-    } else if (name.equals(SHOW_TITLE)) {
+    } else if (name.equals(SHOW_TITLE) && (value == null || !value.equals("false"))) {
       showTitle = true;
     } else if (name.equals(COOLDOWN)) {
       cooldown = getInt(value);

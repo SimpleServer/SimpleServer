@@ -30,6 +30,7 @@
 
 <!ATTLIST property
   name NMTOKEN #REQUIRED
+  value CDATA #IMPLIED
 >
 <!ATTLIST group
   id NMTOKEN #REQUIRED
@@ -44,9 +45,11 @@
 >
 <!ATTLIST player
   group NMTOKEN #REQUIRED
+  name NMTOKEN #IMPLIED
 >
 <!ATTLIST ip
   group NMTOKEN #REQUIRED
+  address CDATA #IMPLIED
 >
 <!ATTLIST command
   name NMTOKEN #REQUIRED
@@ -57,6 +60,7 @@
   alias CDATA #IMPLIED
 >
 <!ATTLIST argument
+  name CDATA #IMPLIED
   allow CDATA #REQUIRED
 >
 <!ATTLIST block
@@ -85,4 +89,5 @@
 >
 <!ATTLIST permission
   allow CDATA #REQUIRED
+  node CDATA #IMPLIED
 >

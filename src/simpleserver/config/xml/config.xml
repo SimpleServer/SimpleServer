@@ -33,6 +33,7 @@
 	<property name="maxPlayers">16</property>
 	<property name="serverDescription">A server running SimpleServer</property>
 	<property name="xmlInlineAttributes">true</property>
+	<property name="xmlPCDATA">true</property>
 	
 	<ip group="5">127.0.0.1</ip>
 	

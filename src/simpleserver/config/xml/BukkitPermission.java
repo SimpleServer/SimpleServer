@@ -25,6 +25,7 @@ class BukkitPermission extends XMLTag {
   String allow;
 
   private static final String ALLOW = "allow";
+  private static final String NODE = "node";
 
   BukkitPermission() {
     super("permission");
@@ -34,6 +35,8 @@ class BukkitPermission extends XMLTag {
   void setAttribute(String name, String value) {
     if (name.equals(ALLOW)) {
       allow = value;
+    } else if (name.equals(NODE)) {
+      node = value;
     }
   }
 
@@ -43,12 +46,8 @@ class BukkitPermission extends XMLTag {
   }
 
   @Override
-  String saveContent() {
-    return node;
-  }
-
-  @Override
   void saveAttributes(AttributeList attributes) {
+    attributes.setValue(NODE, node);
     attributes.addAttribute(ALLOW, allow);
   }
 

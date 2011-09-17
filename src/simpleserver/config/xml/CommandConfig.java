@@ -75,11 +75,11 @@ public class CommandConfig extends StorageContainer implements Comparable<Comman
       this.name = originalName = value.toLowerCase();
     } else if (name.equals(ALLOW)) {
       allow = new Permission(value);
-    } else if (name.equals(FORWARD)) {
+    } else if (name.equals(FORWARD) && (value == null || !value.equals("false"))) {
       forwarding = Forwarding.BOTH;
-    } else if (name.equals(FORWARD_ONLY)) {
+    } else if (name.equals(FORWARD_ONLY) && (value == null || !value.equals("false"))) {
       forwarding = Forwarding.ONLY;
-    } else if (name.equals(HIDDEN)) {
+    } else if (name.equals(HIDDEN) && (value == null || !value.equals("false"))) {
       hidden = true;
     } else if (name.equals(ALIAS) && value != null) {
       if (aliases == null) {

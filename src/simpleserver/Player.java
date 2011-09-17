@@ -482,7 +482,7 @@ public class Player {
     }
 
     String commandName = message.split(" ")[0].substring(1).toLowerCase();
-    String args = commandName.length() == message.length() ? "" : message.substring(commandName.length() + 2);
+    String args = commandName.length() + 1 >= message.length() ? "" : message.substring(commandName.length() + 2);
     CommandConfig config = server.config.commands.getTopConfig(commandName);
     String originalName = config == null ? commandName : config.originalName;
 

@@ -112,29 +112,24 @@ abstract class XMLTag implements Cloneable {
     childs.add(child);
   }
 
-  protected void save(ContentHandler handler, boolean childs) throws SAXException {
-    AttributeList attributes = new AttributeList(childs);
+  protected void save(ContentHandler handler, boolean childs, boolean pcdata) throws SAXException {
+    AttributeList attributes = new AttributeList(childs, pcdata);
     saveAttributes(attributes);
     handler.startElement("", "", tag, attributes.inlineAttributes());
     for (AttributeList.Attribute attribute : attributes.childAttributes()) {
       saveAttributeElement(handler, attribute.name, attribute.value);
     }
-    saveChilds(handler, childs);
-    String content = saveContent();
-    if (content != null) {
-      handler.characters(content.toCharArray(), 0, content.length());
+    saveChilds(handler, childs, pcdata);
+    if (attributes.content != null) {
+      handler.characters(attributes.content.toCharArray(), 0, attributes.content.length());
     }
     handler.endElement("", "", tag);
   }
 
-  String saveContent() {
-    return null;
-  }
-
-  void saveChilds(ContentHandler handler, boolean childAttributes) throws SAXException {
+  void saveChilds(ContentHandler handler, boolean childAttributes, boolean pcdata) throws SAXException {
     if (childs != null) {
       for (XMLTag child : childs) {
-        child.save(handler, childAttributes);
+        child.save(handler, childAttributes, pcdata);
       }
     }
   }
@@ -155,10 +150,13 @@ abstract class XMLTag implements Cloneable {
   static class AttributeList {
     private AttributesImpl attributes = new AttributesImpl();
     private List<Attribute> childs = new LinkedList<Attribute>();
+    public String content;
     private boolean childAttributes;
+    private boolean pcdata;
 
-    public AttributeList(boolean childAttributes) {
+    public AttributeList(boolean childAttributes, boolean pcdata) {
       this.childAttributes = childAttributes;
+      this.pcdata = pcdata;
     }
 
     public void addAttribute(String name, String value) {
@@ -195,6 +193,14 @@ abstract class XMLTag implements Cloneable {
 
     public void addAttributeElement(String name) {
       addAttributeElement(name, null);
+    }
+
+    public void setValue(String name, String value) {
+      if (pcdata) {
+        content = value;
+      } else {
+        addAttribute(name, value);
+      }
     }
 
     public Attributes inlineAttributes() {

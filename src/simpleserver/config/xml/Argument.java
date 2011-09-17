@@ -34,6 +34,8 @@ class Argument extends XMLTag {
   void setAttribute(String name, String value) throws SAXException {
     if (name.equals("allow")) {
       allow = new Permission(value);
+    } else if (name.equals("value")) {
+      argument = value;
     }
   }
 
@@ -43,12 +45,8 @@ class Argument extends XMLTag {
   }
 
   @Override
-  String saveContent() {
-    return argument;
-  }
-
-  @Override
   void saveAttributes(AttributeList attributes) {
+    attributes.setValue("name", argument);
     attributes.addAttribute("allow", allow);
   }
 }

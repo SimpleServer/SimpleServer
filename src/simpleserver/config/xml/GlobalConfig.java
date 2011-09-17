@@ -60,6 +60,7 @@ public class GlobalConfig extends AbstractConfig {
       defaults = loadDefaults();
     } catch (Exception e) {
       System.out.println("[SimpleServer] Error while loading default config.xml");
+      e.printStackTrace();
       return;
     }
   }

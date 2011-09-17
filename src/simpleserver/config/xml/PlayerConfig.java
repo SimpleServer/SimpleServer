@@ -40,6 +40,8 @@ class PlayerConfig extends XMLTag {
   void setAttribute(String name, String value) throws SAXException {
     if (name.equals("group")) {
       group = getInt(value);
+    } else if (name.equals("name")) {
+      content(value);
     }
   }
 
@@ -49,12 +51,8 @@ class PlayerConfig extends XMLTag {
   }
 
   @Override
-  String saveContent() {
-    return name;
-  }
-
-  @Override
   void saveAttributes(AttributeList attributes) {
+    attributes.setValue("name", name);
     attributes.addAttribute("group", Integer.toString(group));
   }
 }
