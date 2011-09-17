@@ -177,7 +177,7 @@ public class Player {
       return false;
     }
 
-    if (!guest && server.options.getBoolean("useWhitelist")
+    if (!guest && server.config.properties.getBoolean("useWhitelist")
         && !server.whitelist.isWhitelisted(name)) {
       kick(t("You are not whitelisted!"));
       return false;
@@ -482,7 +482,7 @@ public class Player {
     }
 
     String commandName = message.split(" ")[0].substring(1).toLowerCase();
-    String args = commandName.length() == message.length() ? "" : message.substring(commandName.length() + 1);
+    String args = commandName.length() == message.length() ? "" : message.substring(commandName.length() + 2);
     CommandConfig config = server.config.commands.getTopConfig(commandName);
     String originalName = config == null ? commandName : config.originalName;
 

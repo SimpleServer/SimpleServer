@@ -30,6 +30,8 @@ import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import org.apache.xml.serialize.OutputFormat;
+import org.apache.xml.serialize.XMLSerializer;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -41,9 +43,7 @@ import simpleserver.config.xml.legacy.LegacyPermissionConfig;
 import simpleserver.options.Options;
 import simpleserver.util.UnicodeReader;
 
-import com.sun.org.apache.xml.internal.serialize.OutputFormat;
-import com.sun.org.apache.xml.internal.serialize.XMLSerializer;
-
+@SuppressWarnings("deprecation")
 public class GlobalConfig extends AbstractConfig {
   public Config config;
   public boolean loadsuccess;
@@ -89,6 +89,7 @@ public class GlobalConfig extends AbstractConfig {
         config = load(new FileInputStream(getFile()));
       } catch (Exception e) {
         System.out.println("[SimpleServer] Error in config.xml: " + e);
+        e.printStackTrace();
         lock.unlock();
         return;
       }

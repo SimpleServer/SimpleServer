@@ -25,6 +25,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
 
+import org.apache.xml.serialize.XMLSerializer;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
@@ -32,8 +33,7 @@ import org.xml.sax.helpers.AttributesImpl;
 import simpleserver.Coordinate;
 import simpleserver.Player;
 
-import com.sun.org.apache.xml.internal.serialize.XMLSerializer;
-
+@SuppressWarnings("deprecation")
 public class Config extends PermissionContainer {
   public PropertyStorage properties;
   public PlayerStorage players;

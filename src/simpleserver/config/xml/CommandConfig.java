@@ -83,7 +83,7 @@ public class CommandConfig extends StorageContainer implements Comparable<Comman
       forwarding = Forwarding.ONLY;
     } else if (name.equals(HIDDEN)) {
       hidden = true;
-    } else if (name.equals(ALIAS)) {
+    } else if (name.equals(ALIAS) && value != null && value.length() > 0) {
       if (aliases == null) {
         aliases = new ArrayList<String>();
       }

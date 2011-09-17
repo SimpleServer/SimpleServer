@@ -106,6 +106,7 @@ public class Permission {
     }
     String[] parts = permission.split(";");
     for (String group : parts[0].split(",")) {
+      group = group.trim();
       if (group.length() == 0) {
         continue;
       }
@@ -145,6 +146,7 @@ public class Permission {
 
     if (parts.length >= 2) {
       for (String player : parts[1].split(",")) {
+        player = player.trim();
         if (player.startsWith("!") || player.startsWith("~") || player.startsWith("\u00ac")) {
           disallowedPlayers.add(player.substring(1).toLowerCase());
         } else {
