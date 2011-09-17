@@ -22,13 +22,14 @@ package simpleserver.export;
 
 import simpleserver.Server;
 
-public class CustAuthExport extends PropertiesExport implements Export {
+public class CustAuthExport extends PropertiesExport {
   private Server server;
 
   public CustAuthExport(Server server) {
     super("custAuthData.txt", 2);
     this.server = server;
-    header = "Export of custAuth data in the format: playerName=groupId,pwHash";
+    header = "Export of custAuth data in the format: playerName=groupId,pwHash\n" +
+        "DO NOT MODIFY THIS FILE!";
   }
 
   @Override
@@ -43,14 +44,17 @@ public class CustAuthExport extends PropertiesExport implements Export {
 
   public void addEntry(String playerName, int groupId, byte[] pwHash) {
     setEntry(playerName, String.valueOf(groupId), hashToHex(pwHash));
+    save();
   }
 
   public void updatePw(String playerName, byte[] pwHash) {
     updateEntry(playerName, 1, hashToHex(pwHash));
+    save();
   }
 
   public void updateGroup(String playerName, int groupId) {
     updateEntry(playerName, 0, String.valueOf(groupId));
+    save();
   }
 
   private String hashToHex(byte[] pwHash) {

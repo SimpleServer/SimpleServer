@@ -21,13 +21,17 @@
 package simpleserver.export;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 
+import simpleserver.Resource;
 import simpleserver.config.SortedProperties;
 
-abstract class PropertiesExport implements Export {
+abstract class PropertiesExport implements Resource {
   private static final String LOCATION = "simpleserver" + File.separator + "export";
   protected SortedProperties properties;
 
@@ -52,9 +56,26 @@ abstract class PropertiesExport implements Export {
       return file;
     }
 
-    new File(LOCATION).mkdir();
     populate();
+    new File(LOCATION).mkdir();
     return file;
+  }
+
+  public void load() {
+    try {
+      InputStream stream = new FileInputStream(getFile());
+      try {
+        properties.load(stream);
+      } finally {
+        stream.close();
+      }
+    } catch (FileNotFoundException e) {
+      save();
+    } catch (IOException e) {
+      properties.clear();
+      populate();
+      save();
+    }
   }
 
   public void save() {
@@ -103,7 +124,7 @@ abstract class PropertiesExport implements Export {
     }
 
     if (pieces.length > 0) {
-      return value.substring(0, value.length() - 2);
+      return value.substring(0, value.length() - 1);
     } else {
       return "";
     }

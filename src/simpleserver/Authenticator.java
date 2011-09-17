@@ -120,7 +120,11 @@ public class Authenticator {
     server.data.save();
 
     if (server.options.getBoolean("enableCustAuthExport")) {
-      server.custAuthExport.addEntry(playerName, server.config.players.get(playerName), pwHash);
+      Integer groupId = server.config.players.get(playerName);
+      if (groupId == null) {
+        groupId = server.config.properties.getInt("defaultGroup");
+      }
+      server.custAuthExport.addEntry(playerName, groupId, pwHash);
     }
   }
 
