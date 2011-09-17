@@ -78,6 +78,10 @@ public class SetGroupCommand extends PlayerArgCommand implements ServerCommand {
     server.config.players.set(target, group);
     server.saveConfig();
 
+    if (server.options.getBoolean("enableCustAuthExport")) {
+      server.custAuthExport.updateGroup(target, group);
+    }
+
     player.addTMessage(Color.GRAY, "Player %s's group was set to %s!",
                        target, new Integer(group).toString());
     server.adminLog("User " + player.getName() + " set player's group:\t "

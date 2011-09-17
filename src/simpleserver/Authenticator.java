@@ -114,9 +114,14 @@ public class Authenticator {
   /***** REGISTRATION *****/
 
   public void register(String playerName, String password) {
-    server.data.players.setPw(playerName, generateHash(password, playerName));
+    byte[] pwHash = generateHash(password, playerName);
+    server.data.players.setPw(playerName, pwHash);
     server.data.players.setRealName(playerName);
     server.data.save();
+
+    if (server.options.getBoolean("enableCustAuthExport")) {
+      server.custAuthExport.addEntry(playerName, server.config.players.get(playerName), pwHash);
+    }
   }
 
   public boolean isRegistered(String playerName) {
@@ -126,8 +131,13 @@ public class Authenticator {
   public boolean changePassword(Player player, String oldPassword, String newPassword) {
     String playerName = player.getName();
     if (passwordMatches(playerName, oldPassword)) {
-      server.data.players.setPw(playerName, generateHash(newPassword, playerName));
+      byte[] pwHash = generateHash(newPassword, playerName);
+      server.data.players.setPw(playerName, pwHash);
       server.data.save();
+
+      if (server.options.getBoolean("enableCustAuthExport")) {
+        server.custAuthExport.updatePw(playerName, pwHash);
+      }
       return true;
     }
     return false;

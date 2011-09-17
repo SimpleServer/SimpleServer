@@ -47,6 +47,8 @@ import simpleserver.config.WhiteList;
 import simpleserver.config.data.GlobalData;
 import simpleserver.config.xml.Config;
 import simpleserver.config.xml.GlobalConfig;
+import simpleserver.export.CustAuthExport;
+import simpleserver.export.Export;
 import simpleserver.lang.Translations;
 import simpleserver.log.AdminLog;
 import simpleserver.log.ConnectionLog;
@@ -97,14 +99,17 @@ public class Server {
   public PlayerList playerList;
   public Authenticator authenticator;
   private List<Resource> resources;
+
   private CommandParser commandParser;
   private Messager messager;
-
   private AdminLog adminLog;
   private ErrorLog errorLog;
   private ConnectionLog connectionLog;
   private MessageLog messageLog;
   private SystemInputQueue systemInput;
+
+  private List<Export> exports;
+  public CustAuthExport custAuthExport;
 
   private MinecraftWrapper minecraft;
   private RconServer rconServer;
@@ -266,6 +271,12 @@ public class Server {
     globalConfig.save();
   }
 
+  public void saveExports() {
+    for (Export export : exports) {
+      export.save();
+    }
+  }
+
   public String findName(String prefix) {
     Player i = playerList.findPlayer(prefix);
     if (i != null) {
@@ -400,6 +411,11 @@ public class Server {
     resources.add(data = new GlobalData());
     resources.add(docs = new ReadFiles());
 
+    exports = new LinkedList<Export>();
+    if (options.getBoolean("enableCustAuthExport")) {
+      exports.add(custAuthExport = new CustAuthExport(this));
+    }
+
     time = new Time(this);
     bots = new BotController(this);
 
@@ -506,6 +522,7 @@ public class Server {
     requestTracker.stop();
     c10t.stop();
     saveResources();
+    saveExports();
 
     playerList.waitUntilEmpty();
     minecraft.stop();
