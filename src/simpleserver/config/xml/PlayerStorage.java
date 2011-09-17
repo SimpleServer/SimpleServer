@@ -33,7 +33,7 @@ public class PlayerStorage extends Storage {
     players.put(player.name, player);
   }
 
-  public void set(String name, int group) {
+  public void setGroup(String name, int group) {
     name = name.toLowerCase();
     if (contains(name)) {
       players.get(name).group = group;
@@ -54,13 +54,13 @@ public class PlayerStorage extends Storage {
     return players.containsKey(name);
   }
 
-  public Integer get(String name) {
+  public Integer group(String name) {
     name = name.toLowerCase();
     return contains(name) ? players.get(name).group : null;
   }
 
   public Integer get(Player player) {
-    return get(player.getName());
+    return group(player.getName());
   }
 
   public int count() {

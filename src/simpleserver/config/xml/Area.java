@@ -21,7 +21,6 @@
 package simpleserver.config.xml;
 
 import org.xml.sax.SAXException;
-import org.xml.sax.helpers.AttributesImpl;
 
 import simpleserver.Coordinate;
 
@@ -98,12 +97,12 @@ public class Area extends PermissionContainer implements Comparable<Area> {
   }
 
   @Override
-  void saveAttributes(AttributesImpl attributes) {
-    addAttribute(attributes, NAME, name);
-    addAttribute(attributes, START, start.toString());
-    addAttribute(attributes, END, end.toString());
+  void saveAttributes(AttributeList attributes) {
+    attributes.addAttribute(NAME, name);
+    attributes.addAttribute(START, start.toString());
+    attributes.addAttribute(END, end.toString());
     if (owner != null) {
-      addAttribute(attributes, OWNER, owner);
+      attributes.addAttribute(OWNER, owner);
     }
   }
 

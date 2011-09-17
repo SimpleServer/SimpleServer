@@ -57,7 +57,7 @@ public class Config extends PermissionContainer {
 
   void save(ContentHandler handler, XMLSerializer serializer) throws SAXException, IOException {
     handler.startElement("", "", tag, new AttributesImpl());
-    saveChilds(handler);
+    saveChilds(handler, !properties.getBoolean("xmlInlineAttributes"));
     handler.endElement("", "", tag);
   }
 

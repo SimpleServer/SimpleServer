@@ -20,9 +20,7 @@
  */
 package simpleserver.config.xml;
 
-import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
-import org.xml.sax.helpers.AttributesImpl;
 
 public class Group extends XMLTag {
   public int id;
@@ -96,28 +94,24 @@ public class Group extends XMLTag {
   }
 
   @Override
-  void saveAttributeElements(ContentHandler handler) throws SAXException {
+  void saveAttributes(AttributeList attributes) {
+    attributes.addAttribute(ID, id);
+    attributes.addAttribute(NAME, name);
+    attributes.addAttribute(COLOR, Character.toString(color));
     if (ignoreChestLocks) {
-      saveAttributeElement(handler, IGNORE_CHESTS);
+      attributes.addAttributeElement(IGNORE_CHESTS);
     }
     if (ignoreAreas) {
-      saveAttributeElement(handler, IGNORE_AREAS);
+      attributes.addAttributeElement(IGNORE_AREAS);
     }
     if (showTitle) {
-      saveAttributeElement(handler, SHOW_TITLE);
+      attributes.addAttributeElement(SHOW_TITLE);
     }
     if (cooldown != 0) {
-      saveAttributeElement(handler, COOLDOWN, Integer.toString(cooldown));
+      attributes.addAttributeElement(COOLDOWN, cooldown);
     }
     if (warmup != 0) {
-      saveAttributeElement(handler, WARMUP, Integer.toString(warmup));
+      attributes.addAttributeElement(WARMUP, warmup);
     }
-  }
-
-  @Override
-  void saveAttributes(AttributesImpl attributes) {
-    addAttribute(attributes, ID, id);
-    addAttribute(attributes, NAME, name);
-    addAttribute(attributes, COLOR, Character.toString(color));
   }
 }

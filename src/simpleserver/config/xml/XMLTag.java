@@ -23,6 +23,7 @@ package simpleserver.config.xml;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 
 import org.xml.sax.Attributes;
@@ -57,10 +58,7 @@ abstract class XMLTag implements Cloneable {
   }
 
   // save data
-  void saveAttributes(AttributesImpl attributes) {
-  }
-
-  void saveAttributeElements(ContentHandler handler) throws SAXException {
+  void saveAttributes(AttributeList attributes) {
   }
 
   // setup
@@ -102,7 +100,7 @@ abstract class XMLTag implements Cloneable {
 
   void setAttributes(Attributes attributes) throws SAXException {
     for (int i = 0; i < attributes.getLength(); i++) {
-      setAttribute(attributes.getLocalName(i).toLowerCase(), attributes.getValue(i));
+      setAttribute(attributes.getLocalName(i), attributes.getValue(i));
     }
     loadedAttributes();
   }
@@ -114,11 +112,14 @@ abstract class XMLTag implements Cloneable {
     childs.add(child);
   }
 
-  protected void save(ContentHandler handler) throws SAXException {
-    AttributesImpl attributes = new AttributesImpl();
+  protected void save(ContentHandler handler, boolean childs) throws SAXException {
+    AttributeList attributes = new AttributeList(childs);
     saveAttributes(attributes);
-    handler.startElement("", "", tag, attributes);
-    saveChilds(handler);
+    handler.startElement("", "", tag, attributes.inlineAttributes());
+    for (AttributeList.Attribute attribute : attributes.childAttributes()) {
+      saveAttributeElement(handler, attribute.name, attribute.value);
+    }
+    saveChilds(handler, childs);
     String content = saveContent();
     if (content != null) {
       handler.characters(content.toCharArray(), 0, content.length());
@@ -130,16 +131,15 @@ abstract class XMLTag implements Cloneable {
     return null;
   }
 
-  void saveChilds(ContentHandler handler) throws SAXException {
-    saveAttributeElements(handler);
+  void saveChilds(ContentHandler handler, boolean childAttributes) throws SAXException {
     if (childs != null) {
       for (XMLTag child : childs) {
-        child.save(handler);
+        child.save(handler, childAttributes);
       }
     }
   }
 
-  void saveAttributeElement(ContentHandler handler, String name, String content) throws SAXException {
+  private void saveAttributeElement(ContentHandler handler, String name, String content) throws SAXException {
     handler.startElement("", "", name, new AttributesImpl());
     if (content != null) {
       handler.characters(content.toCharArray(), 0, content.length());
@@ -147,24 +147,72 @@ abstract class XMLTag implements Cloneable {
     handler.endElement("", "", name);
   }
 
-  void saveAttributeElement(ContentHandler handler, String name) throws SAXException {
-    saveAttributeElement(handler, name, null);
-  }
-
-  void addAttribute(AttributesImpl attributes, String name, Object value) {
-    addAttribute(attributes, name, value.toString());
-  }
-
-  void addAttribute(AttributesImpl attributes, String name, String value) {
-    attributes.addAttribute("", "", name, "CDATA", value);
-  }
-
-  void addAttribute(AttributesImpl attributes, String name, int value) {
-    addAttribute(attributes, name, Integer.toString(value));
-  }
-
   @Override
   public XMLTag clone() throws CloneNotSupportedException {
     return ((XMLTag) super.clone()).callInit();
+  }
+
+  static class AttributeList {
+    private AttributesImpl attributes = new AttributesImpl();
+    private List<Attribute> childs = new LinkedList<Attribute>();
+    private boolean childAttributes;
+
+    public AttributeList(boolean childAttributes) {
+      this.childAttributes = childAttributes;
+    }
+
+    public void addAttribute(String name, String value) {
+      if (attributes.getIndex(name) >= 0) {
+        value = attributes.getValue(name) + "," + value;
+        attributes.removeAttribute(attributes.getIndex(name));
+      }
+      attributes.addAttribute("", "", name, "CDATA", value == null ? "true" : value);
+    }
+
+    public void addAttribute(String name) {
+      addAttribute(name, null);
+    }
+
+    public void addAttribute(String name, Object object) {
+      addAttribute(name, object.toString());
+    }
+
+    public void addAttribute(String name, int number) {
+      addAttribute(name, Integer.toString(number));
+    }
+
+    public void addAttributeElement(String name, String value) {
+      if (childAttributes) {
+        childs.add(new Attribute(name, value));
+      } else {
+        addAttribute(name, value);
+      }
+    }
+
+    public void addAttributeElement(String name, int number) {
+      addAttributeElement(name, Integer.toString(number));
+    }
+
+    public void addAttributeElement(String name) {
+      addAttributeElement(name, null);
+    }
+
+    public Attributes inlineAttributes() {
+      return attributes;
+    }
+
+    public List<Attribute> childAttributes() {
+      return childs;
+    }
+
+    static class Attribute {
+      public String name;
+      public String value;
+
+      Attribute(String name, String value) {
+        this.name = name;
+        this.value = value;
+      }
+    }
   }
 }

@@ -36,7 +36,7 @@ public class SetGroupCommand extends PlayerArgCommand implements ServerCommand {
 
   protected boolean allowed(Player player, int group, String target) {
     Server server = player.getServer();
-    if (server.config.players.get(target) != null && player.getGroupId() <= server.config.players.get(target)) {
+    if (server.config.players.group(target) != null && player.getGroupId() <= server.config.players.group(target)) {
       player.addTMessage(Color.RED, "You cannot set the group of this user!");
       return false;
     }
@@ -75,7 +75,7 @@ public class SetGroupCommand extends PlayerArgCommand implements ServerCommand {
 
   protected void setGroup(Player player, int group, String target) {
     Server server = player.getServer();
-    server.config.players.set(target, group);
+    server.config.players.setGroup(target, group);
     server.saveConfig();
 
     if (server.options.getBoolean("enableCustAuthExport")) {
@@ -108,7 +108,7 @@ public class SetGroupCommand extends PlayerArgCommand implements ServerCommand {
   }
 
   protected void setGroup(Server server, int group, String target) {
-    server.config.players.set(target, group);
+    server.config.players.setGroup(target, group);
     server.saveConfig();
     System.out.println("[SimpleServer] Player " + target + "'s group was set to " + new Integer(group).toString() + "!");
 

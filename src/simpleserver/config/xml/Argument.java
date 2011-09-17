@@ -21,7 +21,6 @@
 package simpleserver.config.xml;
 
 import org.xml.sax.SAXException;
-import org.xml.sax.helpers.AttributesImpl;
 
 class Argument extends XMLTag {
   Permission allow;
@@ -49,7 +48,7 @@ class Argument extends XMLTag {
   }
 
   @Override
-  void saveAttributes(AttributesImpl attributes) {
-    addAttribute(attributes, "allow", allow);
+  void saveAttributes(AttributeList attributes) {
+    attributes.addAttribute("allow", allow);
   }
 }

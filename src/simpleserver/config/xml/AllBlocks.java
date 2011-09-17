@@ -21,7 +21,6 @@
 package simpleserver.config.xml;
 
 import org.xml.sax.SAXException;
-import org.xml.sax.helpers.AttributesImpl;
 
 public class AllBlocks extends XMLTag {
   public Permission place;
@@ -52,18 +51,18 @@ public class AllBlocks extends XMLTag {
   }
 
   @Override
-  void saveAttributes(AttributesImpl attributes) {
+  void saveAttributes(AttributeList attributes) {
     if (place != null) {
-      addAttribute(attributes, PLACE, place);
+      attributes.addAttribute(PLACE, place);
     }
     if (destroy != null) {
-      addAttribute(attributes, DESTROY, destroy);
+      attributes.addAttribute(DESTROY, destroy);
     }
     if (use != null) {
-      addAttribute(attributes, USE, use);
+      attributes.addAttribute(USE, use);
     }
     if (give != null) {
-      addAttribute(attributes, GIVE, give);
+      attributes.addAttribute(GIVE, give);
     }
   }
 }

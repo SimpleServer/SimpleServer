@@ -20,8 +20,6 @@
  */
 package simpleserver.config.xml;
 
-import org.xml.sax.helpers.AttributesImpl;
-
 class BukkitPermission extends XMLTag {
   String node;
   String allow;
@@ -50,8 +48,8 @@ class BukkitPermission extends XMLTag {
   }
 
   @Override
-  void saveAttributes(AttributesImpl attributes) {
-    addAttribute(attributes, ALLOW, allow);
+  void saveAttributes(AttributeList attributes) {
+    attributes.addAttribute(ALLOW, allow);
   }
 
 }

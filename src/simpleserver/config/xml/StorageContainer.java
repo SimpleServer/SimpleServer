@@ -63,13 +63,13 @@ abstract class StorageContainer extends XMLTag {
   }
 
   @Override
-  void saveChilds(ContentHandler handler) throws SAXException {
+  void saveChilds(ContentHandler handler, boolean childs) throws SAXException {
     for (Storage storage : storages.values()) {
       Iterator<? extends XMLTag> it = storage.iterator();
       while (it.hasNext()) {
-        it.next().save(handler);
+        it.next().save(handler, childs);
       }
     }
-    super.saveChilds(handler);
+    super.saveChilds(handler, childs);
   }
 }

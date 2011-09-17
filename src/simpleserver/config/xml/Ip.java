@@ -24,7 +24,6 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 import org.xml.sax.SAXException;
-import org.xml.sax.helpers.AttributesImpl;
 
 class Ip extends XMLTag {
   InetAddress address;
@@ -69,7 +68,7 @@ class Ip extends XMLTag {
   }
 
   @Override
-  void saveAttributes(AttributesImpl attributes) {
-    addAttribute(attributes, "group", Integer.toString(group));
+  void saveAttributes(AttributeList attributes) {
+    attributes.addAttribute("group", Integer.toString(group));
   }
 }

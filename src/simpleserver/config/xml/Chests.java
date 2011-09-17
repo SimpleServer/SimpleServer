@@ -21,7 +21,6 @@
 package simpleserver.config.xml;
 
 import org.xml.sax.SAXException;
-import org.xml.sax.helpers.AttributesImpl;
 
 public class Chests extends XMLTag {
   Permission allow;
@@ -52,7 +51,7 @@ public class Chests extends XMLTag {
   }
 
   @Override
-  void saveAttributes(AttributesImpl attributes) {
-    addAttribute(attributes, ALLOW, allow);
+  void saveAttributes(AttributeList attributes) {
+    attributes.addAttribute(ALLOW, allow);
   }
 }

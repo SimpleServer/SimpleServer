@@ -20,9 +20,6 @@
  */
 package simpleserver.config.xml;
 
-import org.xml.sax.ContentHandler;
-import org.xml.sax.SAXException;
-import org.xml.sax.helpers.AttributesImpl;
 
 class Property extends XMLTag implements Comparable<Property> {
   String name;
@@ -72,23 +69,12 @@ class Property extends XMLTag implements Comparable<Property> {
 
   @Override
   String saveContent() {
-    return (isBoolean()) ? null : value;
+    return value;
   }
 
   @Override
-  void saveAttributeElements(ContentHandler handler) throws SAXException {
-    if (isBoolean()) {
-      saveAttributeElement(handler, value);
-    }
-  }
-
-  private boolean isBoolean() {
-    return value.equals("true") | value.equals("false");
-  }
-
-  @Override
-  void saveAttributes(AttributesImpl attributes) {
-    addAttribute(attributes, "name", name);
+  void saveAttributes(AttributeList attributes) {
+    attributes.addAttribute("name", name);
   }
 
   public int compareTo(Property property) {

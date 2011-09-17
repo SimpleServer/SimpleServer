@@ -21,7 +21,6 @@
 package simpleserver.config.xml;
 
 import org.xml.sax.SAXException;
-import org.xml.sax.helpers.AttributesImpl;
 
 class PlayerConfig extends XMLTag {
   String name;
@@ -55,7 +54,7 @@ class PlayerConfig extends XMLTag {
   }
 
   @Override
-  void saveAttributes(AttributesImpl attributes) {
-    addAttribute(attributes, "group", Integer.toString(group));
+  void saveAttributes(AttributeList attributes) {
+    attributes.addAttribute("group", Integer.toString(group));
   }
 }

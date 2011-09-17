@@ -23,9 +23,7 @@ package simpleserver.config.xml;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
-import org.xml.sax.helpers.AttributesImpl;
 
 public class CommandConfig extends StorageContainer implements Comparable<CommandConfig> {
   public String name;
@@ -83,40 +81,40 @@ public class CommandConfig extends StorageContainer implements Comparable<Comman
       forwarding = Forwarding.ONLY;
     } else if (name.equals(HIDDEN)) {
       hidden = true;
-    } else if (name.equals(ALIAS) && value != null && value.length() > 0) {
+    } else if (name.equals(ALIAS) && value != null) {
       if (aliases == null) {
         aliases = new ArrayList<String>();
       }
-      aliases.add(value.toLowerCase());
+      for (String alias : value.split(",")) {
+        if (alias.trim().length() > 0) {
+          aliases.add(alias.trim());
+        }
+      }
     } else if (name.equals(RENAME)) {
       this.name = value;
     }
   }
 
   @Override
-  void saveAttributeElements(ContentHandler handler) throws SAXException {
+  void saveAttributes(AttributeList attributes) {
+    attributes.addAttribute(NAME, originalName);
+    attributes.addAttribute(ALLOW, allow);
     if (hidden) {
-      saveAttributeElement(handler, HIDDEN);
+      attributes.addAttributeElement(HIDDEN);
     }
     if (forwarding == Forwarding.BOTH) {
-      saveAttributeElement(handler, FORWARD);
+      attributes.addAttributeElement(FORWARD);
     } else if (forwarding == Forwarding.ONLY) {
-      saveAttributeElement(handler, FORWARD_ONLY);
+      attributes.addAttributeElement(FORWARD_ONLY);
     }
     if (!name.equals(originalName)) {
-      saveAttributeElement(handler, RENAME, name);
+      attributes.addAttributeElement(RENAME, name);
     }
     if (aliases != null) {
       for (String alias : aliases) {
-        saveAttributeElement(handler, ALIAS, alias);
+        attributes.addAttributeElement(ALIAS, alias);
       }
     }
-  }
-
-  @Override
-  void saveAttributes(AttributesImpl attributes) {
-    addAttribute(attributes, NAME, originalName);
-    addAttribute(attributes, ALLOW, allow);
   }
 
   public Permission allow(String args) {

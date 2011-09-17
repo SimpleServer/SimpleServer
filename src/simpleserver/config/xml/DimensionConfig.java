@@ -21,7 +21,6 @@
 package simpleserver.config.xml;
 
 import org.xml.sax.SAXException;
-import org.xml.sax.helpers.AttributesImpl;
 
 import simpleserver.Coordinate.Dimension;
 
@@ -54,8 +53,8 @@ public class DimensionConfig extends PermissionContainer {
   }
 
   @Override
-  void saveAttributes(AttributesImpl attributes) {
-    addAttribute(attributes, "name", dimension);
+  void saveAttributes(AttributeList attributes) {
+    attributes.addAttribute("name", dimension);
   }
 
   public void add(Area area) {

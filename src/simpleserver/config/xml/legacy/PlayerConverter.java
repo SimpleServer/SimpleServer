@@ -37,7 +37,7 @@ public class PlayerConverter extends TagConverter {
   @Override
   void convert(Attributes attributes, Stack<PermissionContainer> stack) throws SAXException {
     Config config = (Config) stack.peek();
-    config.players.set(attributes.getValue("name"), getInt(attributes.getValue("group")));
+    config.players.setGroup(attributes.getValue("name"), getInt(attributes.getValue("group")));
   }
 
 }

@@ -36,7 +36,7 @@
   name CDATA #IMPLIED 
   color NMTOKEN #IMPLIED
   showTitle NMTOKEN #IMPLIED
-  ignoreChestlocks NMTOKEN #IMPLIED
+  ignoreChestLocks NMTOKEN #IMPLIED
   ignoreAreas NMTOKEN #IMPLIED
   forwardUnknownCommands NMTOKEN #IMPLIED
   warmup NMTOKEN #IMPLIED
@@ -54,6 +54,7 @@
   forward NMTOKEN #IMPLIED
   hidden NMTOKEN #IMPLIED
   rename NMTOKEN #IMPLIED
+  alias CDATA #IMPLIED
 >
 <!ATTLIST argument
   allow CDATA #REQUIRED

@@ -21,7 +21,6 @@
 package simpleserver.config.xml;
 
 import org.xml.sax.SAXException;
-import org.xml.sax.helpers.AttributesImpl;
 
 public class Block extends XMLTag {
   public String id;
@@ -60,13 +59,13 @@ public class Block extends XMLTag {
   }
 
   @Override
-  void saveAttributes(AttributesImpl attributes) {
-    addAttribute(attributes, ID, id);
+  void saveAttributes(AttributeList attributes) {
+    attributes.addAttribute(ID, id);
     if (place != null) {
-      addAttribute(attributes, PLACE, place);
+      attributes.addAttribute(PLACE, place);
     }
     if (give != null) {
-      addAttribute(attributes, GIVE, give);
+      attributes.addAttribute(GIVE, give);
     }
   }
 }

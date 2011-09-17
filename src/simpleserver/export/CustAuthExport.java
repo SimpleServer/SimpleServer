@@ -37,7 +37,7 @@ public class CustAuthExport extends PropertiesExport {
     for (String playerName : server.data.players.names()) {
       byte[] pwHash = server.data.players.getPwHash(playerName);
       if (pwHash != null) {
-        setEntry(playerName, String.valueOf(server.config.players.get(playerName)), hashToHex(pwHash));
+        setEntry(playerName, String.valueOf(server.config.players.group(playerName)), hashToHex(pwHash));
       }
     }
   }
