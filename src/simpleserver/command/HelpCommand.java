@@ -50,10 +50,10 @@ public class HelpCommand extends AbstractCommand implements PlayerCommand {
       }
       player.addMessage(command.getHelpText(prefix));
 
-      List<String> aliases = player.getServer().config.commands.get(command.getName()).aliases;
-      if (aliases != null) {
+      CommandConfig config = player.getServer().config.commands.get(command.getName());
+      if (config != null && config.aliases != null && !config.aliases.isEmpty()) {
         StringBuffer line = new StringBuffer();
-        for (String alias : aliases) {
+        for (String alias : config.aliases) {
           line.append(commandPrefix());
           line.append(alias);
           line.append(" ");
