@@ -102,7 +102,7 @@ public class MessageHandler {
       handleError(new Exception(line));
     } else if (line.matches("^>+$")) {
       return;
-    } else if (line.contains("SERVER IS RUNNING IN OFFLINE/INSECURE MODE") && server.options.getBoolean("onlineMode")) {
+    } else if (line.contains("SERVER IS RUNNING IN OFFLINE/INSECURE MODE") && server.config.properties.getBoolean("onlineMode")) {
       ignoreNextLines(3);
       return;
     } else {

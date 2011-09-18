@@ -29,6 +29,6 @@ public class GiveSelfCommand extends GiveCommand implements PlayerCommand {
 
   public void execute(Player player, String message) {
     executor = player;
-    execute(extractArguments(message), player, player.getName());
+    execute(extractArguments(message), player, player.getName(), player);
   }
 }

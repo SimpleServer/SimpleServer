@@ -34,6 +34,8 @@
 	<property name="serverDescription">A server running SimpleServer</property>
 	<property name="xmlInlineAttributes">true</property>
 	<property name="xmlPCDATA">true</property>
+	<property name="onlineMode">true</property>
+	<property name="custAuth">false</property>
 	
 	<ip group="5">127.0.0.1</ip>
 	

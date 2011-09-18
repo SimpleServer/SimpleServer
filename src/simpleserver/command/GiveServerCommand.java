@@ -34,7 +34,7 @@ public class GiveServerCommand extends GiveCommand implements ServerCommand {
       tError("No player specified");
       return;
     }
-    execute(extractArguments(message, 1), getTarget(arguments[0], server), "Console");
+    execute(extractArguments(message, 1), getTarget(arguments[0], server), "Console", null);
   }
 
   @Override

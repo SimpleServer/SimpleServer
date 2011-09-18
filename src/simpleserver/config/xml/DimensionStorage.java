@@ -20,6 +20,7 @@
  */
 package simpleserver.config.xml;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -58,7 +59,7 @@ public class DimensionStorage extends Storage implements Iterable<DimensionConfi
     if (dim != null) {
       return dim.areas.get(coordinate);
     }
-    return null;
+    return new ArrayList<Area>(0);
   }
 
   public Set<Area> overlaps(Area area) {
@@ -77,5 +78,4 @@ public class DimensionStorage extends Storage implements Iterable<DimensionConfi
     dimensions.put(dimension, newDimension);
     return newDimension;
   }
-
 }

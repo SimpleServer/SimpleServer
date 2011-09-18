@@ -34,6 +34,6 @@ public class GivePlayerCommand extends GiveCommand implements PlayerCommand {
       tError("No player specified");
       return;
     }
-    execute(extractArguments(message, 1), getTarget(arguments[0], player.getServer()), player.getName());
+    execute(extractArguments(message, 1), getTarget(arguments[0], player.getServer()), player.getName(), player);
   }
 }

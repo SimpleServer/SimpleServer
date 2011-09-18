@@ -34,7 +34,7 @@ public abstract class GiveCommand extends AbstractCommand {
     super(name, usage);
   }
 
-  public void execute(String[] arguments, Player target, String logName) {
+  public void execute(String[] arguments, Player target, String logName, Player source) {
     if (target == null) {
       return;
     }
@@ -59,6 +59,11 @@ public abstract class GiveCommand extends AbstractCommand {
         }
         id = item.id;
         damage = item.damage;
+      }
+
+      if (source != null && !allowed(source, id)) {
+        tError("You are not allowed to give this block.");
+        return;
       }
 
       if (request.length > 1) {
@@ -97,6 +102,10 @@ public abstract class GiveCommand extends AbstractCommand {
     } else {
       tError("No item or amount specified!");
     }
+  }
+
+  private boolean allowed(Player player, int id) {
+    return player.getServer().config.blockPermission(player, player.position(), id).give;
   }
 
   protected void tError(String message, Object... args) {

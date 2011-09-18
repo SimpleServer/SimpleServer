@@ -92,7 +92,7 @@ public class Authenticator {
   }
 
   public boolean useCustAuth() {
-    return server.options.getBoolean("onlineMode") && isMinecraftUp;
+    return server.config.properties.getBoolean("onlineMode") && isMinecraftUp;
   }
 
   public boolean useCustAuth(Player player) {
@@ -100,15 +100,15 @@ public class Authenticator {
   }
 
   public boolean allowGuestJoin() {
-    return server.options.getBoolean("custAuth") || !server.options.getBoolean("onlineMode");
+    return server.config.properties.getBoolean("custAuth") || !server.config.properties.getBoolean("onlineMode");
   }
 
   public boolean allowLogin() {
-    return server.options.getBoolean("custAuth");
+    return server.config.properties.getBoolean("custAuth");
   }
 
   public boolean allowRegistration() {
-    return server.options.getBoolean("custAuth");
+    return server.config.properties.getBoolean("custAuth");
   }
 
   /***** REGISTRATION *****/

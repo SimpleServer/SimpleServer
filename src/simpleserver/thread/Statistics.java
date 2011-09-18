@@ -87,8 +87,8 @@ public class Statistics extends Thread {
       data.put("version", Main.version);
 
       options.put("jar", server.options.get("alternateJarFile"));
-      options.put("onlineMode", server.options.getBoolean("onlineMode"));
-      options.put("custAuth", server.options.getBoolean("custAuth"));
+      options.put("onlineMode", server.config.properties.getBoolean("onlineMode"));
+      options.put("custAuth", server.config.properties.getBoolean("custAuth"));
       options.put("maxPlayers", server.config.properties.getInt("maxPlayers"));
 
       stats.put("registeredPlayers", server.data.players.count());
