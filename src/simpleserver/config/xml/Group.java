@@ -107,6 +107,9 @@ public class Group extends XMLTag {
     if (showTitle) {
       attributes.addAttributeElement(SHOW_TITLE);
     }
+    if (forwardUnknownCommands) {
+      attributes.addAttributeElement(FORWARD_UNKNOWN);
+    }
     if (cooldown != 0) {
       attributes.addAttributeElement(COOLDOWN, cooldown);
     }
