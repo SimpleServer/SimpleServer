@@ -1,3 +1,13 @@
+== 8.3.3 ==
+ * added custAuth export
+ * added permissions for giving blocks
+ * added /me command
+ * changed XML format
+ * fixed whitelist
+ * fixed forwardUnknownCommands option
+ * fixed help command
+ * improved XML parsing
+
 == 8.3.0 ==
  * added support for Minecraft 1.8 
  * improved XML parser
