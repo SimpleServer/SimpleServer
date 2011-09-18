@@ -36,9 +36,9 @@ public class Messager {
     this.server = server;
   }
 
-  public void propagate(Chat chat, String message) {
+  public void propagate(Chat chat, String message, boolean build) {
     int recieverCount = 0;
-    String builtMessage = chat.buildMessage(message);
+    String builtMessage = build ? chat.buildMessage(message) : message;
 
     for (Player reciever : chat.getRecievers(server.playerList)) {
       reciever.addMessage(builtMessage);
@@ -59,6 +59,10 @@ public class Messager {
       chat.noRecieverFound();
       return;
     }
+  }
+
+  public void propagate(Chat chat, String message) {
+    propagate(chat, message, true);
   }
 
   private void forwardToServer(Chat chat, String message) {

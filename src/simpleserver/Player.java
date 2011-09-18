@@ -33,17 +33,17 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import org.xml.sax.SAXException;
 
 import simpleserver.Coordinate.Dimension;
+import simpleserver.bot.BotController.ConnectException;
 import simpleserver.bot.Giver;
 import simpleserver.bot.Teleporter;
-import simpleserver.bot.BotController.ConnectException;
 import simpleserver.command.ExternalCommand;
 import simpleserver.command.PlayerCommand;
 import simpleserver.config.KitList.Kit;
 import simpleserver.config.data.Stats.StatField;
 import simpleserver.config.xml.CommandConfig;
+import simpleserver.config.xml.CommandConfig.Forwarding;
 import simpleserver.config.xml.Group;
 import simpleserver.config.xml.Permission;
-import simpleserver.config.xml.CommandConfig.Forwarding;
 import simpleserver.message.AbstractChat;
 import simpleserver.message.Chat;
 import simpleserver.message.GlobalChat;
@@ -265,8 +265,16 @@ public class Player {
     sendMessage(chatType, message);
   }
 
+  public void sendMessage(String message, boolean build) {
+    sendMessage(chatType, message, build);
+  }
+
   public void sendMessage(Chat messageType, String message) {
     server.getMessager().propagate(messageType, message);
+  }
+
+  public void sendMessage(Chat messageType, String message, boolean build) {
+    server.getMessager().propagate(messageType, message, build);
   }
 
   public void forwardMessage(String message) {
