@@ -94,6 +94,7 @@
 	</command>
 	<command name="lock" allow="1+" />
 	<command name="login" allow="0+" />
+	<command name="me" allow="0+" />
 	<command name="motd" allow="0+" />
 	<command name="mute" allow="3+" />
 	<command name="myarea" allow="2+" />
