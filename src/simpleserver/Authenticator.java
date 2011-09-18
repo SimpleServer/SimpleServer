@@ -42,7 +42,7 @@ import java.util.TimerTask;
 
 public class Authenticator {
   private static final int REFRESH_TIME = 120; // online status
-  private static final String MINECRAFT_AUTH_URL = "http://50.16.200.224/game/checkserver.jsp";
+  private static final String MINECRAFT_AUTH_URL = "http://session.minecraft.net/game/checkserver.jsp";
 
   public static final int REQUEST_EXPIRATION = 60;
   private static final int REMEMBER_TIME = REQUEST_EXPIRATION;
@@ -335,6 +335,7 @@ public class Authenticator {
       System.out.println("[CustAuth] Malformed URL: " + urlStr);
     } catch (Exception e) {
       // seems to be down
+      System.out.println("[CustAuth] Could not reach authentication url: " + urlStr);
       updateMinecraftState();
     }
     return result;
