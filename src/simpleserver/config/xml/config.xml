@@ -23,6 +23,7 @@
 	<property name="logMessageFormat">%1$s-&gt;%2$s\: %3$s</property>
 	<property name="autoRestartMins">240</property>
 	<property name="msgTitleFormat">§%3$s&lt;[%2$s]%1$s&gt;§f</property>
+	<property name="meCommandFormat"> * %1$s%3$s%2$s</property>
 	<property name="exitOnFailure">true</property>
 	<property name="msgFormat">§%3$s&lt;%1$s&gt;§f</property>
 	<property name="forwardAllCommands">false</property>
