@@ -50,6 +50,11 @@ public class Options extends AbstractOptions {
   }
 
   @Override
+  protected String getComment() {
+    return "Some of the options which used to be here are now stored in config.xml";
+  }
+
+  @Override
   protected void missingFile() {
     super.missingFile();
 
