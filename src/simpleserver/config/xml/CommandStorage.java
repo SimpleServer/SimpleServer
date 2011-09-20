@@ -51,11 +51,11 @@ public class CommandStorage extends Storage implements Iterable<CommandConfig> {
   }
 
   public CommandConfig getTopConfig(String name) {
-    if (commands.containsKey(name)) {
+    if (commands.containsKey(name) && !commands.get(name).disabled) {
       return commands.get(name);
     }
     for (CommandConfig command : commands.values()) {
-      if (command.alias(name)) {
+      if (!command.disabled && command.alias(name)) {
         return command;
       }
     }

@@ -166,7 +166,7 @@ public class GlobalConfig extends AbstractConfig {
     of.setIndent(1);
     of.setIndenting(true);
     of.setLineWidth(200);
-    of.setDoctype(null, "http://simpleserver.ceilingcat.ch/resources/config.1.dtd");
+    of.setDoctype(null, "http://simpleserver.ceilingcat.ch/resources/config.2.dtd");
     XMLSerializer serializer = new ConfigSerializer(fos, of);
     ContentHandler hd;
     try {

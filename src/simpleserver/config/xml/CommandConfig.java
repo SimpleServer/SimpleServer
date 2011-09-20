@@ -32,6 +32,7 @@ public class CommandConfig extends StorageContainer implements Comparable<Comman
   public Forwarding forwarding = Forwarding.NONE;
   public Permission allow;
   public boolean hidden;
+  public boolean disabled = false;
 
   private ArgumentStorage arguments;
 
@@ -42,6 +43,7 @@ public class CommandConfig extends StorageContainer implements Comparable<Comman
   private static final String FORWARD = "forward";
   private static final String FORWARD_ONLY = "forwardonly";
   private static final String HIDDEN = "hidden";
+  private static final String DISABLED = "disabled";
 
   CommandConfig() {
     super("command");
@@ -50,6 +52,7 @@ public class CommandConfig extends StorageContainer implements Comparable<Comman
     acceptAttribute(FORWARD);
     acceptAttribute(FORWARD_ONLY);
     acceptAttribute(HIDDEN);
+    acceptAttribute(DISABLED);
   }
 
   public CommandConfig(String name) {
@@ -75,8 +78,12 @@ public class CommandConfig extends StorageContainer implements Comparable<Comman
       this.name = originalName = value.toLowerCase();
     } else if (name.equals(ALLOW)) {
       allow = new Permission(value);
-    } else if (name.equals(FORWARD) && (value == null || !value.equals("false"))) {
-      forwarding = Forwarding.BOTH;
+    } else if (name.equals(FORWARD)) {
+      if (value == null || value.equals("true")) {
+        forwarding = Forwarding.BOTH;
+      } else if (value.equals("only")) {
+        forwarding = Forwarding.ONLY;
+      }
     } else if (name.equals(FORWARD_ONLY) && (value == null || !value.equals("false"))) {
       forwarding = Forwarding.ONLY;
     } else if (name.equals(HIDDEN) && (value == null || !value.equals("false"))) {
@@ -92,6 +99,8 @@ public class CommandConfig extends StorageContainer implements Comparable<Comman
       }
     } else if (name.equals(RENAME)) {
       this.name = value;
+    } else if (name.equals(DISABLED) && (value == null || !value.equals("false"))) {
+      disabled = true;
     }
   }
 
@@ -101,6 +110,9 @@ public class CommandConfig extends StorageContainer implements Comparable<Comman
     attributes.addAttribute(ALLOW, allow);
     if (hidden) {
       attributes.addAttributeElement(HIDDEN);
+    }
+    if (disabled) {
+      attributes.addAttributeElement(DISABLED);
     }
     if (forwarding == Forwarding.BOTH) {
       attributes.addAttributeElement(FORWARD);

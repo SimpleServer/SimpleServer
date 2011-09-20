@@ -3,7 +3,7 @@
 <!ELEMENT group ( warmup | cooldown | ignoreChestLocks | showTitle | ignoreAreas | forwardUnknownCommands | color )*>
 <!ELEMENT player ( #PCDATA )>
 <!ELEMENT ip ( #PCDATA )>
-<!ELEMENT command ( rename | alias | forward | forwardonly | hidden | argument )*>
+<!ELEMENT command ( rename | alias | forward | forwardonly | hidden | argument | disabled )*>
 <!ELEMENT allblocks EMPTY>
 <!ELEMENT block EMPTY>
 <!ELEMENT chests EMPTY>
@@ -22,6 +22,7 @@
 <!ELEMENT alias (#PCDATA)>
 <!ELEMENT forward EMPTY>
 <!ELEMENT forwardonly EMPTY>
+<!ELEMENT disabled EMPTY>
 <!ELEMENT hidden EMPTY>
 <!ELEMENT argument (#PCDATA)>
 
@@ -57,6 +58,9 @@
   forward NMTOKEN #IMPLIED
   hidden NMTOKEN #IMPLIED
   rename NMTOKEN #IMPLIED
+  forward NMTOKEN #IMPLIED
+  forwardonly NMTOKEN #IMPLIED
+  disabled NMTOKEN #IMPLIED
   alias CDATA #IMPLIED
 >
 <!ATTLIST argument
