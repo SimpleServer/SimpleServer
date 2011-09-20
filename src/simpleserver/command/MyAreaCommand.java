@@ -91,7 +91,7 @@ public class MyAreaCommand extends AbstractCommand implements PlayerCommand {
       }
       saveArea(area, player);
       player.addTMessage(Color.GRAY, "Your area has been saved!");
-    } else if (arguments[0].equals("unsave")) {
+    } else if (arguments[0].equals("unsave") || arguments[0].equals("remove")) {
       AreaStoragePair area = config.playerArea(player);
       if (area == null) {
         player.addTMessage(Color.RED, "You currently have no personal area which can be removed!");
@@ -100,6 +100,7 @@ public class MyAreaCommand extends AbstractCommand implements PlayerCommand {
 
       area.storage.remove(area.area);
       player.addTMessage(Color.GRAY, "Your area has been removed!");
+      player.getServer().saveConfig();
     } else if (arguments[0].equals("rename")) {
       AreaStoragePair area = config.playerArea(player);
       if (area == null) {
@@ -111,6 +112,7 @@ public class MyAreaCommand extends AbstractCommand implements PlayerCommand {
       if (label != null) {
         area.area.name = label;
         player.addTMessage(Color.GRAY, "Your area has been renamed!");
+        player.getServer().saveConfig();
       } else {
         player.addTMessage(Color.RED, "Please supply an area name.");
       }

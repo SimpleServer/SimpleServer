@@ -20,6 +20,7 @@
  */
 package simpleserver.config.xml;
 
+import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
 import simpleserver.Coordinate.Dimension;
@@ -57,8 +58,14 @@ public class DimensionConfig extends PermissionContainer {
     attributes.addAttribute("name", dimension);
   }
 
+  @Override
+  protected void save(ContentHandler handler, boolean childs, boolean pcdata) throws SAXException {
+    if (!topAreas.isEmpty()) {
+      super.save(handler, childs, pcdata);
+    }
+  }
+
   public void add(Area area) {
     topAreas.add(area);
-    areas.add(area);
   }
 }

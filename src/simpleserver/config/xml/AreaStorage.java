@@ -52,4 +52,8 @@ public class AreaStorage extends Storage implements Iterable<Area> {
     globalStorage.remove(area);
   }
 
+  public boolean isEmpty() {
+    return localStorage.isEmpty();
+  }
+
 }
