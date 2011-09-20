@@ -1,3 +1,11 @@
+== 8.3.4 ==
+ * fixed myarea command
+ * fixed external command forwarding
+ * added aliases for external commands
+ * fixed external commands with double-slash prefix
+ * fixed chest name length bug
+ * fixed forward attribute in DTD
+
 == 8.3.3 ==
  * added custAuth export
  * added permissions for giving blocks
