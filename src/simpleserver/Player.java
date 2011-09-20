@@ -33,17 +33,17 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import org.xml.sax.SAXException;
 
 import simpleserver.Coordinate.Dimension;
-import simpleserver.bot.BotController.ConnectException;
 import simpleserver.bot.Giver;
 import simpleserver.bot.Teleporter;
+import simpleserver.bot.BotController.ConnectException;
 import simpleserver.command.ExternalCommand;
 import simpleserver.command.PlayerCommand;
 import simpleserver.config.KitList.Kit;
 import simpleserver.config.data.Stats.StatField;
 import simpleserver.config.xml.CommandConfig;
-import simpleserver.config.xml.CommandConfig.Forwarding;
 import simpleserver.config.xml.Group;
 import simpleserver.config.xml.Permission;
+import simpleserver.config.xml.CommandConfig.Forwarding;
 import simpleserver.message.AbstractChat;
 import simpleserver.message.Chat;
 import simpleserver.message.GlobalChat;
@@ -475,11 +475,11 @@ public class Player {
     return position.pitch;
   }
 
-  public boolean parseCommand(String message) {
+  public String parseCommand(String message) {
     // TODO: Handle aliases of external commands
 
     if (closed) {
-      return true;
+      return null;
     }
 
     // Repeat last command
@@ -505,7 +505,7 @@ public class Player {
     }
 
     if (command == null) {
-      if (groupObject.forwardUnknownCommands) {
+      if (groupObject.forwardUnknownCommands || config != null) {
         command = new ExternalCommand(commandName);
       } else {
         command = server.getCommandParser().getPlayerCommand((String) null);
@@ -516,7 +516,7 @@ public class Player {
       Permission permission = server.config.getCommandPermission(config.name, args, position.coordinate());
       if (!permission.contains(this)) {
         addTMessage(Color.RED, "Insufficient permission.");
-        return true;
+        return null;
       }
     }
 
@@ -524,7 +524,13 @@ public class Player {
       command.execute(this, message);
     }
 
-    return !((command instanceof ExternalCommand) || (config != null && config.forwarding != Forwarding.NONE) || server.config.properties.getBoolean("forwardAllCommands"));
+    if (command instanceof ExternalCommand) {
+      return "/" + originalName + " " + args;
+    } else if ((config != null && config.forwarding != Forwarding.NONE) || server.config.properties.getBoolean("forwardAllCommands")) {
+      return message;
+    } else {
+      return null;
+    }
   }
 
   public void execute(Class<? extends PlayerCommand> c) {

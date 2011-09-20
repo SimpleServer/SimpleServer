@@ -36,12 +36,12 @@ import java.io.OutputStream;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import simpleserver.Authenticator.AuthRequest;
 import simpleserver.Color;
 import simpleserver.Coordinate;
-import simpleserver.Coordinate.Dimension;
 import simpleserver.Player;
 import simpleserver.Server;
+import simpleserver.Authenticator.AuthRequest;
+import simpleserver.Coordinate.Dimension;
 import simpleserver.command.PlayerListCommand;
 import simpleserver.config.data.Chests.Chest;
 import simpleserver.config.xml.Config.BlockPermission;
@@ -280,11 +280,12 @@ public class StreamTunnel {
           }
 
           if (message.charAt(0) == commandPrefix) {
-            if (player.parseCommand(message)) {
+            message = player.parseCommand(message);
+            if (message == null) {
               break;
             }
             write(packetId);
-            write('/' + message.substring(1));
+            write(message);
             return;
           }
 

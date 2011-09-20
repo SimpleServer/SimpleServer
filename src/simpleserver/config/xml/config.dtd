@@ -53,11 +53,11 @@
   address CDATA #IMPLIED
 >
 <!ATTLIST command
-  name NMTOKEN #REQUIRED
+  name CDATA #REQUIRED
   allow CDATA #IMPLIED
   forward NMTOKEN #IMPLIED
   hidden NMTOKEN #IMPLIED
-  rename NMTOKEN #IMPLIED
+  rename CDATA #IMPLIED
   forward NMTOKEN #IMPLIED
   forwardonly NMTOKEN #IMPLIED
   disabled NMTOKEN #IMPLIED
