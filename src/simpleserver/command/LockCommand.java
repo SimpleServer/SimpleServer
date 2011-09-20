@@ -51,6 +51,10 @@ public class LockCommand extends AbstractCommand implements PlayerCommand {
         }
       }
     } else {
+      if (name != null && name.length() > 16) {
+        player.addTMessage(Color.RED, "Names longer than 16 characters are not allowed.");
+        return;
+      }
       player.addTMessage(Color.GRAY, "Create or open a chest, and it will be locked to you.");
       player.setAttemptedAction(Action.Lock);
       player.setChestName(name);
