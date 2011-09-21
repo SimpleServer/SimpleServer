@@ -24,6 +24,7 @@ import java.util.List;
 
 import simpleserver.Player;
 import simpleserver.PlayerList;
+import simpleserver.Server;
 
 public interface Chat {
 
@@ -34,4 +35,6 @@ public interface Chat {
   public void noRecieverFound();
 
   public String buildMessage(String message);
+
+  public boolean broadcast(Server server);
 }

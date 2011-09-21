@@ -66,4 +66,15 @@ public class RingCache<E> {
     }
     return (items[end] != null && items[end].equals(item));
   }
+
+  public boolean hasLike(String item) {
+    int end = writeIndex;
+    int start = (end + minusOneMod) % capacity;
+    for (int i = start; i != end; i = (i + minusOneMod) % capacity) {
+      if (items[i] != null && item.contains((String) items[i])) {
+        return true;
+      }
+    }
+    return (items[end] != null && item.contains((String) items[end]));
+  }
 }

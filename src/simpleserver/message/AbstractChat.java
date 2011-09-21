@@ -26,6 +26,7 @@ import java.util.List;
 import simpleserver.Color;
 import simpleserver.Player;
 import simpleserver.PlayerList;
+import simpleserver.Server;
 
 public abstract class AbstractChat implements Chat {
 
@@ -67,6 +68,10 @@ public abstract class AbstractChat implements Chat {
 
   protected static final String getColoredString(Color color, String message) {
     return String.format("%s%s", color, message);
+  }
+
+  public boolean broadcast(Server server) {
+    return true;
   }
 
   @Override

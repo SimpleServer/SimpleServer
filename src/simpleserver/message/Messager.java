@@ -27,6 +27,7 @@ import simpleserver.Server;
 import simpleserver.util.RingCache;
 
 public class Messager {
+  private static final int MAXIMUM_MESSAGE_SIZE = 119;
   private static final int MESSAGE_SIZE = 60;
 
   private Server server;
@@ -40,25 +41,30 @@ public class Messager {
     int recieverCount = 0;
     String builtMessage = build ? chat.buildMessage(message) : message;
 
-    for (Player reciever : chat.getRecievers(server.playerList)) {
-      reciever.addMessage(builtMessage);
+    if (chat.broadcast(server)) {
+      for (Player reciever : chat.getRecievers(server.playerList)) {
+        reciever.addMessage(builtMessage);
 
-      if (!reciever.equals(chat.getSender())) {
-        recieverCount++;
+        if (!reciever.equals(chat.getSender())) {
+          recieverCount++;
+        }
       }
+
+      if (recieverCount == 0) {
+        chat.noRecieverFound();
+        return;
+      }
+      if (server.config.properties.getBoolean("forwardChat")) {
+        forwardToServer(chat, message);
+      }
+    } else {
+      forwardToServer(chat, message, false);
     }
 
-    if (server.config.properties.getBoolean("forwardChat")) {
-      forwardToServer(chat, message);
-    }
     if (server.config.properties.getBoolean("logMessages")) {
       server.messageLog(chat, message);
     }
 
-    if (recieverCount == 0) {
-      chat.noRecieverFound();
-      return;
-    }
   }
 
   public void propagate(Chat chat, String message) {
@@ -66,30 +72,40 @@ public class Messager {
   }
 
   private void forwardToServer(Chat chat, String message) {
+    forwardToServer(chat, message, true);
+  }
+
+  private void forwardToServer(Chat chat, String message, boolean absorbOnReturn) {
     Player sender = chat.getSender();
     String forwardMessage = String.format(server.config.properties.get("msgForwardFormat"), chat, message);
 
     for (String msgPart : warpMessage(forwardMessage)) {
-      forwardedMessages.put(String.format("<%s> %s", sender.getName(), msgPart));
+      if (absorbOnReturn) {
+        forwardedMessages.put(msgPart);
+      }
       sender.forwardMessage(msgPart);
     }
   }
 
   public boolean wasForwarded(String message) {
-    return forwardedMessages.has(message);
+    return forwardedMessages.hasLike(message);
   }
 
   private LinkedList<String> warpMessage(String message) {
     LinkedList<String> messages = new LinkedList<String>();
 
+    int msgSize = MESSAGE_SIZE;
+    if (!server.config.properties.getBoolean("msgWrap")) {
+      msgSize = MAXIMUM_MESSAGE_SIZE;
+    }
     if (message.length() > 0) {
-      while (message.length() > MESSAGE_SIZE) {
-        int end = MESSAGE_SIZE - 1;
+      while (message.length() > msgSize) {
+        int end = msgSize - 1;
         while (end > 0 && message.charAt(end) != ' ') {
           end--;
         }
         if (end == 0) {
-          end = MESSAGE_SIZE;
+          end = msgSize;
         } else {
           end++;
         }

@@ -73,6 +73,11 @@ public class GlobalChat extends AbstractChat {
   }
 
   @Override
+  public boolean broadcast(Server server) {
+    return server.config.properties.getBoolean("broadcastGlobalMessages");
+  }
+
+  @Override
   public void noRecieverFound() {
     return;
   }
