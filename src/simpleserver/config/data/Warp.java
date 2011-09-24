@@ -21,6 +21,8 @@
 package simpleserver.config.data;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
@@ -43,6 +45,13 @@ public class Warp {
     for (String key : keys) {
       names.add(capitalize(key));
     }
+
+    Collections.sort(names, new Comparator<String>() {
+      public int compare(String a, String b) {
+        return a.compareTo(b);
+      }
+    });
+
     return names;
   }
 
