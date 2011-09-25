@@ -21,6 +21,7 @@
 package simpleserver.config.data;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -37,13 +38,20 @@ public class Warp {
     return node.names();
   }
 
-  public List<String> names() {
+  public List<String> names(String prefix) {
     Set<String> keys = keys();
     List<String> names = new ArrayList<String>(keys.size());
     for (String key : keys) {
-      names.add(capitalize(key));
+      if (prefix == null || key.startsWith(prefix.toLowerCase())) {
+        names.add(capitalize(key));
+      }
     }
+    Collections.sort(names);
     return names;
+  }
+
+  public List<String> names() {
+    return names(null);
   }
 
   public boolean contains(String name) {

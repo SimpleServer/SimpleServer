@@ -37,13 +37,15 @@ public class WarpCommand extends AbstractCommand implements PlayerCommand {
       player.addTMessage(Color.GRAY, "Usage:");
       player.addTMessage(Color.GRAY, "%s name: teleport to waypoint", warpCommand);
       player.addTMessage(Color.GRAY, "%s: list waypoints", warpCommand + " list");
+      player.addTMessage(Color.GRAY, "%s prefix: list waypoints starting with prefix", warpCommand + " list");
       player.addTMessage(Color.GRAY, "%s name: add waypoint", warpCommand + " add");
       player.addTMessage(Color.GRAY, "%s name: remove waypoint", warpCommand + " remove");
       return;
     }
     String command = arguments[0];
     if (command.equals("list")) {
-      player.addTCaptionedMessage("Waypoints", "%s", join(player.getServer().data.warp.names()));
+      String prefix = arguments.length > 1 ? arguments[1] : null;
+      player.addTCaptionedMessage("Waypoints", "%s", join(player.getServer().data.warp.names(prefix)));
     } else if (command.equals("add")) {
       if (arguments.length == 1) {
         player.addTMessage(Color.RED, "You have to provide the name of a waypoint");
