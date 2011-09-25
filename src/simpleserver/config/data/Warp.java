@@ -39,13 +39,10 @@ public class Warp {
   }
 
   public List<String> names(String prefix) {
-    if (prefix != null) {
-      prefix = prefix.toLowerCase();
-    }
     Set<String> keys = keys();
     List<String> names = new ArrayList<String>(keys.size());
     for (String key : keys) {
-      if (prefix == null || key.startsWith(prefix)) {
+      if (prefix == null || key.startsWith(prefix.toLowerCase())) {
         names.add(capitalize(key));
       }
     }

@@ -37,7 +37,7 @@ public class WarpCommand extends AbstractCommand implements PlayerCommand {
       player.addTMessage(Color.GRAY, "Usage:");
       player.addTMessage(Color.GRAY, "%s name: teleport to waypoint", warpCommand);
       player.addTMessage(Color.GRAY, "%s: list waypoints", warpCommand + " list");
-      player.addTMessage(Color.GRAY, "%s: list waypoints starting with prefix", warpCommand + " list prefix");
+      player.addTMessage(Color.GRAY, "%s prefix: list waypoints starting with prefix", warpCommand + " list");
       player.addTMessage(Color.GRAY, "%s name: add waypoint", warpCommand + " add");
       player.addTMessage(Color.GRAY, "%s name: remove waypoint", warpCommand + " remove");
       return;
