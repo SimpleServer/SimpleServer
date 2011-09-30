@@ -436,9 +436,17 @@ public class StreamTunnel {
         final short dropItem = in.readShort();
         byte itemCount = 0;
         short uses = 0;
+        byte[] data = null;
         if (dropItem != -1) {
           itemCount = in.readByte();
           uses = in.readShort();
+          if (false) {
+            short dataLength = in.readShort();
+            if (dataLength != -1) {
+              data = new byte[dataLength];
+              in.readFully(data);
+            }
+          }
         }
 
         boolean writePacket = true;
@@ -506,6 +514,10 @@ public class StreamTunnel {
           if (dropItem != -1) {
             write(itemCount);
             write(uses);
+            if (data != null) {
+              write((short) data.length);
+              out.write(data);
+            }
 
             if (dropItem <= 94 && direction >= 0) {
               player.placedBlock();
@@ -799,51 +811,26 @@ public class StreamTunnel {
         write(in.readByte());
         break;
       case 0x66: // Inventory Item Move
-        byte typeFrom = in.readByte();
-        short slotFrom = in.readShort();
-        byte typeTo = in.readByte();
-        short slotTo = in.readShort();
-
         write(packetId);
-        write(typeFrom);
-        write(slotFrom);
-        write(typeTo);
-        write(slotTo);
+        write(in.readByte());
+        write(in.readShort());
+        write(in.readByte());
+        write(in.readShort());
         write(in.readBoolean());
-        short moveItem = in.readShort();
-        write(moveItem);
-        if (moveItem != -1) {
-          write(in.readByte());
-          write(in.readShort());
-        }
+        copyItem();
         break;
       case 0x67: // Inventory Item Update
-        byte type67 = in.readByte();
-        short slot = in.readShort();
-        short setItem = in.readShort();
         write(packetId);
-        write(type67);
-        write(slot);
-        write(setItem);
-        if (setItem != -1) {
-          write(in.readByte());
-          write(in.readShort());
-        }
+        write(in.readByte());
+        write(in.readShort());
+        copyItem();
         break;
       case 0x68: // Inventory
-        byte type = in.readByte();
         write(packetId);
-        write(type);
-        short count = in.readShort();
-        write(count);
+        write(in.readByte());
+        short count = write(in.readShort());
         for (int c = 0; c < count; ++c) {
-          short item = in.readShort();
-          write(item);
-
-          if (item != -1) {
-            write(in.readByte());
-            write(in.readShort());
-          }
+          copyItem();
         }
         break;
       case 0x69:
@@ -956,6 +943,19 @@ public class StreamTunnel {
     }
     packetFinished();
     lastPacket = (packetId == 0x00) ? lastPacket : packetId;
+  }
+
+  private void copyItem() throws IOException {
+    if (write(in.readShort()) > 0) {
+      write(in.readByte());
+      write(in.readShort());
+      if (false) {
+        short length;
+        if ((length = write(in.readShort())) > 0) {
+          copyNBytes(length);
+        }
+      }
+    }
   }
 
   private long copyVLC() throws IOException {
