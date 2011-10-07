@@ -33,6 +33,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.HashSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -57,6 +58,27 @@ public class StreamTunnel {
   private static final String CONSOLE_CHAT_PATTERN = "\\(CONSOLE:.*\\)";
   private static final int MESSAGE_SIZE = 60;
   private static final int MAXIMUM_MESSAGE_SIZE = 119;
+  private static final HashSet<Short> ENCHANTABLE = new HashSet<Short>();
+
+  static {
+    ENCHANTABLE.add((short) 0x103); // Flint and steel
+    ENCHANTABLE.add((short) 0x15a); // Fishing rod
+    ENCHANTABLE.add((short) 0x167); // Shears
+    // Tools
+    for (short id = 267; id <= 279; id++) {
+      ENCHANTABLE.add(id);
+    }
+    for (short id = 283; id <= 286; id++) {
+      ENCHANTABLE.add(id);
+    }
+    for (short id = 290; id <= 294; id++) {
+      ENCHANTABLE.add(id);
+    }
+    // Armour
+    for (short id = 298; id <= 317; id++) {
+      ENCHANTABLE.add(id);
+    }
+  };
 
   private final boolean isServerTunnel;
   private final String streamType;
@@ -440,7 +462,7 @@ public class StreamTunnel {
         if (dropItem != -1) {
           itemCount = in.readByte();
           uses = in.readShort();
-          if (false) {
+          if (ENCHANTABLE.contains(dropItem)) {
             short dataLength = in.readShort();
             if (dataLength != -1) {
               data = new byte[dataLength];
@@ -514,9 +536,13 @@ public class StreamTunnel {
           if (dropItem != -1) {
             write(itemCount);
             write(uses);
-            if (data != null) {
-              write((short) data.length);
-              out.write(data);
+            if (ENCHANTABLE.contains(dropItem)) {
+              if (data != null) {
+                write((short) data.length);
+                out.write(data);
+              } else {
+                write((short) -1);
+              }
             }
 
             if (dropItem <= 94 && direction >= 0) {
@@ -946,10 +972,11 @@ public class StreamTunnel {
   }
 
   private void copyItem() throws IOException {
-    if (write(in.readShort()) > 0) {
+    short id;
+    if ((id = write(in.readShort())) > 0) {
       write(in.readByte());
       write(in.readShort());
-      if (false) {
+      if (ENCHANTABLE.contains(id)) {
         short length;
         if ((length = write(in.readShort())) > 0) {
           copyNBytes(length);
