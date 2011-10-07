@@ -29,7 +29,7 @@ public class SortedProperties extends Properties {
   private static final long serialVersionUID = 2327114648488311204L;
 
   @Override
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({ "unchecked", "rawtypes" })
   public synchronized Enumeration<Object> keys() {
     Enumeration<Object> keysEnum = super.keys();
     Vector keyList = new Vector();

@@ -35,7 +35,7 @@ import simpleserver.command.PlayerCommand;
 import simpleserver.command.ServerCommand;
 import simpleserver.options.Options;
 
-@SuppressWarnings("unchecked")
+@SuppressWarnings("rawtypes")
 public class CommandParser {
   private final Map<String, PlayerCommand> playerCommands;
   private final Map<Class, PlayerCommand> playerCommandClasses;

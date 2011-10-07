@@ -26,9 +26,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.Map.Entry;
 
 public class SegmentTree<E> {
   private Node root;
@@ -240,6 +240,7 @@ public class SegmentTree<E> {
     E object;
     Segment[] segments;
 
+    @SuppressWarnings("unchecked")
     HyperSegment(int[] start, int[] end, E object) {
       this.object = object;
       segments = (Segment[]) Array.newInstance(Segment.class, dimensions);

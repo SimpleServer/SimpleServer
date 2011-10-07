@@ -126,8 +126,8 @@ public class Main {
             System.out.println(new NoSuchKeyException(path));
             return;
           }
-          if (((NBTList) tag).size() > index) {
-            ((NBTList) tag).remove(((NBTList) tag).get(index));
+          if (((NBTList<NBTag>) tag).size() > index) {
+            ((NBTList<NBTag>) tag).remove(((NBTList<NBTag>) tag).get(index));
           } else {
             System.out.println(new NoSuchKeyException(path));
           }
@@ -163,7 +163,7 @@ public class Main {
               System.out.println("Error: Unknown type");
               return;
             }
-            newTag = new NBTList(type);
+            newTag = new NBTList<NBTag>(type);
           } else {
             NBT type = NBT.get(args[4]);
             if (type == null || type == NBT.END) {
@@ -245,7 +245,7 @@ public class Main {
           current = comp.get(name);
           break;
         case LIST:
-          NBTList list = (NBTList) current;
+          NBTList<NBTag> list = (NBTList<NBTag>) current;
           int key = Integer.valueOf(name);
           if (key >= list.size()) {
             throw new NoSuchKeyException(Integer.toString(key));
