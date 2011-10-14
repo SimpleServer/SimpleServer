@@ -31,12 +31,12 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.concurrent.locks.ReentrantLock;
 
+import simpleserver.Coordinate.Dimension;
 import simpleserver.Position;
 import simpleserver.Server;
-import simpleserver.Coordinate.Dimension;
 
 public class Bot {
-  private static final int VERSION = 19;
+  private static final int VERSION = 20;
 
   protected String name;
   protected Server server;
@@ -524,7 +524,7 @@ public class Bot {
         break;
       default:
         error("Unable to handle packet 0x" + Integer.toHexString(packetId)
-              + " after 0x" + Integer.toHexString(lastPacket));
+            + " after 0x" + Integer.toHexString(lastPacket));
     }
     lastPacket = packetId;
   }

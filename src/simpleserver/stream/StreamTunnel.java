@@ -37,12 +37,12 @@ import java.util.HashSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import simpleserver.Authenticator.AuthRequest;
 import simpleserver.Color;
 import simpleserver.Coordinate;
+import simpleserver.Coordinate.Dimension;
 import simpleserver.Player;
 import simpleserver.Server;
-import simpleserver.Authenticator.AuthRequest;
-import simpleserver.Coordinate.Dimension;
 import simpleserver.command.PlayerListCommand;
 import simpleserver.config.data.Chests.Chest;
 import simpleserver.config.xml.Config.BlockPermission;
@@ -706,8 +706,8 @@ public class StreamTunnel {
         break;
       case 0x2b: // new in 1.8 (43)
         write(packetId);
-        write(in.readByte());
-        write(in.readByte());
+        write(in.readFloat());
+        write(in.readShort());
         write(in.readShort());
         break;
 
@@ -878,6 +878,11 @@ public class StreamTunnel {
         write(in.readShort());
         write(in.readShort());
         break;
+      case 0x6c: // 1.9 (108)
+        write(packetId);
+        write(in.readByte());
+        write(in.readByte());
+        break;
       case (byte) 0x82: // Update Sign
         write(packetId);
         write(in.readInt());
@@ -962,8 +967,8 @@ public class StreamTunnel {
                 + player.getName() + " (after 0x" + Integer.toHexString(lastPacket));
           } else {
             throw new IOException("Unable to parse unknown " + streamType
-                                  + " packet 0x" + Integer.toHexString(packetId) + " for player "
-                                  + player.getName());
+                + " packet 0x" + Integer.toHexString(packetId) + " for player "
+                + player.getName());
           }
         }
     }
