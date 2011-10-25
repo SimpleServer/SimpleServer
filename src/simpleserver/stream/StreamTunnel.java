@@ -61,10 +61,12 @@ public class StreamTunnel {
   private static final HashSet<Short> ENCHANTABLE = new HashSet<Short>();
 
   static {
-    ENCHANTABLE.add((short) 0x103); // Flint and steel
     ENCHANTABLE.add((short) 0x15a); // Fishing rod
     ENCHANTABLE.add((short) 0x167); // Shears
     // Tools
+    for (short id = 256; id <= 259; id++) {
+      ENCHANTABLE.add(id);
+    }
     for (short id = 267; id <= 279; id++) {
       ENCHANTABLE.add(id);
     }
