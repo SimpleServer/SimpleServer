@@ -876,9 +876,7 @@ public class StreamTunnel {
       case 0x6b: // 1.8 (107)
         write(packetId);
         write(in.readShort());
-        write(in.readShort());
-        write(in.readShort());
-        write(in.readShort());
+        copyItem();
         break;
       case 0x6c: // 1.9 (108)
         write(packetId);

@@ -217,6 +217,9 @@ public class AutoBackup {
         }
       }
     } else {
+      if (source.getName().equals("level.dat_old")) {
+        return;
+      }
       InputStream in = new FileInputStream(source);
       OutputStream out = new FileOutputStream(target);
 
