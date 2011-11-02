@@ -36,11 +36,12 @@ public class StopCommand extends AbstractCommand implements PlayerCommand,
 
   public void execute(Player player, String message) {
     player.getServer().adminLog("User " + player.getName()
-                                    + " stopped the server!");
+        + " stopped the server!");
     player.getServer().stop();
   }
 
-  public void execute(Server server, String message) {
+  public void execute(Server server, String message, CommandFeedback feedback) {
+    feedback.send("Stopping server...");
     server.stop();
   }
 }

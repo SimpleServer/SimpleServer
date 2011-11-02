@@ -35,8 +35,8 @@ public class BackupCommand extends AbstractCommand implements PlayerCommand,
     player.getServer().forceBackup();
   }
 
-  public void execute(Server server, String message) {
-    System.out.println("Forcing backup!");
+  public void execute(Server server, String message, CommandFeedback feedback) {
+    feedback.send("Forcing backup!");
     server.forceBackup();
   }
 }

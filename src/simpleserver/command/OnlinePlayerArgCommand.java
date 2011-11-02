@@ -23,6 +23,7 @@ package simpleserver.command;
 import static simpleserver.lang.Translations.t;
 import simpleserver.Color;
 import simpleserver.Player;
+import simpleserver.Server;
 
 public abstract class OnlinePlayerArgCommand extends AbstractCommand implements
     PlayerCommand {
@@ -53,16 +54,38 @@ public abstract class OnlinePlayerArgCommand extends AbstractCommand implements
       if (playerOptional) {
         executeWithTarget(player, message, null);
       } else {
-        noTargetSpecified(player, message);
+        player.addTMessage(Color.RED, noTargetSpecified());
       }
     }
   }
 
-  protected abstract void executeWithTarget(Player player, String message,
-                                            Player target);
+  public void execute(Server server, String message, CommandFeedback feedback) {
+    String[] arguments = extractArguments(message);
 
-  protected void noTargetSpecified(Player player, String message) {
-    player.addTMessage(Color.RED, "No player specified.");
+    if (arguments.length > 0) {
+      Player target = server.findPlayer(arguments[0]);
+      if (target == null) {
+        feedback.send("Player not online (%s)", arguments[0]);
+      } else {
+        executeWithTarget(server, message, target, feedback);
+      }
+    } else {
+      if (playerOptional) {
+        executeWithTarget(server, message, null, feedback);
+      } else {
+        feedback.send(noTargetSpecified());
+      }
+    }
+  }
+
+  protected void executeWithTarget(Server server, String message, Player target, CommandFeedback feedback) {
+    feedback.send("Command %s is not implemented.", name);
+  }
+
+  protected abstract void executeWithTarget(Player player, String message, Player target);
+
+  protected String noTargetSpecified() {
+    return "No player specified.";
   }
 
   @Override

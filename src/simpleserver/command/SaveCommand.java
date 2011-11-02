@@ -36,9 +36,9 @@ public class SaveCommand extends AbstractCommand implements PlayerCommand,
     player.addTMessage(Color.GRAY, "Resources Saved!");
   }
 
-  public void execute(Server server, String message) {
+  public void execute(Server server, String message, CommandFeedback feedback) {
     server.saveResources();
     server.runCommand("save-all", null);
-    System.out.println("Resources Saved!");
+    feedback.send("Resources Saved!");
   }
 }

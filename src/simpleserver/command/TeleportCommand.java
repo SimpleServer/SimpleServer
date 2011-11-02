@@ -46,7 +46,7 @@ public class TeleportCommand extends OnlinePlayerArgCommand {
           player.addTMessage(Color.GRAY, "Teleported %s to %s!",
                              target1.getName(), target2.getName());
           server.adminLog("User " + player.getName() + " teleported:\t "
-                          + target1.getName() + "\tto\t" + target2.getName());
+              + target1.getName() + "\tto\t" + target2.getName());
         } else {
           player.addTMessage(Color.RED, "Players %s and %s are in different dimensions.",
                              target1.getName(),
@@ -60,7 +60,7 @@ public class TeleportCommand extends OnlinePlayerArgCommand {
   }
 
   @Override
-  protected void noTargetSpecified(Player player, String message) {
-    player.addTMessage(Color.RED, "No players specified.");
+  protected String noTargetSpecified() {
+    return "No players specified.";
   }
 }

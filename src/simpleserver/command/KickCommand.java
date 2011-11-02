@@ -23,8 +23,9 @@ package simpleserver.command;
 import static simpleserver.lang.Translations.t;
 import simpleserver.Color;
 import simpleserver.Player;
+import simpleserver.Server;
 
-public class KickCommand extends OnlinePlayerArgCommand {
+public class KickCommand extends OnlinePlayerArgCommand implements ServerCommand {
   public KickCommand() {
     super("kick PLAYER [REASON]", "Kick the named player from the server");
   }
@@ -40,21 +41,31 @@ public class KickCommand extends OnlinePlayerArgCommand {
   @Override
   protected void executeWithTarget(Player player, String message, Player target) {
     if (allowed(player, target)) {
-      String reason = extractArgument(message, 1);
-      if (reason == null) {
-        reason = t("Kicked by admin.");
-      }
-
-      target.kick(reason);
-      player.getServer().adminLog("Admin " + player.getName() + " kicked player:\t " +
-          target.getName() + "\t(" + reason + ")");
-      String msg = t("Player %s has been kicked! (%s)", target.getName(), reason);
-      player.getServer().runCommand("say", msg);
+      String reason = kick(player.getServer(), message, target);
+      player.getServer().adminLog("Admin " + player.getName() + " kicked player:\t " + target.getName() + "\t(" + reason + ")");
     }
   }
 
   @Override
-  protected void noTargetSpecified(Player player, String message) {
-    player.addTMessage(Color.RED, "No player or reason specified.");
+  protected void executeWithTarget(Server server, String message, Player target, CommandFeedback feedback) {
+    String reason = kick(server, message, target);
+    server.adminLog("Console kicked player:\t " + target.getName() + "\t(" + reason + ")");
+    feedback.send("Kicked player %s", target.getName());
+  }
+
+  private String kick(Server server, String message, Player target) {
+    String reason = extractArgument(message, 1);
+    if (reason == null) {
+      reason = t("Kicked by admin.");
+    }
+    target.kick(reason);
+    String msg = t("Player %s has been kicked! (%s)", target.getName(), reason);
+    server.runCommand("say", msg);
+    return reason;
+  }
+
+  @Override
+  protected String noTargetSpecified() {
+    return "No player or reason specified.";
   }
 }

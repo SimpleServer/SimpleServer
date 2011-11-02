@@ -39,9 +39,9 @@ public class ReloadCommand extends AbstractCommand implements PlayerCommand,
     }
   }
 
-  public void execute(Server server, String message) {
+  public void execute(Server server, String message, CommandFeedback feedback) {
     if (server.loadResources()) {
-      System.out.println("Resources Reloaded!");
+      feedback.send("Resources Reloaded!");
     }
   }
 }

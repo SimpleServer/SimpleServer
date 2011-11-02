@@ -31,7 +31,7 @@ public abstract class TimeCommand extends AbstractCommand {
 
   private void usage() {
     info(t("Usage:") + " " + commandPrefix() +
-         "time 0-23999|day|night|unfreeze [freeze]");
+        "time 0-23999|day|night|unfreeze [freeze]");
   }
 
   public void execute(Server server, String message) {

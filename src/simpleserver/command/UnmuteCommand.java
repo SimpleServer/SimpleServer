@@ -32,9 +32,19 @@ public class UnmuteCommand extends PlayerArgCommand {
   @Override
   protected void executeWithTarget(Player player, String message, String name) {
     Server server = player.getServer();
-    server.mutelist.removeName(name);
-
+    mute(server, name);
     server.adminLog("Admin " + player.getName() + " unmuted player:\t " + name);
+  }
+
+  @Override
+  protected void executeWithTarget(Server server, String message, String target, CommandFeedback feedback) {
+    mute(server, name);
+    server.adminLog("Console unmuted player:\t " + name);
+    feedback.send("Unmuted player %s", target);
+  }
+
+  private void mute(Server server, String target) {
+    server.mutelist.removeName(name);
     String msg = t("Player %s has been unmuted!", name);
     server.runCommand("say", msg);
   }

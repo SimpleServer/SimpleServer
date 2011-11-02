@@ -43,25 +43,35 @@ public class BanCommand extends PlayerArgCommand {
   @Override
   protected void executeWithTarget(Player player, String message, String target) {
     if (allowed(player, target)) {
-      Server server = player.getServer();
-      String reason = extractArgument(message, 1);
-      if (reason == null) {
-        reason = t("Banned by admin.");
-      }
-
-      server.runCommand("ban", target);
-      server.kick(target, reason);
-
-      server.adminLog("User " + player.getName() + " banned player:\t " + target +
-          "\t(Banned by admin.)");
-
-      String msg = t("Player %s has been banned! (%s)", target, reason);
-      server.runCommand("say", msg);
+      String reason = ban(player.getServer(), target, message);
+      player.getServer().adminLog("User " + player.getName() + " banned player:\t " + target + "\t(" + reason + ")");
     }
   }
 
   @Override
-  protected void noTargetSpecified(Player player, String message) {
-    player.addTMessage(Color.RED, "No player or reason specified.");
+  protected void executeWithTarget(Server server, String message, String target, CommandFeedback feedback) {
+    String reason = ban(server, target, message);
+    server.adminLog("Console banned player:\t " + target + "\t(" + reason + ")");
+    feedback.send("Player %s was banned", target);
+  }
+
+  private String ban(Server server, String target, String message) {
+    String reason = extractArgument(message, 1);
+    if (reason == null) {
+      reason = t("Banned by admin.");
+    }
+
+    server.runCommand("ban", target);
+    server.kick(target, reason);
+
+    String msg = t("Player %s has been banned! (%s)", target, reason);
+    server.runCommand("say", msg);
+
+    return reason;
+  }
+
+  @Override
+  protected String noTargetSpecified() {
+    return "No player or reason specified.";
   }
 }

@@ -26,6 +26,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import simpleserver.Server;
+import simpleserver.command.CommandFeedback;
 import simpleserver.command.InvalidCommand;
 import simpleserver.command.ServerCommand;
 
@@ -36,6 +37,12 @@ public class MessageHandler {
 
   private boolean loaded = false;
   private int ignoreLines = 0;
+
+  private CommandFeedback feedback = new CommandFeedback() {
+    public void send(String message, Object... args) {
+      System.out.println("[SimpleServer] " + String.format(message, args));
+    }
+  };
 
   public MessageHandler(Server server) {
     this.server = server;
@@ -128,7 +135,7 @@ public class MessageHandler {
   public boolean parseCommand(String line) {
     ServerCommand command = server.getCommandParser().getServerCommand(line.split(" ")[0]);
     if ((command != null) && !(command instanceof InvalidCommand)) {
-      command.execute(server, line);
+      command.execute(server, line, feedback);
       return !command.shouldPassThroughToConsole(server);
     }
     return false;

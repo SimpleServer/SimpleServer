@@ -36,7 +36,8 @@ public class RestartCommand extends AbstractCommand implements PlayerCommand,
     server.restart();
   }
 
-  public void execute(Server server, String message) {
+  public void execute(Server server, String message, CommandFeedback feedback) {
+    feedback.send("Restarting server...");
     server.restart();
   }
 }

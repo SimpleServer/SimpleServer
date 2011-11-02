@@ -23,33 +23,54 @@ package simpleserver.command;
 import static simpleserver.lang.Translations.t;
 import simpleserver.Color;
 import simpleserver.Player;
+import simpleserver.Server;
 
-public abstract class PlayerArgCommand extends AbstractCommand implements
-    PlayerCommand {
+public abstract class PlayerArgCommand extends AbstractCommand implements PlayerCommand, ServerCommand {
   protected PlayerArgCommand(String name, String commandCode) {
     super(name, commandCode);
   }
 
   public void execute(Player player, String message) {
-    String[] arguments = extractArguments(message);
+    String target = completeName(message, player.getServer());
 
-    if (arguments.length > 0) {
-      String name = player.getServer().findName(arguments[0]);
-      if (name == null) {
-        name = arguments[0];
-      }
-
-      executeWithTarget(player, message, name);
+    if (target != null) {
+      executeWithTarget(player, message, target);
     } else {
-      noTargetSpecified(player, message);
+      player.addTMessage(Color.RED, noTargetSpecified());
     }
   }
 
-  protected abstract void executeWithTarget(Player player, String message,
-                                            String target);
+  public void execute(Server server, String message, CommandFeedback feedback) {
+    String target = completeName(message, server);
 
-  protected void noTargetSpecified(Player player, String message) {
-    player.addTMessage(Color.RED, "No player specified.");
+    if (target != null) {
+      executeWithTarget(server, message, target, feedback);
+    } else {
+      feedback.send(noTargetSpecified());
+    }
+  }
+
+  private String completeName(String message, Server server) {
+    String[] arguments = extractArguments(message);
+
+    if (arguments.length > 0) {
+      String name = server.findName(arguments[0]);
+      if (name == null) {
+        return arguments[0];
+      } else {
+        return name;
+      }
+    } else {
+      return null;
+    }
+  }
+
+  protected abstract void executeWithTarget(Player player, String message, String target);
+
+  protected abstract void executeWithTarget(Server server, String message, String target, CommandFeedback feedback);
+
+  protected String noTargetSpecified() {
+    return "No player specified.";
   }
 
   @Override

@@ -32,10 +32,20 @@ public class MuteCommand extends PlayerArgCommand {
   @Override
   protected void executeWithTarget(Player player, String message, String name) {
     Server server = player.getServer();
-    server.mutelist.addName(name);
-
+    mute(server, name);
     server.adminLog("Admin " + player.getName() + " muted player:\t " + name);
-    String msg = t("Player %s has been muted!", name);
+  }
+
+  @Override
+  protected void executeWithTarget(Server server, String message, String target, CommandFeedback feedback) {
+    mute(server, target);
+    server.adminLog("Console muted player:\t " + target);
+    feedback.send("Muted player %s", target);
+  }
+
+  private void mute(Server server, String target) {
+    server.mutelist.addName(target);
+    String msg = t("Player %s has been muted!", target);
     server.runCommand("say", msg);
   }
 }

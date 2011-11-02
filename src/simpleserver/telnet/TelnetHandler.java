@@ -29,6 +29,9 @@ import java.net.Socket;
 import java.net.SocketTimeoutException;
 
 import simpleserver.Server;
+import simpleserver.command.CommandFeedback;
+import simpleserver.command.InvalidCommand;
+import simpleserver.command.ServerCommand;
 
 public class TelnetHandler implements Runnable {
   private BufferedReader in;
@@ -40,6 +43,12 @@ public class TelnetHandler implements Runnable {
   private boolean authorized = false;
 
   static final int IDLE_TIME = 60 * 1000;
+
+  private CommandFeedback feedback = new CommandFeedback() {
+    public void send(String message, Object... args) {
+      output(String.format(message, args) + "\n");
+    }
+  };
 
   public TelnetHandler(Socket s, TelnetTCP r, Server server) throws IOException {
     in = new BufferedReader(new InputStreamReader(s.getInputStream()));
@@ -78,9 +87,7 @@ public class TelnetHandler implements Runnable {
       }
     } catch (InterruptedException e1) {
     } catch (SocketTimeoutException e) {
-
     } catch (Exception e) {
-      e.printStackTrace();
     }
     try {
       in.close();
@@ -133,7 +140,13 @@ public class TelnetHandler implements Runnable {
       int idx = command.indexOf(tokens[0]) + tokens[0].length() + 1;
       rest = command.substring(idx);
     }
-    server.runCommand(tokens[0], rest);
-  }
 
+    ServerCommand serverCommand = server.getCommandParser().getServerCommand(tokens[0]);
+    if ((serverCommand != null) && !(serverCommand instanceof InvalidCommand)) {
+      serverCommand.execute(server, command, feedback);
+    }
+    if (serverCommand == null || serverCommand.shouldPassThroughToConsole(server)) {
+      server.runCommand(tokens[0], rest);
+    }
+  }
 }

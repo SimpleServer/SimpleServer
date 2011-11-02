@@ -23,7 +23,7 @@ package simpleserver.command;
 import simpleserver.Server;
 
 public interface ServerCommand extends Command {
-  public void execute(Server server, String message);
+  public void execute(Server server, String message, CommandFeedback feedback);
 
   public boolean shouldPassThroughToConsole(Server server);
 }

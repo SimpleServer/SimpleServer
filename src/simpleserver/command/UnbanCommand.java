@@ -22,6 +22,7 @@ package simpleserver.command;
 
 import simpleserver.Color;
 import simpleserver.Player;
+import simpleserver.Server;
 
 public class UnbanCommand extends PlayerArgCommand {
   public UnbanCommand() {
@@ -32,8 +33,15 @@ public class UnbanCommand extends PlayerArgCommand {
   protected void executeWithTarget(Player player, String message, String name) {
     player.getServer().runCommand("pardon", name);
 
-    player.getServer().adminLog("User " + player.getName()
-                                    + " unbanned player:\t " + name);
+    player.getServer().adminLog("User " + player.getName() + " unbanned player:\t " + name);
     player.addTMessage(Color.GRAY, "Unbanned %s!", name);
+  }
+
+  @Override
+  protected void executeWithTarget(Server server, String message, String target, CommandFeedback feedback) {
+    server.runCommand("pardon", target);
+
+    server.adminLog("Console unbanned player:\t " + target);
+    feedback.send("Unbanned %s!", target);
   }
 }

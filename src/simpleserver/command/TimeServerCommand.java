@@ -20,20 +20,29 @@
  */
 package simpleserver.command;
 
+import simpleserver.Server;
+
 public class TimeServerCommand extends TimeCommand implements ServerCommand {
+  private CommandFeedback feedback;
+
+  public synchronized void execute(Server server, String message, CommandFeedback feedback) {
+    this.feedback = feedback;
+    super.execute(server, message);
+  }
+
   @Override
   protected void captionedInfo(String caption, String message, Object... args) {
-    System.out.println("[SimpleServer] " + caption + ": " + String.format(message, args));
+    feedback.send(caption + ": " + String.format(message, args));
   }
 
   @Override
   protected void error(String message) {
-    System.out.println("[SimpleServer] Error: " + message);
+    feedback.send("Error: " + message);
   }
 
   @Override
   protected void info(String message) {
-    System.out.println("[SimpleServer] " + message);
+    feedback.send(message);
   }
 
   @Override

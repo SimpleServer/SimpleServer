@@ -37,10 +37,10 @@ public class IPListCommand extends AbstractCommand implements PlayerCommand,
     }
   }
 
-  public void execute(Server server, String message) {
-    System.out.println("IP Addresses:");
+  public void execute(Server server, String message, CommandFeedback feedback) {
+    feedback.send("IP Addresses:");
     for (Player friend : server.playerList.getArray()) {
-      System.out.println(friend.getName() + " " + friend.getIPAddress());
+      feedback.send(friend.getName() + " " + friend.getIPAddress());
     }
   }
 }

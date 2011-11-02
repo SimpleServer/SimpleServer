@@ -24,7 +24,7 @@ import simpleserver.Color;
 import simpleserver.Player;
 import simpleserver.Server;
 
-public class SetGroupCommand extends PlayerArgCommand implements ServerCommand {
+public class SetGroupCommand extends PlayerArgCommand {
   public SetGroupCommand() {
     super("setgroup PLAYER GROUP",
           "Set the group ID of the named player");
@@ -88,18 +88,19 @@ public class SetGroupCommand extends PlayerArgCommand implements ServerCommand {
         + target + "\t(" + group + ")");
   }
 
-  public void execute(Server server, String message) {
+  @Override
+  protected void executeWithTarget(Server server, String message, String target, CommandFeedback feedback) {
     String[] arguments = extractArguments(message);
     int group;
 
     if (arguments.length < 2) {
-      System.out.println("[SimpleServer] You must specify a group!");
+      feedback.send("You must specify a group!");
       return;
     }
     try {
       group = Integer.parseInt(arguments[1]);
     } catch (NumberFormatException e) {
-      System.out.println("[SimpleServer] Group must be a number!");
+      feedback.send("Group must be a number!");
       return;
     }
 

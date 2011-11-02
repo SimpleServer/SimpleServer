@@ -22,6 +22,7 @@ package simpleserver.command;
 
 import simpleserver.Color;
 import simpleserver.Player;
+import simpleserver.Server;
 
 public class WhitelistCommand extends PlayerArgCommand {
   public WhitelistCommand() {
@@ -33,7 +34,15 @@ public class WhitelistCommand extends PlayerArgCommand {
     player.getServer().whitelist.addName(name);
 
     player.getServer().adminLog("User " + player.getName()
-                                + " whitelisted player:\t " + name);
+        + " whitelisted player:\t " + name);
     player.addTMessage(Color.GRAY, "Player %s was whitelisted!", name);
+  }
+
+  @Override
+  protected void executeWithTarget(Server server, String message, String name, CommandFeedback feedback) {
+    server.whitelist.addName(name);
+
+    server.adminLog("Console whitelisted player:\t " + name);
+    feedback.send("Player %s was whitelisted!", name);
   }
 }

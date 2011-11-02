@@ -20,27 +20,6 @@
  */
 package simpleserver.command;
 
-import static simpleserver.lang.Translations.t;
-import simpleserver.Color;
-import simpleserver.Player;
-import simpleserver.Server;
-
-public class InvalidCommand extends AbstractCommand implements PlayerCommand,
-    ServerCommand {
-  public InvalidCommand() {
-    super(null, "No such command!");
-  }
-
-  public void execute(Player player, String message) {
-    player.addTMessage(Color.RED, "No such command %s", message);
-  }
-
-  public void execute(Server server, String message, CommandFeedback feedback) {
-    feedback.send("No such command " + message);
-  }
-
-  @Override
-  public String getHelpText(String prefix) {
-    return Color.RED + t(commandCode);
-  }
+public interface CommandFeedback {
+  public void send(String message, Object... args);
 }

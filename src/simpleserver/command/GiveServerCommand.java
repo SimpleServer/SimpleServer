@@ -23,12 +23,14 @@ package simpleserver.command;
 import simpleserver.Server;
 
 public class GiveServerCommand extends GiveCommand implements ServerCommand {
+  private CommandFeedback feedback;
 
   public GiveServerCommand() {
     super("give", "Spawn items for players");
   }
 
-  public void execute(Server server, String message) {
+  public synchronized void execute(Server server, String message, CommandFeedback feedback) {
+    this.feedback = feedback;
     String[] arguments = extractArguments(message);
     if (arguments.length == 0) {
       tError("No player specified");
@@ -39,6 +41,6 @@ public class GiveServerCommand extends GiveCommand implements ServerCommand {
 
   @Override
   protected void tError(String message, Object... args) {
-    System.out.println(String.format(message, args));
+    feedback.send(String.format(message, args));
   }
 }
