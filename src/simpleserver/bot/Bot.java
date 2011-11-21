@@ -36,7 +36,7 @@ import simpleserver.Position;
 import simpleserver.Server;
 
 public class Bot {
-  private static final int VERSION = 21;
+  private static final int VERSION = 22;
 
   protected String name;
   protected Server server;

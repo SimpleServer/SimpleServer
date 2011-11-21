@@ -63,6 +63,7 @@ public class StreamTunnel {
   static {
     ENCHANTABLE.add((short) 0x15a); // Fishing rod
     ENCHANTABLE.add((short) 0x167); // Shears
+    ENCHANTABLE.add((short) 0x105); // Bow
     // Tools
     for (short id = 256; id <= 259; id++) {
       ENCHANTABLE.add(id);
