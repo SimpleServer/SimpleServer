@@ -30,10 +30,12 @@ public class MeCommand extends AbstractCommand implements PlayerCommand {
 
   public void execute(Player player, String message) {
     String msg = extractArgument(message);
-    String messagePattern = player.getServer().config.properties.get("meCommandFormat");
+    if (msg != null) {
+      String messagePattern = player.getServer().config.properties.get("meCommandFormat");
 
-    String space = msg.startsWith("'") ? "" : " ";
-    player.sendMessage(String.format(messagePattern, player.getName(), msg, space), false);
+      String space = msg.startsWith("'") ? "" : " ";
+      player.sendMessage(String.format(messagePattern, player.getName(), msg, space), false);
+    }
   }
 
 }
