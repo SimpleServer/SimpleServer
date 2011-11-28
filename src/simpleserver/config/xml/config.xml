@@ -28,6 +28,7 @@
 	<property name="msgFormat">§%3$s&lt;%1$s&gt;§f</property>
 	<property name="forwardAllCommands">false</property>
 	<property name="forwardChat">false</property>
+	<property name="chatToConsole">true</property>
 	<property name="useWhitelist">false</property>
 	<property name="debug">false</property>
 	<property name="defaultGroup">1</property>

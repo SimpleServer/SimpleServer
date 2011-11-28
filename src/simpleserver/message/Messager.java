@@ -51,6 +51,9 @@ public class Messager {
     if (server.config.properties.getBoolean("forwardChat")) {
       forwardToServer(chat, message);
     }
+    if (server.config.properties.getBoolean("chatToConsole")) {
+      writeToConsole(builtMessage);
+    }
     if (server.config.properties.getBoolean("logMessages")) {
       server.messageLog(chat, message);
     }
@@ -72,6 +75,12 @@ public class Messager {
     for (String msgPart : warpMessage(forwardMessage)) {
       forwardedMessages.put(String.format("<%s> %s", sender.getName(), msgPart));
       sender.forwardMessage(msgPart);
+    }
+  }
+
+  private void writeToConsole(String message) {
+    for (String msgPart : warpMessage(message)) {
+      System.out.println(msgPart);
     }
   }
 
