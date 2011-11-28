@@ -25,21 +25,19 @@ import java.net.UnknownHostException;
 
 import simpleserver.Player;
 import simpleserver.nbt.Inventory;
-import simpleserver.nbt.PlayerFile;
 import simpleserver.nbt.Inventory.Slot;
+import simpleserver.nbt.PlayerFile;
 
 public class Giver extends Bot {
 
   private Inventory inv;
   private int count;
   private Player player;
-  int slot;
 
   public Giver(Player player) {
     super(player.getServer(), "Giver" + Math.round(100000 * Math.random()));
     inv = new Inventory();
     count = 0;
-    slot = 0;
     this.player = player;
   }
 
@@ -54,10 +52,13 @@ public class Giver extends Bot {
   }
 
   public void add(int id, int count, int damage) {
-    if (slot < 9) {
-      inv.add(id, count, damage);
-      this.count++;
-    }
+    inv.add(id, count, damage);
+    this.count++;
+  }
+
+  public void add(Slot slot) {
+    inv.add(slot);
+    count++;
   }
 
   @Override
@@ -87,9 +88,7 @@ public class Giver extends Bot {
       out.writeByte(0);
       out.writeShort(i * 2);
       out.writeBoolean(false);
-      out.writeShort(slot.id);
-      out.writeByte(slot.count);
-      out.writeShort(slot.damage);
+      slot.write(out);
       out.flush();
       out.writeByte(0x66);
       out.writeByte(0);

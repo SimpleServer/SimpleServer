@@ -33,17 +33,17 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import org.xml.sax.SAXException;
 
 import simpleserver.Coordinate.Dimension;
+import simpleserver.bot.BotController.ConnectException;
 import simpleserver.bot.Giver;
 import simpleserver.bot.Teleporter;
-import simpleserver.bot.BotController.ConnectException;
 import simpleserver.command.ExternalCommand;
 import simpleserver.command.PlayerCommand;
 import simpleserver.config.KitList.Kit;
 import simpleserver.config.data.Stats.StatField;
 import simpleserver.config.xml.CommandConfig;
+import simpleserver.config.xml.CommandConfig.Forwarding;
 import simpleserver.config.xml.Group;
 import simpleserver.config.xml.Permission;
-import simpleserver.config.xml.CommandConfig.Forwarding;
 import simpleserver.message.AbstractChat;
 import simpleserver.message.Chat;
 import simpleserver.message.GlobalChat;
@@ -71,6 +71,7 @@ public class Player {
   public Position position;
   private Position deathPlace;
   private short health = 0;
+  private short experience = 0;
   private int group = 0;
   private int entityId = 0;
   private Group groupObject = null;
@@ -99,6 +100,7 @@ public class Player {
   public Coordinate areaend;
 
   private long lastTeleport;
+  private short experienceLevel;
 
   public Player(Socket inc, Server parent) {
     connected = System.currentTimeMillis();
@@ -449,6 +451,19 @@ public class Player {
     if (health <= 0) {
       setDeathPlace(new Position(position()));
     }
+  }
+
+  public short getExperience() {
+    return experience;
+  }
+
+  public short getExperienceLevel() {
+    return experienceLevel;
+  }
+
+  public void updateExperience(float bar, short level, short experience) {
+    experienceLevel = level;
+    this.experience = experience;
   }
 
   public double x() {

@@ -20,7 +20,13 @@
  */
 package simpleserver.nbt;
 
+import static simpleserver.stream.StreamTunnel.ENCHANTABLE;
+
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class Inventory {
   private HashMap<Byte, Slot> slots;;
@@ -43,12 +49,22 @@ public class Inventory {
     return slot;
   }
 
+  public byte add(Slot item) {
+    byte slot = bestSlot();
+    set(slot, item);
+    return slot;
+  }
+
+  public void set(byte slot, Slot item) {
+    slots.put(slot, item);
+  }
+
   public byte add(int id, int count, int damage) {
     return add((short) id, (byte) count, (short) damage);
   }
 
   public void set(byte slot, short id, byte count, short damage) {
-    slots.put(slot, new Slot(id, count, damage));
+    set(slot, new Slot(id, count, damage));
   }
 
   public Slot get(byte slot) {
@@ -85,15 +101,50 @@ public class Inventory {
     return slot;
   }
 
-  public class Slot {
+  public static class Slot {
     public short id;
     public byte count;
     public short damage;
+    private List<Enchantment> enchantments = new ArrayList<Enchantment>(0);
 
-    public Slot(short id, byte count, short damage) {
-      this.id = id;
-      this.count = count;
-      this.damage = damage;
+    public Slot(int id) {
+      this(id, 1, 0);
+    }
+
+    public Slot(int id, int count) {
+      this(id, count, 0);
+    }
+
+    public Slot(int id, int count, int damage) {
+      this.id = (short) id;
+      this.count = (byte) count;
+      this.damage = (short) damage;
+    }
+
+    public void addEnchantment(Enchantment enchantment) {
+      enchantments.add(enchantment);
+    }
+
+    public List<Enchantment> enchantments() {
+      return enchantments;
+    }
+
+    public boolean enchantedWith(int id) {
+      for (Enchantment enchantment : enchantments) {
+        if (enchantment.id == id) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    public void removeEnchantment(Integer id2) {
+      for (Enchantment enchantment : enchantments) {
+        if (enchantment.id == id) {
+          enchantments.remove(enchantment);
+          return;
+        }
+      }
     }
 
     public NBTCompound compound() {
@@ -101,6 +152,43 @@ public class Inventory {
       compound.put(new NBTShort("id", id));
       compound.put(new NBTByte("Count", count));
       compound.put(new NBTShort("Damage", damage));
+      if (enchantments.size() > 0) {
+        NBTCompound tag = new NBTCompound("tag");
+        NBTList<NBTCompound> ench = new NBTList<NBTCompound>("ench", NBT.COMPOUND);
+        for (Enchantment enchantment : enchantments) {
+          ench.add(enchantment.compound());
+        }
+        tag.put(ench);
+        compound.put(tag);
+      }
+      return compound;
+    }
+
+    public void write(DataOutputStream out) throws IOException {
+      out.writeShort(id);
+      out.writeByte(count);
+      out.writeShort(damage);
+      if (ENCHANTABLE.contains(id)) {
+        out.writeShort(-1);
+      }
+
+    }
+
+  }
+
+  public static class Enchantment {
+    public short id;
+    public short level;
+
+    public Enchantment(int i, int j) {
+      id = (short) i;
+      level = (short) j;
+    }
+
+    public NBTCompound compound() {
+      NBTCompound compound = new NBTCompound();
+      compound.put(new NBTShort("id", id));
+      compound.put(new NBTShort("lvl", level));
       return compound;
     }
   }

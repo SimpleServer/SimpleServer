@@ -20,6 +20,8 @@
  */
 package simpleserver.bot;
 
+import static simpleserver.stream.StreamTunnel.ENCHANTABLE;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.DataInputStream;
@@ -52,6 +54,7 @@ public class Bot {
   ReentrantLock writeLock;
   protected Position position;
   protected BotController controller;
+  protected boolean gotFirstPacket = false;
   private byte lastPacket;
   private short health;
 
@@ -164,6 +167,7 @@ public class Bot {
   }
 
   protected void handlePacket(byte packetId) throws IOException {
+    // System.out.println("Packet: 0x" + Integer.toHexString(packetId));
     switch (packetId) {
       case 0x2:
         readUTF16();
@@ -272,11 +276,7 @@ public class Bot {
         in.readByte();
         in.readInt();
         in.readByte();
-        final short dropItem = in.readShort();
-        if (dropItem != -1) {
-          in.readByte();
-          in.readShort();
-        }
+        readItem();
         break;
       case 0x10: // Holding Change
         readNBytes(2);
@@ -385,8 +385,8 @@ public class Bot {
         in.readByte();
         break;
       case 0x2b: // experience
-        in.readByte();
-        in.readByte();
+        in.readFloat();
+        in.readShort();
         in.readShort();
         break;
       case 0x32: // Pre-Chunk
@@ -445,30 +445,18 @@ public class Bot {
         in.readByte();
         in.readShort();
         in.readBoolean();
-        short moveItem = in.readShort();
-        if (moveItem != -1) {
-          in.readByte();
-          in.readShort();
-        }
+        readItem();
         break;
       case 0x67: // Inventory Item Update
         in.readByte();
         in.readShort();
-        short setItem = in.readShort();
-        if (setItem != -1) {
-          in.readByte();
-          in.readShort();
-        }
+        readItem();
         break;
       case 0x68: // Inventory
         in.readByte();
         short count = in.readShort();
         for (int c = 0; c < count; ++c) {
-          short item = in.readShort();
-          if (item != -1) {
-            in.readByte();
-            in.readShort();
-          }
+          readItem();
         }
         break;
       case 0x69:
@@ -483,9 +471,10 @@ public class Bot {
         break;
       case 0x6b: // creative item get
         in.readShort();
-        in.readShort();
-        in.readShort();
-        in.readShort();
+        readItem();
+        break;
+      case (byte) 0x6c:
+        readNBytes(2);
         break;
       case (byte) 0x82: // Update Sign
         in.readInt();
@@ -527,6 +516,20 @@ public class Bot {
             + " after 0x" + Integer.toHexString(lastPacket));
     }
     lastPacket = packetId;
+  }
+
+  private void readItem() throws IOException {
+    short id;
+    if ((id = in.readShort()) > 0) {
+      in.readByte();
+      in.readShort();
+      if (ENCHANTABLE.contains(id)) {
+        short length;
+        if ((length = in.readShort()) > 0) {
+          readNBytes(length);
+        }
+      }
+    }
   }
 
   private void readUnknownBlob() throws IOException {
@@ -630,8 +633,20 @@ public class Bot {
         try {
           handlePacket(in.readByte());
           out.flush();
+          if (!gotFirstPacket) {
+            gotFirstPacket = true;
+          }
         } catch (IOException e) {
-          error("Soket closed");
+          if (!gotFirstPacket) {
+            try {
+              connect();
+            } catch (Exception e2) {
+              error("Soket closed on reconnect");
+            }
+            break;
+          } else {
+            error("Soket closed");
+          }
         }
       }
     }

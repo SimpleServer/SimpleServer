@@ -72,6 +72,7 @@
 	<command name="dimension" allow="0+">
 		<alias>d</alias>
 	</command>
+	<command name="enchant" allow="4+" />
 	<command name="gamemode" allow="4+" />
 	<command name="give" allow="3+" />
 	<command name="giveplayer" allow="4+" />
@@ -145,6 +146,7 @@
 	<command name="who" allow="0+">
 		<alias>list</alias>
 	</command>
+	<command name="xp" allow="4+" />
 	
 	<allblocks destroy="1+" place="1+" use="1+" />
 </config>

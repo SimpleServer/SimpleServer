@@ -58,7 +58,7 @@ public class StreamTunnel {
   private static final String CONSOLE_CHAT_PATTERN = "\\(CONSOLE:.*\\)";
   private static final int MESSAGE_SIZE = 60;
   private static final int MAXIMUM_MESSAGE_SIZE = 119;
-  private static final HashSet<Short> ENCHANTABLE = new HashSet<Short>();
+  public static final HashSet<Short> ENCHANTABLE = new HashSet<Short>();
 
   static {
     ENCHANTABLE.add((short) 0x15a); // Fishing rod
@@ -707,11 +707,9 @@ public class StreamTunnel {
         write(in.readInt());
         write(in.readByte());
         break;
-      case 0x2b: // new in 1.8 (43)
+      case 0x2b: // Experience (43)
         write(packetId);
-        write(in.readFloat());
-        write(in.readShort());
-        write(in.readShort());
+        player.updateExperience(write(in.readFloat()), write(in.readShort()), write(in.readShort()));
         break;
 
       case 0x32: // Pre-Chunk
@@ -1251,8 +1249,12 @@ public class StreamTunnel {
           } catch (IOException e) {
             if (run && !player.isRobot()) {
               System.out.println("[SimpleServer] " + e);
-              System.out.println("[SimpleServer] " + streamType
-                  + " error handling traffic for " + player.getIPAddress() + " (" + Integer.toHexString(lastPacket) + ")");
+              System.out.print("[SimpleServer] " + streamType
+                  + " error handling traffic for " + player.getIPAddress());
+              if (lastPacket != null) {
+                System.out.print(" (" + Integer.toHexString(lastPacket) + ")");
+              }
+              System.out.println();
             }
             break;
           }
