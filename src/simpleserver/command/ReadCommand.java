@@ -32,6 +32,11 @@ public class ReadCommand extends AbstractCommand implements PlayerCommand {
   public void execute(Player player, String message) {
     String filename = extractArgument(message);
 
+    if (filename == null) {
+      player.addTMessage(Color.RED, "Invalid number of arguments!");
+      return;
+    }
+
     String text = player.getServer().docs.getText(filename);
     if (text != null) {
       player.addTCaptionedMessage("Loaded document", filename);
