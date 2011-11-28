@@ -34,23 +34,28 @@ public class GameModeCommand extends AbstractCommand implements PlayerCommand {
     Player target;
     Integer gameMode;
 
-    if (args.length == 1) {
-      target = player;
-      gameMode = Integer.parseInt(args[0]);
-    } else if (args.length == 2) {
-      target = player.getServer().findPlayer(args[0]);
-      if (target == null) {
-        player.addTMessage(Color.RED, "Player not online (%s)", args[1]);
+    try {
+      if (args.length == 1) {
+        target = player;
+        gameMode = Integer.parseInt(args[0]);
+      } else if (args.length == 2) {
+        target = player.getServer().findPlayer(args[0]);
+        if (target == null) {
+          player.addTMessage(Color.RED, "Player not online (%s)", args[1]);
+          return;
+        }
+        gameMode = Integer.parseInt(args[1]);
+      } else {
+        player.addTMessage(Color.RED, "Invalid number of arguments!");
         return;
       }
-      gameMode = Integer.parseInt(args[1]);
-    } else {
-      player.addTMessage(Color.RED, "Invalid number of arguments!");
+    } catch (NumberFormatException e) {
+      player.addTMessage(Color.RED, "Invalid gameMode %s!", args[0]);
       return;
     }
 
     if (gameMode != 0 && gameMode != 1) {
-      player.addTMessage(Color.RED, "Invalid gameMode!");
+      player.addTMessage(Color.RED, "Invalid gameMode %d!", gameMode);
       return;
     }
     player.getServer().runCommand("gamemode", target.getName() + " " + gameMode);
