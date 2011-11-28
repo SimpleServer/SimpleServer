@@ -20,6 +20,7 @@
  */
 package simpleserver.command;
 
+import simpleserver.Color;
 import simpleserver.Player;
 
 public class MeCommand extends AbstractCommand implements PlayerCommand {
@@ -35,6 +36,8 @@ public class MeCommand extends AbstractCommand implements PlayerCommand {
 
       String space = msg.startsWith("'") ? "" : " ";
       player.sendMessage(String.format(messagePattern, player.getName(), msg, space), false);
+    } else {
+      player.addTMessage(Color.RED, "No argument given!");
     }
   }
 

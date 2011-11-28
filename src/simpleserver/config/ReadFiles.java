@@ -27,6 +27,7 @@ import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.Hashtable;
+import java.util.Set;
 
 import simpleserver.Resource;
 import simpleserver.util.UnicodeReader;
@@ -43,6 +44,10 @@ public class ReadFiles implements Resource {
 
   public String getText(String documentName) {
     return docs.get(documentName);
+  }
+
+  public Set<String> getList() {
+    return docs.keySet();
   }
 
   public void save() {

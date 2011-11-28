@@ -22,6 +22,7 @@ package simpleserver.command;
 
 import simpleserver.Color;
 import simpleserver.Player;
+import simpleserver.config.ReadFiles;
 
 public class ReadCommand extends AbstractCommand implements PlayerCommand {
 
@@ -31,13 +32,24 @@ public class ReadCommand extends AbstractCommand implements PlayerCommand {
 
   public void execute(Player player, String message) {
     String filename = extractArgument(message);
+    ReadFiles d = player.getServer().docs;
 
     if (filename == null) {
-      player.addTMessage(Color.RED, "Invalid number of arguments!");
+      // no arguments given -> display list of available files
+
+      StringBuilder s = new StringBuilder();
+      for (String file : d.getList()) {
+        s.append(file);
+        s.append(", ");
+      }
+      if (s.length() > 2) {
+        s.delete(s.length() - 2, s.length());
+      }
+      player.addTCaptionedMessage("Avilable text files", s.toString());
       return;
     }
 
-    String text = player.getServer().docs.getText(filename);
+    String text = d.getText(filename);
     if (text != null) {
       player.addTCaptionedMessage("Loaded document", filename);
 
