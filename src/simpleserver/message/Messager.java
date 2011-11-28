@@ -72,14 +72,15 @@ public class Messager {
     Player sender = chat.getSender();
     String forwardMessage = String.format(server.config.properties.get("msgForwardFormat"), chat, message);
 
-    for (String msgPart : warpMessage(forwardMessage)) {
+    for (String msgPart : wrapMessage(forwardMessage)) {
       forwardedMessages.put(String.format("<%s> %s", sender.getName(), msgPart));
       sender.forwardMessage(msgPart);
     }
   }
 
   private void writeToConsole(String message) {
-    for (String msgPart : warpMessage(message)) {
+    for (String msgPart : wrapMessage(message)) {
+      // They are always wrapped
       System.out.println(msgPart);
     }
   }
@@ -88,7 +89,7 @@ public class Messager {
     return forwardedMessages.has(message);
   }
 
-  private LinkedList<String> warpMessage(String message) {
+  private LinkedList<String> wrapMessage(String message) {
     LinkedList<String> messages = new LinkedList<String>();
 
     if (message.length() > 0) {
