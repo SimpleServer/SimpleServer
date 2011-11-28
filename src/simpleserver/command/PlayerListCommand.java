@@ -35,7 +35,10 @@ public class PlayerListCommand extends AbstractCommand implements PlayerCommand 
     for (Player friend : server.playerList.getArray()) {
       list.append(friend.getName() + ", ");
     }
-    list.delete(list.length() - 2, list.length());
+    if (list.length() > 2) {
+      list.delete(list.length() - 2, list.length());
+    }
+
     player.addCaptionedMessage(t("Connected Players (%s)", server.numPlayers()), list.toString());
   }
 }
