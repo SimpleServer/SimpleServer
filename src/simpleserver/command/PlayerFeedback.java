@@ -20,7 +20,16 @@
  */
 package simpleserver.command;
 
+import simpleserver.Player;
 
-public interface CommandFeedback {
-  public void send(String message, Object... args);
+public class PlayerFeedback implements CommandFeedback {
+  private Player player;
+
+  public PlayerFeedback(Player player) {
+    this.player = player;
+  }
+
+  public void send(String message, Object... args) {
+    player.addMessage(message, args);
+  }
 }

@@ -20,7 +20,21 @@
  */
 package simpleserver.command;
 
+import simpleserver.Player;
+import simpleserver.Server;
 
-public interface CommandFeedback {
-  public void send(String message, Object... args);
+public class DownfallCommand extends AbstractCommand implements PlayerCommand, ServerCommand {
+
+  public DownfallCommand() {
+    super("toggledownfall", "Toggling rain and snow, hold on...");
+  }
+
+  public void execute(Server server, String message, CommandFeedback feedback) {
+    server.runCommand("toggledownfall", "");
+    feedback.send("Toggled rain and snowfall");
+  }
+
+  public void execute(Player player, String message) {
+    execute(player.getServer(), message, new PlayerFeedback(player));
+  }
 }

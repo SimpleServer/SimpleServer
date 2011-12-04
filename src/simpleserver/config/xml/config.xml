@@ -72,7 +72,7 @@
 	<command name="dimension" allow="0+">
 		<alias>d</alias>
 	</command>
-	<command name="enchant" allow="4+" />
+	<command name="enchant" alias="e" allow="4+" />
 	<command name="gamemode" allow="4+" />
 	<command name="give" allow="3+" />
 	<command name="giveplayer" allow="4+" />
@@ -131,6 +131,7 @@
 	<command name="time" allow="0+">
 		<argument allow="4+">*</argument>
 	</command>
+	<command name="toggledownfall" alias="rain" allow="4+" />
 	<command name="unban" allow="4+" />
 	<command name="unbanip" allow="4+" />
 	<command name="unlock" allow="1+" />
