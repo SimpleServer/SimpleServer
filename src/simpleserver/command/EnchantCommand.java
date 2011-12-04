@@ -38,7 +38,7 @@ import simpleserver.nbt.Inventory.Slot;
 
 public class EnchantCommand extends AbstractCommand implements PlayerCommand {
   public EnchantCommand() {
-    super("enchant [options]", "Spawns enchanted items");
+    super("enchant [ITEM | add ID:LEVEL | give | remove ID]", "Spawns enchanted items");
   }
 
   private static final HashMap<Integer, String> ENCHANTMENTS = new HashMap<Integer, String>();
