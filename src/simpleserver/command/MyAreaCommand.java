@@ -35,18 +35,39 @@ import simpleserver.config.xml.Permission;
 import simpleserver.config.xml.Config.AreaStoragePair;
 
 public class MyAreaCommand extends AbstractCommand implements PlayerCommand {
+  private static final byte DEFAULT_SIZE = 50;
+  
   public MyAreaCommand() {
     super("myarea [start|end|save|unsave|rename]",
           "Manage your personal area");
   }
 
-  private boolean areaSizeOk(Player player) {
-    return (Math.abs(player.areastart.x() - player.areaend.x()) < 50)
-          && (Math.abs(player.areastart.z() - player.areaend.z()) < 50)
+  private boolean areaSizeOk(Player player, int[] maxSize) {
+    return (Math.abs(player.areastart.x() - player.areaend.x()) < maxSize[0])
+          && (Math.abs(player.areastart.z() - player.areaend.z()) < maxSize[1])
           && player.areaend.dimension() == player.areastart.dimension();
+  }
+  
+  private int[] getAreaMax(Player player) {
+    // Get the maximum area sizes from config.xml
+    int[] size = { Math.abs(player.getServer().config.properties.getInt("areaMaxX")),
+    Math.abs(player.getServer().config.properties.getInt("areaMaxZ")) };
+    
+    return size;
   }
 
   public void execute(Player player, String message) {
+    // Set up an integer array to hold the maximum area size
+    int[] maxSize = getAreaMax(player); // X, Z
+    
+    // Check to make sure the configuration is valid
+    // If not, reset to default size
+    for (byte i = 0; i < maxSize.length; i++) {
+      if (maxSize[i] <= 0 || Integer.valueOf(maxSize[i]) == null) {
+        maxSize[i] = DEFAULT_SIZE;
+      }
+    }
+    
     Config config = player.getServer().config;
     String arguments[] = extractArguments(message);
 
@@ -54,70 +75,84 @@ public class MyAreaCommand extends AbstractCommand implements PlayerCommand {
       player.addTCaptionedMessage("Usage", commandPrefix() + "myarea [start|end|save|unsave|rename]");
       return;
     }
-
-    if (arguments[0].equals("start")) {
-      player.areastart = player.position();
-      player.areastart = player.areastart.setY((byte) 0); // no height limit
-      player.addTMessage(Color.GRAY, "Start coordinate set.");
-    } else if (arguments[0].equals("end")) {
-      player.areaend = player.position();
-      player.areaend = player.areaend.setY((byte) 127); // no height limit
-      player.addTMessage(Color.GRAY, "End coordinate set.");
-    } else if (arguments[0].equals("save")) {
-      if (player.areastart == null || player.areaend == null) {
-        player.addTMessage(Color.RED, "Define start and end coordinates for your area first!");
-        return;
-      }
-      if (!areaSizeOk(player)) {
-        player.addTMessage(Color.RED, "Your area is allowed to have a maximum size of 50x50!");
-        return;
-      }
-      if (player.getServer().config.playerArea(player) != null) {
-        player.addTMessage(Color.RED, "New area can not be saved before you remove your old one!");
-        return;
-      }
-      Area area = createPlayerArea(player);
-      Set<Area> overlaps = config.dimensions.overlaps(area);
-      if (!overlaps.isEmpty()) {
-        player.addTMessage(Color.RED, "Your area overlaps with other areas and could therefore not be saved!");
-        StringBuilder str = new StringBuilder();
-        for (Area overlap : overlaps) {
-          str.append(overlap.name);
-          str.append(", ");
+    
+    switch (arguments[0]) {
+      case "start":
+        player.areastart = player.position();
+        player.areastart = player.areastart.setY((byte) 0); // no height limit
+        player.addTMessage(Color.GRAY, "Start coordinate set.");
+        break;
+      case "end":
+        player.areaend = player.position();
+        player.areaend = player.areaend.setY((byte) 127); // no height limit
+        player.addTMessage(Color.GRAY, "End coordinate set.");
+        // Check area size after end coordinate set to save player a step
+        if (!areaSizeOk(player, maxSize)) {
+          player.addTMessage(Color.RED, "Your area is allowed to have a maximum size of "
+                                        + maxSize[0] + "x" + maxSize[1] + "!");
+          return;
         }
-        str.delete(str.length() - 2, str.length() - 1);
-        player.addTCaptionedMessage("Overlapping areas", "%s", str);
-        return;
-      }
-      saveArea(area, player);
-      player.addTMessage(Color.GRAY, "Your area has been saved!");
-    } else if (arguments[0].equals("unsave") || arguments[0].equals("remove")) {
-      AreaStoragePair area = config.playerArea(player);
-      if (area == null) {
-        player.addTMessage(Color.RED, "You currently have no personal area which can be removed!");
-        return;
-      }
-
-      area.storage.remove(area.area);
-      player.addTMessage(Color.GRAY, "Your area has been removed!");
-      player.getServer().saveConfig();
-    } else if (arguments[0].equals("rename")) {
-      AreaStoragePair area = config.playerArea(player);
-      if (area == null) {
-        player.addTMessage(Color.RED, "You currently have no personal area which can be renamed!");
-        return;
-      }
-
-      String label = extractArgument(message, 1);
-      if (label != null) {
-        area.area.name = label;
-        player.addTMessage(Color.GRAY, "Your area has been renamed!");
-        player.getServer().saveConfig();
-      } else {
-        player.addTMessage(Color.RED, "Please supply an area name.");
-      }
-    } else {
-      player.addTMessage(Color.RED, "You entered an invalid argument.");
+        break;
+      case "save":
+        {
+          if (player.areastart == null || player.areaend == null) {
+            player.addTMessage(Color.RED, "Define start and end coordinates for your area first!");
+            return;
+          }
+          if (player.getServer().config.playerArea(player) != null) {
+            player.addTMessage(Color.RED, "New area can not be saved before you remove your old one!");
+            return;
+          }
+          Area area = createPlayerArea(player);
+          Set<Area> overlaps = config.dimensions.overlaps(area);
+          if (!overlaps.isEmpty()) {
+            player.addTMessage(Color.RED, "Your area overlaps with other areas and could therefore not be saved!");
+            StringBuilder str = new StringBuilder();
+            for (Area overlap : overlaps) {
+              str.append(overlap.name);
+              str.append(", ");
+            }
+            str.delete(str.length() - 2, str.length() - 1);
+            player.addTCaptionedMessage("Overlapping areas", "%s", str);
+            return;
+          }
+          saveArea(area, player);
+          player.addTMessage(Color.GRAY, "Your area has been saved!");
+          break;
+        }
+      case "unsave":
+      case "remove":
+        {
+          AreaStoragePair area = config.playerArea(player);
+          if (area == null) {
+            player.addTMessage(Color.RED, "You currently have no personal area which can be removed!");
+            return;
+          }
+          area.storage.remove(area.area);
+          player.addTMessage(Color.GRAY, "Your area has been removed!");
+          player.getServer().saveConfig();
+          break;
+        }
+      case "rename":
+        {
+          AreaStoragePair area = config.playerArea(player);
+          if (area == null) {
+            player.addTMessage(Color.RED, "You currently have no personal area which can be renamed!");
+            return;
+          }
+          String label = extractArgument(message, 1);
+          if (label != null) {
+            area.area.name = label;
+            player.addTMessage(Color.GRAY, "Your area has been renamed!");
+            player.getServer().saveConfig();
+          } else {
+            player.addTMessage(Color.RED, "Please supply an area name.");
+          }
+          break;
+        }
+      default:
+        player.addTMessage(Color.RED, "You entered an invalid argument.");
+        break;
     }
   }
 
