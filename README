@@ -133,8 +133,8 @@ Configuration: simpleserver/config.xml
 announceBackup      | Announce backups to players
 announceRestart     | Announce planned restarts to players
 announceSave        | Announce world saves to players
-areaMaxX            | Maximum width (X-axis) of player-defined areas
-areaMaxZ            | Maximum breadth (Z-axis) of player-defined areas
+areaMaxX            | Maximum width (X-axis) of player-defined areas in METERS
+areaMaxZ            | Maximum breadth (Z-axis) of player-defined areas in METERS
 autoBackup          | Back up world at regular intervals
 autoBackupMins      | Time between backups in MINUTES
 autoRestart         | Restart server at regular intervals
