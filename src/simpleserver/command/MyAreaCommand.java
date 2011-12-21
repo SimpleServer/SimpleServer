@@ -83,16 +83,15 @@ public class MyAreaCommand extends AbstractCommand implements PlayerCommand {
     } else if (arguments[0].equals("end")) {
       player.areaend = player.position();
       player.areaend = player.areaend.setY((byte) 127); // no height limit
-      // Save the player a step by checking area size after end coord set
-      if (!areaSizeOk(player, maxSize)) {
-        player.addTMessage(Color.RED, "Your area is allowed to have a maximum size of " +
-                                      maxSize[0] + "x" + maxSize[1] + "!");
-        return;
-      }
       player.addTMessage(Color.GRAY, "End coordinate set.");
     } else if (arguments[0].equals("save")) {
       if (player.areastart == null || player.areaend == null) {
         player.addTMessage(Color.RED, "Define start and end coordinates for your area first!");
+        return;
+      }
+      if (!areaSizeOk(player, maxSize)) {
+        player.addTMessage(Color.RED, "Your area is allowed to have a maximum size of " +
+                                      maxSize[0] + "x" + maxSize[1] + "!");
         return;
       }
       if (player.getServer().config.playerArea(player) != null) {
