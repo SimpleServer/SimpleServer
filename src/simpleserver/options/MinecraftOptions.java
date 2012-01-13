@@ -41,6 +41,7 @@ public class MinecraftOptions extends AbstractOptions {
     options.setProperty("difficulty", simpleServerOptions.get("difficulty"));
     options.setProperty("max-players", "1024");
     options.setProperty("level-name", simpleServerOptions.get("levelName"));
+    options.setProperty("level-type", simpleServerOptions.get("levelType"));
     options.setProperty("spawn-animals", simpleServerOptions.get("spawnAnimals"));
     options.setProperty("spawn-monsters", simpleServerOptions.get("spawnMonsters"));
     options.setProperty("allow-flight", simpleServerOptions.get("allowFlight"));
