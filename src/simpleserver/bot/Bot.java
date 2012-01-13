@@ -119,7 +119,7 @@ public class Bot {
     out.writeInt(VERSION);
     write(name);
     out.writeLong(0);
-    write(readUTF16()); // Added in 1.1 (level type)
+    write("DEFAULT"); // Added in 1.1 (level type)
     out.writeInt(0);
     out.writeByte(0);
     out.writeByte(0);
@@ -135,7 +135,7 @@ public class Bot {
     out.writeByte(0);
     out.writeShort(128);
     out.writeLong(0);
-    write(readUTF16()); // Added in 1.1 (level type)
+    write("DEFAULT"); // Added in 1.1 (level type)
     writeLock.unlock();
   }
 
