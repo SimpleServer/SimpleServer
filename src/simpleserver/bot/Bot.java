@@ -179,6 +179,7 @@ public class Bot {
         in.readInt();
         readUTF16();
         in.readLong();
+        readUTF16(); // Added in 1.1, level type
         in.readInt();
         position.dimension = Dimension.get(in.readByte());
         in.readByte();
@@ -259,6 +260,7 @@ public class Bot {
         in.readByte();
         in.readShort();
         in.readLong();
+        readUTF16(); // Added in 1.1, level type
         break;
       case 0x0a: // Player
         in.readByte();
