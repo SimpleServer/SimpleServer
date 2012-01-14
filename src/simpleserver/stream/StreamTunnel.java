@@ -193,6 +193,7 @@ public class StreamTunnel {
           write(in.readLong());
         }
 
+        write(readUTF16()); // added in 1.1 (level type)
         write(in.readInt());
 
         dimension = in.readByte();
@@ -364,6 +365,7 @@ public class StreamTunnel {
         write(in.readByte());
         write(in.readShort());
         write(in.readLong());
+        write(readUTF16()); // Added in 1.1 (level type)
         break;
       case 0x0a: // Player
         write(packetId);
@@ -649,10 +651,6 @@ public class StreamTunnel {
         write(in.readInt());
         write(in.readShort());
         break;
-      case 0x1b: // ???
-        write(packetId);
-        copyNBytes(18);
-        break;
       case 0x1c: // Entity Velocity?
         write(packetId);
         copyNBytes(10);
@@ -933,6 +931,13 @@ public class StreamTunnel {
         for (int i = 0; i < sizeString; i++) {
           copyNBytes(write(in.readInt()));
         }
+        break;
+      case (byte) 0xfa:
+        write(packetId);
+        write(readUTF16());
+        short arrayLength = in.readShort();
+        write(arrayLength);
+        copyNBytes(0xff & arrayLength);
         break;
       case (byte) 0xfe: // 1.8, poll server status (254)
         write(packetId);

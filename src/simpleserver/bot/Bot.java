@@ -38,7 +38,7 @@ import simpleserver.Position;
 import simpleserver.Server;
 
 public class Bot {
-  private static final int VERSION = 22;
+  private static final int VERSION = 23;
 
   protected String name;
   protected Server server;
@@ -119,6 +119,7 @@ public class Bot {
     out.writeInt(VERSION);
     write(name);
     out.writeLong(0);
+    write("DEFAULT"); // Added in 1.1 (level type)
     out.writeInt(0);
     out.writeByte(0);
     out.writeByte(0);
@@ -134,6 +135,7 @@ public class Bot {
     out.writeByte(0);
     out.writeShort(128);
     out.writeLong(0);
+    write("DEFAULT"); // Added in 1.1 (level type)
     writeLock.unlock();
   }
 
@@ -177,6 +179,7 @@ public class Bot {
         in.readInt();
         readUTF16();
         in.readLong();
+        readUTF16(); // Added in 1.1, level type
         in.readInt();
         position.dimension = Dimension.get(in.readByte());
         in.readByte();
@@ -257,6 +260,7 @@ public class Bot {
         in.readByte();
         in.readShort();
         in.readLong();
+        readUTF16(); // Added in 1.1, level type
         break;
       case 0x0a: // Player
         in.readByte();
@@ -339,9 +343,6 @@ public class Bot {
         in.readInt();
         in.readInt();
         in.readShort();
-        break;
-      case 0x1b: // ???
-        readNBytes(18);
         break;
       case 0x1c: // Entity Velocity?
         readNBytes(10);
@@ -508,6 +509,11 @@ public class Bot {
         for (int i = 0; i < sizeString; i++) {
           readNBytes(in.readInt());
         }
+        break;
+      case (byte) 0xfa: // Unknown, added in 1.1
+        readUTF16();
+        short arrayLength = in.readShort();
+        readNBytes(0xff & arrayLength);
         break;
       case (byte) 0xfe:
         break;

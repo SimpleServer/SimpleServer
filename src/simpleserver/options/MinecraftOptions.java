@@ -41,13 +41,17 @@ public class MinecraftOptions extends AbstractOptions {
     options.setProperty("difficulty", simpleServerOptions.get("difficulty"));
     options.setProperty("max-players", "1024");
     options.setProperty("level-name", simpleServerOptions.get("levelName"));
+    options.setProperty("level-type", simpleServerOptions.get("levelType"));
     options.setProperty("spawn-animals", simpleServerOptions.get("spawnAnimals"));
     options.setProperty("spawn-monsters", simpleServerOptions.get("spawnMonsters"));
+    options.setProperty("spawn-npcs", simpleServerOptions.get("spawnNPCs"));
     options.setProperty("allow-flight", simpleServerOptions.get("allowFlight"));
     options.setProperty("pvp", simpleServerOptions.get("pvp"));
     options.setProperty("view-distance", simpleServerOptions.get("viewDistance"));
     options.setProperty("allow-nether", simpleServerOptions.get("allowNether"));
     options.setProperty("level-seed", simpleServerOptions.get("worldSeed"));
+    options.setProperty("generate-structures",
+                        simpleServerOptions.get("generateStructures"));
     options.setProperty("gamemode", simpleServerOptions.get("gameMode"));
     options.setProperty("motd", "");
 
