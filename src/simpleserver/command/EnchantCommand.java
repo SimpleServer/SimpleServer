@@ -64,6 +64,10 @@ public class EnchantCommand extends AbstractCommand implements PlayerCommand {
     ENCHANTMENTS.put(33, "Silk Touch");
     ENCHANTMENTS.put(34, "Unbreaking");
     ENCHANTMENTS.put(35, "Fortune");
+    ENCHANTMENTS.put(48, "Power");
+    ENCHANTMENTS.put(49, "Punch");
+    ENCHANTMENTS.put(50, "Flame");
+    ENCHANTMENTS.put(51, "Infinity");
 
     ITEMS.put(256, "Iron Shovel");
     ITEMS.put(257, "Iron Pickaxe");
@@ -105,6 +109,7 @@ public class EnchantCommand extends AbstractCommand implements PlayerCommand {
     ITEMS.put(315, "Gold Chestplate");
     ITEMS.put(316, "Gold Leggings");
     ITEMS.put(317, "Gold Boots");
+    ITEMS.put(261, "Bow");
 
     for (int i = 0; i <= 5; i++) {
       if (i == 2) {
@@ -121,6 +126,9 @@ public class EnchantCommand extends AbstractCommand implements PlayerCommand {
     }
     for (int i = 32; i <= 35; i++) {
       APPLIABLE.put(i, new Integer[] { 256, 257, 258, 269, 270, 271, 273, 274, 275, 277, 278, 279, 284, 285, 286 });
+    }
+    for (int i = 48; i <= 51; i++) {
+      APPLIABLE.put(i, new Integer[] { 261 });
     }
   }
 
