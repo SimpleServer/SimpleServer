@@ -20,9 +20,9 @@
  */
 package simpleserver.config.xml;
 
-class Property extends XMLTag implements Comparable<Property> {
-  String name;
-  String value;
+public class Property extends XMLTag implements Comparable<Property> {
+  public String name;
+  public String value;
 
   Property() {
     super("property");
