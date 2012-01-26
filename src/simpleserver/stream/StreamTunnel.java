@@ -173,7 +173,7 @@ public class StreamTunnel {
     switch (packetId) {
       case 0x00: // Keep Alive
         write(packetId);
-        write(in.readInt()); // random number that is returned form server
+        write(in.readInt()); // random number that is returned from server
         break;
       case 0x01: // Login Request/Response
         write(packetId);
@@ -193,7 +193,7 @@ public class StreamTunnel {
           write(in.readLong());
         }
 
-        write(readUTF16()); // added in 1.1 (level type)
+        write(readUTF16());
         write(in.readInt());
 
         dimension = in.readByte();
@@ -201,7 +201,6 @@ public class StreamTunnel {
           player.setDimension(Dimension.get(dimension));
         }
         write(dimension);
-        // added in 1.8
         write(in.readByte());
         write(in.readByte());
         if (isServerTunnel) {
@@ -336,7 +335,7 @@ public class StreamTunnel {
         write(packetId);
         copyNBytes(12);
         break;
-      case 0x07: // Use Entity?
+      case 0x07: // Use Entity
         int user = in.readInt();
         int target = in.readInt();
         Player targetPlayer = server.playerList.findPlayer(target);
@@ -351,21 +350,21 @@ public class StreamTunnel {
         write(target);
         copyNBytes(1);
         break;
-      case 0x08: // Update Health, changed in 1.8 (added food and expirience?)
+      case 0x08: // Update Health
         write(packetId);
         player.updateHealth(write(in.readShort()));
         player.getHealth();
         write(in.readShort());
         write(in.readFloat());
         break;
-      case 0x09: // Respawn, changed in 1.8 added 2 bytes, short and long
+      case 0x09: // Respawn
         write(packetId);
         player.setDimension(Dimension.get(write(in.readByte())));
         write(in.readByte());
         write(in.readByte());
         write(in.readShort());
         write(in.readLong());
-        write(readUTF16()); // Added in 1.1 (level type)
+        write(readUTF16());
         break;
       case 0x0a: // Player
         write(packetId);
@@ -386,7 +385,7 @@ public class StreamTunnel {
         copyPlayerLocation();
         copyNBytes(1);
         break;
-      case 0x0c: // Player Look (12)
+      case 0x0c: // Player Look
         write(packetId);
         copyPlayerLook();
         copyNBytes(1);
@@ -582,7 +581,7 @@ public class StreamTunnel {
         write(packetId);
         copyNBytes(5);
         break;
-      case 0x13: // ???
+      case 0x13: // Entity Action
         write(packetId);
         write(in.readInt());
         write(in.readByte());
@@ -599,7 +598,7 @@ public class StreamTunnel {
           skipNBytes(16);
         }
         break;
-      case 0x15: // Pickup spawn
+      case 0x15: // Pickup Spawn
         write(packetId);
         copyNBytes(24);
         break;
@@ -631,10 +630,11 @@ public class StreamTunnel {
         write(in.readInt());
         write(in.readByte());
         write(in.readByte());
+        write(in.readByte());
 
         copyUnknownBlob();
         break;
-      case 0x19: // Painting
+      case 0x19: // Entity: Painting
         write(packetId);
         write(in.readInt());
         write(readUTF16());
@@ -643,7 +643,7 @@ public class StreamTunnel {
         write(in.readInt());
         write(in.readInt());
         break;
-      case 0x1a: // 1.8p3, experience Orb spawn
+      case 0x1a: // Experience Orb
         write(packetId);
         write(in.readInt());
         write(in.readInt());
@@ -651,7 +651,7 @@ public class StreamTunnel {
         write(in.readInt());
         write(in.readShort());
         break;
-      case 0x1c: // Entity Velocity?
+      case 0x1c: // Entity Velocity
         write(packetId);
         copyNBytes(10);
         break;
@@ -679,11 +679,15 @@ public class StreamTunnel {
         write(packetId);
         copyNBytes(18);
         break;
-      case 0x26: // Entity status?
+      case 0x23: // ???, added in 12w03a
+        write(in.readInt());
+        write(in.readByte());
+        break;
+      case 0x26: // Entity Status
         write(packetId);
         copyNBytes(5);
         break;
-      case 0x27: // Attach Entity?
+      case 0x27: // Attach Entity
         write(packetId);
         copyNBytes(8);
         break;
@@ -693,19 +697,19 @@ public class StreamTunnel {
 
         copyUnknownBlob();
         break;
-      case 0x29: // new in 1.8, add status effect (41)
+      case 0x29: // Entity Effect
         write(packetId);
         write(in.readInt());
         write(in.readByte());
         write(in.readByte());
         write(in.readShort());
         break;
-      case 0x2a: // new in 1.8, remove status effect (42)
+      case 0x2a: // Remove Entity Effect
         write(packetId);
         write(in.readInt());
         write(in.readByte());
         break;
-      case 0x2b: // Experience (43)
+      case 0x2b: // Experience
         write(packetId);
         player.updateExperience(write(in.readFloat()), write(in.readShort()), write(in.readShort()));
         break;
@@ -749,7 +753,7 @@ public class StreamTunnel {
         write(metadata);
 
         break;
-      case 0x36: // ???
+      case 0x36: // Block Action
         write(packetId);
         copyNBytes(12);
         break;
@@ -760,7 +764,7 @@ public class StreamTunnel {
         write(recordCount);
         copyNBytes(recordCount * 3);
         break;
-      case 0x3d: // Unknown
+      case 0x3d: // Sound/Particle Effect
         write(packetId);
         write(in.readInt());
         write(in.readInt());
@@ -768,16 +772,16 @@ public class StreamTunnel {
         write(in.readInt());
         write(in.readInt());
         break;
-      case 0x46: // (70) Invalid state, changed in 1.8 (added serverMode byte)
+      case 0x46: // New/Invalid State
         write(packetId);
         write(in.readByte());
         write(in.readByte());
         break;
-      case 0x47: // Thunder
+      case 0x47: // Thunderbolt
         write(packetId);
         copyNBytes(17);
         break;
-      case 0x64: // Open window
+      case 0x64: // Open Window
         boolean allow = true;
         byte id = in.readByte();
         byte invtype = in.readByte();
@@ -831,11 +835,11 @@ public class StreamTunnel {
           write(unknownByte);
         }
         break;
-      case 0x65:
+      case 0x65: // Close Window
         write(packetId);
         write(in.readByte());
         break;
-      case 0x66: // Inventory Item Move
+      case 0x66: // Window Click
         write(packetId);
         write(in.readByte());
         write(in.readShort());
@@ -844,13 +848,13 @@ public class StreamTunnel {
         write(in.readBoolean());
         copyItem();
         break;
-      case 0x67: // Inventory Item Update
+      case 0x67: // Set Slot
         write(packetId);
         write(in.readByte());
         write(in.readShort());
         copyItem();
         break;
-      case 0x68: // Inventory
+      case 0x68: // Window Items
         write(packetId);
         write(in.readByte());
         short count = write(in.readShort());
@@ -858,24 +862,24 @@ public class StreamTunnel {
           copyItem();
         }
         break;
-      case 0x69:
+      case 0x69: // Update Window Property
         write(packetId);
         write(in.readByte());
         write(in.readShort());
         write(in.readShort());
         break;
-      case 0x6a:
+      case 0x6a: // Transaction
         write(packetId);
         write(in.readByte());
         write(in.readShort());
         write(in.readByte());
         break;
-      case 0x6b: // 1.8 (107)
+      case 0x6b: // Creative Inventory Action
         write(packetId);
         write(in.readShort());
         copyItem();
         break;
-      case 0x6c: // 1.9 (108)
+      case 0x6c: // Enchant Item
         write(packetId);
         write(in.readByte());
         write(in.readByte());
@@ -890,7 +894,7 @@ public class StreamTunnel {
         write(readUTF16());
         write(readUTF16());
         break;
-      case (byte) 0x83: // Map data
+      case (byte) 0x83: // Item Data
         write(packetId);
         write(in.readShort());
         write(in.readShort());
@@ -903,11 +907,11 @@ public class StreamTunnel {
         write(in.readInt());
         copyNBytes(write(in.readInt()));
         break;
-      case (byte) 0xc8: // Statistic
+      case (byte) 0xc8: // Increment Statistic
         write(packetId);
         copyNBytes(5);
         break;
-      case (byte) 0xc9: // (201) 1.8, playerList
+      case (byte) 0xc9: // Player List Item
         write(packetId);
         write(readUTF16());
         write(in.readByte());
@@ -932,14 +936,14 @@ public class StreamTunnel {
           copyNBytes(write(in.readInt()));
         }
         break;
-      case (byte) 0xfa:
+      case (byte) 0xfa: // Plugin Message
         write(packetId);
         write(readUTF16());
         short arrayLength = in.readShort();
         write(arrayLength);
         copyNBytes(0xff & arrayLength);
         break;
-      case (byte) 0xfe: // 1.8, poll server status (254)
+      case (byte) 0xfe: // Server List Ping
         write(packetId);
         break;
       case (byte) 0xff: // Disconnect/Kick

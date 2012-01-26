@@ -38,7 +38,7 @@ import simpleserver.Position;
 import simpleserver.Server;
 
 public class Bot {
-  private static final int VERSION = 23;
+  private static final int VERSION = 24;
 
   protected String name;
   protected Server server;
@@ -119,7 +119,7 @@ public class Bot {
     out.writeInt(VERSION);
     write(name);
     out.writeLong(0);
-    write("DEFAULT"); // Added in 1.1 (level type)
+    write("DEFAULT");
     out.writeInt(0);
     out.writeByte(0);
     out.writeByte(0);
@@ -135,7 +135,7 @@ public class Bot {
     out.writeByte(0);
     out.writeShort(128);
     out.writeLong(0);
-    write("DEFAULT"); // Added in 1.1 (level type)
+    write("DEFAULT");
     writeLock.unlock();
   }
 
@@ -171,15 +171,15 @@ public class Bot {
   protected void handlePacket(byte packetId) throws IOException {
     // System.out.println("Packet: 0x" + Integer.toHexString(packetId));
     switch (packetId) {
-      case 0x2:
+      case 0x2: // Handshake
         readUTF16();
         login();
         break;
-      case 0x1:
+      case 0x1: // Login Request
         in.readInt();
         readUTF16();
         in.readLong();
-        readUTF16(); // Added in 1.1, level type
+        readUTF16();
         in.readInt();
         position.dimension = Dimension.get(in.readByte());
         in.readByte();
@@ -230,7 +230,7 @@ public class Bot {
       case 0x04: // Time Update
         in.readLong();
         break;
-      case 0x05: // Player Inventory
+      case 0x05: // Entity Equipment
         in.readInt();
         in.readShort();
         in.readShort();
@@ -239,7 +239,7 @@ public class Bot {
       case 0x06: // Spawn Position
         readNBytes(12);
         break;
-      case 0x07: // Use Entity?
+      case 0x07: // Use Entity
         in.readInt();
         in.readInt();
         in.readBoolean();
@@ -260,7 +260,7 @@ public class Bot {
         in.readByte();
         in.readShort();
         in.readLong();
-        readUTF16(); // Added in 1.1, level type
+        readUTF16();
         break;
       case 0x0a: // Player
         in.readByte();
@@ -291,7 +291,7 @@ public class Bot {
       case 0x12: // Animation
         readNBytes(5);
         break;
-      case 0x13: // ???
+      case 0x13: // Entity Action
         in.readInt();
         in.readByte();
         break;
@@ -327,9 +327,10 @@ public class Bot {
         in.readInt();
         in.readByte();
         in.readByte();
+        in.readByte();
         readUnknownBlob();
         break;
-      case 0x19: // Painting
+      case 0x19: // Entity: Painting
         in.readInt();
         readUTF16();
         in.readInt();
@@ -337,14 +338,14 @@ public class Bot {
         in.readInt();
         in.readInt();
         break;
-      case 0x1a:
+      case 0x1a: // Experience Orb
         in.readInt();
         in.readInt();
         in.readInt();
         in.readInt();
         in.readShort();
         break;
-      case 0x1c: // Entity Velocity?
+      case 0x1c: // Entity Velocity
         readNBytes(10);
         break;
       case 0x1d: // Destroy Entity
@@ -365,27 +366,31 @@ public class Bot {
       case 0x22: // Entity Teleport
         readNBytes(18);
         break;
-      case 0x26: // Entity status?
+      case 0x23: // ???, added in 12w03a
+        in.readInt();
+        in.readByte();
+        break;
+      case 0x26: // Entity Status
         readNBytes(5);
         break;
-      case 0x27: // Attach Entity?
+      case 0x27: // Attach Entity
         readNBytes(8);
         break;
       case 0x28: // Entity Metadata
         in.readInt();
         readUnknownBlob();
         break;
-      case 0x29: // new in 1.8, add status effect (41)
+      case 0x29: // Entity Effect
         in.readInt();
         in.readByte();
         in.readByte();
         in.readShort();
         break;
-      case 0x2a: // new in 1.8, remove status effect (42)
+      case 0x2a: // Remove Entity Effect
         in.readInt();
         in.readByte();
         break;
-      case 0x2b: // experience
+      case 0x2b: // Experience
         in.readFloat();
         in.readShort();
         in.readShort();
@@ -410,7 +415,7 @@ public class Bot {
         in.readByte();
         in.readByte();
         break;
-      case 0x36: // ???
+      case 0x36: // Block Action
         readNBytes(12);
         break;
       case 0x3c: // Explosion
@@ -418,29 +423,29 @@ public class Bot {
         int recordCount = in.readInt();
         readNBytes(recordCount * 3);
         break;
-      case 0x3d: // Unknown
+      case 0x3d: // Sound/Particle Effect
         in.readInt();
         in.readInt();
         in.readByte();
         in.readInt();
         in.readInt();
         break;
-      case 0x46: // Invalid Bed
+      case 0x46: // New/Invalid State
         readNBytes(2);
         break;
-      case 0x47: // Thunder
+      case 0x47: // Thunderbolt
         readNBytes(17);
         break;
-      case 0x64: // Open window
+      case 0x64: // Open Window
         in.readByte();
         in.readByte();
         readUTF16();
         in.readByte();
         break;
-      case 0x65:
+      case 0x65: // Close Window
         in.readByte();
         break;
-      case 0x66: // Inventory Item Move
+      case 0x66: // Window Click
         in.readByte();
         in.readShort();
         in.readByte();
@@ -448,33 +453,33 @@ public class Bot {
         in.readBoolean();
         readItem();
         break;
-      case 0x67: // Inventory Item Update
+      case 0x67: // Set Slot
         in.readByte();
         in.readShort();
         readItem();
         break;
-      case 0x68: // Inventory
+      case 0x68: // Window Items
         in.readByte();
         short count = in.readShort();
         for (int c = 0; c < count; ++c) {
           readItem();
         }
         break;
-      case 0x69:
+      case 0x69: // Update Window Property
         in.readByte();
         in.readShort();
         in.readShort();
         break;
-      case 0x6a: // item transaction
+      case 0x6a: // Transaction
         in.readByte();
         in.readShort();
         in.readByte();
         break;
-      case 0x6b: // creative item get
+      case 0x6b: // Creative Inventory Action
         in.readShort();
         readItem();
         break;
-      case (byte) 0x6c:
+      case (byte) 0x6c: // Enchant Item
         readNBytes(2);
         break;
       case (byte) 0x82: // Update Sign
@@ -486,16 +491,16 @@ public class Bot {
         readUTF16();
         readUTF16();
         break;
-      case (byte) 0x83: // Map data
+      case (byte) 0x83: // Item Data
         in.readShort();
         in.readShort();
         byte length = in.readByte();
         readNBytes(0xff & length);
         break;
-      case (byte) 0xc8: // Statistic
+      case (byte) 0xc8: // Increment Statistic
         readNBytes(5);
         break;
-      case (byte) 0xc9: // User list
+      case (byte) 0xc9: // Player List Item
         readUTF16();
         in.readBoolean();
         in.readShort();
@@ -510,12 +515,12 @@ public class Bot {
           readNBytes(in.readInt());
         }
         break;
-      case (byte) 0xfa: // Unknown, added in 1.1
+      case (byte) 0xfa: // Plugin Message
         readUTF16();
         short arrayLength = in.readShort();
         readNBytes(0xff & arrayLength);
         break;
-      case (byte) 0xfe:
+      case (byte) 0xfe: // Server List Ping
         break;
       default:
         error("Unable to handle packet 0x" + Integer.toHexString(packetId)
