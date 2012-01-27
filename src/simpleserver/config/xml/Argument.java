@@ -34,8 +34,8 @@ class Argument extends XMLTag {
   void setAttribute(String name, String value) throws SAXException {
     if (name.equals("allow")) {
       allow = new Permission(value);
-    } else if (name.equals("value")) {
-      argument = value;
+    } else if (name.equals("name")) {
+      content(value);
     }
   }
 
