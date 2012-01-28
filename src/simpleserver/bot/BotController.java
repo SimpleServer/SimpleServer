@@ -41,6 +41,7 @@ public class BotController {
   private Set<String> deadNinjas;
   private List<File> garbage;
   private Timer timer;
+  private boolean running = true;
 
   public BotController(Server server) {
     this.server = server;
@@ -60,6 +61,10 @@ public class BotController {
       throw new ConnectException();
     }
 
+  }
+
+  public int size() {
+    return bots.size();
   }
 
   public void ready() {
@@ -88,13 +93,16 @@ public class BotController {
   }
 
   void remove(Bot bot) {
-    bots.remove(bot.name);
-    if (bot.ninja()) {
-      deadNinjas.add(bot.name);
+    if (running) {
+      bots.remove(bot.name);
+      if (bot.ninja()) {
+        deadNinjas.add(bot.name);
+      }
     }
   }
 
   public void stop() {
+    running = false;
     for (Bot bot : bots.values()) {
       try {
         bot.logout();

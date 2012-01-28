@@ -104,12 +104,18 @@ public class Main {
     if (args.length >= 3) {
       String path = args[2];
       int split = Math.max(path.lastIndexOf('.'), path.lastIndexOf('/'));
-
-      NBTag tag = tryGetTag(path.substring(0, split), file.root());
-      if (tag == null) {
-        return;
+      NBTag tag;
+      String name;
+      if (split > 0) {
+        tag = tryGetTag(path.substring(0, split), file.root());
+        if (tag == null) {
+          return;
+        }
+        name = path.substring(split + 1);
+      } else {
+        tag = file.root();
+        name = path;
       }
-      String name = path.substring(split + 1);
       switch (tag.type()) {
         case COMPOUND:
           if (((NBTCompound) tag).containsKey(name)) {

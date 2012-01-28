@@ -60,29 +60,6 @@ public class StreamTunnel {
   private static final int MAXIMUM_MESSAGE_SIZE = 119;
   public static final HashSet<Short> ENCHANTABLE = new HashSet<Short>();
 
-  static {
-    ENCHANTABLE.add((short) 0x15a); // Fishing rod
-    ENCHANTABLE.add((short) 0x167); // Shears
-    ENCHANTABLE.add((short) 0x105); // Bow
-    // Tools
-    for (short id = 256; id <= 259; id++) {
-      ENCHANTABLE.add(id);
-    }
-    for (short id = 267; id <= 279; id++) {
-      ENCHANTABLE.add(id);
-    }
-    for (short id = 283; id <= 286; id++) {
-      ENCHANTABLE.add(id);
-    }
-    for (short id = 290; id <= 294; id++) {
-      ENCHANTABLE.add(id);
-    }
-    // Armour
-    for (short id = 298; id <= 317; id++) {
-      ENCHANTABLE.add(id);
-    }
-  };
-
   private final boolean isServerTunnel;
   private final String streamType;
   private final Player player;

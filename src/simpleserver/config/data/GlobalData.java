@@ -43,11 +43,13 @@ public class GlobalData implements Resource {
   public Warp warp;
   public PlayerData players;
   public Chests chests;
+  public EnchantableItems enchantable;
 
   public GlobalData() {
     warp = new Warp();
     players = new PlayerData();
     chests = new Chests();
+    enchantable = new EnchantableItems();
   }
 
   public void load() {
@@ -90,6 +92,7 @@ public class GlobalData implements Resource {
     warp.load(nbt.root());
     players.load(nbt.root());
     chests.load(nbt.root());
+    enchantable.load(nbt.root());
 
     save();
 

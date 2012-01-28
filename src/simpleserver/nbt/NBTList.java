@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class NBTList<T extends NBTag> extends NBTag {
+public class NBTList<T extends NBTag> extends NBTag implements Iterable<T> {
   private ArrayList<T> value;
   private byte tagId;
 
@@ -81,7 +81,7 @@ public class NBTList<T extends NBTag> extends NBTag {
     return NBT.values()[tagId];
   }
 
-  @SuppressWarnings( { "unchecked", "hiding" })
+  @SuppressWarnings({ "unchecked", "hiding" })
   public <T extends NBTag> T cast() {
     return (T) this;
   }

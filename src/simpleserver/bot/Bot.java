@@ -46,6 +46,7 @@ public class Bot {
   private boolean expectDisconnect;
   protected boolean ready;
   protected boolean dead;
+  private int connectCount = 0;
 
   private Socket socket;
   protected DataInputStream in;
@@ -76,8 +77,8 @@ public class Bot {
     out = new DataOutputStream(new BufferedOutputStream(socket.getOutputStream()));
 
     writeLock = new ReentrantLock();
-
     connected = true;
+
     new Tunneler().start();
 
     handshake();
@@ -639,7 +640,7 @@ public class Bot {
   protected void error(String reason) {
     die();
     if (!expectDisconnect) {
-      System.out.print("[SimpleServer] Bot " + name + " died (" + reason + ")");
+      System.out.println("[SimpleServer] Bot " + name + " died (" + reason + ")");
     }
   }
 
@@ -659,6 +660,16 @@ public class Bot {
           }
         } catch (IOException e) {
           if (!gotFirstPacket) {
+            if (connectCount > 10) {
+              error("Failed to connect");
+              return;
+            }
+            try {
+              connectCount += 1;
+              sleep(500);
+            } catch (InterruptedException e1) {
+              e1.printStackTrace();
+            }
             try {
               connect();
             } catch (Exception e2) {
