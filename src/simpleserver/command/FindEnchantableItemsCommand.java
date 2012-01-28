@@ -37,15 +37,36 @@ public class FindEnchantableItemsCommand extends AbstractCommand implements Serv
   }
 
   public synchronized void execute(Server server, String message, CommandFeedback feedback) {
-    this.server = server;
-    this.feedback = feedback;
-    server.data.enchantable.clear();
-    int end = 400;
-    int n = (int) Math.ceil((end - 256) / 35F);
-    float time = n * 5 / 60F;
-    new BotStarter(256, n).start();
-    feedback.send("Scanning process started");
-    feedback.send("This process is currently very slow and will take about %.1f minutes", time);
+    String[] parts = message.trim().split(" ");
+    if (parts.length == 1) {
+      feedback.send("This command scanns items up to a given ID for enchantability");
+      feedback.send("Usage:");
+      feedback.send(" fei <max id>: Start scanning (this might take a while)");
+      feedback.send(" fei reset: Revert to the default list");
+    } else if (parts[1].toLowerCase().equals("reset") || parts[1].toLowerCase().equals("default")) {
+      server.data.enchantable.clear();
+      server.data.enchantable.loadDefaults();
+      server.data.save();
+    } else {
+      short end;
+      try {
+        end = Short.valueOf(parts[1]);
+      } catch (NumberFormatException e) {
+        feedback.send("Error: The provided ID was invalid");
+        return;
+      }
+      this.server = server;
+      this.feedback = feedback;
+      server.data.enchantable.clear();
+      int n = (int) Math.ceil((end - 256) / 35F);
+      float time = n * 5 / 60F;
+      new BotStarter(256, n).start();
+      feedback.send("Scanning process started");
+      if (!Server.addressFactory.canCycle() && !server.config.properties.getBoolean("fastScanning")) {
+        feedback.send("This process will take about %.1f minutes", time);
+        feedback.send("See https://github.com/SimpleServer/SimpleServer/wiki/Item_Scanner for details");
+      }
+    }
   }
 
   private void addBot(int start) {
@@ -75,14 +96,22 @@ public class FindEnchantableItemsCommand extends AbstractCommand implements Serv
     @Override
     public void run() {
       int started = 0;
+      int delay = Server.addressFactory.canCycle() || server.config.properties.getBoolean("fastScanning") ? 100 : 5001;
       while (started < n) {
         if (server.bots.size() + server.playerList.size() < server.config.properties.getInt("maxPlayers")) {
           addBot(start + started * 35);
           started += 1;
-        }
-        try {
-          sleep(5000);
-        } catch (InterruptedException e) {
+          if (delay > 100) {
+            try {
+              sleep(delay);
+            } catch (InterruptedException e) {
+            }
+          }
+        } else {
+          try {
+            sleep(delay);
+          } catch (InterruptedException e) {
+          }
         }
       }
       while (server.bots.size() > 0) {

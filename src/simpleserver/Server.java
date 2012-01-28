@@ -651,7 +651,7 @@ public class Server {
       return "127." + octets[0] + "." + octets[1] + "." + octets[2];
     }
 
-    private boolean canCycle() {
+    public boolean canCycle() {
       if (canCycle == null) {
         InetAddress testDestination;
         InetAddress testSource;

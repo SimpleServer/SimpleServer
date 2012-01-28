@@ -660,13 +660,13 @@ public class Bot {
           }
         } catch (IOException e) {
           if (!gotFirstPacket) {
-            if (connectCount > 10) {
+            if (connectCount > 1) {
               error("Failed to connect");
               return;
             }
             try {
               connectCount += 1;
-              sleep(500);
+              sleep(5001);
             } catch (InterruptedException e1) {
               e1.printStackTrace();
             }

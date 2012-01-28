@@ -957,7 +957,18 @@ public class StreamTunnel {
       case (byte) 0xff: // Disconnect/Kick
         // server list answer 'serverText§playerOnline§maxPlayers'
         write(packetId);
-        String reason = readUTF16();
+        String reason;
+        try {
+          reason = readUTF16();
+        } catch (NegativeArraySizeException e) {
+          write((byte) 0xff);
+          player.kick("Internal Error (see console)");
+          System.out.println("[SimpleServer] An internal error occured");
+          System.out.println("[SimpleServer] This error was most likely caused by an item added by one of your mods");
+          System.out.println("[SimpleServer] See https://github.com/SimpleServer/SimpleServer/wiki/Item_Scanner for details");
+          System.out.println("[SimpleServer] Short version: Run the \"fei\" console command to update the list of enchantable items");
+          return;
+        }
         if (reason.contains("\u00a7")) {
           reason = String.format("%s\u00a7%s\u00a7%s",
                                  server.config.properties.get("serverDescription"),
@@ -1021,7 +1032,11 @@ public class StreamTunnel {
   }
 
   private String readUTF16() throws IOException {
-    short length = in.readShort();
+    byte lower = in.readByte();
+    if (lower < 0) {
+      throw new NegativeArraySizeException();
+    }
+    short length = (short) (lower << 4 | in.readByte());
     byte[] bytes = new byte[length * 2 + 2];
     in.readFully(bytes, 2, length * 2);
     bytes[0] = (byte) 0xfffffffe;
