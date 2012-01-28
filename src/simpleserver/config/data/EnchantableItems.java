@@ -52,7 +52,7 @@ public class EnchantableItems {
     }
     node = new NBTList<NBTShort>(ENCHANTABLE, NBT.SHORT);
     data.put(node);
-    // loadDefaults();
+    loadDefaults();
     update();
   }
 
