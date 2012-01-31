@@ -1,5 +1,5 @@
-Simple Server 8.3.5 RC
-An open source simple server tunnel for minecraft beta multiplayer servers.
+Simple Server 8.4.1
+An open source simple server tunnel for the official minecraft multiplayer servers.
 Copyright (c) 2011 SimpleServer authors (see CONTRIBUTORS)
 See LICENSE for details.
 
@@ -10,26 +10,32 @@ Source: http://github.com/SimpleServer/SimpleServer
 Installation:
 1) Run launch.bat (Windows), launch.command (Mac OS X), or launch.sh (Linux/BSD)
    to start the server for the first time
-2) You can now connect to the server using your IP Address (www.whatismyip.com)
-   and the port indicated in simpleserver.properties
+2) You can now connect to the server using "localhost" and the port indicated in
+   the simpleserver.properties file. Other people, that are not connected to your
+   local network, can connect to your IP Address (www.whatismyip.com)
+   and the port indicated in properties file.
+3) For more info on customising configurations please visit the SimpleServer Wiki.
+   Link is above.
 
-Features (See CHANGES for updates):
- * Denial of service protection.  More than 30 requests/IP/minute will
+Features (See CHANGES for updates and more infomation):
+ * Denial of service protection (DDOS).  More than 30 requests/IP/minute will
    automatically ban the IP.
  * RCON and experimental telnet access.
- * Optional automated saving, backups, restarts, and mapping.
+ * Automated saving, backups, restarts, and mapping system.
  * Locked chests.  Each player can lock as many chests as he wants.
    Other non-admins cannot access or destroy the chest.
  * Automatically makes space for members with higher group IDs.
- * Local chat.  Say /l MESSAGE to send a message to nearby players
+ * Local chat.  Say /l [MESSAGE] to send a message to nearby players.
+   Local chat perimeter changeable.
  * Customizable message formats.
- * Compatible with CrufBukkit, hey0 and other server mods.
- * Customizable groups, command and block permissions (permissions.xml).
- * Possibility of local area permissions (permissions.xml).
+ * Compatible with CraftBukkit, hey0 and other server modifications.
+ * Group, Command and Block permissions system (See permissions.xml).
+ * Optional local area permissions (See permissions.xml).
  * Customizable kits (kit-list.txt).
  * Customizable give aliases (give-alias-list.txt).
+ * Customizable command aliases (See permissions.xml)
  * IP bans (ip-ban-list.txt).
- * Message of the day displayed to members when joining (motd.txt).
+ * Message of the day (MOTD) displayed to members when joining (motd.txt).
  * Muting players from global chat (mute-list.txt).
  * Rules listing (rules.txt).
  * Optional member whitelist (white-list.txt).
@@ -39,14 +45,15 @@ See simpleserver.properties and simpleserver/config.xml for general configuratio
 Console Commands:
 Say help in the console for all the standard minecraft server commands.
 Added commands:
-  enchant           -- Spawns enchanted items
-  global            -- Send a chat message to all players
+  enchant           -- Enchants items
+  global            -- Sends a global chat message to all players
   idbehold          -- Make tools work instantly for yourself
-  me                -- Displays a message like "* Notch is a cool man!"
-  read              -- Display a specified text document
-  rename            -- Rename a player
+  me                -- Displays a "me" message. Default: *<YOUR-USERNAME> [MESSAGE]
+                       Example: *Notch is awesome. (/me is awesome.)
+  read              -- Display a specified text document in the (DOCS File)
+  rename            -- Renames a player
   toggledownfall    -- Toggle rain and snow
-  xp                -- Gives XP to a player
+  xp                -- Give XP to a player
 
 In-game Commands:
 Commands are based on rank.  Say /help in game for a list of currently
@@ -168,7 +175,7 @@ useWhitelist        | Only allow whitelisted players to join server
 xmlInlineAttributes | Turn on inline XML attributes (EXPERT SETTING)
 xmlPCDATA           | Turn on XML PCDATA between tags (EXPERT SETTING)
 
-For more help with configuration, please see:
+For more information with configuration, please see:
 https://github.com/SimpleServer/SimpleServer/wiki/Configuration
   
 Technical Details:
