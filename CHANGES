@@ -1,3 +1,17 @@
+== 8.4.1 ==
+ * Added Enchantment Command
+ * Added XP Command
+ * Added Rain/Snow Control Command
+ * Added option for defining maximum area size
+ * Various Bug Fixes:
+   - Bot Timeout Solution
+   - Unmute Bug fixed
+   - Warp List
+   - Myarea removing Bug fixed
+   - Chest name length Bug fixed
+   - Read command crash fixed
+
+
 == 8.3.4 ==
  * fixed myarea command
  * fixed external command forwarding
