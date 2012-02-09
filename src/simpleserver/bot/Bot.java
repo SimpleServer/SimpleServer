@@ -38,7 +38,7 @@ import simpleserver.Position;
 import simpleserver.Server;
 
 public class Bot {
-  private static final int VERSION = 24;
+  private static final int VERSION = 25;
 
   protected String name;
   protected Server server;
@@ -490,6 +490,15 @@ public class Bot {
         readUTF16();
         readUTF16();
         readUTF16();
+        break;
+      case (byte) 0x84: // added in 12w06a
+        in.readInt();
+        in.readShort();
+        in.readInt();
+        in.readByte();
+        in.readInt();
+        in.readInt();
+        in.readInt();
         break;
       case (byte) 0x83: // Item Data
         in.readShort();
