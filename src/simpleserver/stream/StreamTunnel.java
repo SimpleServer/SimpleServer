@@ -222,6 +222,9 @@ public class StreamTunnel {
             name = player.getConnectionHash();
           }
         } else {
+          if (name.contains(";")) {
+            name = name.substring(0, name.indexOf(";"));
+          }
           if (name.equals("Player") || !server.authenticator.isMinecraftUp) {
             AuthRequest req = server.authenticator.getAuthRequest(player.getIPAddress());
             if (req != null) {
@@ -901,6 +904,16 @@ public class StreamTunnel {
         byte length = in.readByte();
         write(length);
         copyNBytes(0xff & length);
+        break;
+      case (byte) 0x84: // added in 12w06a
+        write(packetId);
+        write(in.readInt());
+        write(in.readShort());
+        write(in.readInt());
+        write(in.readByte());
+        write(in.readInt());
+        write(in.readInt());
+        write(in.readInt());
         break;
       case (byte) 0xc3: // BukkitContrib
         write(packetId);
