@@ -39,7 +39,7 @@ public class Main {
       extendedVersion += "-" + releaseState;
     } else {
       String commitversion = getVersionString("VERSION");
-      if (!commitversion.equals("")) {
+      if (commitversion != null) {
         extendedVersion += "-" + commitversion;
       }
     }
@@ -48,7 +48,7 @@ public class Main {
 
   private static String getVersionString(String file) {
     InputStream input = Main.class.getResourceAsStream(file);
-    String retversion = "";
+    String retversion = null;
 
     if (input != null) {
       BufferedReader reader = new BufferedReader(new InputStreamReader(input));
