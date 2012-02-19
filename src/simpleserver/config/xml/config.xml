@@ -147,6 +147,7 @@
 	<command name="warpmeto" allow="3+">
 		<alias>tpto</alias>
 	</command>
+	<command name="warpto" allow="3+" />
 	<command name="warptome" allow="3+" />
 	<command name="whitelist" allow="3+" />
 	<command name="who" allow="0+">
