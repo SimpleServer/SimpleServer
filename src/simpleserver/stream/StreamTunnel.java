@@ -335,6 +335,8 @@ public class StreamTunnel {
       case 0x06: // Spawn Position
         write(packetId);
         copyNBytes(12);
+        if (server.options.getBoolean("enableEvents"))
+          server.eventhost.execute(server.eventhost.findEvent("onPlayerConnect"), player, true);
         break;
       case 0x07: // Use Entity
         int user = in.readInt();
@@ -364,7 +366,9 @@ public class StreamTunnel {
         write(in.readByte());
         write(in.readByte());
         write(in.readShort());
-        write(readUTF16());
+        write(readUTF16()); // Added in 1.1 (level type)
+        if (server.options.getBoolean("enableEvents") && isServerTunnel)
+          server.eventhost.execute(server.eventhost.findEvent("onPlayerRespawn"), player, true);
         break;
       case 0x0a: // Player
         write(packetId);
@@ -479,6 +483,10 @@ public class StreamTunnel {
         boolean drop = false;
 
         BlockPermission perm = server.config.blockPermission(player, coordinate, dropItem);
+
+        if (server.options.getBoolean("enableEvents"))
+          player.checkButtonEvents(new Coordinate(x+(x<0?1:0),y+1,z+(z<0?1:0)));
+
 
         if (isServerTunnel || server.data.chests.isChest(coordinate)) {
           // continue
@@ -1059,6 +1067,8 @@ public class StreamTunnel {
     double stance = in.readDouble();
     double z = in.readDouble();
     player.position.updatePosition(x, y, z, stance);
+    if (server.options.getBoolean("enableEvents"))
+      player.checkLocationEvents();
     write(x);
     write(y);
     write(stance);

@@ -1,4 +1,4 @@
-<!ELEMENT config ( property | group | player | ip | command | allblocks | block | chests | dimension | permission )*>
+<!ELEMENT config ( property | group | player | ip | command | allblocks | block | chests | dimension | permission | event )*>
 <!ELEMENT property ( #PCDATA | true | false )*>
 <!ELEMENT group ( warmup | cooldown | ignoreChestLocks | showTitle | ignoreAreas | forwardUnknownCommands | color )*>
 <!ELEMENT player ( #PCDATA )>
@@ -9,6 +9,7 @@
 <!ELEMENT chests EMPTY>
 <!ELEMENT dimension ( area | allblocks | block | chests | command | permission )+>
 <!ELEMENT area ( area | allblocks | block | chests | command | permission )*>
+<!ELEMENT event (#PCDATA)>
 <!ELEMENT permission (#PCDATA)>
 
 <!ELEMENT warmup (#PCDATA)>
@@ -63,6 +64,16 @@
   disabled NMTOKEN #IMPLIED
   alias CDATA #IMPLIED
 >
+<!ATTLIST event
+  name CDATA #REQUIRED
+  coordinate CDATA #IMPLIED
+  dimension CDATA #IMPLIED
+  interval CDATA #IMPLIED
+  allow CDATA #IMPLIED
+  disabled CDATA #IMPLIED
+  isbutton CDATA #IMPLIED
+  value CDATA #IMPLIED
+>
 <!ATTLIST argument
   name CDATA #IMPLIED
   allow CDATA #REQUIRED
@@ -95,3 +106,4 @@
   allow CDATA #REQUIRED
   node CDATA #IMPLIED
 >
+

@@ -40,6 +40,7 @@ public class Config extends PermissionContainer {
   public IpStorage ips;
   public GroupStorage groups;
   public DimensionStorage dimensions;
+  public EventStorage events;
 
   public Config() {
     super("config");
@@ -53,6 +54,7 @@ public class Config extends PermissionContainer {
     addStorage("group", groups = new GroupStorage());
     super.addStorages();
     addStorage("dimension", dimensions = new DimensionStorage());
+    addStorage("event", events = new EventStorage());
   }
 
   void save(ContentHandler handler, XMLSerializer serializer) throws SAXException, IOException {

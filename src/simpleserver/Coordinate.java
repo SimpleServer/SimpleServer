@@ -70,6 +70,13 @@ public class Coordinate {
     this(x, (byte) y, z);
   }
 
+  public static Coordinate fromString(String str) {
+    String[] c = str.split(",");
+    if (c.length<3)
+        return null;
+    return new Coordinate(Integer.valueOf(c[0]),Byte.valueOf(c[1]),Integer.valueOf(c[2]));
+  }
+
   public int x() {
     return x;
   }

@@ -36,7 +36,7 @@ import simpleserver.config.xml.Config.AreaStoragePair;
 
 public class MyAreaCommand extends AbstractCommand implements PlayerCommand {
   private static final byte DEFAULT_SIZE = 50;
-  
+
   public MyAreaCommand() {
     super("myarea [start|end|save|unsave|rename]",
           "Manage your personal area");
@@ -47,12 +47,12 @@ public class MyAreaCommand extends AbstractCommand implements PlayerCommand {
           && (Math.abs(player.areastart.z() - player.areaend.z()) < size[1])
           && player.areaend.dimension() == player.areastart.dimension();
   }
-  
+
   private int[] getAreaMax(Player player) {
     // Get the maximum area sizes from config.xml
     int[] size = { Math.abs(player.getServer().config.properties.getInt("areaMaxX")),
                    Math.abs(player.getServer().config.properties.getInt("areaMaxZ")) };
-    
+
     // Check to make sure the configuration is valid
     // If not, reset to default size
     for (byte i = 0; i < size.length; i++) {
@@ -60,14 +60,14 @@ public class MyAreaCommand extends AbstractCommand implements PlayerCommand {
         size[i] = DEFAULT_SIZE;
       }
     }
-    
+
     return size;
   }
 
   public void execute(Player player, String message) {
     // Set up an integer array to hold the maximum area size
     int[] maxSize = getAreaMax(player); // X, Z
-    
+
     Config config = player.getServer().config;
     String arguments[] = extractArguments(message);
 
@@ -75,7 +75,7 @@ public class MyAreaCommand extends AbstractCommand implements PlayerCommand {
       player.addTCaptionedMessage("Usage", commandPrefix() + "myarea [start|end|save|unsave|rename]");
       return;
     }
-    
+
     if (arguments[0].equals("start")) {
       player.areastart = player.position();
       player.areastart = player.areastart.setY((byte) 0); // no height limit
