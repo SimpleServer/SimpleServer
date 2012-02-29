@@ -38,7 +38,7 @@ import simpleserver.Position;
 import simpleserver.Server;
 
 public class Bot {
-  private static final int VERSION = 25;
+  private static final int VERSION = 28;
 
   protected String name;
   protected Server server;
@@ -100,7 +100,7 @@ public class Bot {
   private void handshake() throws IOException {
     writeLock.lock();
     out.writeByte(2);
-    write(name);
+    write(name + ";localbot");
     out.flush();
     writeLock.unlock();
   }
@@ -118,10 +118,9 @@ public class Bot {
     out.writeByte(1);
     out.writeInt(VERSION);
     write(name);
-    out.writeLong(0);
     write("DEFAULT");
     out.writeInt(0);
-    out.writeByte(0);
+    out.writeInt(0);
     out.writeByte(0);
     out.writeByte(0);
     out.writeByte(0);
@@ -131,10 +130,10 @@ public class Bot {
   private void respawn() throws IOException {
     writeLock.lock();
     out.writeByte(9);
-    out.writeByte(position.dimension.index());
+    out.writeInt(position.dimension.index());
+    out.writeByte(0);
     out.writeByte(0);
     out.writeShort(128);
-    out.writeLong(0);
     write("DEFAULT");
     writeLock.unlock();
   }
@@ -178,11 +177,10 @@ public class Bot {
       case 0x1: // Login Request
         in.readInt();
         readUTF16();
-        in.readLong();
         readUTF16();
         in.readInt();
         position.dimension = Dimension.get(in.readByte());
-        in.readByte();
+        in.readInt();
         in.readByte();
         in.readByte();
         break;
@@ -255,11 +253,10 @@ public class Bot {
         }
         break;
       case 0x09: // Respawn
-        position.dimension = Dimension.get(in.readByte());
+        position.dimension = Dimension.get((byte) in.readInt());
         in.readByte();
         in.readByte();
         in.readShort();
-        in.readLong();
         readUTF16();
         break;
       case 0x0a: // Player
@@ -400,13 +397,11 @@ public class Bot {
         break;
       case 0x33: // Map Chunk
         readNBytes(13);
-        int chunkSize = in.readInt();
-        readNBytes(chunkSize);
+        readNBytes(in.readInt() + 4);
         break;
       case 0x34: // Multi Block Change
         readNBytes(8);
-        short arraySize = in.readShort();
-        readNBytes(arraySize * 4);
+        readNBytes(in.readShort());
         break;
       case 0x35: // Block Change
         in.readInt();

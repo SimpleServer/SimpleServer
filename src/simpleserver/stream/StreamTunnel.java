@@ -168,7 +168,7 @@ public class StreamTunnel {
     int x;
     byte y;
     int z;
-    byte dimension;
+    int dimension;
     Coordinate coordinate;
     switch (packetId) {
       case 0x00: // Keep Alive
@@ -185,18 +185,16 @@ public class StreamTunnel {
           }
           player.setEntityId(write(in.readInt()));
           write(readUTF16());
-          server.setMapSeed(write(in.readLong()));
         } else {
           write(in.readInt());
           readUTF16(); // and throw away
           write(player.getName());
-          write(in.readLong());
         }
 
         write(readUTF16());
         write(in.readInt());
 
-        dimension = in.readByte();
+        dimension = in.readInt();
         if (isServerTunnel) {
           player.setDimension(Dimension.get(dimension));
         }
@@ -362,11 +360,10 @@ public class StreamTunnel {
         break;
       case 0x09: // Respawn
         write(packetId);
-        player.setDimension(Dimension.get(write(in.readByte())));
+        player.setDimension(Dimension.get(write(in.readInt())));
         write(in.readByte());
         write(in.readByte());
         write(in.readShort());
-        write(in.readLong());
         write(readUTF16());
         break;
       case 0x0a: // Player
@@ -723,17 +720,19 @@ public class StreamTunnel {
         break;
       case 0x33: // Map Chunk
         write(packetId);
-        copyNBytes(13);
-        int chunkSize = in.readInt();
-        write(chunkSize);
-        copyNBytes(chunkSize);
+        write(in.readInt());
+        write(in.readInt());
+        write(in.readBoolean());
+        write(in.readShort());
+        write(in.readShort());
+        copyNBytes(write(in.readInt()) + 4);
         break;
       case 0x34: // Multi Block Change
         write(packetId);
-        copyNBytes(8);
-        short arraySize = in.readShort();
-        write(arraySize);
-        copyNBytes(arraySize * 4);
+        write(in.readInt());
+        write(in.readInt());
+        write(in.readShort());
+        copyNBytes(write(in.readInt()));
         break;
       case 0x35: // Block Change
         write(packetId);

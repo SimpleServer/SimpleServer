@@ -28,6 +28,7 @@ import simpleserver.nbt.NBTByte;
 import simpleserver.nbt.NBTCompound;
 import simpleserver.nbt.NBTDouble;
 import simpleserver.nbt.NBTFloat;
+import simpleserver.nbt.NBTInt;
 
 public class Position {
   private final static String DIMENSION = "dimension";
@@ -77,7 +78,11 @@ public class Position {
     if (tag.containsKey("Dimension")) {
       tag.rename("Dimension", DIMENSION);
     }
-    dimension = Dimension.get(tag.getByte(DIMENSION).get());
+    if (tag.get(DIMENSION) instanceof NBTByte) {
+      dimension = Dimension.get(tag.getByte(DIMENSION).get());
+    } else {
+      dimension = Dimension.get(tag.getInt(DIMENSION).get());
+    }
     yaw = tag.getFloat(YAW).get();
     pitch = tag.getFloat(PITCH).get();
     onGround = true;
@@ -88,7 +93,7 @@ public class Position {
     tag.put(new NBTDouble(X, x));
     tag.put(new NBTDouble(Y, y));
     tag.put(new NBTDouble(Z, z));
-    tag.put(new NBTByte(DIMENSION, dimension.index()));
+    tag.put(new NBTInt(DIMENSION, dimension.index()));
     tag.put(new NBTFloat(YAW, yaw));
     tag.put(new NBTFloat(PITCH, pitch));
     return tag;

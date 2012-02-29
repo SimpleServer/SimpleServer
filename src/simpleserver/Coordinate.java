@@ -43,7 +43,9 @@ public class Coordinate {
     this(tag.getInt("x").get(),
          tag.getByte("y").get(),
          tag.getInt("z").get(),
-         Dimension.get(tag.getByte("dimension").get()));
+         (tag.get("dimension") instanceof NBTByte) ?
+             Dimension.get(tag.getByte("dimension").get()) :
+             Dimension.get(tag.getInt("dimension").get()));
   }
 
   public Coordinate(int x, byte y, int z, Dimension dimension) {
@@ -139,19 +141,19 @@ public class Coordinate {
     tag.put(new NBTInt("x", x));
     tag.put(new NBTByte("y", y));
     tag.put(new NBTInt("z", z));
-    tag.put(new NBTByte("dimension", dimension.index()));
+    tag.put(new NBTInt("dimension", dimension.index()));
     return tag;
   }
 
   public enum Dimension {
-    EARTH((byte) 0),
-    NETHER((byte) -1),
-    END((byte) 1),
+    EARTH(0),
+    NETHER(-1),
+    END(1),
     LIMBO;
 
-    private byte index;
+    private int index;
 
-    Dimension(byte index) {
+    Dimension(int index) {
       this.index = index;
     }
 
@@ -168,11 +170,11 @@ public class Coordinate {
       return super.toString().equals(name.toUpperCase());
     }
 
-    public byte index() {
+    public int index() {
       return index;
     }
 
-    public static Dimension get(byte index) {
+    public static Dimension get(int index) {
       for (Dimension dim : Dimension.values()) {
         if (dim.index == index) {
           return dim;
