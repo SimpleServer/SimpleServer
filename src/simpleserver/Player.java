@@ -28,7 +28,9 @@ import java.net.Socket;
 import java.util.Queue;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.Iterator;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.xml.sax.SAXException;
 
@@ -44,6 +46,7 @@ import simpleserver.config.xml.CommandConfig;
 import simpleserver.config.xml.CommandConfig.Forwarding;
 import simpleserver.config.xml.Group;
 import simpleserver.config.xml.Permission;
+import simpleserver.config.xml.Event;
 import simpleserver.message.AbstractChat;
 import simpleserver.message.Chat;
 import simpleserver.message.GlobalChat;
@@ -102,12 +105,18 @@ public class Player {
   private long lastTeleport;
   private short experienceLevel;
 
+  public ConcurrentHashMap<String,String> vars; //temporary player-scope Script variables
+  private long lastEvent;
+
   public Player(Socket inc, Server parent) {
     connected = System.currentTimeMillis();
     position = new Position();
     server = parent;
     chatType = new GlobalChat(this);
     extsocket = inc;
+
+    vars = new ConcurrentHashMap<String,String>();
+
     if (server.isRobot(getIPAddress())) {
       System.out.println("[SimpleServer] Robot Heartbeat: " + getIPAddress()
           + ".");
@@ -847,6 +856,40 @@ public class Player {
       } else {
         teleportSelf(position);
       }
+    }
+  }
+
+  public void checkLocationEvents() {
+    long currtime = System.currentTimeMillis();
+    if (currtime < lastEvent+500) //0.5 sec force timeout
+        return;
+
+    Iterator<Event> it = server.eventhost.events.keySet().iterator();
+    while (it.hasNext()) {
+        Event ev = it.next();
+        if (ev.isbutton || ev.coordinate == null)
+            continue;
+        if (position.coordinate().equals(ev.coordinate)) { //matching -> execute
+            server.eventhost.execute(ev, this, false);
+            lastEvent = currtime;
+        }
+    }
+  }
+
+  public void checkButtonEvents(Coordinate c) {
+    long currtime = System.currentTimeMillis();
+    if (currtime < lastEvent+500) //0.5 sec force timeout
+      return;
+
+    Iterator<Event> it = server.eventhost.events.keySet().iterator();
+    while (it.hasNext()) {
+        Event ev = it.next();
+        if (!ev.isbutton || ev.coordinate == null)
+            continue;
+        if ((new Coordinate(c.x(),c.y(),c.z(),position.dimension())).equals(ev.coordinate)) { //matching -> execute
+            server.eventhost.execute(ev, this, false);
+            lastEvent = currtime;
+        }
     }
   }
 

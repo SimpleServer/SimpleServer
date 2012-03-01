@@ -58,6 +58,7 @@
 		<ignoreAreas />
 	</group>
 	
+	<command name="addevent" allow="5" />
 	<command name="area" allow="0+" />
 	<command name="areasay" allow="0+">
 		<alias>a</alias>

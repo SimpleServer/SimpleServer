@@ -118,6 +118,8 @@ public class Server {
   private AutoRestart autoRestart;
   public RequestTracker requestTracker;
 
+  public EventHost eventhost;
+
   public long mapSeed;
 
   private boolean run = true;
@@ -254,6 +256,11 @@ public class Server {
     addressFactory.toggle(!config.properties.getBoolean("disableAddressFactory"));
 
     saveResources();
+
+    //reload events from config
+    if (eventhost != null) {
+        eventhost.loadEvents();
+    }
 
     return globalConfig.loadsuccess;
   }
@@ -472,6 +479,10 @@ public class Server {
     c10t = new AutoRun(this, options.get("c10tArgs"));
     if (data.freezeTime() >= 0) {
       time.freeze(data.freezeTime());
+    }
+
+    if (options.getBoolean("enableEvents")) {
+      eventhost = new EventHost(this);
     }
 
     bots.ready();
