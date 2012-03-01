@@ -1,3 +1,7 @@
+== 8.4.2 ==
+ * Updated to Minecraft 1.2
+ * Added experimental event scripting system
+
 == 8.4.1 ==
  * Added Enchantment Command
  * Added XP Command
