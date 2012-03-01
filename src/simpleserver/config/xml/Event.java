@@ -87,8 +87,6 @@ public class Event extends XMLTag implements Comparable<Event>{
   @Override
   void saveAttributes(AttributeList attributes) {
     attributes.addAttribute(NAME, name);
-    if (coordinate!=null)
-      attributes.addAttribute(COORDINATE,coordinate.toString());
     if (interval != 0)
       attributes.addAttribute(INTERVAL, interval);
     if (script!=null && !script.equals(""))
@@ -99,10 +97,12 @@ public class Event extends XMLTag implements Comparable<Event>{
       attributes.addAttribute(DISABLED,"true");
     if (isbutton)
       attributes.addAttribute(ISBUTTON,"true");
+    if (coordinate!=null)
+      attributes.addAttribute(COORDINATE,coordinate.toString());
+    if (coordinate!=null && coordinate.dimension() != Coordinate.Dimension.get("Earth"))
+      attributes.addAttribute(DIMENSION, coordinate.dimension().toString());
     if (!value.equals(""))
       attributes.addAttribute(VALUE, value);
-    if (coordinate.dimension() != Coordinate.Dimension.get("Earth"))
-      attributes.addAttribute(DIMENSION, coordinate.dimension().toString());
   }
 
   public int compareTo(Event ev) {

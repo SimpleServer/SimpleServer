@@ -180,6 +180,8 @@ public class EventHost {
           running = true;
 
           String script = event.script;
+          if (script == null)
+              return; //no script data present
 
           //Top level event without initialized stack -> initialize empty data stack
           if (threadstack == null)
@@ -215,6 +217,8 @@ public class EventHost {
                 try {Thread.sleep(Integer.valueOf(tokens.get(0)));} catch(Exception e){}
               else if (cmd.equals("say"))
                 say(tokens);
+              else if (cmd.equals("broadcast") && tokens.size() > 0)
+                server.runCommand("say", tokens.get(0));
               else if (cmd.equals("give"))
                 give(tokens);
               else if (cmd.equals("teleport"))
@@ -311,6 +315,8 @@ public class EventHost {
                 return String.valueOf(System.currentTimeMillis());
               else if (loc.equals("POP"))
                 return threadstack.size()==0 ? "null" : threadstack.remove(0);
+              else if (loc.equals("TOP"))
+                return threadstack.size()==0 ? "null" : threadstack.get(0);
               else if (server.eventhost.colors.containsKey(loc))
                 return "\u00a7"+server.eventhost.colors.get(loc);
               else //normal local variable
@@ -681,6 +687,16 @@ public class EventHost {
                 String s = expstack.remove(0);
                 expstack.add(0, String.valueOf(toBool(s)));
               }
+              else if (elem.equals("isempty")) {
+                String s = expstack.remove(0);
+                expstack.add(0, String.valueOf(s.equals("")));
+
+              }
+              else if (elem.equals("length")) {
+                String s = expstack.remove(0);
+                expstack.add(0, String.valueOf(s.length()));
+              }
+
               else /* not op -> push */
                 expstack.add(0, elem);
              }
