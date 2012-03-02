@@ -20,13 +20,11 @@
  */
 package simpleserver.config.xml;
 
-import java.util.ArrayList;
-import java.util.List;
-import simpleserver.Coordinate;
-
 import org.xml.sax.SAXException;
 
-public class Event extends XMLTag implements Comparable<Event>{
+import simpleserver.Coordinate;
+
+public class Event extends XMLTag implements Comparable<Event> {
   public String name;
   public Coordinate coordinate;
   public int interval = 0;
@@ -37,7 +35,7 @@ public class Event extends XMLTag implements Comparable<Event>{
 
   public String value = "";
 
-  //private ArgumentStorage arguments;
+  // private ArgumentStorage arguments;
 
   private static final String NAME = "name";
   private static final String COORDINATE = "coordinate";
@@ -55,7 +53,7 @@ public class Event extends XMLTag implements Comparable<Event>{
   public Event(String name, Coordinate coord) {
     this();
     this.name = name;
-    this.coordinate = coord;
+    coordinate = coord;
   }
 
   @Override
@@ -63,7 +61,7 @@ public class Event extends XMLTag implements Comparable<Event>{
     if (name.equals(NAME)) {
       this.name = value;
     } else if (name.equals(COORDINATE)) {
-      this.coordinate = Coordinate.fromString(value);
+      coordinate = Coordinate.fromString(value);
     } else if (name.equals(INTERVAL)) {
       interval = Integer.valueOf(value);
     } else if (name.equals(ALLOW)) {
@@ -75,34 +73,42 @@ public class Event extends XMLTag implements Comparable<Event>{
     } else if (name.equals(VALUE)) {
       this.value = value;
     } else if (name.equals(DIMENSION)) {
-      this.coordinate = coordinate.setDimension(Coordinate.Dimension.get(value));
+      coordinate = coordinate.setDimension(Coordinate.Dimension.get(value));
     }
   }
 
   @Override
   void content(String cont) {
-      script = (script == null) ? cont : script + cont;
+    script = (script == null) ? cont : script + cont;
   }
 
   @Override
   void saveAttributes(AttributeList attributes) {
     attributes.addAttribute(NAME, name);
-    if (interval != 0)
+    if (interval != 0) {
       attributes.addAttribute(INTERVAL, interval);
-    if (script!=null && !script.equals(""))
-      attributes.setValue("script",script);
-    if (allow!=null)
+    }
+    if (script != null && !script.equals("")) {
+      attributes.setValue("script", script);
+    }
+    if (allow != null) {
       attributes.addAttribute(ALLOW, allow);
-    if (disabled)
-      attributes.addAttribute(DISABLED,"true");
-    if (isbutton)
-      attributes.addAttribute(ISBUTTON,"true");
-    if (coordinate!=null)
-      attributes.addAttribute(COORDINATE,coordinate.toString());
-    if (coordinate!=null && coordinate.dimension() != Coordinate.Dimension.get("Earth"))
+    }
+    if (disabled) {
+      attributes.addAttribute(DISABLED, "true");
+    }
+    if (isbutton) {
+      attributes.addAttribute(ISBUTTON, "true");
+    }
+    if (coordinate != null) {
+      attributes.addAttribute(COORDINATE, coordinate.toString());
+    }
+    if (coordinate != null && coordinate.dimension() != Coordinate.Dimension.get("Earth")) {
       attributes.addAttribute(DIMENSION, coordinate.dimension().toString());
-    if (!value.equals(""))
+    }
+    if (!value.equals("")) {
       attributes.addAttribute(VALUE, value);
+    }
   }
 
   public int compareTo(Event ev) {

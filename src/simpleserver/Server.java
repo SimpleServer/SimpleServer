@@ -47,6 +47,7 @@ import simpleserver.config.WhiteList;
 import simpleserver.config.data.GlobalData;
 import simpleserver.config.xml.Config;
 import simpleserver.config.xml.GlobalConfig;
+import simpleserver.events.EventHost;
 import simpleserver.export.CustAuthExport;
 import simpleserver.lang.Translations;
 import simpleserver.log.AdminLog;
@@ -257,9 +258,9 @@ public class Server {
 
     saveResources();
 
-    //reload events from config
+    // reload events from config
     if (eventhost != null) {
-        eventhost.loadEvents();
+      eventhost.loadEvents();
     }
 
     return globalConfig.loadsuccess;

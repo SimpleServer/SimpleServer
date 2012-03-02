@@ -20,11 +20,9 @@
  */
 package simpleserver.command;
 
-import static simpleserver.lang.Translations.t;
 import simpleserver.Color;
-import simpleserver.Player;
 import simpleserver.Coordinate;
-
+import simpleserver.Player;
 import simpleserver.config.xml.Event;
 
 public class AddEventCommand extends AbstractCommand implements PlayerCommand {
@@ -45,7 +43,7 @@ public class AddEventCommand extends AbstractCommand implements PlayerCommand {
     }
 
     Event e = new Event(args[0],
-              new Coordinate((int)player.x(), (int)player.y(), (int)player.z(), player.getDimension()));
+                        new Coordinate((int) player.x(), (int) player.y(), (int) player.z(), player.getDimension()));
     player.getServer().config.events.add(e);
     player.getServer().saveConfig();
 
