@@ -162,6 +162,8 @@ class RunningEvent extends Thread implements Runnable {
         loop(tokens, actions);
       } else if (cmd.equals("endwhile")) {
         currline = whilestack.remove(0);
+      } else if (cmd.equals("execcmd")) {
+        execcmd(tokens);
       } else {
         notifyError("Command not found!");
       }
@@ -370,6 +372,21 @@ class RunningEvent extends Thread implements Runnable {
     } else {
       notifyError("Destination not found!");
     }
+  }
+
+  private void execcmd(ArrayList<String> tokens) {
+    if (tokens.size() == 0) {
+      notifyError("Wrong number of arguments!");
+      return; // no command to execute
+    }
+
+    String message = server.options.getBoolean("useSlashes") ? "/" : "!";
+    for (String token : tokens) {
+      message += token + " ";
+    }
+
+    // execute the server command, overriding the player permissions
+    player.parseCommand(message, true);
   }
 
   /*---- variable & runtime ----*/
@@ -654,6 +671,15 @@ class RunningEvent extends Thread implements Runnable {
         else if (elem.equals("length")) {
           String s = expstack.remove(0);
           expstack.add(0, String.valueOf(s.length()));
+        }
+        else if (elem.equals("getgroup")) {
+          String s = expstack.remove(0);
+          Player tmp = server.findPlayer(s);
+          if (tmp == null) {
+            expstack.add(0, String.valueOf(-1));
+          } else {
+            expstack.add(0, String.valueOf(tmp.getGroupId()));
+          }
         } else {
           expstack.add(0, elem);
         }
