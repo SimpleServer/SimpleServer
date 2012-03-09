@@ -26,6 +26,9 @@ import java.util.HashMap;
 import simpleserver.Coordinate;
 import simpleserver.Player;
 import simpleserver.Server;
+import simpleserver.command.CommandFeedback;
+import simpleserver.command.InvalidCommand;
+import simpleserver.command.ServerCommand;
 import simpleserver.config.xml.Event;
 
 class RunningEvent extends Thread implements Runnable {
@@ -68,6 +71,9 @@ class RunningEvent extends Thread implements Runnable {
     player = p;
     threadname = n;
 
+    // Top level event without initialized stack -> initialize empty data stack
+    threadstack = new ArrayList<String>();
+
     vars = new HashMap<String, String>();
     ifstack = new ArrayList<Integer>();
     whilestack = new ArrayList<Integer>();
@@ -84,22 +90,15 @@ class RunningEvent extends Thread implements Runnable {
 
   @Override
   public void run() {
-    if (running) {
+    if (running) { // prevent running the same object twice
       return;
     }
-
     running = true;
 
     String script = event.script;
     if (script == null)
     {
       return; // no script data present
-    }
-
-    // Top level event without initialized stack -> initialize empty data
-    // stack
-    if (threadstack == null) {
-      threadstack = new ArrayList<String>();
     }
 
     // Split actions by semicola and newlines
@@ -162,6 +161,8 @@ class RunningEvent extends Thread implements Runnable {
         loop(tokens, actions);
       } else if (cmd.equals("endwhile")) {
         currline = whilestack.remove(0);
+      } else if (cmd.equals("execsvrcmd")) {
+        execsvrcmd(tokens);
       } else if (cmd.equals("execcmd")) {
         execcmd(tokens);
       } else {
@@ -387,6 +388,24 @@ class RunningEvent extends Thread implements Runnable {
 
     // execute the server command, overriding the player permissions
     player.parseCommand(message, true);
+  }
+
+  private void execsvrcmd(ArrayList<String> tokens) {
+    if (tokens.size() == 0) {
+      notifyError("Wrong number of arguments!");
+      return; // no command to execute
+    }
+
+    String cmd = tokens.get(0);
+    String cmdline = "";
+    for (String t : tokens) {
+      cmdline += t + " ";
+    }
+    ServerCommand command = server.getCommandParser().getServerCommand(cmd);
+
+    if ((command != null) && !(command instanceof InvalidCommand)) {
+      command.execute(server, cmdline, feedback);
+    }
   }
 
   /*---- variable & runtime ----*/
@@ -726,4 +745,9 @@ class RunningEvent extends Thread implements Runnable {
     System.out.println(err + "\n");
   }
 
+  private CommandFeedback feedback = new CommandFeedback() {
+    public void send(String message, Object... args) {
+      System.out.println("[SimpleServer] " + String.format(message, args));
+    }
+  };
 }
