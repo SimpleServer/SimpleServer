@@ -953,6 +953,7 @@ public class StreamTunnel {
         write(in.readInt()); // packet id
         copyNBytes(write(in.readInt()) * 4); // ints
         copyNBytes(write(in.readInt()) * 4); // floats
+        copyNBytes(write(in.readInt()) * 8); // doubles
         int sizeString = write(in.readInt()); // strings
         for (int i = 0; i < sizeString; i++) {
           copyNBytes(write(in.readInt()));
