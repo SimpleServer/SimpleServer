@@ -38,11 +38,11 @@ class RunningEvent extends Thread implements Runnable {
    */
   public boolean stopping = false; // indicates that the thread should stop
 
-  private EventHost eventHost;
-  private Server server;
-  private Event event; // currently run event
-  private Player player; // referred player context
-                         // (default -> triggering player)
+  protected EventHost eventHost;
+  protected Server server;
+  protected Event event; // currently run event
+  protected Player player; // referred player context
+  // (default -> triggering player)
   private String threadname = null; // null = just subroutine
 
   private static final int MAXDEPTH = 5;
@@ -227,7 +227,7 @@ class RunningEvent extends Thread implements Runnable {
     }
   }
 
-  private String evaluateVar(String varname) {
+  protected String evaluateVar(String varname) {
     if (varname == null || varname.equals("")) {
       return "";
     }
@@ -420,7 +420,8 @@ class RunningEvent extends Thread implements Runnable {
     char scope = var.charAt(0);
     var = var.substring(1);
 
-    String exp = evaluatePostfixExp(tokens);
+    String exp = new PostfixEvaluator(this).evaluate(tokens);
+
     if (exp == null) {
       return;
     }
@@ -442,7 +443,8 @@ class RunningEvent extends Thread implements Runnable {
   }
 
   private void push(ArrayList<String> tokens) {
-    String exp = evaluatePostfixExp(tokens);
+    String exp = new PostfixEvaluator(this).evaluate(tokens);
+
     if (exp == null) {
       threadstack.add(0, "null");
       return;
@@ -477,16 +479,11 @@ class RunningEvent extends Thread implements Runnable {
   }
 
   private void condition(ArrayList<String> tokens, ArrayList<String> actions) {
-    String exp = evaluatePostfixExp(tokens);
+    boolean result = new PostfixEvaluator(this).evaluateCondition(tokens);
 
-    if (exp == null) {
-      return;
-    }
-
-    boolean result = toBool(exp);
     int ifcounter = 0;
 
-    boolean haselse = false;
+    boolean hasElse = false;
     if (result) {
       for (int i = currline + 1; i < actions.size(); i++) {
         ArrayList<String> line = parseLine(actions.get(i));
@@ -500,12 +497,12 @@ class RunningEvent extends Thread implements Runnable {
         }
 
         if (cmd.equals("else") && ifcounter == 0) {
-          haselse = true;
+          hasElse = true;
         }
 
         if (cmd.equals("endif")) {
           if (ifcounter == 0) {
-            if (haselse) {
+            if (hasElse) {
               ifstack.add(0, i);
             }
             break;
@@ -543,13 +540,7 @@ class RunningEvent extends Thread implements Runnable {
   }
 
   private void loop(ArrayList<String> tokens, ArrayList<String> actions) {
-    String exp = evaluatePostfixExp(tokens);
-
-    if (exp == null) {
-      return;
-    }
-
-    boolean result = toBool(exp);
+    boolean result = new PostfixEvaluator(this).evaluateCondition(tokens);
 
     if (!result) { // jump over while loop
       int whilecounter = 0;
@@ -578,169 +569,9 @@ class RunningEvent extends Thread implements Runnable {
     }
   }
 
-  /*---- Expressions ----*/
-
-  private String evaluatePostfixExp(ArrayList<String> tokens) {
-    ArrayList<String> expstack = new ArrayList<String>();
-
-    try {
-      while (tokens.size() > 0) {
-        /* DEBUG
-        for (String a : expstack)
-            System.out.print(a+" ");
-        System.out.println("");
-        */
-
-        String elem = tokens.remove(0);
-        if (elem.equals("not")) {
-          boolean b = toBool(expstack.remove(0));
-          expstack.add(0, String.valueOf(!b));
-        }
-        else if (elem.equals("and")) {
-          boolean b2 = toBool(expstack.remove(0));
-          boolean b1 = toBool(expstack.remove(0));
-          expstack.add(0, String.valueOf(b1 && b2));
-        }
-        else if (elem.equals("or")) {
-          boolean b2 = toBool(expstack.remove(0));
-          boolean b1 = toBool(expstack.remove(0));
-          expstack.add(0, String.valueOf(b1 || b2));
-        }
-        /* ops on numbers */
-        else if (elem.equals("+")) {
-          long d2 = toNum(expstack.remove(0));
-          long d1 = toNum(expstack.remove(0));
-          expstack.add(0, String.valueOf(d1 + d2));
-        }
-        else if (elem.equals("-")) {
-          long d2 = toNum(expstack.remove(0));
-          long d1 = toNum(expstack.remove(0));
-          expstack.add(0, String.valueOf(d1 - d2));
-        }
-        else if (elem.equals("*")) {
-          long d2 = toNum(expstack.remove(0));
-          long d1 = toNum(expstack.remove(0));
-          expstack.add(0, String.valueOf(d1 * d2));
-        }
-        else if (elem.equals("/")) {
-          long d2 = toNum(expstack.remove(0));
-          long d1 = toNum(expstack.remove(0));
-          expstack.add(0, String.valueOf(d1 / d2));
-        }
-        else if (elem.equals("%")) {
-          long d2 = toNum(expstack.remove(0));
-          long d1 = toNum(expstack.remove(0));
-          expstack.add(0, String.valueOf(d1 % d2));
-        }
-        else if (elem.equals("rand")) {
-          long d = toNum(expstack.remove(0));
-          expstack.add(String.valueOf(eventHost.rng.nextInt((int) d)));
-        }
-        else if (elem.equals("eq")) { // works on everything
-          String v2 = expstack.remove(0);
-          String v1 = expstack.remove(0);
-          expstack.add(0, String.valueOf(v1.equals(v2)));
-        }
-        else if (elem.equals("gt")) {
-          long d2 = toNum(expstack.remove(0));
-          long d1 = toNum(expstack.remove(0));
-          expstack.add(0, String.valueOf(d1 > d2));
-        }
-        else if (elem.equals("lt")) {
-          long d2 = toNum(expstack.remove(0));
-          long d1 = toNum(expstack.remove(0));
-          expstack.add(0, String.valueOf(d1 < d2));
-        }
-        /* ops on strings */
-        else if (elem.equals(".")) {
-          String s2 = expstack.remove(0);
-          String s1 = expstack.remove(0);
-          expstack.add(0, s1 + s2);
-        }
-        else if (elem.equals("..")) {
-          String s2 = expstack.remove(0);
-          String s1 = expstack.remove(0);
-          expstack.add(0, s1 + " " + s2);
-        }
-        /* other */
-        else if (elem.equals("evalvar")) {
-          String s = expstack.remove(0);
-          String v = evaluateVar(s);
-          if (v != null) {
-            expstack.add(0, v);
-          } else {
-            notifyError("Warning: Invalid variable: " + s + "!");
-            expstack.add(0, "null");
-          }
-        }
-        else if (elem.equals("int")) {
-          String s = expstack.remove(0);
-          expstack.add(0, String.valueOf(toNum(s)));
-
-        }
-        else if (elem.equals("bool")) {
-          String s = expstack.remove(0);
-          expstack.add(0, String.valueOf(toBool(s)));
-        }
-        else if (elem.equals("isempty")) {
-          String s = expstack.remove(0);
-          expstack.add(0, String.valueOf(s.equals("")));
-
-        }
-        else if (elem.equals("length")) {
-          String s = expstack.remove(0);
-          expstack.add(0, String.valueOf(s.length()));
-        }
-        else if (elem.equals("getgroup")) {
-          String s = expstack.remove(0);
-          Player tmp = server.findPlayer(s);
-          if (tmp == null) {
-            expstack.add(0, String.valueOf(-1));
-          } else {
-            expstack.add(0, String.valueOf(tmp.getGroupId()));
-          }
-        } else {
-          expstack.add(0, elem);
-        }
-      }
-    } catch (Exception e) {
-      notifyError("Invalid expression!");
-      return null;
-    }
-
-    if (expstack.size() != 1) {
-      notifyError("Invalid expression!");
-      return null;
-    }
-
-    return expstack.get(0); // one element left -> correct evaluated result
-  }
-
-  private boolean toBool(String bool) {
-    if (bool.equals("false") || bool.equals("null") || bool.equals("") || bool.equals("0")) {
-      return false;
-    }
-    return true;
-  }
-
-  private long toNum(String num) {
-    long ret = 0;
-    try {
-      ret = Long.valueOf(num);
-    } catch (Exception e) {
-      if (num.equals("true")) {
-        return 1;
-      } else {
-        return 0;
-      }
-    }
-
-    return ret;
-  }
-
   /*--------*/
 
-  private void notifyError(String err) {
+  protected void notifyError(String err) {
     System.out.println("Error at L" + String.valueOf(currline) + "@" + event.name + ": " + lastline);
     System.out.println(err + "\n");
   }
