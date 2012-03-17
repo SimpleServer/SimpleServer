@@ -66,6 +66,9 @@ public class PostfixEvaluator {
     ops.put("int", "str2num");
     ops.put("bool", "str2bool");
     ops.put("evalvar", "evalvar");
+    ops.put("dup", "dup");
+    ops.put("drop", "drop");
+
     ops.put("getgroup", "getgroup");
   }
 
@@ -107,10 +110,13 @@ public class PostfixEvaluator {
         String elem = tokens.remove(0);
         if (ops.containsKey(elem)) { // look through methods
           this.getClass().getDeclaredMethod(ops.get(elem), new Class[] {}).invoke(this);
-        } else { // no method found -> regular value
+        } else { // no method in hash -> regular value
           push(elem);
         }
       }
+    } catch (NoSuchMethodException ex) {
+      e.notifyError("Error in interpreter - no matching method found!");
+      System.out.println("Method not found! Please file a bug report!");
     } catch (Exception ex) {
       e.notifyError("Invalid expression!");
       return null;
@@ -270,6 +276,16 @@ public class PostfixEvaluator {
       e.notifyError("Warning: Invalid variable: " + s + "! Returning null");
       push("null");
     }
+  }
+
+  private void dup() {
+    String s = pop();
+    push(s);
+    push(s);
+  }
+
+  private void drop() {
+    pop();
   }
 
   private void getgroup() {
