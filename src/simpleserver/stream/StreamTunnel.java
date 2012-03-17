@@ -336,7 +336,7 @@ public class StreamTunnel {
         write(packetId);
         copyNBytes(12);
         if (server.options.getBoolean("enableEvents")) {
-          server.eventhost.execute(server.eventhost.findEvent("onPlayerConnect"), player, true);
+          server.eventhost.execute(server.eventhost.findEvent("onPlayerConnect"), player, true, null);
         }
         break;
       case 0x07: // Use Entity
@@ -369,7 +369,7 @@ public class StreamTunnel {
         write(in.readShort());
         write(readUTF16()); // Added in 1.1 (level type)
         if (server.options.getBoolean("enableEvents") && isServerTunnel) {
-          server.eventhost.execute(server.eventhost.findEvent("onPlayerRespawn"), player, true);
+          server.eventhost.execute(server.eventhost.findEvent("onPlayerRespawn"), player, true, null);
         }
         break;
       case 0x0a: // Player

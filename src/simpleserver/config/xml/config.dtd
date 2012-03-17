@@ -63,6 +63,7 @@
   forwardonly NMTOKEN #IMPLIED
   disabled NMTOKEN #IMPLIED
   alias CDATA #IMPLIED
+  event CDATA #IMPLIED
 >
 <!ATTLIST event
   name CDATA #REQUIRED

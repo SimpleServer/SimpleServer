@@ -25,6 +25,7 @@ import static simpleserver.lang.Translations.t;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Queue;
 import java.util.Timer;
@@ -545,6 +546,17 @@ public class Player {
       }
     }
 
+    if (server.options.getBoolean("enableEvents") && config.event != null) {
+      Event e = server.eventhost.findEvent(config.event);
+      if (e != null) {
+        ArrayList<String> stack = null;
+        if (!args.equals("")) {
+          stack = new ArrayList<String>(java.util.Arrays.asList(args.split("\\s+")));
+        }
+        server.eventhost.execute(e, this, true, stack);
+      }
+    }
+
     if (!(command instanceof ExternalCommand) && (config == null || config.forwarding != Forwarding.ONLY)) {
       command.execute(this, message);
     }
@@ -873,7 +885,7 @@ public class Player {
         continue;
       }
       if (position.coordinate().equals(ev.coordinate)) { // matching -> execute
-        server.eventhost.execute(ev, this, false);
+        server.eventhost.execute(ev, this, false, null);
         lastEvent = currtime;
       }
     }
@@ -894,7 +906,7 @@ public class Player {
       if ((new Coordinate(c.x(), c.y(), c.z(), position.dimension())).equals(ev.coordinate)) { // matching
                                                                                                // ->
                                                                                                // execute
-        server.eventhost.execute(ev, this, false);
+        server.eventhost.execute(ev, this, false, null);
         lastEvent = currtime;
       }
     }

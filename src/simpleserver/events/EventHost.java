@@ -20,6 +20,7 @@
  */
 package simpleserver.events;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Random;
@@ -85,12 +86,12 @@ public class EventHost {
 
     Event autorun = findEvent("onServerStart");
     if (autorun != null) {
-      execute(autorun, null, true);
+      execute(autorun, null, true, null);
     }
   }
 
   /* Execute given event triggered by given player */
-  public void execute(Event e, Player p, boolean forced) {
+  public void execute(Event e, Player p, boolean forced, ArrayList<String> args) {
     // DEBUG
     // System.out.println(p.getName()
     // +"->"+e.name+"@"+System.currentTimeMillis());
@@ -121,7 +122,7 @@ public class EventHost {
 
     // Start top level event in new thread
     String threadname = e.name + String.valueOf(System.currentTimeMillis());
-    RunningEvent rev = new RunningEvent(this, threadname, e, p);
+    RunningEvent rev = new RunningEvent(this, threadname, e, p, 0, args);
     rev.start();
     running.put(threadname, rev);
   }

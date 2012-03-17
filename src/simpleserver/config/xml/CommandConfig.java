@@ -33,6 +33,7 @@ public class CommandConfig extends StorageContainer implements Comparable<Comman
   public Permission allow;
   public boolean hidden;
   public boolean disabled = false;
+  public String event;
 
   private ArgumentStorage arguments;
 
@@ -44,6 +45,7 @@ public class CommandConfig extends StorageContainer implements Comparable<Comman
   private static final String FORWARD_ONLY = "forwardonly";
   private static final String HIDDEN = "hidden";
   private static final String DISABLED = "disabled";
+  private static final String EVENT = "event";
 
   CommandConfig() {
     super("command");
@@ -101,6 +103,8 @@ public class CommandConfig extends StorageContainer implements Comparable<Comman
       this.name = value;
     } else if (name.equals(DISABLED) && (value == null || !value.equals("false"))) {
       disabled = true;
+    } else if (name.equals(EVENT)) {
+      event = value;
     }
   }
 
@@ -126,6 +130,9 @@ public class CommandConfig extends StorageContainer implements Comparable<Comman
       for (String alias : aliases) {
         attributes.addAttributeElement(ALIAS, alias);
       }
+    }
+    if (event != null) {
+      attributes.addAttribute(EVENT, event);
     }
   }
 

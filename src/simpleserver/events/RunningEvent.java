@@ -80,8 +80,8 @@ class RunningEvent extends Thread implements Runnable {
   }
 
   /* init as subroutine */
-  public RunningEvent(EventHost h, Event e, Player p, int depth, ArrayList<String> stack) {
-    this(h, null, e, p);
+  public RunningEvent(EventHost h, String n, Event e, Player p, int depth, ArrayList<String> stack) {
+    this(h, n, e, p);
     stackdepth = depth;
     if (stack != null) {
       threadstack = stack;
@@ -152,7 +152,9 @@ class RunningEvent extends Thread implements Runnable {
       } else if (cmd.equals("push")) {
         push(tokens);
       } else if (cmd.equals("run")) {
-        cmdrun(tokens);
+        cmdrun(tokens, false);
+      } else if (cmd.equals("launch")) {
+        cmdrun(tokens, true);
       } else if (cmd.equals("if")) {
         condition(tokens, actions);
       } else if (cmd.equals("else")) {
@@ -453,7 +455,7 @@ class RunningEvent extends Thread implements Runnable {
     threadstack.add(0, exp);
   }
 
-  private void cmdrun(ArrayList<String> tokens) {
+  private void cmdrun(ArrayList<String> tokens, boolean newThread) {
     if (tokens.size() < 1) {
       notifyError("Wrong number of arguments!");
       return;
@@ -471,10 +473,16 @@ class RunningEvent extends Thread implements Runnable {
       p = server.findPlayer(tokens.get(1));
     }
 
-    if (stackdepth < MAXDEPTH) {
-      (new RunningEvent(eventHost, e, p, stackdepth + 1, threadstack)).run();
-    } else {
-      notifyError("Can not run event - stack level too deep!");
+    if (!newThread) {
+      if (stackdepth < MAXDEPTH) {
+        (new RunningEvent(eventHost, null, e, p, stackdepth + 1, threadstack)).run();
+      } else {
+        notifyError("Can not run event - stack level too deep!");
+      }
+    } else { // run in a new thread (passing threadstack copy!)
+      @SuppressWarnings("unchecked")
+      ArrayList<String> clone = (ArrayList<String>) threadstack.clone();
+      eventHost.execute(e, p, true, clone);
     }
   }
 
