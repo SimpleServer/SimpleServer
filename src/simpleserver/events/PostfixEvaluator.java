@@ -47,8 +47,8 @@ public class PostfixEvaluator {
     ops.put("and", "and");
     ops.put("or", "or");
 
-    ops.put("+", "plus");
-    ops.put("-", "minus");
+    ops.put("+", "add");
+    ops.put("-", "sub");
     ops.put("*", "mul");
     ops.put("/", "div");
     ops.put("%", "mod");
@@ -70,7 +70,25 @@ public class PostfixEvaluator {
     ops.put("drop", "drop");
 
     ops.put("getgroup", "getgroup");
+
+    /* array ops */
+
+    ops.put("Anew", "arraynew");
+    ops.put("Acreate", "arraycreate");
+
+    ops.put("Apush", "arraypush");
+    ops.put("Apop", "arraypop");
+    ops.put("Ainsert", "arrayinsert");
+    ops.put("Aremove", "arrayremove");
+    ops.put("Asize", "arraysize");
+    ops.put("Aisempty", "arrayisempty");
+
+    ops.put("Aget", "arrayget");
+    ops.put("Ajoin", "arrayjoin");
+
   }
+
+  /*---- push + pop helpers ----*/
 
   private String pop() throws IndexOutOfBoundsException {
     return expstack.remove(0);
@@ -85,6 +103,14 @@ public class PostfixEvaluator {
     return toBool(expstack.remove(0));
   }
 
+  private ArrayList<String> popArray() throws IndexOutOfBoundsException {
+    return toArray(expstack.remove(0));
+  }
+
+  private void push(String val) {
+    expstack.add(0, val);
+  }
+
   private void push(long val) {
     expstack.add(0, String.valueOf(val));
   }
@@ -93,9 +119,11 @@ public class PostfixEvaluator {
     expstack.add(0, String.valueOf(val));
   }
 
-  private void push(String val) {
-    expstack.add(0, val);
+  private void push(ArrayList<String> val) {
+    expstack.add(0, fromArray(val));
   }
+
+  /*---- interface ----*/
 
   public String evaluate(ArrayList<String> tokens) {
 
@@ -158,6 +186,36 @@ public class PostfixEvaluator {
     return ret;
   }
 
+  private ArrayList<String> toArray(String val) {
+    if (val == null || val.length() < 2 || val.charAt(0) != '[' || val.charAt(val.length() - 1) != ']') {
+      return new ArrayList<String>(); // not valid array -> return empty one
+    }
+
+    ArrayList<String> arr = new ArrayList<String>();
+    val = val.substring(1, val.length() - 1);
+    for (String s : val.split("(?<!\\\\),")) {
+      s.replaceAll("\\\\,", ","); // unescape commas
+      arr.add(s);
+    }
+
+    return arr;
+  }
+
+  private String fromArray(ArrayList<String> val) {
+    String s = "[";
+    while (val.size() != 0) {
+      String t = val.remove(0);
+      t = t.replaceAll(",", "\\\\,"); // escape commas
+      s += t;
+
+      if (val.size() != 0) {
+        s += ",";
+      }
+    }
+    s += "]";
+    return s;
+  }
+
   /*---- Operators ----*/
 
   /* boolean ops */
@@ -180,13 +238,13 @@ public class PostfixEvaluator {
 
   /* number ops */
 
-  private void plus() {
+  private void add() {
     long d2 = popNum();
     long d1 = popNum();
     push(d1 + d2);
   }
 
-  private void minus() {
+  private void sub() {
     long d2 = popNum();
     long d1 = popNum();
     push(d1 - d2);
@@ -297,5 +355,92 @@ public class PostfixEvaluator {
     } else {
       push(tmp.getGroupId());
     }
+  }
+
+  /* array ops */
+
+  private void arraynew() {
+    push(new ArrayList<String>());
+  }
+
+  private void arraycreate() {
+    long num = popNum();
+    ArrayList<String> arr = new ArrayList<String>();
+    for (int i = 0; i < num; i++) {
+      arr.add(0, pop());
+    }
+
+    push(arr);
+  }
+
+  private void arraypush() {
+    String val = pop();
+    ArrayList<String> arr = popArray();
+    arr.add(val);
+    push(arr);
+  }
+
+  private void arraypop() {
+    ArrayList<String> arr = popArray();
+    if (arr.size() != 0) {
+      arr.remove(arr.size() - 1);
+    }
+    push(arr);
+  }
+
+  private void arrayinsert() {
+    String val = pop();
+    int index = popNum().intValue();
+    ArrayList<String> arr = popArray();
+
+    if (index>=0 && arr.size() >= index) {
+      arr.add(index, val);
+    }
+    push(arr);
+  }
+
+  private void arrayremove() {
+    int index = popNum().intValue();
+    ArrayList<String> arr = popArray();
+
+    if (index>=0 && arr.size() > index) {
+      arr.remove(index);
+    }
+    push(arr);
+  }
+
+  private void arrayget() {
+    int index = popNum().intValue();
+    ArrayList<String> arr = popArray();
+
+    if (arr.size() > index) {
+      push(arr.get(index).replaceAll("\\\\,", ",")); // unescape commas
+    } else {
+      push("null");
+    }
+  }
+
+  private void arraysize() {
+    ArrayList<String> arr = popArray();
+    push(arr.size());
+  }
+
+  private void arrayisempty() {
+    ArrayList<String> arr = popArray();
+    push(arr.size() == 0);
+  }
+
+  private void arrayjoin() {
+    String delimeter = pop();
+    ArrayList<String> arr = popArray();
+
+    String s = "";
+    while (arr.size() != 0) {
+      s += arr.remove(0).replaceAll("\\\\,", ","); // unescape commas
+      if (arr.size() != 0) {
+        s += delimeter;
+      }
+    }
+    push(s);
   }
 }
