@@ -38,7 +38,7 @@ import simpleserver.Position;
 import simpleserver.Server;
 
 public class Bot {
-  private static final int VERSION = 28;
+  private static final int VERSION = 29;
 
   protected String name;
   protected Server server;
@@ -508,6 +508,12 @@ public class Bot {
         readUTF16();
         in.readBoolean();
         in.readShort();
+        break;
+      case (byte) 0xca: // Player Abilities
+        in.readBoolean();
+        in.readBoolean();
+        in.readBoolean();
+        in.readBoolean();
         break;
       case (byte) 0xe6: // ModLoaderMP by SDK
         in.readInt(); // mod

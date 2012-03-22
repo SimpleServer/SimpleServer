@@ -939,6 +939,13 @@ public class StreamTunnel {
         write(in.readByte());
         write(in.readShort());
         break;
+      case (byte) 0xca: // Player Abilities
+        write(packetId);
+        write(in.readByte());
+        write(in.readByte());
+        write(in.readByte());
+        write(in.readByte());
+        break;
       case (byte) 0xd3: // Red Power (mod by Eloraam)
         write(packetId);
         copyNBytes(1);
