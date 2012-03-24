@@ -689,7 +689,8 @@ public class StreamTunnel {
         write(packetId);
         copyNBytes(18);
         break;
-      case 0x23: // ???, added in 12w03a
+      case 0x23: // Entitiy Look
+        write(packetId);
         write(in.readInt());
         write(in.readByte());
         break;
