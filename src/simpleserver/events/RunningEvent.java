@@ -387,6 +387,7 @@ class RunningEvent extends Thread implements Runnable {
     for (String token : tokens) {
       message += token + " ";
     }
+    message = message.substring(0, message.length() - 1);
 
     // execute the server command, overriding the player permissions
     player.parseCommand(message, true);
@@ -403,6 +404,8 @@ class RunningEvent extends Thread implements Runnable {
     for (String t : tokens) {
       cmdline += t + " ";
     }
+    cmdline = cmdline.substring(0, cmdline.length() - 1);
+
     ServerCommand command = server.getCommandParser().getServerCommand(cmd);
 
     if ((command != null) && !(command instanceof InvalidCommand)) {

@@ -45,7 +45,7 @@ public class ReadCommand extends AbstractCommand implements PlayerCommand {
       if (s.length() > 2) {
         s.delete(s.length() - 2, s.length());
       }
-      player.addTCaptionedMessage("Avilable text files", s.toString());
+      player.addTCaptionedMessage("Available text files", s.toString());
       return;
     }
 
