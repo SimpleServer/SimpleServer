@@ -66,8 +66,12 @@ public class PostfixEvaluator {
     ops.put("int", "str2num");
     ops.put("bool", "str2bool");
     ops.put("evalvar", "evalvar");
+
     ops.put("dup", "dup");
     ops.put("drop", "drop");
+    ops.put("flip", "flip");
+    ops.put("rotr", "rotr");
+    ops.put("rotl", "rotl");
 
     ops.put("getgroup", "getgroup");
 
@@ -84,6 +88,7 @@ public class PostfixEvaluator {
     ops.put("Aisempty", "arrayisempty");
 
     ops.put("Aget", "arrayget");
+    ops.put("Agetlast", "arraygetlast");
     ops.put("Ajoin", "arrayjoin");
 
   }
@@ -194,7 +199,7 @@ public class PostfixEvaluator {
     ArrayList<String> arr = new ArrayList<String>();
     val = val.substring(1, val.length() - 1);
     for (String s : val.split("(?<!\\\\),")) {
-      s.replaceAll("\\\\,", ","); // unescape commas
+      s = unescape(s, ",");
       arr.add(s);
     }
 
@@ -205,7 +210,7 @@ public class PostfixEvaluator {
     String s = "[";
     while (val.size() != 0) {
       String t = val.remove(0);
-      t = t.replaceAll(",", "\\\\,"); // escape commas
+      t = escape(t, ",");
       s += t;
 
       if (val.size() != 0) {
@@ -214,6 +219,25 @@ public class PostfixEvaluator {
     }
     s += "]";
     return s;
+  }
+
+  /*---- generic (un)escape for array/hash/etc ----*/
+  private String escape(String str, String chars) {
+    String ret = str;
+    for (int i = 0; i < chars.length(); i++) {
+      String c = chars.substring(i, i + 1);
+      ret = ret.replaceAll(c, "\\\\" + c);
+    }
+    return ret;
+  }
+
+  private String unescape(String str, String chars) {
+    String ret = str;
+    for (int i = 0; i < chars.length(); i++) {
+      String c = chars.substring(i, i + 1);
+      ret = ret.replaceAll("\\\\" + c, c);
+    }
+    return ret;
   }
 
   /*---- Operators ----*/
@@ -346,11 +370,36 @@ public class PostfixEvaluator {
     pop();
   }
 
+  private void flip() {
+    if (expstack.size() < 2) {
+      return;
+    }
+
+    String b = pop();
+    String a = pop();
+    push(b);
+    push(a);
+  }
+
+  private void rotr() {
+    if (expstack.size() == 0) {
+      return;
+    }
+    expstack.add(0, pop());
+  }
+
+  private void rotl() {
+    if (expstack.size() == 0) {
+      return;
+    }
+    push(expstack.remove(0));
+  }
+
   private void getgroup() {
     String s = pop();
     Player tmp = e.server.findPlayer(s);
     if (tmp == null) {
-      e.notifyError("Warning: Player not found! Returning group -1");
+      e.notifyError("Player not found! Returning group -1");
       push(-1);
     } else {
       push(tmp.getGroupId());
@@ -384,8 +433,11 @@ public class PostfixEvaluator {
     ArrayList<String> arr = popArray();
     if (arr.size() != 0) {
       arr.remove(arr.size() - 1);
+      push(arr);
+
+    } else {
+      e.notifyError("Popping empty array!");
     }
-    push(arr);
   }
 
   private void arrayinsert() {
@@ -393,8 +445,10 @@ public class PostfixEvaluator {
     int index = popNum().intValue();
     ArrayList<String> arr = popArray();
 
-    if (index>=0 && arr.size() >= index) {
+    if (index >= 0 && arr.size() >= index) {
       arr.add(index, val);
+    } else {
+      e.notifyError("Index out of range!");
     }
     push(arr);
   }
@@ -403,8 +457,10 @@ public class PostfixEvaluator {
     int index = popNum().intValue();
     ArrayList<String> arr = popArray();
 
-    if (index>=0 && arr.size() > index) {
+    if (index >= 0 && arr.size() > index) {
       arr.remove(index);
+    } else {
+      e.notifyError("Index out of range!");
     }
     push(arr);
   }
@@ -413,9 +469,21 @@ public class PostfixEvaluator {
     int index = popNum().intValue();
     ArrayList<String> arr = popArray();
 
-    if (arr.size() > index) {
-      push(arr.get(index).replaceAll("\\\\,", ",")); // unescape commas
+    if (index >= 0 && arr.size() > index) {
+      push(unescape(arr.get(index), ","));
     } else {
+      e.notifyError("Index out of range!");
+      push("null");
+    }
+  }
+
+  private void arraygetlast() {
+    ArrayList<String> arr = popArray();
+
+    if (arr.size() != 0) {
+      push(arr.remove(arr.size() - 1));
+    } else {
+      e.notifyError("Popping empty array!");
       push("null");
     }
   }
@@ -436,7 +504,7 @@ public class PostfixEvaluator {
 
     String s = "";
     while (arr.size() != 0) {
-      s += arr.remove(0).replaceAll("\\\\,", ","); // unescape commas
+      s += unescape(arr.remove(0), ",");
       if (arr.size() != 0) {
         s += delimeter;
       }
