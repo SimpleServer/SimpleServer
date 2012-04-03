@@ -421,34 +421,78 @@ class RunningEvent extends Thread implements Runnable {
       return;
     }
 
-    String var = tokens.remove(0);
-    char scope = var.charAt(0);
-    var = var.substring(1);
+    ArrayList<String> vals = new PostfixEvaluator(this).evaluate(tokens);
 
-    String exp = new PostfixEvaluator(this).evaluate(tokens);
-
-    if (exp == null) {
+    if (vals == null || vals.size() < 2) {
       return;
     }
 
+    /* only 2 elements left - normal behaviour like before */
+    if (vals.size() == 2) {
+      String s = vals.remove(0);
+      String v = vals.remove(0);
+      assignVariable(s, v);
+    } else if (vals.size() > 2) { /* more elements = multiple assignment */
+      /* separating symbols and values (looking for "to" keyword */
+      ArrayList<String> vars = new ArrayList<String>();
+      while (vals.size() > 0 && !vals.get(0).equals("to")) {
+        vars.add(vals.remove(0));
+      }
+
+      if (vals.size() == 0) {
+        notifyError("Invalid multiple assignment! ('to' keyword missing)");
+        return;
+      }
+
+      vals.remove(0); // remove 'to'
+
+      /* execute multiple assignment */
+      while (vars.size() != 0) {
+        String s = vars.remove(0);
+        String v = "null";
+
+        if (vals.size() != 0) {
+          if (vars.size() != 0 || vals.size() == 1) {
+            v = vals.remove(0);
+          } else {
+            v = PostfixEvaluator.fromArray(vals);
+          }
+        }
+
+        assignVariable(s, v);
+      }
+
+    }
+  }
+
+  private void assignVariable(String symbol, String value) {
+    if (symbol == null || symbol.length() < 2) {
+      return;
+    }
+
+    if (value == null) {
+      value = "null";
+    }
+
+    char scope = symbol.charAt(0);
+    String var = symbol.substring(1);
+
     if (scope == LOCALSCOPE) {
-      vars.put(var, exp);
+      vars.put(var, value);
     } else if (scope == PLAYERSCOPE) {
-      player.vars.put(var, exp);
+      player.vars.put(var, value);
     } else if (scope == GLOBALSCOPE) {
       Event e = eventHost.findEvent(var);
       if (e != null) {
-        e.value = exp;
+        e.value = value;
       }
     } else {
-      notifyError("Invalid variable reference!");
+      notifyError("Assignment failed: Invalid variable reference!");
     }
-
-    // System.out.println("Setting var "+scope+var+" to "+exp); //DEBUG
   }
 
   private void push(ArrayList<String> tokens) {
-    String exp = new PostfixEvaluator(this).evaluate(tokens);
+    String exp = new PostfixEvaluator(this).evaluateSingle(tokens);
 
     if (exp == null) {
       threadstack.add(0, "null");

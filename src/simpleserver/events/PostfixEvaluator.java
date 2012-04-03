@@ -130,16 +130,11 @@ public class PostfixEvaluator {
 
   /*---- interface ----*/
 
-  public String evaluate(ArrayList<String> tokens) {
+  /* evaluate, return all elements left at the end */
+  public ArrayList<String> evaluate(ArrayList<String> tokens) {
 
     try {
       while (tokens.size() > 0) {
-        /* DEBUG
-        for (String a : expstack)
-            System.out.print(a+" ");
-        System.out.println("");
-        */
-
         String elem = tokens.remove(0);
         if (ops.containsKey(elem)) { // look through methods
           this.getClass().getDeclaredMethod(ops.get(elem), new Class[] {}).invoke(this);
@@ -155,28 +150,43 @@ public class PostfixEvaluator {
       return null;
     }
 
-    if (expstack.size() != 1) {
-      e.notifyError("Invalid expression!");
+    ArrayList<String> ret = new ArrayList<String>();
+    for (String s : expstack) {
+      ret.add(0, s);
+    }
+
+    return ret;
+  }
+
+  /* evaluate, return top element */
+  public String evaluateSingle(ArrayList<String> tokens) {
+    tokens = evaluate(tokens);
+
+    if (expstack.size() == 0) {
+      e.notifyError("Expression returns no value! Returning null.");
       return null;
+    } else if (expstack.size() > 1) {
+      e.notifyError("Expression returns multiple values! Returning last.");
     }
 
     return pop(); // one element left -> correct evaluated result
   }
 
+  /* evaluate stack, use as boolean expression */
   public boolean evaluateCondition(ArrayList<String> tokens) {
-    return toBool(evaluate(tokens));
+    return toBool(evaluateSingle(tokens));
   }
 
   /*---- Common data type methods ----*/
 
-  private boolean toBool(String bool) {
+  public static boolean toBool(String bool) {
     if (bool.equals("false") || bool.equals("null") || bool.equals("") || bool.equals("0")) {
       return false;
     }
     return true;
   }
 
-  private long toNum(String num) {
+  public static long toNum(String num) {
     long ret = 0;
     try {
       ret = Long.valueOf(num);
@@ -191,7 +201,7 @@ public class PostfixEvaluator {
     return ret;
   }
 
-  private ArrayList<String> toArray(String val) {
+  public static ArrayList<String> toArray(String val) {
     if (val == null || val.length() < 2 || val.charAt(0) != '[' || val.charAt(val.length() - 1) != ']') {
       return new ArrayList<String>(); // not valid array -> return empty one
     }
@@ -206,7 +216,7 @@ public class PostfixEvaluator {
     return arr;
   }
 
-  private String fromArray(ArrayList<String> val) {
+  public static String fromArray(ArrayList<String> val) {
     String s = "[";
     while (val.size() != 0) {
       String t = val.remove(0);
@@ -222,7 +232,7 @@ public class PostfixEvaluator {
   }
 
   /*---- generic (un)escape for array/hash/etc ----*/
-  private String escape(String str, String chars) {
+  public static String escape(String str, String chars) {
     String ret = str;
     for (int i = 0; i < chars.length(); i++) {
       String c = chars.substring(i, i + 1);
@@ -231,7 +241,7 @@ public class PostfixEvaluator {
     return ret;
   }
 
-  private String unescape(String str, String chars) {
+  public static String unescape(String str, String chars) {
     String ret = str;
     for (int i = 0; i < chars.length(); i++) {
       String c = chars.substring(i, i + 1);
