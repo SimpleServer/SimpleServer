@@ -65,13 +65,12 @@ public class PostfixEvaluator {
 
     ops.put("int", "str2num");
     ops.put("bool", "str2bool");
+    ops.put("totime", "int2timestr");
     ops.put("evalvar", "evalvar");
 
     ops.put("dup", "dup");
     ops.put("drop", "drop");
     ops.put("flip", "flip");
-    ops.put("rotr", "rotr");
-    ops.put("rotl", "rotl");
 
     ops.put("getgroup", "getgroup");
 
@@ -199,6 +198,42 @@ public class PostfixEvaluator {
     }
 
     return ret;
+  }
+
+  /* format time string from milliseconds (max. unit=days) */
+  public static String fmtTime(long ms) {
+    long millis = ms % 1000;
+    ms -= millis;
+    ms /= 1000;
+    long secs = ms % 60;
+    ms -= secs;
+    ms /= 60;
+    long mins = ms % 60;
+    ms -= mins;
+    ms /= 60;
+    long hrs = ms % 24;
+    ms -= hrs;
+    ms /= 24;
+    long days = ms;
+
+    String time = "";
+    if (days != 0) {
+      time += String.valueOf(days) + "d ";
+    }
+    if (hrs != 0) {
+      time += String.valueOf(hrs) + "h ";
+    }
+    if (mins != 0) {
+      time += String.valueOf(mins) + "m ";
+    }
+    if (secs != 0) {
+      time += String.valueOf(secs) + "s ";
+    }
+    if (millis != 0) {
+      time += String.valueOf(millis) + "ms ";
+    }
+
+    return time;
   }
 
   public static ArrayList<String> toArray(String val) {
@@ -359,6 +394,10 @@ public class PostfixEvaluator {
     push(popBool());
   }
 
+  private void int2timestr() {
+    push(fmtTime(popNum()));
+  }
+
   private void evalvar() {
     String s = pop();
     String v = e.evaluateVar(s);
@@ -389,20 +428,6 @@ public class PostfixEvaluator {
     String a = pop();
     push(b);
     push(a);
-  }
-
-  private void rotr() {
-    if (expstack.size() == 0) {
-      return;
-    }
-    expstack.add(0, pop());
-  }
-
-  private void rotl() {
-    if (expstack.size() == 0) {
-      return;
-    }
-    push(expstack.remove(0));
   }
 
   private void getgroup() {
