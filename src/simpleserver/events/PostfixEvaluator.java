@@ -85,10 +85,33 @@ public class PostfixEvaluator {
     ops.put("Aremove", "arrayremove");
     ops.put("Asize", "arraysize");
     ops.put("Aisempty", "arrayisempty");
-
     ops.put("Aget", "arrayget");
     ops.put("Agetlast", "arraygetlast");
     ops.put("Ajoin", "arrayjoin");
+
+    /* hash ops */
+    ops.put("Hnew", "hashnew");
+    ops.put("Hcreate", "hashcreate");
+
+    ops.put("Hput", "hashput");
+    ops.put("Hget", "hashget");
+    ops.put("Hremove", "hashremove");
+    ops.put("Hcontainskey", "hashcontainskey");
+    ops.put("Hcontainsvalue", "hashcontainsval");
+    ops.put("Hisempty", "hashisempty");
+    ops.put("Hsize", "hashsize");
+    ops.put("Hkeys", "hashkeys");
+    ops.put("Hvalues", "hashvalues");
+
+    /* check that all methods really exist... */
+    try {
+      for (String name : ops.values()) {
+        java.lang.reflect.Method m = this.getClass().getDeclaredMethod(name, new Class[] {});
+      }
+    } catch (NoSuchMethodException e) {
+      System.out.println("Error in event interpreter - stack operator method mappings faulty!");
+      System.out.println("Please file a bug report!");
+    }
 
   }
 
@@ -111,6 +134,10 @@ public class PostfixEvaluator {
     return toArray(expstack.remove(0));
   }
 
+  private HashMap<String, String> popHash() throws IndexOutOfBoundsException {
+    return toHash(expstack.remove(0));
+  }
+
   private void push(String val) {
     expstack.add(0, val);
   }
@@ -127,6 +154,10 @@ public class PostfixEvaluator {
     expstack.add(0, fromArray(val));
   }
 
+  private void push(HashMap<String, String> val) {
+    expstack.add(0, fromHash(val));
+  }
+
   /*---- interface ----*/
 
   /* evaluate, return all elements left at the end */
@@ -141,9 +172,6 @@ public class PostfixEvaluator {
           push(elem);
         }
       }
-    } catch (NoSuchMethodException ex) {
-      e.notifyError("Error in interpreter - no matching method found!");
-      System.out.println("Method not found! Please file a bug report!");
     } catch (Exception ex) {
       e.notifyError("Invalid expression!");
       return null;
@@ -264,6 +292,41 @@ public class PostfixEvaluator {
     }
     s += "]";
     return s;
+  }
+
+  public static String fromHash(HashMap<String, String> val) {
+    String s = "{";
+
+    if (val.size() > 0) {
+      for (String key : val.keySet()) {
+        String t = val.get(key);
+        t = escape(t, ",:");
+        s += key + ":" + t + ",";
+      }
+      s = s.substring(0, s.length() - 1);
+    }
+
+    s += "}";
+    return s;
+  }
+
+  public static HashMap<String, String> toHash(String val) {
+    if (val == null || val.length() < 2 || val.charAt(0) != '{' || val.charAt(val.length() - 1) != '}') {
+      return new HashMap<String, String>(); // not valid hash -> return empty
+                                            // one
+    }
+
+    HashMap<String, String> ret = new HashMap<String, String>();
+    val = val.substring(1, val.length() - 1);
+    for (String s : val.split("(?<!\\\\),")) {
+      String[] toks = s.split("(?<!\\\\):");
+      if (toks.length != 2) {
+        return new HashMap<String, String>();
+      }
+      ret.put(toks[0], unescape(toks[1], ",:"));
+    }
+
+    return ret;
   }
 
   /*---- generic (un)escape for array/hash/etc ----*/
@@ -546,4 +609,108 @@ public class PostfixEvaluator {
     }
     push(s);
   }
+
+  /* hash ops */
+
+  private void hashnew() {
+    push(new HashMap<String, String>());
+  }
+
+  private void hashcreate() {
+    long num = popNum();
+    HashMap<String, String> h = new HashMap<String, String>();
+
+    for (int i = 0; i < num; i++) {
+      String val = pop();
+      String key = pop();
+      if (!key.equals("") && !key.equals("null")) {
+        h.put(key, val);
+      } else {
+        e.notifyError("Invalid hash key! Ignoring hash pair...");
+      }
+    }
+
+    push(h);
+  }
+
+  private void hashput() {
+    String val = pop();
+    String key = pop();
+    HashMap<String, String> h = popHash();
+
+    if (!key.equals("") && !key.equals("null")) {
+      h.put(key, val);
+    } else {
+      e.notifyError("Invalid hash key!");
+    }
+
+    push(h);
+  }
+
+  private void hashget() {
+    String key = pop();
+    HashMap<String, String> h = popHash();
+
+    if (!key.equals("") && !key.equals("null")) {
+      String val = h.get(key);
+      if (val == null) {
+        val = "null";
+      }
+      push(unescape(val, ",:"));
+    } else {
+      e.notifyError("Invalid hash key!");
+      push("null");
+    }
+  }
+
+  private void hashremove() {
+    String key = pop();
+    HashMap<String, String> h = popHash();
+
+    if (!key.equals("") && !key.equals("null")) {
+      h.remove(key);
+    } else {
+      e.notifyError("Invalid hash key!");
+    }
+    push(h);
+  }
+
+  private void hashcontainskey() {
+    String key = pop();
+    HashMap<String, String> h = popHash();
+
+    if (!key.equals("") && !key.equals("null")) {
+      push(h.containsKey(key));
+    } else {
+      e.notifyError("Invalid hash key!");
+      push(false);
+    }
+  }
+
+  private void hashcontainsval() {
+    String val = pop();
+    HashMap<String, String> h = popHash();
+    push(h.containsValue(val));
+  }
+
+  private void hashisempty() {
+    HashMap<String, String> h = popHash();
+    push(h.size() == 0);
+  }
+
+  private void hashsize() {
+    HashMap<String, String> h = popHash();
+    push(h.size());
+  }
+
+  private void hashkeys() {
+    HashMap<String, String> h = popHash();
+    push(new ArrayList<String>(h.keySet()));
+  }
+
+  private void hashvalues() {
+    HashMap<String, String> h = popHash();
+    push(new ArrayList<String>(h.values()));
+  }
+
 }
