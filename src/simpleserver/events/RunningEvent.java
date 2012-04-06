@@ -149,6 +149,10 @@ class RunningEvent extends Thread implements Runnable {
         teleport(tokens);
       } else if (cmd.equals("set")) {
         set(tokens);
+      } else if (cmd.equals("inc")) {
+        increment(tokens);
+      } else if (cmd.equals("dec")) {
+        decrement(tokens);
       } else if (cmd.equals("push")) {
         push(tokens);
       } else if (cmd.equals("run")) {
@@ -161,7 +165,9 @@ class RunningEvent extends Thread implements Runnable {
         currline = ifstack.remove(0);
       } else if (cmd.equals("while")) {
         loop(tokens, actions);
-      } else if (cmd.equals("endwhile")) {
+      } else if (cmd.equals("break")) {
+        breakloop(tokens, actions);
+      } else if (cmd.equals("endwhile") || cmd.equals("continue")) {
         currline = whilestack.remove(0);
       } else if (cmd.equals("execsvrcmd")) {
         execsvrcmd(tokens);
@@ -274,6 +280,7 @@ class RunningEvent extends Thread implements Runnable {
         return String.valueOf(ev.value);
       }
     }
+
     return null; // not a variable
   }
 
@@ -440,7 +447,7 @@ class RunningEvent extends Thread implements Runnable {
       }
 
       if (vals.size() == 0) {
-        notifyError("Invalid multiple assignment! ('to' keyword missing)");
+        notifyError("Invalid multiple assignment / invalid expression! ('to' keyword missing?)");
         return;
       }
 
@@ -463,6 +470,24 @@ class RunningEvent extends Thread implements Runnable {
       }
 
     }
+  }
+
+  private void increment(ArrayList<String> tokens) {
+    if (tokens.size() != 1) {
+      notifyError("Wrong number of arguments!");
+      return;
+    }
+    String v = tokens.get(0);
+    assignVariable(v, String.valueOf(PostfixEvaluator.toNum(evaluateVar(v)) + 1));
+  }
+
+  private void decrement(ArrayList<String> tokens) {
+    if (tokens.size() != 1) {
+      notifyError("Wrong number of arguments!");
+      return;
+    }
+    String v = tokens.get(0);
+    assignVariable(v, String.valueOf(PostfixEvaluator.toNum(evaluateVar(v)) - 1));
   }
 
   private void assignVariable(String symbol, String value) {
@@ -597,30 +622,34 @@ class RunningEvent extends Thread implements Runnable {
   private void loop(ArrayList<String> tokens, ArrayList<String> actions) {
     boolean result = new PostfixEvaluator(this).evaluateCondition(tokens);
 
-    if (!result) { // jump over while loop
-      int whilecounter = 0;
-      for (int i = currline + 1; i < actions.size(); i++) {
-        ArrayList<String> line = parseLine(actions.get(i));
-        if (line.size() == 0) {
-          continue;
-        }
-        String cmd = line.get(0);
+    if (!result) { // jump over while loop -> leave
+      breakloop(tokens, actions);
+    } else { // save current line for jump back -> enter
+      whilestack.add(0, currline - 1);
+    }
+  }
 
-        if (cmd.equals("while")) {
-          whilecounter++;
-        }
+  private void breakloop(ArrayList<String> tokens, ArrayList<String> actions) {
+    int whilecounter = 0;
+    for (int i = currline + 1; i < actions.size(); i++) {
+      ArrayList<String> line = parseLine(actions.get(i));
+      if (line.size() == 0) {
+        continue;
+      }
+      String cmd = line.get(0);
 
-        if (cmd.equals("endwhile")) {
-          if (whilecounter == 0) {
-            currline = i;
-            break;
-          } else {
-            whilecounter--;
-          }
+      if (cmd.equals("while")) {
+        whilecounter++;
+      }
+
+      if (cmd.equals("endwhile")) {
+        if (whilecounter == 0) {
+          currline = i;
+          break;
+        } else {
+          whilecounter--;
         }
       }
-    } else { // save current line for jump back
-      whilestack.add(0, currline - 1);
     }
   }
 
