@@ -81,7 +81,6 @@ public class AutoBackup {
       System.out.println("[SimpleServer] Backing up server...");
     }
     announce(t("Backing up..."));
-    server.runCommand("save-off", null);
 
     File copy;
     try {
@@ -317,8 +316,6 @@ public class AutoBackup {
           }
           forceBackup = false;
 
-          server.autoSpaceCheck.check(true);
-
           if (server.config.properties.getBoolean("announceSave")) {
             server.runCommand("say", t("Saving Map..."));
           }
@@ -331,8 +328,11 @@ public class AutoBackup {
             }
           }
 
+          server.runCommand("save-off", null);
+          server.autoSpaceCheck.check(true);
+
           try {
-            backup();
+            backup(); // does enable saving
           } catch (IOException e) {
             server.errorLog(e, "Server Backup Failure");
             System.out.println("[SimpleServer] " + e);

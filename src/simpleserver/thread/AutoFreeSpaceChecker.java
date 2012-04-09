@@ -65,8 +65,8 @@ public class AutoFreeSpaceChecker {
       long freeSpaceKb = FileSystemUtils.freeSpaceKb();
       if (freeSpaceKb < neededSizeKb) {
         System.out.println("[SimpleServer] Warning: You have only " +
-                           Math.round(freeSpaceKb / 1024) +
-                           " MB free space in this drive!");
+            Math.round(freeSpaceKb / 1024) +
+            " MB free space in this drive!");
         System.out.println("[SimpleServer] Trying to delete old backups...");
 
         int filesDeleted = 0;
@@ -92,6 +92,10 @@ public class AutoFreeSpaceChecker {
     } catch (IOException e) {
       System.out.println("[SimpleServer] " + e);
       System.out.println("[SimpleServer] Free Space Checker Failed!");
+    } catch (IllegalArgumentException e) {
+      System.out.println("[SimpleServer] " + e);
+      System.out.println("[SimpleServer] Backup space calculation failed because of a was file deleted during action. Trying again later.");
+
     }
   }
 
