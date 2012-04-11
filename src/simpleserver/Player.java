@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Queue;
 import java.util.Timer;
@@ -43,6 +44,7 @@ import simpleserver.command.ExternalCommand;
 import simpleserver.command.PlayerCommand;
 import simpleserver.config.KitList.Kit;
 import simpleserver.config.data.Stats.StatField;
+import simpleserver.config.xml.Area;
 import simpleserver.config.xml.CommandConfig;
 import simpleserver.config.xml.CommandConfig.Forwarding;
 import simpleserver.config.xml.Event;
@@ -109,6 +111,7 @@ public class Player {
   public ConcurrentHashMap<String, String> vars; // temporary player-scope
                                                  // Script variables
   private long lastEvent;
+  private HashSet<Area> currentAreas = new HashSet<Area>();
 
   public Player(Socket inc, Server parent) {
     connected = System.currentTimeMillis();
@@ -546,15 +549,21 @@ public class Player {
       }
     }
 
-    if (server.options.getBoolean("enableEvents") && config.event != null) {
-      Event e = server.eventhost.findEvent(config.event);
-      if (e != null) {
-        ArrayList<String> stack = null;
-        if (!args.equals("")) {
-          stack = new ArrayList<String>(java.util.Arrays.asList(args.split("\\s+")));
+    try {
+      if (server.options.getBoolean("enableEvents") && config.event != null) {
+        Event e = server.eventhost.findEvent(config.event);
+        if (e != null) {
+          ArrayList<String> stack = null;
+          if (!args.equals("")) {
+            stack = new ArrayList<String>(java.util.Arrays.asList(args.split("\\s+")));
+          }
+          server.eventhost.execute(e, this, true, stack);
+        } else {
+          System.out.println("Error in player command " + originalName + ": Event " + config.event + " not found!");
         }
-        server.eventhost.execute(e, this, true, stack);
       }
+    } catch (NullPointerException e) {
+      System.out.println("Error evaluating player command: " + originalName);
     }
 
     if (!(command instanceof ExternalCommand) && (config == null || config.forwarding != Forwarding.ONLY)) {
@@ -872,7 +881,48 @@ public class Player {
     }
   }
 
+  public void checkAreaEvents() {
+    HashSet<Area> areas = new HashSet<Area>(server.config.dimensions.areas(position()));
+    HashSet<Area> areasCopy = new HashSet<Area>(areas);
+    HashSet<Area> oldAreas = currentAreas;
+
+    areasCopy.removeAll(oldAreas); // -> now contains only newly entered areas
+    oldAreas.removeAll(areas); // -> now contains only areas not present anymore
+
+    for (Area a : areasCopy) { // run area onenter events
+      if (a.onenter == null) {
+        continue;
+      }
+      Event e = server.eventhost.findEvent(a.onenter);
+      if (e != null) {
+        ArrayList<String> stack = new ArrayList<String>();
+        stack.add(a.name);
+        server.eventhost.execute(e, this, true, stack);
+      } else {
+        System.out.println("Error in area " + a.name + "/onenter: Event " + a.onenter + " not found!");
+      }
+    }
+
+    for (Area a : oldAreas) { // run area onleave events
+      if (a.onleave == null) {
+        continue;
+      }
+      Event e = server.eventhost.findEvent(a.onleave);
+      if (e != null) {
+        ArrayList<String> stack = new ArrayList<String>();
+        stack.add(a.name);
+        server.eventhost.execute(e, this, true, stack);
+      } else {
+        System.out.println("Error in area " + a.name + "/onleave: Event " + a.onleave + " not found!");
+      }
+    }
+
+    currentAreas = areas;
+  }
+
   public void checkLocationEvents() {
+    checkAreaEvents();
+
     long currtime = System.currentTimeMillis();
     if (currtime < lastEvent + 500) {
       return;

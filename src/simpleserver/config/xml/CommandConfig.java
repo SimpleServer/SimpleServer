@@ -33,6 +33,7 @@ public class CommandConfig extends StorageContainer implements Comparable<Comman
   public Permission allow;
   public boolean hidden;
   public boolean disabled = false;
+
   public String event;
 
   private ArgumentStorage arguments;
@@ -45,6 +46,7 @@ public class CommandConfig extends StorageContainer implements Comparable<Comman
   private static final String FORWARD_ONLY = "forwardonly";
   private static final String HIDDEN = "hidden";
   private static final String DISABLED = "disabled";
+
   private static final String EVENT = "event";
 
   CommandConfig() {

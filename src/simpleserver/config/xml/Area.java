@@ -37,11 +37,17 @@ public class Area extends PermissionContainer implements Comparable<Area> {
   int level;
   Area parent;
 
+  public String onenter;
+  public String onleave;
+
   private static final String NAME = "name";
   private static final String START = "start";
   private static final String END = "end";
   private static final String OWNER = "owner";
   private static final String PRIORITY = "priority";
+
+  private static final String ONENTER = "onenter";
+  private static final String ONLEAVE = "onleave";
 
   Area() {
     super("area");
@@ -87,6 +93,10 @@ public class Area extends PermissionContainer implements Comparable<Area> {
       owner = value;
     } else if (name.equals(PRIORITY)) {
       priority = getInt(value);
+    } else if (name.equals(ONENTER)) {
+      onenter = value;
+    } else if (name.equals(ONLEAVE)) {
+      onleave = value;
     }
   }
 
@@ -103,6 +113,13 @@ public class Area extends PermissionContainer implements Comparable<Area> {
     attributes.addAttribute(END, end.toString());
     if (owner != null) {
       attributes.addAttribute(OWNER, owner);
+    }
+
+    if (onenter != null) {
+      attributes.addAttribute(ONENTER, onenter);
+    }
+    if (onleave != null) {
+      attributes.addAttribute(ONLEAVE, onleave);
     }
   }
 

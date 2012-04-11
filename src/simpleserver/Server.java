@@ -245,7 +245,7 @@ public class Server {
     if (globalConfig.loadsuccess) {
       config = globalConfig.config;
     } else {
-      System.out.println("[SimpleServer] Syntax error in comfig.xml! Config was not reloaded.");
+      System.out.println("[SimpleServer] Syntax error in config.xml! Config was not reloaded.");
       return false;
     }
 
@@ -437,7 +437,7 @@ public class Server {
     loadResources();
 
     if (!globalConfig.loadsuccess) {
-      System.out.println("[SimpleServer] Syntax error in comfig.xml! Emergency shutdown...");
+      System.out.println("[SimpleServer] Syntax error in config.xml! Emergency shutdown...");
       System.exit(1);
     }
 
