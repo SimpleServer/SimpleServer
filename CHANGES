@@ -1,3 +1,9 @@
+== 8.4.3 ==
+ * Event system greatly improved and extended
+   - see http://github.com/SimpleServer/SimpleServer/wiki/Events
+ * Protocol version 29
+ * Bugfixes
+
 == 8.4.2 ==
  * Updated to Minecraft 1.2
  * Added experimental event scripting system

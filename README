@@ -1,4 +1,4 @@
-Simple Server 8.4.2
+Simple Server 8.4.3
 An open source simple server tunnel for minecraft beta multiplayer servers.
 Copyright (c) 2011 SimpleServer authors (see CONTRIBUTORS)
 See LICENSE for details.
@@ -17,6 +17,7 @@ Features (See CHANGES for updates):
  * Denial of service protection.  More than 30 requests/IP/minute will
    automatically ban the IP.
  * RCON and experimental telnet access.
+ * Experimental event scripting system.
  * Optional automated saving, backups, restarts, and mapping.
  * Locked chests.  Each player can lock as many chests as he wants.
    Other non-admins cannot access or destroy the chest.
@@ -120,6 +121,7 @@ accessible commands.
   /unwhitelist PLAYER -- Remove player from server access list
   /visit PLAYER -- Teleport to the player if he agrees with /ok
   /warp [list|remove|add] [name] -- Use and manage waypoints
+  /warpto [player] x y z -- Warp (a player) to given coordinates
   /warpmeto PLAYER -- Teleport to the named player
     Alias: /tpto
   /warptome PLAYER -- Teleport the named player to you
