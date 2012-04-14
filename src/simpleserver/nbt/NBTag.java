@@ -24,7 +24,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-abstract class NBTag {
+public abstract class NBTag {
   protected NBTString name;
   protected boolean named;
 

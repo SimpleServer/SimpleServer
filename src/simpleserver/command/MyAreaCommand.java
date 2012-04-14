@@ -30,9 +30,9 @@ import simpleserver.config.xml.AllBlocks;
 import simpleserver.config.xml.Area;
 import simpleserver.config.xml.Chests;
 import simpleserver.config.xml.Config;
+import simpleserver.config.xml.Config.AreaStoragePair;
 import simpleserver.config.xml.DimensionConfig;
 import simpleserver.config.xml.Permission;
-import simpleserver.config.xml.Config.AreaStoragePair;
 
 public class MyAreaCommand extends AbstractCommand implements PlayerCommand {
   private static final byte DEFAULT_SIZE = 50;
@@ -44,14 +44,14 @@ public class MyAreaCommand extends AbstractCommand implements PlayerCommand {
 
   private boolean areaSizeOk(Player player, int[] size) {
     return (Math.abs(player.areastart.x() - player.areaend.x()) < size[0])
-          && (Math.abs(player.areastart.z() - player.areaend.z()) < size[1])
-          && player.areaend.dimension() == player.areastart.dimension();
+        && (Math.abs(player.areastart.z() - player.areaend.z()) < size[1])
+        && player.areaend.dimension() == player.areastart.dimension();
   }
 
   private int[] getAreaMax(Player player) {
     // Get the maximum area sizes from config.xml
     int[] size = { Math.abs(player.getServer().config.properties.getInt("areaMaxX")),
-                   Math.abs(player.getServer().config.properties.getInt("areaMaxZ")) };
+        Math.abs(player.getServer().config.properties.getInt("areaMaxZ")) };
 
     // Check to make sure the configuration is valid
     // If not, reset to default size
@@ -78,11 +78,11 @@ public class MyAreaCommand extends AbstractCommand implements PlayerCommand {
 
     if (arguments[0].equals("start")) {
       player.areastart = player.position();
-      player.areastart = player.areastart.setY((byte) 0); // no height limit
+      player.areastart = player.areastart.setY(0); // no height limit
       player.addTMessage(Color.GRAY, "Start coordinate set.");
     } else if (arguments[0].equals("end")) {
       player.areaend = player.position();
-      player.areaend = player.areaend.setY((byte) 127); // no height limit
+      player.areaend = player.areaend.setY(255); // no height limit
       player.addTMessage(Color.GRAY, "End coordinate set.");
     } else if (arguments[0].equals("save")) {
       if (player.areastart == null || player.areaend == null) {
@@ -91,7 +91,7 @@ public class MyAreaCommand extends AbstractCommand implements PlayerCommand {
       }
       if (!areaSizeOk(player, maxSize)) {
         player.addTMessage(Color.RED, "Your area is allowed to have a maximum size of " +
-                                      maxSize[0] + "x" + maxSize[1] + "!");
+            maxSize[0] + "x" + maxSize[1] + "!");
         return;
       }
       if (player.getServer().config.playerArea(player) != null) {

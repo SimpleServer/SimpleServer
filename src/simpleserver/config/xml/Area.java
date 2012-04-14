@@ -88,7 +88,7 @@ public class Area extends PermissionContainer implements Comparable<Area> {
     } else if (name.equals(START)) {
       start = getCoord(value, 0);
     } else if (name.equals(END)) {
-      end = getCoord(value, 127);
+      end = getCoord(value, 255);
     } else if (name.equals(OWNER)) {
       owner = value;
     } else if (name.equals(PRIORITY)) {
@@ -155,6 +155,6 @@ public class Area extends PermissionContainer implements Comparable<Area> {
       z = getInt(parts[2]);
     }
 
-    return new Coordinate(x, (byte) y, z);
+    return new Coordinate(x, y, z);
   }
 }
