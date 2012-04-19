@@ -87,7 +87,10 @@
 	<command name="help" allow="0+">
 		<alias>commands</alias>
 	</command>
-	<command name="home" allow="1+" />
+	<command name="home" allow="1+">
+		<argument allow="4+">inspect</argument>
+	</command>
+	
 	<command name="iddqd" allow="4+" />
 	<command name="kick" allow="3+" />
 	<command name="kit" allow="1+">

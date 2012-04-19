@@ -32,7 +32,7 @@ import simpleserver.nbt.NBTString;
 
 public class HomeCommand extends AbstractCommand implements PlayerCommand {
   public HomeCommand() {
-    super("home [help|set|delete|public|private|ilist|list|invite|uninvite] [name]", "Teleport to and manage your home");
+    super("home [help|set|delete|public|private|ilist|list|invite|uninvite|inspect] [name]", "Teleport to and manage your home");
   }
 
   public void execute(Player player, String message) {
@@ -163,6 +163,18 @@ public class HomeCommand extends AbstractCommand implements PlayerCommand {
       } else {
         player.addTMessage(Color.GRAY, "Player wasn't invited.");
       }
+    } else if (command.equals("inspect")) {
+      if (arguments.length < 2) {
+        player.addTMessage(Color.GRAY, "No player name given!");
+        return;
+      }
+      String vPlayer = arguments[1];
+      HomePoint home = homes.get(vPlayer);
+      if (home == null) {
+        player.addTMessage(Color.GRAY, "Player doesn't have a home set!");
+        return;
+      }
+      player.teleportWithWarmup(home.position);
     } else {
       if (command.toLowerCase().equals(playerName.toLowerCase())) {
         teleportHome(player);
