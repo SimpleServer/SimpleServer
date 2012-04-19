@@ -58,7 +58,7 @@ public class GameModeCommand extends AbstractCommand implements PlayerCommand {
       player.addTMessage(Color.RED, "Invalid gameMode %d!", gameMode);
       return;
     }
-    player.getServer().runCommand("gamemode", target.getName() + " " + gameMode);
+    player.getServer().runCommand("gamemode", gameMode + " " + target.getName());
 
   }
 }
