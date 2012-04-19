@@ -947,6 +947,15 @@ public class StreamTunnel {
         write(in.readByte());
         write(in.readByte());
         break;
+      case (byte) 0xcb: // autocompletion
+        write(packetId);
+        write(readUTF16());
+        break;
+      case (byte) 0xcc: // language and view distance
+        write(packetId);
+        write(readUTF16());
+        write(in.readInt());
+        break;
       case (byte) 0xd3: // Red Power (mod by Eloraam)
         write(packetId);
         copyNBytes(1);
