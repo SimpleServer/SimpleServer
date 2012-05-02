@@ -92,6 +92,8 @@ public class StreamTunnel {
 
   private DataInput in;
   private DataOutput out;
+  private InputStream inputStream;
+  private OutputStream outputStream;
   private StreamDumper inputDumper;
   private StreamDumper outputDumper;
 
@@ -115,8 +117,10 @@ public class StreamTunnel {
     server = player.getServer();
     commandPrefix = server.options.getBoolean("useSlashes") ? '/' : '!';
 
-    DataInputStream dIn = new DataInputStream(new BufferedInputStream(in));
-    DataOutputStream dOut = new DataOutputStream(new BufferedOutputStream(out));
+    inputStream = in;
+    outputStream = out;
+    DataInputStream dIn = new DataInputStream(in);
+    DataOutputStream dOut = new DataOutputStream(out);
     if (EXPENSIVE_DEBUG_LOGGING) {
       try {
         OutputStream dump = new FileOutputStream(streamType + "Input.debug");
@@ -176,22 +180,21 @@ public class StreamTunnel {
         write(in.readInt()); // random number that is returned from server
         break;
       case 0x01: // Login Request/Response
-        write(packetId);
         if (isServerTunnel) {
           if (server.authenticator.useCustAuth(player)
               && !server.authenticator.onlineAuthenticate(player)) {
             player.kick(t("%s Failed to login: User not premium", "[CustAuth]"));
             break;
           }
+          write(packetId);
           player.setEntityId(write(in.readInt()));
           write(readUTF16());
         } else {
+          write(packetId);
           write(in.readInt());
-          readUTF16(); // and throw away
-          write(player.getName());
+          write(readUTF16());
         }
 
-        write(readUTF16());
         write(in.readInt());
 
         dimension = in.readInt();
@@ -210,39 +213,32 @@ public class StreamTunnel {
 
         break;
       case 0x02: // Handshake
+        byte version = in.readByte();
         String name = readUTF16();
         boolean nameSet = false;
 
-        if (isServerTunnel) {
-          if (!server.authenticator.useCustAuth(player)) {
-            name = "-";
-          } else if (!server.authenticator.vanillaOnlineMode()) {
-            name = player.getConnectionHash();
+        if (name.contains(";")) {
+          name = name.substring(0, name.indexOf(";"));
+        }
+        if (name.equals("Player") || !server.authenticator.isMinecraftUp) {
+          AuthRequest req = server.authenticator.getAuthRequest(player.getIPAddress());
+          if (req != null) {
+            name = req.playerName;
+            nameSet = server.authenticator.completeLogin(req, player);
+          }
+          if (req == null || !nameSet) {
+            if (!name.equals("Player")) {
+              player.addTMessage(Color.RED, "Login verification failed.");
+              player.addTMessage(Color.RED, "You were logged in as guest.");
+            }
+            name = server.authenticator.getFreeGuestName();
+            player.setGuest(true);
+            nameSet = player.setName(name);
           }
         } else {
-          if (name.contains(";")) {
-            name = name.substring(0, name.indexOf(";"));
-          }
-          if (name.equals("Player") || !server.authenticator.isMinecraftUp) {
-            AuthRequest req = server.authenticator.getAuthRequest(player.getIPAddress());
-            if (req != null) {
-              name = req.playerName;
-              nameSet = server.authenticator.completeLogin(req, player);
-            }
-            if (req == null || !nameSet) {
-              if (!name.equals("Player")) {
-                player.addTMessage(Color.RED, "Login verification failed.");
-                player.addTMessage(Color.RED, "You were logged in as guest.");
-              }
-              name = server.authenticator.getFreeGuestName();
-              player.setGuest(true);
-              nameSet = player.setName(name);
-            }
-          } else {
-            nameSet = player.setName(name);
-            if (nameSet) {
-              player.updateRealName(name);
-            }
+          nameSet = player.setName(name);
+          if (nameSet) {
+            player.updateRealName(name);
           }
         }
 
@@ -251,11 +247,10 @@ public class StreamTunnel {
           nameSet = false;
         }
 
-        if (isServerTunnel || nameSet) {
-          tunneler.setName(streamType + "-" + player.getName());
-          write(packetId);
-          write(name);
-        }
+        tunneler.setName(streamType + "-" + player.getName());
+        write(packetId);
+        write(version);
+        write(name);
 
         break;
       case 0x03: // Chat Message
@@ -955,6 +950,7 @@ public class StreamTunnel {
         write(packetId);
         write(readUTF16());
         write(in.readInt());
+        write(in.readByte());
         break;
       case (byte) 0xd3: // Red Power (mod by Eloraam)
         write(packetId);
@@ -982,6 +978,40 @@ public class StreamTunnel {
         short arrayLength = in.readShort();
         write(arrayLength);
         copyNBytes(0xff & arrayLength);
+        break;
+      case (byte) 0xfc: // Encryption Key Response
+        write(packetId);
+        byte[] sharedKey = new byte[in.readShort()];
+        in.readFully(sharedKey);
+        if (!isServerTunnel) {
+          player.clientEncryption.setEncryptedSharedKey(sharedKey);
+          sharedKey = player.serverEncryption.getEncryptedSharedKey();
+        }
+        write((short) sharedKey.length);
+        write(sharedKey);
+        if (isServerTunnel) {
+          in = new DataInputStream(new BufferedInputStream(player.serverEncryption.encryptedInputStream(inputStream)));
+          out = new DataOutputStream(new BufferedOutputStream(player.clientEncryption.encryptedOutputStream(outputStream)));
+        } else {
+          in = new DataInputStream(new BufferedInputStream(player.clientEncryption.encryptedInputStream(inputStream)));
+          out = new DataOutputStream(new BufferedOutputStream(player.serverEncryption.encryptedOutputStream(outputStream)));
+        }
+        break;
+      case (byte) 0xfd: // Encryption Key Request (server -> client)
+        tunneler.setName(streamType + "-" + player.getName());
+        write(packetId);
+        String serverId = readUTF16();
+        if (!server.authenticator.useCustAuth(player)) {
+          serverId = "-";
+        } else {
+          serverId = player.getConnectionHash();
+        }
+        write(serverId);
+        byte[] keyBytes = new byte[in.readShort()];
+        in.readFully(keyBytes);
+        player.serverEncryption.setPublicKey(keyBytes);
+        write((short) player.clientEncryption.publicKey.getEncoded().length);
+        write(player.clientEncryption.publicKey.getEncoded());
         break;
       case (byte) 0xfe: // Server List Ping
         write(packetId);
@@ -1145,6 +1175,11 @@ public class StreamTunnel {
 
   private byte write(byte b) throws IOException {
     out.writeByte(b);
+    return b;
+  }
+
+  private byte[] write(byte[] b) throws IOException {
+    out.write(b);
     return b;
   }
 

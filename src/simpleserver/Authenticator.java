@@ -322,7 +322,13 @@ public class Authenticator {
     boolean result = false;
     // Send a GET request to minecraft.net
 
-    String urlStr = MINECRAFT_AUTH_URL + String.format("?user=%s&serverId=%s", player.getName(true), player.getConnectionHash());
+    String urlStr;
+    try {
+      urlStr = MINECRAFT_AUTH_URL + String.format("?user=%s&serverId=%s", player.getName(true), player.getLoginHash());
+    } catch (Exception e) {
+      e.printStackTrace();
+      return false;
+    }
     try {
       URL url = new URL(urlStr);
       URLConnection conn = url.openConnection();

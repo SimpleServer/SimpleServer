@@ -23,8 +23,10 @@ package simpleserver;
 import static simpleserver.lang.Translations.t;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -53,6 +55,9 @@ import simpleserver.config.xml.Permission;
 import simpleserver.message.AbstractChat;
 import simpleserver.message.Chat;
 import simpleserver.message.GlobalChat;
+import simpleserver.stream.Encryption;
+import simpleserver.stream.Encryption.ClientEncryption;
+import simpleserver.stream.Encryption.ServerEncryption;
 import simpleserver.stream.StreamTunnel;
 
 public class Player {
@@ -64,6 +69,9 @@ public class Player {
   private StreamTunnel serverToClient;
   private StreamTunnel clientToServer;
   private Watchdog watchdog;
+
+  public ServerEncryption serverEncryption = new Encryption.ServerEncryption();
+  public ClientEncryption clientEncryption = new Encryption.ClientEncryption();
 
   private String name = null;
   private String renameName = null;
@@ -239,6 +247,10 @@ public class Player {
       connectionHash = server.nextHash();
     }
     return connectionHash;
+  }
+
+  public String getLoginHash() throws NoSuchAlgorithmException, UnsupportedEncodingException {
+    return clientEncryption.getLoginHash(getConnectionHash());
   }
 
   public double distanceTo(Player player) {
