@@ -942,11 +942,11 @@ public class StreamTunnel {
         write(in.readByte());
         write(in.readByte());
         break;
-      case (byte) 0xcb: // autocompletion
+      case (byte) 0xcb: // Tab-Completion
         write(packetId);
         write(readUTF16());
         break;
-      case (byte) 0xcc: // language and view distance
+      case (byte) 0xcc: // Locale and View Distance
         write(packetId);
         write(readUTF16());
         write(in.readInt());

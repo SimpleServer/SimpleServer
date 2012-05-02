@@ -36,9 +36,10 @@ import java.util.concurrent.locks.ReentrantLock;
 import simpleserver.Coordinate.Dimension;
 import simpleserver.Position;
 import simpleserver.Server;
+import simpleserver.stream.Encryption.ServerEncryption;
 
 public class Bot {
-  private static final int VERSION = 30;
+  private static final int VERSION = 31;
 
   protected String name;
   protected Server server;
@@ -58,6 +59,8 @@ public class Bot {
   private byte lastPacket;
   private short health;
 
+  private ServerEncryption encryption = new ServerEncryption();
+
   public Bot(Server server, String name) {
     this.name = name;
     this.server = server;
@@ -72,8 +75,8 @@ public class Bot {
     } catch (Exception e) {
       socket = new Socket(InetAddress.getByName(null), server.options.getInt("internalPort"));
     }
-    in = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
-    out = new DataOutputStream(new BufferedOutputStream(socket.getOutputStream()));
+    in = new DataInputStream(socket.getInputStream());
+    out = new DataOutputStream(socket.getOutputStream());
 
     writeLock = new ReentrantLock();
 
@@ -100,7 +103,8 @@ public class Bot {
   private void handshake() throws IOException {
     writeLock.lock();
     out.writeByte(2);
-    write(name + ";localbot");
+    out.writeByte(VERSION);
+    write(name);
     out.flush();
     writeLock.unlock();
   }
@@ -117,13 +121,22 @@ public class Bot {
     writeLock.lock();
     out.writeByte(1);
     out.writeInt(VERSION);
-    write(name);
-    write("DEFAULT");
+    write("");
     out.writeInt(0);
     out.writeInt(0);
     out.writeByte(0);
     out.writeByte(0);
     out.writeByte(0);
+    writeLock.unlock();
+  }
+
+  private void sendSharedKey() throws IOException {
+    writeLock.lock();
+    out.writeByte(0xfc);
+    byte[] key = encryption.getEncryptedSharedKey();
+    out.writeShort(key.length);
+    out.write(key);
+    out.flush();
     writeLock.unlock();
   }
 
@@ -170,17 +183,12 @@ public class Bot {
   protected void handlePacket(byte packetId) throws IOException {
     // System.out.println("Packet: 0x" + Integer.toHexString(packetId));
     switch (packetId) {
-      case 0x2: // Handshake
-        readUTF16();
-        login();
-        break;
       case 0x1: // Login Request
         in.readInt();
         readUTF16();
-        readUTF16();
         in.readInt();
         position.dimension = Dimension.get(in.readByte());
-        in.readInt();
+        in.readByte();
         in.readByte();
         in.readByte();
         break;
@@ -515,12 +523,13 @@ public class Bot {
         in.readBoolean();
         in.readBoolean();
         break;
-      case (byte) 0xcb: // autocomplete
+      case (byte) 0xcb: // Tab-Completion
         readUTF16();
         break;
-      case (byte) 0xcc: // language and view distance
+      case (byte) 0xcc: // Locale and View Distance
         readUTF16();
         in.readInt();
+        in.readByte();
         break;
       case (byte) 0xe6: // ModLoaderMP by SDK
         in.readInt(); // mod
@@ -536,6 +545,20 @@ public class Bot {
         readUTF16();
         short arrayLength = in.readShort();
         readNBytes(0xff & arrayLength);
+        break;
+      case (byte) 0xfc: // Encryption Key Response
+        byte[] sharedKey = new byte[in.readShort()];
+        in.readFully(sharedKey);
+        in = new DataInputStream(new BufferedInputStream(encryption.encryptedInputStream(socket.getInputStream())));
+        out = new DataOutputStream(new BufferedOutputStream(encryption.encryptedOutputStream(socket.getOutputStream())));
+        login();
+        break;
+      case (byte) 0xfd: // Encryption Key Request (server -> client)
+        readUTF16();
+        byte[] keyBytes = new byte[in.readShort()];
+        in.readFully(keyBytes);
+        encryption.setPublicKey(keyBytes);
+        sendSharedKey();
         break;
       case (byte) 0xfe: // Server List Ping
         break;
