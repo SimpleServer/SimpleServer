@@ -1010,8 +1010,9 @@ public class StreamTunnel {
         byte[] keyBytes = new byte[in.readShort()];
         in.readFully(keyBytes);
         player.serverEncryption.setPublicKey(keyBytes);
-        write((short) player.clientEncryption.publicKey.getEncoded().length);
-        write(player.clientEncryption.publicKey.getEncoded());
+        byte[] key = player.clientEncryption.getPublicKey();
+        write((short) key.length);
+        write(key);
         break;
       case (byte) 0xfe: // Server List Ping
         write(packetId);

@@ -28,6 +28,7 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.LinkedList;
 import java.util.List;
@@ -60,6 +61,7 @@ import simpleserver.minecraft.MinecraftWrapper;
 import simpleserver.nbt.WorldFile;
 import simpleserver.options.Options;
 import simpleserver.rcon.RconServer;
+import simpleserver.stream.Encryption.ClientEncryption;
 import simpleserver.telnet.TelnetServer;
 import simpleserver.thread.AutoBackup;
 import simpleserver.thread.AutoFreeSpaceChecker;
@@ -464,6 +466,14 @@ public class Server {
     } catch (InterruptedException e) {
       // Severe error happened while starting up.
       // Already on track to stop/restart.
+    }
+
+    try {
+      ClientEncryption.generateKeyPair();
+    } catch (NoSuchAlgorithmException e) {
+      System.out.println("[SimpleServer] Error while generating RSA key pair");
+      e.printStackTrace();
+      System.exit(1);
     }
 
     if (options.getBoolean("enableTelnet")) {

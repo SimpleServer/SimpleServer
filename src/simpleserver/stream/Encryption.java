@@ -43,10 +43,11 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
 public abstract class Encryption {
-  protected PublicKey publicKey;
   protected SecretKey sharedKey;
 
   public static class ServerEncryption extends Encryption {
+    private PublicKey publicKey;
+
     public ServerEncryption() {
       try {
         sharedKey = generateSharedKey();
@@ -74,30 +75,28 @@ public abstract class Encryption {
   }
 
   public static class ClientEncryption extends Encryption {
-    private PrivateKey privateKey;
+    private static KeyPair keyPair;
 
-    public ClientEncryption() {
-      KeyPair pair;
-      try {
-        pair = generateKeyPair();
-      } catch (NoSuchAlgorithmException e) {
-        e.printStackTrace();
-        return;
-      }
-      publicKey = pair.getPublic();
-      privateKey = pair.getPrivate();
+    public static void generateKeyPair() throws NoSuchAlgorithmException {
+      KeyPairGenerator keyGenerator = KeyPairGenerator.getInstance("RSA");
+      keyGenerator.initialize(1024);
+      keyPair = keyGenerator.generateKeyPair();
     }
 
     public void setEncryptedSharedKey(byte[] encryptedSharedKey) {
       try {
-        sharedKey = decryptSharedKey(encryptedSharedKey, privateKey);
+        sharedKey = decryptSharedKey(encryptedSharedKey, keyPair.getPrivate());
       } catch (GeneralSecurityException e) {
         e.printStackTrace();
       }
     }
 
     public String getLoginHash(String name) throws NoSuchAlgorithmException, UnsupportedEncodingException {
-      return new BigInteger(loginHash(name, publicKey, sharedKey)).toString(16);
+      return new BigInteger(loginHash(name, keyPair.getPublic(), sharedKey)).toString(16);
+    }
+
+    public byte[] getPublicKey() {
+      return keyPair.getPublic().getEncoded();
     }
   }
 
@@ -121,12 +120,6 @@ public abstract class Encryption {
 
   private static PublicKey getPublicKey(byte[] keyBytes) throws GeneralSecurityException {
     return KeyFactory.getInstance("RSA").generatePublic(new X509EncodedKeySpec(keyBytes));
-  }
-
-  private static KeyPair generateKeyPair() throws NoSuchAlgorithmException {
-    KeyPairGenerator keyGenerator = KeyPairGenerator.getInstance("RSA");
-    keyGenerator.initialize(1024);
-    return keyGenerator.generateKeyPair();
   }
 
   private static SecretKey generateSharedKey() throws NoSuchAlgorithmException {
