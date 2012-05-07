@@ -31,7 +31,7 @@ public class Event extends XMLTag implements Comparable<Event> {
   public boolean disabled = false;
   public String script = null;
   public Permission allow = null;
-  public boolean isbutton = false;
+  public String type = "plate";
 
   public String value = "";
 
@@ -44,7 +44,7 @@ public class Event extends XMLTag implements Comparable<Event> {
   private static final String DISABLED = "disabled";
   private static final String VALUE = "value";
   private static final String ALLOW = "allow";
-  private static final String ISBUTTON = "isbutton";
+  private static final String TYPE = "type";
 
   Event() {
     super("event");
@@ -68,8 +68,13 @@ public class Event extends XMLTag implements Comparable<Event> {
       allow = new Permission(value);
     } else if (name.equals(DISABLED)) {
       disabled = value != null && !value.equals("false") ? true : false;
-    } else if (name.equals(ISBUTTON)) {
-      isbutton = value != null && !value.equals("false") ? true : false;
+    } else if (name.equals(TYPE)) {
+      if (value.equals("plate") || value.equals("button") || value.equals("consumer")) { // valid
+        // values
+        type = value;
+      } else {
+        System.out.println("WARNING: In config.xml - invalid value for event type (" + value + ")");
+      }
     } else if (name.equals(VALUE)) {
       this.value = value;
     } else if (name.equals(DIMENSION)) {
@@ -97,8 +102,8 @@ public class Event extends XMLTag implements Comparable<Event> {
     if (disabled) {
       attributes.addAttribute(DISABLED, "true");
     }
-    if (isbutton) {
-      attributes.addAttribute(ISBUTTON, "true");
+    if (!type.equals("plate")) {
+      attributes.addAttribute(TYPE, type);
     }
     if (coordinate != null) {
       attributes.addAttribute(COORDINATE, coordinate.toString());

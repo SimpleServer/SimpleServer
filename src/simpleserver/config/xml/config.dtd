@@ -72,7 +72,7 @@
   interval CDATA #IMPLIED
   allow CDATA #IMPLIED
   disabled CDATA #IMPLIED
-  isbutton CDATA #IMPLIED
+  type CDATA #IMPLIED
   value CDATA #IMPLIED
 >
 <!ATTLIST argument

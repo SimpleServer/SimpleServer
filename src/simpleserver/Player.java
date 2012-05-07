@@ -943,7 +943,7 @@ public class Player {
     Iterator<Event> it = server.eventhost.events.keySet().iterator();
     while (it.hasNext()) {
       Event ev = it.next();
-      if (ev.isbutton || ev.coordinate == null) {
+      if (!ev.type.equals("plate") || ev.coordinate == null) {
         continue;
       }
       if (position.coordinate().equals(ev.coordinate)) { // matching -> execute
@@ -962,7 +962,7 @@ public class Player {
     Iterator<Event> it = server.eventhost.events.keySet().iterator();
     while (it.hasNext()) {
       Event ev = it.next();
-      if (!ev.isbutton || ev.coordinate == null) {
+      if (!ev.type.equals("button") || ev.coordinate == null) {
         continue;
       }
       if ((new Coordinate(c.x(), c.y(), c.z(), position.dimension())).equals(ev.coordinate)) { // matching
