@@ -21,8 +21,8 @@
 package simpleserver.command;
 
 import simpleserver.Color;
-import simpleserver.Player;
 import simpleserver.Coordinate;
+import simpleserver.Player;
 
 public class WarpToCoordCommand extends AbstractCommand implements PlayerCommand {
   public WarpToCoordCommand() {
@@ -30,39 +30,39 @@ public class WarpToCoordCommand extends AbstractCommand implements PlayerCommand
   }
 
   public void execute(Player player, String message) {
-      String args[] = extractArguments(message);
-      Coordinate c;
+    String args[] = extractArguments(message);
+    Coordinate c;
 
-      if (args.length < 3) {
+    if (args.length < 3) {
       player.addTMessage(Color.GRAY, "Usage: warpto [player] x y z");
-          return;
-      }
+      return;
+    }
 
-      Player target = player;
-      if (args.length > 3) {
-          String trg = args[0];
-          target = player.getServer().findPlayer(trg);
-          if (target == null) {
-            player.addTMessage(Color.RED, "Player not online (%s)", trg);
-            return;
-          }
+    Player target = player;
+    if (args.length > 3) {
+      String trg = args[0];
+      target = player.getServer().findPlayer(trg);
+      if (target == null) {
+        player.addTMessage(Color.RED, "Player not online (%s)", trg);
+        return;
       }
+    }
 
-      int  x=0;
-      byte y=0;
-      int  z=0;
-      try {
-          x = Integer.valueOf(args[args.length-3]);
-          y = Byte.valueOf(args[args.length-2]);
-          z = Integer.valueOf(args[args.length-1]);
-      } catch (Exception e) {
-            player.addTMessage(Color.RED, "Invalid coordinate!");
-            return;
-      }
+    int x = 0;
+    int y = 0;
+    int z = 0;
+    try {
+      x = Integer.valueOf(args[args.length - 3]);
+      y = Integer.valueOf(args[args.length - 2]);
+      z = Integer.valueOf(args[args.length - 1]);
+    } catch (Exception e) {
+      player.addTMessage(Color.RED, "Invalid coordinate!");
+      return;
+    }
 
-      c = new Coordinate(x,y,z);
-      target.teleportSelf(c);
-      player.getServer().adminLog("Admin " + player.getName() + " teleported:\t "
-                                      + target.getName() + "\tto\t"+c.toString());
+    c = new Coordinate(x, y, z);
+    target.teleportSelf(c);
+    player.getServer().adminLog("Admin " + player.getName() + " teleported:\t "
+        + target.getName() + "\tto\t" + c.toString());
   }
 }
