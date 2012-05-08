@@ -47,6 +47,7 @@ public class Bot {
   private boolean expectDisconnect;
   protected boolean ready;
   protected boolean dead;
+  protected int playerEntityId;
 
   private Socket socket;
   protected DataInputStream in;
@@ -184,7 +185,11 @@ public class Bot {
     // System.out.println("Packet: 0x" + Integer.toHexString(packetId));
     switch (packetId) {
       case 0x1: // Login Request
-        in.readInt();
+        int eid = in.readInt();
+        if (playerEntityId == 0) {
+          playerEntityId = eid;
+        }
+
         readUTF16();
         in.readInt();
         position.dimension = Dimension.get(in.readByte());

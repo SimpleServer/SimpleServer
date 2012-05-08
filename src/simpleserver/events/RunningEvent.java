@@ -20,12 +20,15 @@
  */
 package simpleserver.events;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 import simpleserver.Coordinate;
 import simpleserver.Player;
 import simpleserver.Server;
+import simpleserver.bot.BotController.ConnectException;
+import simpleserver.bot.NpcBot;
 import simpleserver.command.CommandFeedback;
 import simpleserver.command.InvalidCommand;
 import simpleserver.command.ServerCommand;
@@ -173,6 +176,10 @@ class RunningEvent extends Thread implements Runnable {
         execsvrcmd(tokens);
       } else if (cmd.equals("execcmd")) {
         execcmd(tokens);
+      } else if (cmd.equals("npc")) {
+        npcSpawn(tokens);
+      } else if (cmd.equals("npckill")) {
+        npcKill(tokens);
       } else {
         notifyError("Command not found!");
       }
@@ -417,6 +424,71 @@ class RunningEvent extends Thread implements Runnable {
 
     if ((command != null) && !(command instanceof InvalidCommand)) {
       command.execute(server, cmdline, feedback);
+    }
+  }
+
+  private void npcSpawn(ArrayList<String> tokens) {
+    if (tokens.size() < 5) {
+      notifyError("Wrong number of arguments!");
+      return;
+    }
+
+    String name = tokens.remove(0);
+    if (eventHost.npcs.get(name) != null) {
+      notifyError("An NPC with this name still exists!");
+      return;
+    }
+
+    Event event = eventHost.findEvent(tokens.remove(0));
+    if (event == null) {
+      notifyError("Event associated with NPC not found!");
+      return;
+    }
+
+    int x = 0;
+    int y = 0;
+    int z = 0;
+    try {
+      x = Integer.valueOf(tokens.remove(0));
+      y = Integer.valueOf(tokens.remove(0));
+      z = Integer.valueOf(tokens.remove(0));
+    } catch (Exception e) {
+      notifyError("Invalid NPC spawn coordinate!");
+      return;
+    }
+    Coordinate c = new Coordinate(x, y, z);
+
+    try {
+      NpcBot s = new NpcBot(name, event, server, c);
+      server.bots.connect(s);
+      eventHost.npcs.put(name, s);
+    } catch (IOException ex) {
+      notifyError("Could not spawn NPC!");
+      ex.printStackTrace();
+    } catch (ConnectException e) {
+      notifyError("Could not spawn NPC!");
+      e.printStackTrace();
+    }
+  }
+
+  private void npcKill(ArrayList<String> tokens) {
+    if (tokens.size() < 1) {
+      notifyError("Wrong number of arguments!");
+      return;
+    }
+
+    String name = tokens.remove(0);
+    NpcBot b = eventHost.npcs.remove(name);
+    if (b == null) {
+      notifyError("An NPC with this name is not logged on!");
+      return;
+    }
+
+    try {
+      b.logout();
+    } catch (IOException e) {
+      notifyError("Error while logging out bot!");
+      e.printStackTrace();
     }
   }
 
