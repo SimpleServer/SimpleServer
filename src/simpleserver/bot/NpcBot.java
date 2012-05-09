@@ -106,9 +106,9 @@ public class NpcBot extends Bot {
     int y = in.readInt();
     int z = in.readInt();
 
-    byte rotation = in.readByte();
-    byte pitch = in.readByte();
-    byte roll = in.readByte();
+    in.readByte(); // rotation
+    in.readByte(); // pitch
+    in.readByte(); // roll
 
     // System.out.println("Dropped item " + eid + " itemid:" + id + " amount:" +
     // count); // DEBUG
@@ -155,9 +155,6 @@ public class NpcBot extends Bot {
     }
 
     Player nearest = nearestPlayer();
-    if (nearest == null) {
-      return;
-    }
 
     ArrayList<String> args = new ArrayList<String>();
     args.add(purename); // NPC name
@@ -169,18 +166,39 @@ public class NpcBot extends Bot {
     server.eventhost.execute(ev, nearest, true, args);
   }
 
+  private void loginEvent() {
+    Player nearest = nearestPlayer();
+
+    ArrayList<String> args = new ArrayList<String>();
+    args.add(purename); // NPC name
+    args.add("login"); // NPC trigger
+    server.eventhost.execute(ev, nearest, true, args);
+  }
+
+  private void logoutEvent() {
+    Player nearest = nearestPlayer();
+
+    ArrayList<String> args = new ArrayList<String>();
+    args.add(purename); // NPC name
+    args.add("logout"); // NPC trigger
+    server.eventhost.execute(ev, nearest, true, args);
+  }
+
   @Override
   protected void ready() throws IOException {
     super.ready();
     server.runCommand("gamemode", "1 " + name); // creative mode
     timer.schedule(new GhostWalk(), 0, 1000); // send movement updates
+
+    loginEvent();
   }
 
   @Override
   protected void die() {
-    timer.cancel();
+    logoutEvent();
     server.eventhost.npcs.remove(purename);
 
+    timer.cancel();
     super.die();
   }
 
@@ -189,6 +207,7 @@ public class NpcBot extends Bot {
     return false;
   }
 
+  @SuppressWarnings("unused")
   private class DroppedItem {
     public int eid;
 
@@ -214,14 +233,11 @@ public class NpcBot extends Bot {
   }
 
   private final class GhostWalk extends TimerTask {
-    private float t = 0;
-    private float vt = 0;
-
     @Override
     public void run() {
       try {
         if (!dead) {
-          position.updateLook(t, 0);
+          position.updateLook(0, 0);
           writeLock.lock();
           walk(0.1);
           sendPosition();
