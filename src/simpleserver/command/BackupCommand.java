@@ -27,16 +27,62 @@ import simpleserver.Server;
 public class BackupCommand extends AbstractCommand implements PlayerCommand,
     ServerCommand {
   public BackupCommand() {
-    super("backup", "Backup the map");
+    super("backup [tag]", "Backup the map with optional tag");
   }
 
-  public void execute(Player player, String message) {
-    player.addTMessage(Color.GRAY, "Forcing backup!");
-    player.getServer().forceBackup();
+  public void execute(final Player player, final String message) {
+    execute(new Com() {
+      public void sendMsg(String m) {
+        player.addTMessage(Color.GRAY, "Forcing backup!");
+      }
+
+      public Server getServer() {
+        return player.getServer();
+      }
+
+      public String getMessage() {
+        return message;
+      }
+
+    });
   }
 
-  public void execute(Server server, String message, CommandFeedback feedback) {
-    feedback.send("Forcing backup!");
-    server.forceBackup();
+  public void execute(final Server server, final String message, final CommandFeedback feedback) {
+    execute(new Com() {
+      public void sendMsg(String m) {
+        feedback.send(m);
+      }
+
+      public Server getServer() {
+        return server;
+      }
+
+      public String getMessage() {
+        return message;
+      }
+    });
+  }
+
+  /**
+   * Interface to get data from or communicate with caller (server or player)
+   */
+  public interface Com {
+    void sendMsg(String m);
+
+    Server getServer();
+
+    String getMessage();
+  }
+
+  private void execute(Com com) {
+    // com.sendMsg("Forcing backup!");
+    String[] arguments = extractArguments(com.getMessage());
+    if (arguments.length == 0) {
+      com.getServer().forceBackup();
+    } else if (arguments.length == 1) {
+      com.getServer().forceBackup(arguments[0]);
+    } else {
+      com.sendMsg("Wrong number of Arguments!");
+    }
   }
 }

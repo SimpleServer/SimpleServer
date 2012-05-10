@@ -428,6 +428,10 @@ public class Server {
     autoBackup.forceBackup();
   }
 
+  public void forceBackup(String tag) {
+    autoBackup.forceBackup(tag);
+  }
+
   private void kickAllPlayers() {
     String message = t("Server shutting down!");
     if (restart) {

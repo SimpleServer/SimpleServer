@@ -45,7 +45,8 @@ public class AutoBackup {
   private static final long MILLISECONDS_PER_MINUTE = 1000 * 60;
   private static final long MILLISECONDS_PER_HOUR = MILLISECONDS_PER_MINUTE * 60;
   private static final String NAME_FORMAT = "%tF-%1$tH-%1$tM";
-  private static final File BACKUP_DIRECTORY = new File("backups");
+  private static final File BACKUP_AUTO_DIRECTORY = new File("backups/auto");
+  private static final File BACKUP_TAGGED_DIRECTORY = new File("backups/tagged");
   private static final File TEMP_DIRECTORY = new File("tmp");
 
   private final Server server;
@@ -55,6 +56,9 @@ public class AutoBackup {
   private volatile boolean run = true;
   private volatile boolean forceBackup = false;
   private volatile boolean pauseBackup = false;
+
+  private volatile String tag = null; // tag for next backup ('null' means
+                                      // date/no tagged backup)
 
   public AutoBackup(Server server) {
     this.server = server;
@@ -73,10 +77,16 @@ public class AutoBackup {
   }
 
   public void forceBackup() {
+    forceBackup(null);
+  }
+
+  public void forceBackup(String tag) {
+    this.tag = tag;
     forceBackup = true;
     archiver.interrupt();
   }
 
+  // TODO do not overwrite backups!
   private void backup() throws IOException {
     if (server.config.properties.getBoolean("announceBackup")) {
       println("Backing up server...");
@@ -87,8 +97,7 @@ public class AutoBackup {
     try {
       copy = makeTemporaryCopy();
       server.runCommand("save-on", null);
-
-      zipBackup(copy);
+      zipBackup(copy); // create actual backup file
     } finally {
       deleteRecursively(TEMP_DIRECTORY);
     }
@@ -154,9 +163,21 @@ public class AutoBackup {
     return backup;
   }
 
+  /**
+   * Zip and name the temporary created backup
+   * 
+   * @param source Directory to zip
+   * @throws IOException
+   */
   private void zipBackup(File source) throws IOException {
-    File backup = new File(BACKUP_DIRECTORY,
-                           String.format(NAME_FORMAT + ".zip", new Date()));
+    File dir = BACKUP_TAGGED_DIRECTORY;
+
+    if (tag == null) {
+      dir = BACKUP_AUTO_DIRECTORY;
+      tag = String.format(NAME_FORMAT, new Date());
+    }
+
+    File backup = new File(dir, tag + ".zip");
     FileOutputStream fout = new FileOutputStream(backup);
     try {
       ZipOutputStream out = new ZipOutputStream(new BufferedOutputStream(fout));
@@ -260,8 +281,8 @@ public class AutoBackup {
   }
 
   private static File getBackup(boolean old) {
-    BACKUP_DIRECTORY.mkdir();
-    File[] files = BACKUP_DIRECTORY.listFiles(new FileFilter() {
+    BACKUP_AUTO_DIRECTORY.mkdir();
+    File[] files = BACKUP_AUTO_DIRECTORY.listFiles(new FileFilter() {
       public boolean accept(File file) {
         return file.isFile() && file.getPath().contains(".zip");
       }
