@@ -22,8 +22,10 @@ package simpleserver.events;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 
 import simpleserver.Player;
+import simpleserver.config.xml.Area;
 
 @SuppressWarnings("unused")
 public class PostfixEvaluator {
@@ -73,6 +75,8 @@ public class PostfixEvaluator {
     ops.put("flip", "flip");
 
     ops.put("getgroup", "getgroup");
+    ops.put("getplayers", "getplayers");
+    ops.put("isinarea", "isinarea");
 
     /* array ops */
 
@@ -498,11 +502,39 @@ public class PostfixEvaluator {
     String s = pop();
     Player tmp = e.server.findPlayer(s);
     if (tmp == null) {
-      e.notifyError("Player not found! Returning group -1");
+      e.notifyError("getgroup: Player not found! Returning group -1");
       push(-1);
     } else {
       push(tmp.getGroupId());
     }
+  }
+
+  private void getplayers() {
+    ArrayList<String> players = new ArrayList<String>();
+    for (Player p : e.server.playerList.getArray()) {
+      players.add(p.getName());
+    }
+    push(players);
+
+  }
+
+  private void isinarea() {
+    String area = pop();
+    String player = pop();
+    Player p = e.server.findPlayer(player);
+    if (p == null) {
+      e.notifyError("isarea: Player not found!");
+      push(false);
+    }
+    HashSet<Area> areas = new HashSet<Area>(e.server.config.dimensions.areas(p.position()));
+    for (Area a : areas) {
+      if (a.name.equals(area)) {
+        push(true);
+        return;
+      }
+    }
+    push(false);
+    return;
   }
 
   /* array ops */
