@@ -85,6 +85,7 @@ public class PostfixEvaluator {
     ops.put("Aremove", "arrayremove");
     ops.put("Asize", "arraysize");
     ops.put("Aisempty", "arrayisempty");
+    ops.put("Acontains", "arraycontains");
     ops.put("Aget", "arrayget");
     ops.put("Agetlast", "arraygetlast");
     ops.put("Ajoin", "arrayjoin");
@@ -573,6 +574,12 @@ public class PostfixEvaluator {
       e.notifyError("Index out of range!");
       push("null");
     }
+  }
+
+  private void arraycontains() {
+    String val = pop();
+    ArrayList<String> arr = popArray();
+    push(arr.contains(val));
   }
 
   private void arraygetlast() {
