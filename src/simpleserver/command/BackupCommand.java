@@ -33,7 +33,7 @@ public class BackupCommand extends AbstractCommand implements PlayerCommand,
   public void execute(final Player player, final String message) {
     execute(new Com() {
       public void sendMsg(String m) {
-        player.addTMessage(Color.GRAY, "Forcing backup!");
+        player.addTMessage(Color.GRAY, m);
       }
 
       public Server getServer() {
@@ -75,14 +75,16 @@ public class BackupCommand extends AbstractCommand implements PlayerCommand,
   }
 
   private void execute(Com com) {
-    // com.sendMsg("Forcing backup!");
     String[] arguments = extractArguments(com.getMessage());
-    if (arguments.length == 0) {
-      com.getServer().forceBackup();
-    } else if (arguments.length == 1) {
-      com.getServer().forceBackup(arguments[0]);
-    } else {
+    if (arguments.length > 1) {
       com.sendMsg("Wrong number of Arguments!");
+      return;
+    }
+    com.sendMsg("Forcing backup!");
+    if (arguments.length == 0) { // without tag
+      com.getServer().forceBackup();
+    } else { // 'arguments.length == 1': with tag
+      com.getServer().forceBackup(arguments[0]);
     }
   }
 }
