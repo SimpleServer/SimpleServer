@@ -33,9 +33,9 @@ import simpleserver.config.xml.Event;
 
 public class EventHost {
 
-  public ConcurrentHashMap<Event, Long> events; // stores last calls for events
   public HashMap<String, String> colors;
-  public HashMap<String, NpcBot> npcs;
+  public ConcurrentHashMap<Event, Long> events; // stores last calls for events
+  public ConcurrentHashMap<String, NpcBot> npcs; // stores the online npcs
 
   protected Server server;
   protected Random rng;
@@ -52,7 +52,7 @@ public class EventHost {
     }
 
     // initialize
-    npcs = new HashMap<String, NpcBot>();
+    npcs = new ConcurrentHashMap<String, NpcBot>();
     running = new HashMap<String, RunningEvent>();
     events = new ConcurrentHashMap<Event, Long>();
 

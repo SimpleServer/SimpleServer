@@ -77,6 +77,7 @@ public class PostfixEvaluator {
     ops.put("getgroup", "getgroup");
     ops.put("getplayers", "getplayers");
     ops.put("isinarea", "isinarea");
+    ops.put("getcoord", "getcoord");
 
     /* array ops */
 
@@ -93,6 +94,7 @@ public class PostfixEvaluator {
     ops.put("Aget", "arrayget");
     ops.put("Agetlast", "arraygetlast");
     ops.put("Ajoin", "arrayjoin");
+    ops.put("Aexplode", "arrayexplode");
 
     /* hash ops */
     ops.put("Hnew", "hashnew");
@@ -537,6 +539,21 @@ public class PostfixEvaluator {
     return;
   }
 
+  private void getcoord() {
+    String player = pop();
+    Player p = e.server.findPlayer(player);
+    if (p == null) {
+      e.notifyError("isarea: Player not found!");
+      push(false);
+    }
+
+    ArrayList<String> c = new ArrayList<String>();
+    c.add(String.valueOf(p.position().x()));
+    c.add(String.valueOf(p.position().y()));
+    c.add(String.valueOf(p.position().z()));
+    push(c);
+  }
+
   /* array ops */
 
   private void arraynew() {
@@ -647,6 +664,13 @@ public class PostfixEvaluator {
       }
     }
     push(s);
+  }
+
+  private void arrayexplode() {
+    ArrayList<String> arr = popArray();
+    for (String e : arr) {
+      push(e);
+    }
   }
 
   /* hash ops */
