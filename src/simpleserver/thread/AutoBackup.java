@@ -45,8 +45,9 @@ public class AutoBackup {
   private static final long MILLISECONDS_PER_MINUTE = 1000 * 60;
   private static final long MILLISECONDS_PER_HOUR = MILLISECONDS_PER_MINUTE * 60;
   private static final String NAME_FORMAT = "%tF-%1$tH-%1$tM";
-  private static final File BACKUP_AUTO_DIRECTORY = new File("backups/auto");
-  private static final File BACKUP_TAGGED_DIRECTORY = new File("backups/tagged");
+  private static final File BACKUP_BASE_DIRECTORY = new File("backups");
+  private static final File BACKUP_AUTO_DIRECTORY = new File(BACKUP_BASE_DIRECTORY, "auto");
+  private static final File BACKUP_TAGGED_DIRECTORY = new File(BACKUP_BASE_DIRECTORY, "tagged");
   private static final File TEMP_DIRECTORY = new File("tmp");
 
   private final Server server;
@@ -281,7 +282,10 @@ public class AutoBackup {
   }
 
   private static File getBackup(boolean old) {
-    BACKUP_AUTO_DIRECTORY.mkdir();
+    // Create backup directories if not present
+    BACKUP_AUTO_DIRECTORY.mkdirs();
+    BACKUP_TAGGED_DIRECTORY.mkdirs();
+    // Search for backups in BACKUP_AUTO_DIRECTORY
     File[] files = BACKUP_AUTO_DIRECTORY.listFiles(new FileFilter() {
       public boolean accept(File file) {
         return file.isFile() && file.getPath().contains(".zip");
