@@ -49,6 +49,16 @@ public class GiveAliasList extends PropertiesConfig {
     return item;
   }
 
+  public String getAlias(int itemId, int damage) {
+    for (String alias : aliases.keySet()) {
+      Item i = aliases.get(alias);
+      if (i.id == itemId && i.damage == damage) {
+        return alias;
+      }
+    }
+    return null;
+  }
+
   private Item findWithSuffix(String find) {
     for (String suffix : suffixes) {
       if (find.endsWith(suffix)) {

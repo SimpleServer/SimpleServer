@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 import simpleserver.Player;
+import simpleserver.config.GiveAliasList.Item;
 import simpleserver.config.xml.Area;
 
 @SuppressWarnings("unused")
@@ -69,6 +70,8 @@ public class PostfixEvaluator {
     ops.put("bool", "str2bool");
     ops.put("totime", "int2timestr");
     ops.put("evalvar", "evalvar");
+    ops.put("getitemalias", "id2alias");
+    ops.put("getitemid", "alias2id");
 
     ops.put("dup", "dup");
     ops.put("drop", "drop");
@@ -146,7 +149,7 @@ public class PostfixEvaluator {
   }
 
   private void push(String val) {
-    expstack.add(0, val);
+    expstack.add(0, String.valueOf(val));
   }
 
   private void push(long val) {
@@ -307,6 +310,7 @@ public class PostfixEvaluator {
     if (val.size() > 0) {
       for (String key : val.keySet()) {
         String t = val.get(key);
+        key = escape(key, ",:");
         t = escape(t, ",:");
         s += key + ":" + t + ",";
       }
@@ -330,7 +334,7 @@ public class PostfixEvaluator {
       if (toks.length != 2) {
         return new HashMap<String, String>();
       }
-      ret.put(toks[0], unescape(toks[1], ",:"));
+      ret.put(unescape(toks[0], ",:"), unescape(toks[1], ",:"));
     }
 
     return ret;
@@ -475,6 +479,32 @@ public class PostfixEvaluator {
       push(v);
     } else {
       e.notifyError("Warning: Invalid variable: " + s + "! Returning null");
+      push("null");
+    }
+  }
+
+  private void id2alias() {
+    String[] id = pop().split(":");
+    String alias = "null";
+    if (id.length == 1) {
+      alias = e.server.giveAliasList.getAlias(Integer.valueOf(id[0]), 0);
+    }
+    else {
+      alias = e.server.giveAliasList.getAlias(Integer.valueOf(id[0]), Integer.valueOf(id[1]));
+    }
+    push(alias);
+  }
+
+  private void alias2id() {
+    String alias = pop();
+    Item i = e.server.giveAliasList.getItemId(alias);
+    if (i != null) {
+      String id = String.valueOf(i.id);
+      if (i.damage != 0) {
+        id += ":" + String.valueOf(i.damage);
+      }
+      push(id);
+    } else {
       push("null");
     }
   }
@@ -719,7 +749,7 @@ public class PostfixEvaluator {
       if (val == null) {
         val = "null";
       }
-      push(unescape(val, ",:"));
+      push(val);
     } else {
       e.notifyError("Invalid hash key!");
       push("null");

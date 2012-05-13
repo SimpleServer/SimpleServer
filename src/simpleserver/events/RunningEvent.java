@@ -459,7 +459,7 @@ class RunningEvent extends Thread implements Runnable {
     Coordinate c = new Coordinate(x, y, z);
 
     try {
-      NpcBot s = new NpcBot(name, event, server, c);
+      NpcBot s = new NpcBot(name, event.name, server, c);
       server.bots.connect(s);
       eventHost.npcs.put(name, s);
     } catch (IOException ex) {
@@ -562,7 +562,7 @@ class RunningEvent extends Thread implements Runnable {
     assignVariable(v, String.valueOf(PostfixEvaluator.toNum(evaluateVar(v)) - 1));
   }
 
-  private void assignVariable(String symbol, String value) {
+  private synchronized void assignVariable(String symbol, String value) {
     if (symbol == null || symbol.length() < 2) {
       return;
     }

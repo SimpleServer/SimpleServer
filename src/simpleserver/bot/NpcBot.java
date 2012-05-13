@@ -39,15 +39,15 @@ public class NpcBot extends Bot {
   private String purename;
 
   private HashMap<Integer, DroppedItem> dropped = new HashMap<Integer, DroppedItem>();
-  private Event ev = null;
+  private String ev = null;
 
   private Timer timer = new Timer();
 
-  public NpcBot(String name, Event e, Server s, Coordinate coordinate) throws IOException {
+  public NpcBot(String name, String e, Server s, Coordinate coordinate) throws IOException {
     this(name, e, s, new Position(coordinate));
   }
 
-  public NpcBot(String name, Event e, Server s, Position position) throws IOException {
+  public NpcBot(String name, String e, Server s, Position position) throws IOException {
     super(s, "npc" + name);
     purename = name;
     ev = e;
@@ -150,7 +150,13 @@ public class NpcBot extends Bot {
   }
 
   private void itemCollectEvent(DroppedItem i) {
-    if (i == null) {
+    if (i == null || ev == null) {
+      return;
+    }
+
+    Event e = server.eventhost.findEvent(ev);
+    if (e == null) {
+      System.out.println("NPC " + purename + ": Event " + ev + " not found!");
       return;
     }
 
@@ -163,25 +169,37 @@ public class NpcBot extends Bot {
     args.add(String.valueOf(i.id)); // item id
     args.add(String.valueOf(i.count)); // item count
     args.add(String.valueOf(i.data)); // meta data
-    server.eventhost.execute(ev, nearest, true, args);
+    server.eventhost.execute(e, nearest, true, args);
   }
 
   private void loginEvent() {
     Player nearest = nearestPlayer();
 
+    Event e = server.eventhost.findEvent(ev);
+    if (e == null) {
+      System.out.println("NPC " + purename + ": Event " + ev + " not found!");
+      return;
+    }
+
     ArrayList<String> args = new ArrayList<String>();
     args.add(purename); // NPC name
     args.add("login"); // NPC trigger
-    server.eventhost.execute(ev, nearest, true, args);
+    server.eventhost.execute(e, nearest, true, args);
   }
 
   private void logoutEvent() {
     Player nearest = nearestPlayer();
 
+    Event e = server.eventhost.findEvent(ev);
+    if (e == null) {
+      System.out.println("NPC " + purename + ": Event " + ev + " not found!");
+      return;
+    }
+
     ArrayList<String> args = new ArrayList<String>();
     args.add(purename); // NPC name
     args.add("logout"); // NPC trigger
-    server.eventhost.execute(ev, nearest, true, args);
+    server.eventhost.execute(e, nearest, true, args);
   }
 
   @Override
