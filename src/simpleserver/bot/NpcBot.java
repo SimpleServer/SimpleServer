@@ -64,7 +64,12 @@ public class NpcBot extends Bot {
   @Override
   protected void handlePacket(byte packetId) throws IOException {
     switch (packetId) {
-
+      case 0x08: // respawn
+        super.handlePacket(packetId);
+        if (dead) {
+          respawnEvent();
+        }
+        break;
       case 0x15: // pickup spawn
         addDroppedItem();
         break;
@@ -199,6 +204,26 @@ public class NpcBot extends Bot {
     ArrayList<String> args = new ArrayList<String>();
     args.add(purename); // NPC name
     args.add("logout"); // NPC trigger
+    server.eventhost.execute(e, nearest, true, args);
+  }
+
+  private void respawnEvent() {
+    try {
+      Thread.sleep(1000);
+    } catch (Exception e) {
+    }
+
+    Player nearest = nearestPlayer();
+
+    Event e = server.eventhost.findEvent(ev);
+    if (e == null) {
+      System.out.println("NPC " + purename + ": Event " + ev + " not found!");
+      return;
+    }
+
+    ArrayList<String> args = new ArrayList<String>();
+    args.add(purename); // NPC name
+    args.add("respawn"); // NPC trigger
     server.eventhost.execute(e, nearest, true, args);
   }
 
