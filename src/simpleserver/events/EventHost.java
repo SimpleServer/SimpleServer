@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.ReentrantLock;
 
 import simpleserver.Player;
 import simpleserver.Server;
@@ -41,6 +42,8 @@ public class EventHost {
   protected Random rng;
 
   protected HashMap<String, RunningEvent> running;
+
+  protected final ReentrantLock globalVarLock = new ReentrantLock();
 
   public void loadEvents() {
     // make old threads shut down if any

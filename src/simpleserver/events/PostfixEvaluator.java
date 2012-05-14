@@ -176,6 +176,12 @@ public class PostfixEvaluator {
     try {
       while (tokens.size() > 0) {
         String elem = tokens.remove(0);
+        if (elem.charAt(0) == RunningEvent.REFERENCEOP) { // escape->as string
+          elem = elem.substring(1);
+          push(elem);
+          continue;
+        }
+
         if (ops.containsKey(elem)) { // look through methods
           this.getClass().getDeclaredMethod(ops.get(elem), new Class[] {}).invoke(this);
         } else { // no method in hash -> regular value

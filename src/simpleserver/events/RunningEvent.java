@@ -48,11 +48,12 @@ class RunningEvent extends Thread implements Runnable {
   // (default -> triggering player)
   private String threadname = null; // null = just subroutine
 
-  private static final int MAXDEPTH = 5;
-  private static final char LOCALSCOPE = '#';
-  private static final char PLAYERSCOPE = '@';
-  private static final char GLOBALSCOPE = '$';
-  private static final char REFERENCEOP = '\'';
+  protected static final int MAXDEPTH = 5;
+
+  protected static final char LOCALSCOPE = '#';
+  protected static final char PLAYERSCOPE = '@';
+  protected static final char GLOBALSCOPE = '$';
+  protected static final char REFERENCEOP = '\'';
 
   private HashMap<String, String> vars; // local vars
   private ArrayList<String> threadstack; // thread-shared data stack
@@ -247,8 +248,13 @@ class RunningEvent extends Thread implements Runnable {
       return "";
     }
 
-    if (varname.charAt(0) == REFERENCEOP) {
-      return varname.substring(1);
+    if (varname.charAt(0) == REFERENCEOP) { // escape variable
+      char c = varname.charAt(1);
+      if (c == LOCALSCOPE || c == PLAYERSCOPE || c == GLOBALSCOPE) {
+        return varname.substring(1);
+      } else {
+        return null; // not a variable
+      }
     } else if (varname.charAt(0) == LOCALSCOPE) { // local var
       String loc = varname.substring(1);
       // check special vars
@@ -279,11 +285,14 @@ class RunningEvent extends Thread implements Runnable {
 
     } else if (varname.charAt(0) == GLOBALSCOPE) { // global perm var (event
                                                    // value)
+      eventHost.globalVarLock.lock();
       Event ev = eventHost.findEvent(varname.substring(1));
       if (ev == null) {
         notifyError("Event not found!");
+        eventHost.globalVarLock.unlock();
         return "null";
       } else {
+        eventHost.globalVarLock.unlock();
         return String.valueOf(ev.value);
       }
     }
@@ -562,7 +571,7 @@ class RunningEvent extends Thread implements Runnable {
     assignVariable(v, String.valueOf(PostfixEvaluator.toNum(evaluateVar(v)) - 1));
   }
 
-  private synchronized void assignVariable(String symbol, String value) {
+  private void assignVariable(String symbol, String value) {
     if (symbol == null || symbol.length() < 2) {
       return;
     }
@@ -579,10 +588,12 @@ class RunningEvent extends Thread implements Runnable {
     } else if (scope == PLAYERSCOPE) {
       player.vars.put(var, value);
     } else if (scope == GLOBALSCOPE) {
+      eventHost.globalVarLock.lock();
       Event e = eventHost.findEvent(var);
       if (e != null) {
         e.value = value;
       }
+      eventHost.globalVarLock.unlock();
     } else {
       notifyError("Assignment failed: Invalid variable reference!");
     }
