@@ -184,7 +184,10 @@ public class Bot {
   protected void handlePacket(byte packetId) throws IOException {
     // System.out.println("Packet: 0x" + Integer.toHexString(packetId));
     switch (packetId) {
-      case 0x1: // Login Request
+      case 0x00: // Keep Alive
+        keepAlive(in.readInt());
+        break;
+      case 0x01: // Login Request
         int eid = in.readInt();
         if (playerEntityId == 0) {
           playerEntityId = eid;
@@ -192,10 +195,62 @@ public class Bot {
 
         readUTF16();
         in.readInt();
-        position.dimension = Dimension.get(in.readByte());
+        position.dimension = Dimension.get(in.readInt());
         in.readByte();
         in.readByte();
         in.readByte();
+        break;
+      case 0x03: // Chat Message
+        readUTF16();
+        break;
+      case 0x04: // Time Update
+        in.readLong();
+        break;
+      case 0x05: // Entity Equipment
+        in.readInt();
+        in.readShort();
+        in.readShort();
+        in.readShort();
+        break;
+      case 0x06: // Spawn Position
+        readNBytes(12);
+        break;
+      case 0x07: // Use Entity
+        in.readInt();
+        in.readInt();
+        in.readBoolean();
+        break;
+      case 0x08: // Update Health
+        health = in.readShort();
+        in.readShort();
+        in.readFloat();
+        if (health <= 0) {
+          dead = true;
+          respawn();
+        }
+        break;
+      case 0x09: // Respawn
+        position.dimension = Dimension.get((byte) in.readInt());
+        in.readByte();
+        in.readByte();
+        in.readShort();
+        readUTF16();
+        break;
+      case 0x0a: // Player
+        in.readBoolean();
+        break;
+      case 0x0b: // Player Position
+        double x2 = in.readDouble();
+        double stance2 = in.readDouble();
+        double y2 = in.readDouble();
+        double z2 = in.readDouble();
+        boolean onGround2 = in.readBoolean();
+        position.updatePosition(x2, y2, z2, stance2);
+        position.updateGround(onGround2);
+        positionUpdate();
+        break;
+      case 0x0c: // Player Look
+        readNBytes(9);
         break;
       case 0x0d: // Player Position & Look
         double x = in.readDouble();
@@ -217,67 +272,6 @@ public class Bot {
         }
         positionUpdate();
         break;
-      case 0x0b: // Player Position
-        double x2 = in.readDouble();
-        double stance2 = in.readDouble();
-        double y2 = in.readDouble();
-        double z2 = in.readDouble();
-        boolean onGround2 = in.readBoolean();
-        position.updatePosition(x2, y2, z2, stance2);
-        position.updateGround(onGround2);
-        positionUpdate();
-        break;
-      case (byte) 0xff: // Disconnect/Kick
-        String reason = readUTF16();
-        error(reason);
-        break;
-
-      case 0x00: // Keep Alive
-        keepAlive(in.readInt());
-        break;
-      case 0x03: // Chat Message
-        readUTF16();
-        break;
-      case 0x04: // Time Update
-        in.readLong();
-        break;
-      case 0x05: // Entity Equipment
-        in.readInt();
-        in.readShort();
-        in.readShort();
-        in.readShort();
-        break;
-      case 0x06: // Spawn Position
-        readNBytes(12);
-        break;
-      case 0x07: // Use Entity
-        in.readInt();
-        in.readInt();
-        in.readBoolean();
-        in.readBoolean();
-        break;
-      case 0x08: // Update Health
-        health = in.readShort();
-        in.readShort();
-        in.readFloat();
-        if (health <= 0) {
-          dead = true;
-          respawn();
-        }
-        break;
-      case 0x09: // Respawn
-        position.dimension = Dimension.get((byte) in.readInt());
-        in.readByte();
-        in.readByte();
-        in.readShort();
-        readUTF16();
-        break;
-      case 0x0a: // Player
-        in.readByte();
-        break;
-      case 0x0c: // Player Look
-        readNBytes(9);
-        break;
       case 0x0e: // Player Digging
         in.readByte();
         in.readInt();
@@ -293,7 +287,7 @@ public class Bot {
         readItem();
         break;
       case 0x10: // Holding Change
-        readNBytes(2);
+        in.readShort();
         break;
       case 0x11: // Use Bed
         readNBytes(14);
@@ -413,8 +407,10 @@ public class Bot {
         readNBytes(in.readInt() + 4);
         break;
       case 0x34: // Multi Block Change
-        readNBytes(8);
-        readNBytes(in.readShort());
+        in.readInt();
+        in.readInt();
+        in.readShort();
+        readNBytes(in.readInt());
         break;
       case 0x35: // Block Change
         in.readInt();
@@ -437,6 +433,14 @@ public class Bot {
         in.readByte();
         in.readInt();
         in.readInt();
+        break;
+      case 0x3e: // Named Sound Effect
+        readUTF16();
+        in.readInt();
+        in.readInt();
+        in.readInt();
+        in.readByte();
+        in.readByte();
         break;
       case 0x46: // New/Invalid State
         readNBytes(2);
@@ -481,7 +485,7 @@ public class Bot {
       case 0x6a: // Transaction
         in.readByte();
         in.readShort();
-        in.readByte();
+        in.readBoolean();
         break;
       case 0x6b: // Creative Inventory Action
         in.readShort();
@@ -499,6 +503,12 @@ public class Bot {
         readUTF16();
         readUTF16();
         break;
+      case (byte) 0x83: // Item Data
+        in.readShort();
+        in.readShort();
+        byte length = in.readByte();
+        readNBytes(0xff & length);
+        break;
       case (byte) 0x84: // added in 12w06a
         in.readInt();
         in.readShort();
@@ -507,12 +517,6 @@ public class Bot {
         in.readInt();
         in.readInt();
         in.readInt();
-        break;
-      case (byte) 0x83: // Item Data
-        in.readShort();
-        in.readShort();
-        byte length = in.readByte();
-        readNBytes(0xff & length);
         break;
       case (byte) 0xc8: // Increment Statistic
         readNBytes(5);
@@ -566,6 +570,10 @@ public class Bot {
         sendSharedKey();
         break;
       case (byte) 0xfe: // Server List Ping
+        break;
+      case (byte) 0xff: // Disconnect/Kick
+        String reason = readUTF16();
+        error(reason);
         break;
       default:
         error("Unable to handle packet 0x" + Integer.toHexString(packetId)
