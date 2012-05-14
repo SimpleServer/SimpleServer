@@ -106,15 +106,11 @@ public class Coordinate {
     return new Coordinate(x, y, z, dimension);
   }
 
-  public Coordinate add(int x, byte y, int z) {
+  public Coordinate add(int x, int y, int z) {
     return new Coordinate(this.x + x,
                           this.y + y,
                           this.z + z,
                           dimension);
-  }
-
-  public Coordinate add(int x, int y, int z) {
-    return add(x, y, z);
   }
 
   public boolean equals(Coordinate coordinate) {
