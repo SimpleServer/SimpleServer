@@ -130,10 +130,6 @@ class RunningEvent extends Thread implements Runnable {
       if (cmd.equals("return")) {
         cmdreturn(tokens);
         return;
-      } else if (cmd.equals("run")) {
-        cmdrun(tokens, false);
-      } else if (cmd.equals("launch")) {
-        cmdrun(tokens, true);
       } else if (cmd.equals("rem") || cmd.equals("endif")) {
         currline++;
         continue;
@@ -147,14 +143,20 @@ class RunningEvent extends Thread implements Runnable {
             break;
           }
         }
-      } else if (cmd.equals("say")) {
-        say(tokens);
-      } else if (cmd.equals("broadcast") && tokens.size() > 0) {
-        broadcast(tokens);
-      } else if (cmd.equals("give")) {
-        give(tokens);
       } else if (cmd.equals("teleport")) {
         teleport(tokens);
+      } else if (cmd.equals("npc")) {
+        npcSpawn(tokens);
+      } else if (cmd.equals("npckill")) {
+        npcKill(tokens);
+      } else if (cmd.equals("say")) {
+        say(tokens);
+      } else if (cmd.equals("broadcast")) {
+        broadcast(tokens);
+      } else if (cmd.equals("execsvrcmd")) {
+        execsvrcmd(tokens);
+      } else if (cmd.equals("execcmd")) {
+        execcmd(tokens);
       } else if (cmd.equals("set")) {
         set(tokens);
       } else if (cmd.equals("inc")) {
@@ -173,14 +175,10 @@ class RunningEvent extends Thread implements Runnable {
         breakloop(tokens, actions);
       } else if (cmd.equals("endwhile") || cmd.equals("continue")) {
         currline = whilestack.remove(0);
-      } else if (cmd.equals("execsvrcmd")) {
-        execsvrcmd(tokens);
-      } else if (cmd.equals("execcmd")) {
-        execcmd(tokens);
-      } else if (cmd.equals("npc")) {
-        npcSpawn(tokens);
-      } else if (cmd.equals("npckill")) {
-        npcKill(tokens);
+      } else if (cmd.equals("run")) {
+        cmdrun(tokens, false);
+      } else if (cmd.equals("launch")) {
+        cmdrun(tokens, true);
       } else {
         notifyError("Command not found!");
       }
@@ -329,38 +327,6 @@ class RunningEvent extends Thread implements Runnable {
     server.runCommand("say", message);
   }
 
-  private void give(ArrayList<String> tokens) {
-    if (tokens.size() < 2) {
-      notifyError("Wrong number of arguments!");
-      return;
-    }
-
-    Player p = server.findPlayer(tokens.get(0));
-    if (p == null) {
-      notifyError("Player not online!");
-      return;
-    }
-
-    int id = 1;
-    if (tokens.get(1).matches("\\d+")) {
-      id = Integer.valueOf(tokens.get(1));
-    } else {
-      id = server.giveAliasList.getItemId(tokens.get(1)).id;
-    }
-
-    int amount = 1;
-    if (tokens.size() > 2)
-    {
-      try {
-        amount = Integer.valueOf(tokens.get(2));
-      } catch (Exception e) {
-      } // invalid amount
-    }
-
-    // give items
-    p.give(id, amount);
-  }
-
   private void teleport(ArrayList<String> tokens) {
     if (tokens.size() < 2) {
       notifyError("Wrong number of arguments!");
@@ -497,7 +463,7 @@ class RunningEvent extends Thread implements Runnable {
       return;
     }
 
-    String name = tokens.remove(0);
+    String name = new PostfixEvaluator(this).evaluateSingle(tokens);
     NpcBot b = eventHost.npcs.remove(name);
     if (b == null) {
       notifyError("An NPC with this name is not logged on!");
