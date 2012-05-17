@@ -55,7 +55,6 @@ public class PostfixEvaluator {
     ops.put("*", "mul");
     ops.put("/", "div");
     ops.put("%", "mod");
-    ops.put("rand", "rand");
 
     ops.put("gt", "gt");
     ops.put("lt", "lt");
@@ -68,6 +67,8 @@ public class PostfixEvaluator {
 
     ops.put("int", "str2num");
     ops.put("bool", "str2bool");
+    ops.put("rand", "rand");
+    ops.put("currtime", "currtime");
     ops.put("totime", "int2timestr");
     ops.put("evalvar", "evalvar");
     ops.put("getitemalias", "id2alias");
@@ -474,6 +475,10 @@ public class PostfixEvaluator {
 
   private void str2bool() {
     push(popBool());
+  }
+
+  private void currtime() {
+    push(String.valueOf(System.currentTimeMillis()));
   }
 
   private void int2timestr() {

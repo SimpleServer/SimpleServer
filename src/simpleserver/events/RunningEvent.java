@@ -128,12 +128,16 @@ class RunningEvent extends Thread implements Runnable {
       // run action
       String cmd = tokens.remove(0);
       if (cmd.equals("return")) {
+        cmdreturn(tokens);
         return;
+      } else if (cmd.equals("run")) {
+        cmdrun(tokens, false);
+      } else if (cmd.equals("launch")) {
+        cmdrun(tokens, true);
       } else if (cmd.equals("rem") || cmd.equals("endif")) {
         currline++;
         continue;
-      }
-      else if (cmd.equals("print") && tokens.size() > 0) {
+      } else if (cmd.equals("print") && tokens.size() > 0) {
         System.out.println("L" + String.valueOf(currline) + "@" + event.name + " msg: " + tokens.get(0));
       } else if (cmd.equals("sleep") && tokens.size() > 0) {
         try {
@@ -146,7 +150,7 @@ class RunningEvent extends Thread implements Runnable {
       } else if (cmd.equals("say")) {
         say(tokens);
       } else if (cmd.equals("broadcast") && tokens.size() > 0) {
-        server.runCommand("say", tokens.get(0));
+        broadcast(tokens);
       } else if (cmd.equals("give")) {
         give(tokens);
       } else if (cmd.equals("teleport")) {
@@ -159,10 +163,6 @@ class RunningEvent extends Thread implements Runnable {
         decrement(tokens);
       } else if (cmd.equals("push")) {
         push(tokens);
-      } else if (cmd.equals("run")) {
-        cmdrun(tokens, false);
-      } else if (cmd.equals("launch")) {
-        cmdrun(tokens, true);
       } else if (cmd.equals("if")) {
         condition(tokens, actions);
       } else if (cmd.equals("else")) {
@@ -187,6 +187,9 @@ class RunningEvent extends Thread implements Runnable {
 
       currline++;
     }
+
+    // implicit return value -> empty array
+    threadstack.add(0, PostfixEvaluator.fromArray(new ArrayList<String>()));
 
     // finished -> remove itself from the running thread list
     if (threadname != null) {
@@ -268,8 +271,6 @@ class RunningEvent extends Thread implements Runnable {
         return event.value;
       } else if (loc.equals("COORD")) {
         return String.valueOf(event.coordinate);
-      } else if (loc.equals("CURRTIME")) {
-        return String.valueOf(System.currentTimeMillis());
       } else if (loc.equals("POP")) {
         return threadstack.size() == 0 ? "null" : threadstack.remove(0);
       } else if (loc.equals("TOP")) {
@@ -308,19 +309,24 @@ class RunningEvent extends Thread implements Runnable {
   /*---- Interaction ----*/
 
   private void say(ArrayList<String> tokens) {
-    if (tokens.size() != 2) {
+    if (tokens.size() < 2) {
       notifyError("Wrong number of arguments!");
       return;
     }
 
-    Player p = server.findPlayer(tokens.get(0));
-    String message = tokens.get(1);
-
-    if (p != null) {
-      p.addTMessage(message);
-    } else {
+    Player p = server.findPlayer(tokens.remove(0));
+    if (p == null) {
       notifyError("Player not found!");
+      return;
     }
+
+    String message = new PostfixEvaluator(this).evaluateSingle(tokens);
+    p.addTMessage(message);
+  }
+
+  private void broadcast(ArrayList<String> tokens) {
+    String message = new PostfixEvaluator(this).evaluateSingle(tokens);
+    server.runCommand("say", message);
   }
 
   private void give(ArrayList<String> tokens) {
@@ -615,34 +621,37 @@ class RunningEvent extends Thread implements Runnable {
     threadstack.add(0, exp);
   }
 
+  private void cmdreturn(ArrayList<String> tokens) {
+    threadstack.add(0, PostfixEvaluator.fromArray(new PostfixEvaluator(this).evaluate(tokens)));
+  }
+
   private void cmdrun(ArrayList<String> tokens, boolean newThread) {
     if (tokens.size() < 1) {
       notifyError("Wrong number of arguments!");
       return;
     }
 
-    Event e = eventHost.findEvent(tokens.get(0));
+    Event e = eventHost.findEvent(tokens.remove(0));
 
     if (e == null) {
       notifyError("Event to run not found!");
       return;
     }
 
-    Player p = player;
-    if (tokens.size() > 1) {
-      p = server.findPlayer(tokens.get(1));
-    }
+    String args = PostfixEvaluator.fromArray(new PostfixEvaluator(this).evaluate(tokens));
 
     if (!newThread) {
       if (stackdepth < MAXDEPTH) {
-        (new RunningEvent(eventHost, null, e, p, stackdepth + 1, threadstack)).run();
+        threadstack.add(0, args);
+        (new RunningEvent(eventHost, null, e, player, stackdepth + 1, threadstack)).run();
       } else {
         notifyError("Can not run event - stack level too deep!");
       }
     } else { // run in a new thread (passing threadstack copy!)
       @SuppressWarnings("unchecked")
       ArrayList<String> clone = (ArrayList<String>) threadstack.clone();
-      eventHost.executeEvent(e, p, clone);
+      clone.add(args);
+      eventHost.executeEvent(e, player, clone);
     }
   }
 
