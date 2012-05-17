@@ -583,7 +583,13 @@ public class Player {
     }
 
     if (command instanceof ExternalCommand) {
-      return "/" + originalName + " " + args;
+      // commands with bound events have to be forwarded explicitly
+      // (to prevent unknown command error by server)
+      if (config.event != null && config.forwarding == Forwarding.NONE) {
+        return null;
+      } else {
+        return "/" + originalName + " " + args;
+      }
     } else if ((config != null && config.forwarding != Forwarding.NONE) || server.config.properties.getBoolean("forwardAllCommands")) {
       return message;
     } else {

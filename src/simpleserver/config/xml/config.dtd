@@ -56,7 +56,6 @@
 <!ATTLIST command
   name CDATA #REQUIRED
   allow CDATA #IMPLIED
-  forward NMTOKEN #IMPLIED
   hidden NMTOKEN #IMPLIED
   rename CDATA #IMPLIED
   forward NMTOKEN #IMPLIED
