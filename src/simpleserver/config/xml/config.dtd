@@ -102,8 +102,7 @@
   end CDATA #REQUIRED
   owner NMTOKEN #IMPLIED
   priority NMTOKEN #IMPLIED
-  onenter CDATA #IMPLIED
-  onleave CDATA #IMPLIED
+  event CDATA #IMPLIED
 >
 <!ATTLIST permission
   allow CDATA #REQUIRED

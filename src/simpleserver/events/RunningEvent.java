@@ -277,7 +277,12 @@ class RunningEvent extends Thread implements Runnable {
       } else if (eventHost.colors.containsKey(loc)) {
         return "\u00a7" + eventHost.colors.get(loc);
       } else {
-        return String.valueOf(vars.get(loc));
+        String v = vars.get(loc);
+        if (v == null) {
+          vars.put(loc, "null");
+          v = "null";
+        }
+        return String.valueOf(v);
       }
 
     } else if (varname.charAt(0) == PLAYERSCOPE) { // player var
@@ -637,7 +642,7 @@ class RunningEvent extends Thread implements Runnable {
     } else { // run in a new thread (passing threadstack copy!)
       @SuppressWarnings("unchecked")
       ArrayList<String> clone = (ArrayList<String>) threadstack.clone();
-      eventHost.execute(e, p, true, clone);
+      eventHost.executeEvent(e, p, clone);
     }
   }
 

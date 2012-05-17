@@ -565,11 +565,11 @@ public class Player {
       if (server.options.getBoolean("enableEvents") && config.event != null) {
         Event e = server.eventhost.findEvent(config.event);
         if (e != null) {
-          ArrayList<String> stack = null;
+          ArrayList<String> arguments = new ArrayList<String>();
           if (!args.equals("")) {
-            stack = new ArrayList<String>(java.util.Arrays.asList(args.split("\\s+")));
+            arguments = new ArrayList<String>(java.util.Arrays.asList(args.split("\\s+")));
           }
-          server.eventhost.execute(e, this, true, stack);
+          server.eventhost.execute(e, this, true, arguments);
         } else {
           System.out.println("Error in player command " + originalName + ": Event " + config.event + " not found!");
         }
@@ -902,30 +902,32 @@ public class Player {
     oldAreas.removeAll(areas); // -> now contains only areas not present anymore
 
     for (Area a : areasCopy) { // run area onenter events
-      if (a.onenter == null) {
+      if (a.event == null) {
         continue;
       }
-      Event e = server.eventhost.findEvent(a.onenter);
+      Event e = server.eventhost.findEvent(a.event);
       if (e != null) {
-        ArrayList<String> stack = new ArrayList<String>();
-        stack.add(a.name);
-        server.eventhost.execute(e, this, true, stack);
+        ArrayList<String> args = new ArrayList<String>();
+        args.add("enter");
+        args.add(a.name);
+        server.eventhost.execute(e, this, true, args);
       } else {
-        System.out.println("Error in area " + a.name + "/onenter: Event " + a.onenter + " not found!");
+        System.out.println("Error in area " + a.name + "/event: Event " + a.event + " not found!");
       }
     }
 
     for (Area a : oldAreas) { // run area onleave events
-      if (a.onleave == null) {
+      if (a.event == null) {
         continue;
       }
-      Event e = server.eventhost.findEvent(a.onleave);
+      Event e = server.eventhost.findEvent(a.event);
       if (e != null) {
-        ArrayList<String> stack = new ArrayList<String>();
-        stack.add(a.name);
-        server.eventhost.execute(e, this, true, stack);
+        ArrayList<String> args = new ArrayList<String>();
+        args.add("leave");
+        args.add(a.name);
+        server.eventhost.execute(e, this, true, args);
       } else {
-        System.out.println("Error in area " + a.name + "/onleave: Event " + a.onleave + " not found!");
+        System.out.println("Error in area " + a.name + "/event: Event " + a.event + " not found!");
       }
     }
 

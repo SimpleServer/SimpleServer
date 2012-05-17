@@ -96,11 +96,31 @@ public class EventHost {
     }
   }
 
-  /* Execute given event triggered by given player */
-  public void execute(Event e, Player p, boolean forced, ArrayList<String> args) {
+  /* General event call */
+  protected void executeEvent(Event e, Player p, ArrayList<String> stack) {
     // DEBUG
     // System.out.println(p.getName()
     // +"->"+e.name+"@"+System.currentTimeMillis());
+
+    if (e == null) { // no event given -> abort
+      return;
+    }
+
+    // no stack given -> add empty array representing no arguments
+    if (stack == null) {
+      stack = new ArrayList<String>();
+      stack.add(PostfixEvaluator.fromArray(new ArrayList<String>()));
+    }
+
+    // Start top level event in new thread
+    String threadname = e.name + String.valueOf(System.currentTimeMillis());
+    RunningEvent rev = new RunningEvent(this, threadname, e, p, 0, stack);
+    rev.start();
+    running.put(threadname, rev);
+  }
+
+  /* Execute given event triggered by given player */
+  public void execute(Event e, Player p, boolean forced, ArrayList<String> args) {
 
     if (e == null) { // no event given -> abort
       return;
@@ -126,11 +146,14 @@ public class EventHost {
       events.put(e, currtime); // Update last event call time
     }
 
-    // Start top level event in new thread
-    String threadname = e.name + String.valueOf(System.currentTimeMillis());
-    RunningEvent rev = new RunningEvent(this, threadname, e, p, 0, args);
-    rev.start();
-    running.put(threadname, rev);
+    /* pack an array with the passed arguments onto the stack for that event */
+    if (args == null) {
+      args = new ArrayList<String>();
+    }
+
+    ArrayList<String> stack = new ArrayList<String>();
+    stack.add(PostfixEvaluator.fromArray(args));
+    executeEvent(e, p, stack);
   }
 
   public Event findEvent(String name) {

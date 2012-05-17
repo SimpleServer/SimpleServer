@@ -289,7 +289,9 @@ public class PostfixEvaluator {
     val = val.substring(1, val.length() - 1);
     for (String s : val.split("(?<!\\\\),")) {
       s = unescape(s, ",");
-      arr.add(s);
+      if (!s.equals("")) {
+        arr.add(s);
+      }
     }
 
     return arr;
@@ -704,8 +706,12 @@ public class PostfixEvaluator {
 
   private void arrayexplode() {
     ArrayList<String> arr = popArray();
-    for (String e : arr) {
-      push(e);
+    if (arr.size() > 0) {
+      for (String e : arr) {
+        push(e);
+      }
+    } else {
+      push("null");
     }
   }
 
