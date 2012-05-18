@@ -25,7 +25,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.locks.ReentrantLock;
 
 import simpleserver.Player;
 import simpleserver.Server;
@@ -35,7 +34,10 @@ import simpleserver.config.xml.Event;
 public class EventHost {
 
   public HashMap<String, String> colors;
-  public ConcurrentHashMap<Event, Long> events; // stores last calls for events
+  public ConcurrentHashMap<Event, Long> events; // stores events and their last
+                                                // calls
+  public ConcurrentHashMap<String, String> globals; // cache for global event
+                                                    // vars
   public ConcurrentHashMap<String, NpcBot> npcs; // stores the online npcs
 
   protected Server server;
@@ -43,26 +45,38 @@ public class EventHost {
 
   protected HashMap<String, RunningEvent> running;
 
-  protected final ReentrantLock globalVarLock = new ReentrantLock();
-
   public void loadEvents() {
-    // make old threads shut down if any
-    if (running != null) {
-      for (String k : running.keySet()) {
-        running.get(k).stopping = true;
-        running.get(k).interrupt();
+    // try to make old threads shut down if any
+    try {
+      if (running != null) {
+        for (String k : running.keySet()) {
+          running.get(k).stopping = true;
+          running.get(k).interrupt();
+        }
       }
+    } catch (Exception e) {
+      // ignore failures...
     }
 
     // initialize
     npcs = new ConcurrentHashMap<String, NpcBot>();
     running = new HashMap<String, RunningEvent>();
     events = new ConcurrentHashMap<Event, Long>();
+    globals = new ConcurrentHashMap<String, String>();
 
     Iterator<Event> it = server.config.events.iterator();
     while (it.hasNext()) {
       Event ev = it.next();
       events.put(ev, (long) 0);
+      globals.put(ev.name, ev.value);
+    }
+  }
+
+  public void saveGlobalVars() {
+    Iterator<Event> it = server.config.events.iterator();
+    while (it.hasNext()) {
+      Event ev = it.next();
+      ev.value = globals.get(ev.name);
     }
   }
 

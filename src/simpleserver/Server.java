@@ -258,17 +258,21 @@ public class Server {
 
     addressFactory.toggle(!config.properties.getBoolean("disableAddressFactory"));
 
-    saveResources();
-
     // reload events from config
     if (eventhost != null) {
       eventhost.loadEvents();
     }
 
+    saveResources();
+
     return globalConfig.loadsuccess;
   }
 
   public void saveResources() {
+    if (eventhost != null) {
+      eventhost.saveGlobalVars();
+    }
+
     for (Resource resource : resources) {
       resource.save();
     }

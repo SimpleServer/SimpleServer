@@ -266,7 +266,7 @@ class RunningEvent extends Thread implements Runnable {
       } else if (loc.equals("THIS")) {
         return "$" + event.name;
       } else if (loc.equals("VALUE")) {
-        return event.value;
+        return eventHost.globals.get(event.name);
       } else if (loc.equals("COORD")) {
         return String.valueOf(event.coordinate);
       } else if (loc.equals("POP")) {
@@ -289,15 +289,13 @@ class RunningEvent extends Thread implements Runnable {
 
     } else if (varname.charAt(0) == GLOBALSCOPE) { // global perm var (event
                                                    // value)
-      eventHost.globalVarLock.lock();
-      Event ev = eventHost.findEvent(varname.substring(1));
-      if (ev == null) {
-        notifyError("Event not found!");
-        eventHost.globalVarLock.unlock();
-        return "null";
+      String name = varname.substring(1);
+      if (eventHost.globals.containsKey(name)) {
+        String ret = eventHost.globals.get(name);
+        return ret;
       } else {
-        eventHost.globalVarLock.unlock();
-        return String.valueOf(ev.value);
+        notifyError("Event " + name + " not found!");
+        return "null";
       }
     }
 
@@ -565,12 +563,11 @@ class RunningEvent extends Thread implements Runnable {
     } else if (scope == PLAYERSCOPE) {
       player.vars.put(var, value);
     } else if (scope == GLOBALSCOPE) {
-      eventHost.globalVarLock.lock();
-      Event e = eventHost.findEvent(var);
-      if (e != null) {
-        e.value = value;
+      if (eventHost.globals.containsKey(var)) {
+        eventHost.globals.put(var, value);
+      } else {
+        notifyError("Assignment failed: event " + var + " not found!");
       }
-      eventHost.globalVarLock.unlock();
     } else {
       notifyError("Assignment failed: Invalid variable reference!");
     }
