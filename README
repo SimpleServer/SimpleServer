@@ -30,17 +30,18 @@ Features (See CHANGES for updates and more infomation):
    Local chat perimeter changeable.
  * Customizable message formats.
  * Compatible with CraftBukkit, hey0 and other server modifications.
- * Group, Command and Block permissions system (See permissions.xml).
- * Optional local area permissions (See permissions.xml).
+ * Group, Command and Block permissions system (See config.xml).
+ * Optional local area permissions (See config.xml).
  * Customizable kits (kit-list.txt).
  * Customizable give aliases (give-alias-list.txt).
- * Customizable command aliases (See permissions.xml)
+ * Customizable command aliases (See config.xml)
  * IP bans (ip-ban-list.txt).
  * Message of the day (MOTD) displayed to members when joining (motd.txt).
  * Muting players from global chat (mute-list.txt).
  * Rules listing (rules.txt).
  * Optional member whitelist (white-list.txt).
  * Selectable language packages for all in-game notifications.
+
 See simpleserver.properties and simpleserver/config.xml for general configuration.
 
 Console Commands:
@@ -177,7 +178,7 @@ useWhitelist        | Only allow whitelisted players to join server
 xmlInlineAttributes | Turn on inline XML attributes (EXPERT SETTING)
 xmlPCDATA           | Turn on XML PCDATA between tags (EXPERT SETTING)
 
-For more information with configuration, please see:
+For more information about configuration, please see:
 https://github.com/SimpleServer/SimpleServer/wiki/Configuration
   
 Technical Details:
