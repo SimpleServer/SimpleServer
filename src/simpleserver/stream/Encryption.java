@@ -36,11 +36,17 @@ import java.security.PublicKey;
 import java.security.spec.X509EncodedKeySpec;
 
 import javax.crypto.Cipher;
-import javax.crypto.CipherInputStream;
-import javax.crypto.CipherOutputStream;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
+
+import org.bouncycastle.crypto.BufferedBlockCipher;
+import org.bouncycastle.crypto.engines.AESFastEngine;
+import org.bouncycastle.crypto.io.CipherInputStream;
+import org.bouncycastle.crypto.io.CipherOutputStream;
+import org.bouncycastle.crypto.modes.CFBBlockCipher;
+import org.bouncycastle.crypto.params.KeyParameter;
+import org.bouncycastle.crypto.params.ParametersWithIV;
 
 public abstract class Encryption {
   protected SecretKey sharedKey;
@@ -100,9 +106,15 @@ public abstract class Encryption {
     }
   }
 
+  public BufferedBlockCipher getStreamCipher(boolean out) {
+    BufferedBlockCipher cipher = new BufferedBlockCipher(new CFBBlockCipher(new AESFastEngine(), 8));
+    cipher.init(out, new ParametersWithIV(new KeyParameter(sharedKey.getEncoded()), sharedKey.getEncoded(), 0, 16));
+    return cipher;
+  }
+
   public OutputStream encryptedOutputStream(OutputStream stream) {
     try {
-      return new CipherOutputStream(stream, getCipher("RC4", sharedKey, 1));
+      return new CipherOutputStream(stream, getStreamCipher(true));
     } catch (Exception e) {
       e.printStackTrace();
     }
@@ -111,7 +123,7 @@ public abstract class Encryption {
 
   public InputStream encryptedInputStream(InputStream stream) {
     try {
-      return new CipherInputStream(stream, getCipher("RC4", sharedKey, 1));
+      return new CipherInputStream(stream, getStreamCipher(false));
     } catch (Exception e) {
       e.printStackTrace();
     }
@@ -123,7 +135,7 @@ public abstract class Encryption {
   }
 
   private static SecretKey generateSharedKey() throws NoSuchAlgorithmException {
-    KeyGenerator keyGenerator = KeyGenerator.getInstance("RC4");
+    KeyGenerator keyGenerator = KeyGenerator.getInstance("AES");
     keyGenerator.init(128);
     return keyGenerator.generateKey();
   }

@@ -53,9 +53,9 @@ public class StreamTunnel {
   private static final int BUFFER_SIZE = 1024;
   private static final byte BLOCK_DESTROYED_STATUS = 2;
   private static final Pattern MESSAGE_PATTERN = Pattern.compile("^<([^>]+)> (.*)$");
-  private static final Pattern COLOR_PATTERN = Pattern.compile("\u00a7[0-9a-f]");
+  private static final Pattern COLOR_PATTERN = Pattern.compile("\u00a7[0-9a-z]");
   private static final Pattern JOIN_PATTERN = Pattern.compile("\u00a7.((\\d|\\w)*) (joined|left) the game.");
-  private static final String CONSOLE_CHAT_PATTERN = "\\(CONSOLE:.*\\)";
+  private static final String CONSOLE_CHAT_PATTERN = "\\[Server:.*\\]";
   private static final int MESSAGE_SIZE = 60;
   private static final int MAXIMUM_MESSAGE_SIZE = 119;
   public static final HashSet<Short> ENCHANTABLE = new HashSet<Short>();
@@ -169,10 +169,12 @@ public class StreamTunnel {
 
   private void handlePacket() throws IOException {
     Byte packetId = in.readByte();
+    // System.out.println((isServerTunnel ? "server " : "client ") +
+    // String.format("%02x", packetId));
     int x;
     byte y;
     int z;
-    int dimension;
+    byte dimension;
     Coordinate coordinate;
     switch (packetId) {
       case 0x00: // Keep Alive
@@ -180,24 +182,21 @@ public class StreamTunnel {
         write(in.readInt()); // random number that is returned from server
         break;
       case 0x01: // Login Request/Response
-        if (isServerTunnel) {
-          if (server.authenticator.useCustAuth(player)
-              && !server.authenticator.onlineAuthenticate(player)) {
-            player.kick(t("%s Failed to login: User not premium", "[CustAuth]"));
-            break;
-          }
-          write(packetId);
-          player.setEntityId(write(in.readInt()));
-          write(readUTF16());
-        } else {
-          write(packetId);
-          write(in.readInt());
-          write(readUTF16());
+        if (server.authenticator.useCustAuth(player)
+            && !server.authenticator.onlineAuthenticate(player)) {
+          player.kick(t("%s Failed to login: User not premium", "[CustAuth]"));
+          break;
         }
+        write(packetId);
+        if (!isServerTunnel) {
+          break;
+        }
+        player.setEntityId(write(in.readInt()));
+        write(readUTF16());
 
-        write(in.readInt());
+        write(in.readByte());
 
-        dimension = in.readInt();
+        dimension = in.readByte();
         if (isServerTunnel) {
           player.setDimension(Dimension.get(dimension));
         }
@@ -251,6 +250,8 @@ public class StreamTunnel {
         write(packetId);
         write(version);
         write(name);
+        write(readUTF16());
+        write(in.readInt());
 
         break;
       case 0x03: // Chat Message
@@ -324,8 +325,7 @@ public class StreamTunnel {
         write(packetId);
         write(in.readInt());
         write(in.readShort());
-        write(in.readShort());
-        write(in.readShort());
+        copyItem();
         break;
       case 0x06: // Spawn Position
         write(packetId);
@@ -358,6 +358,9 @@ public class StreamTunnel {
         break;
       case 0x09: // Respawn
         write(packetId);
+        if (!isServerTunnel) {
+          break;
+        }
         player.setDimension(Dimension.get(write(in.readInt())));
         write(in.readByte());
         write(in.readByte());
@@ -475,6 +478,9 @@ public class StreamTunnel {
             }
           }
         }
+        byte blockX = in.readByte();
+        byte blockY = in.readByte();
+        byte blockZ = in.readByte();
 
         boolean writePacket = true;
         boolean drop = false;
@@ -558,6 +564,9 @@ public class StreamTunnel {
               player.placedBlock();
             }
           }
+          write(blockX);
+          write(blockY);
+          write(blockZ);
 
           player.openingChest(coordinate);
 
@@ -719,11 +728,6 @@ public class StreamTunnel {
         write(packetId);
         player.updateExperience(write(in.readFloat()), write(in.readShort()), write(in.readShort()));
         break;
-
-      case 0x32: // Pre-Chunk
-        write(packetId);
-        copyNBytes(9);
-        break;
       case 0x33: // Map Chunk
         write(packetId);
         write(in.readInt());
@@ -765,6 +769,14 @@ public class StreamTunnel {
         write(packetId);
         copyNBytes(12);
         break;
+      case 0x37: // Mining progress
+        write(packetId);
+        write(in.readInt());
+        write(in.readInt());
+        write(in.readInt());
+        write(in.readInt());
+        write(in.readByte());
+        break;
       case 0x3c: // Explosion
         write(packetId);
         copyNBytes(28);
@@ -779,6 +791,15 @@ public class StreamTunnel {
         write(in.readByte());
         write(in.readInt());
         write(in.readInt());
+        break;
+      case 0x3e: // Named Sound/Particle Effect
+        write(packetId);
+        write(readUTF16());
+        write(in.readInt());
+        write(in.readInt());
+        write(in.readInt());
+        write(in.readByte());
+        write(in.readByte());
         break;
       case 0x46: // New/Invalid State
         write(packetId);
@@ -940,7 +961,6 @@ public class StreamTunnel {
         write(in.readByte());
         write(in.readByte());
         write(in.readByte());
-        write(in.readByte());
         break;
       case (byte) 0xcb: // Tab-Completion
         write(packetId);
@@ -949,7 +969,8 @@ public class StreamTunnel {
       case (byte) 0xcc: // Locale and View Distance
         write(packetId);
         write(readUTF16());
-        write(in.readInt());
+        write(in.readByte());
+        write(in.readByte());
         write(in.readByte());
         break;
       case (byte) 0xd3: // Red Power (mod by Eloraam)
@@ -1085,11 +1106,11 @@ public class StreamTunnel {
 
   private String readUTF16() throws IOException {
     short length = in.readShort();
-    byte[] bytes = new byte[length * 2 + 2];
-    in.readFully(bytes, 2, length * 2);
-    bytes[0] = (byte) 0xfffffffe;
-    bytes[1] = (byte) 0xffffffff;
-    return new String(bytes, "UTF-16");
+    StringBuilder string = new StringBuilder();
+    for (int i = 0; i < length; i++) {
+      string.append(in.readChar());
+    }
+    return string.toString();
   }
 
   private void lockChest(Coordinate coordinate) {

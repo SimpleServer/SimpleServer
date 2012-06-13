@@ -68,6 +68,7 @@
 			<zipfileset excludes="META-INF/**" src="lib/slf4j-nop-1.6.1.jar" />
 			<zipfileset excludes="META-INF/**" src="lib/serializer.jar" />
 			<zipfileset excludes="META-INF/**" src="lib/xercesImpl.jar" />
+			<zipfileset excludes="META-INF/**" src="lib/bouncycastle.jar" />
 		</jar>
 	</target>
 

@@ -39,7 +39,7 @@ import simpleserver.Server;
 import simpleserver.stream.Encryption.ServerEncryption;
 
 public class Bot {
-  private static final int VERSION = 31;
+  private static final int VERSION = 35;
 
   protected String name;
   protected Server server;
@@ -106,6 +106,8 @@ public class Bot {
     out.writeByte(2);
     out.writeByte(VERSION);
     write(name);
+    write("localhost");
+    out.writeInt(server.options.getInt("internalPort"));
     out.flush();
     writeLock.unlock();
   }
@@ -121,13 +123,6 @@ public class Bot {
   protected void login() throws IOException {
     writeLock.lock();
     out.writeByte(1);
-    out.writeInt(VERSION);
-    write("");
-    out.writeInt(0);
-    out.writeInt(0);
-    out.writeByte(0);
-    out.writeByte(0);
-    out.writeByte(0);
     writeLock.unlock();
   }
 
@@ -144,11 +139,6 @@ public class Bot {
   private void respawn() throws IOException {
     writeLock.lock();
     out.writeByte(9);
-    out.writeInt(position.dimension.index());
-    out.writeByte(0);
-    out.writeByte(0);
-    out.writeShort(128);
-    write("DEFAULT");
     writeLock.unlock();
   }
 
@@ -194,11 +184,48 @@ public class Bot {
         }
 
         readUTF16();
-        in.readInt();
-        position.dimension = Dimension.get(in.readInt());
+        in.readByte();
+        position.dimension = Dimension.get(in.readByte());
         in.readByte();
         in.readByte();
         in.readByte();
+        break;
+      case 0x0d: // Player Position & Look
+        double x = in.readDouble();
+        double stance = in.readDouble();
+        double y = in.readDouble();
+        double z = in.readDouble();
+        float yaw = in.readFloat();
+        float pitch = in.readFloat();
+        boolean onGround = in.readBoolean();
+        position.updatePosition(x, y, z, stance);
+        position.updateLook(yaw, pitch);
+        position.updateGround(onGround);
+        if (!ready) {
+          sendPosition();
+          ready();
+        } else if (dead) {
+          sendPosition();
+          dead = false;
+        }
+        positionUpdate();
+        break;
+      case 0x0b: // Player Position
+        double x2 = in.readDouble();
+        double stance2 = in.readDouble();
+        double y2 = in.readDouble();
+        double z2 = in.readDouble();
+        boolean onGround2 = in.readBoolean();
+        position.updatePosition(x2, y2, z2, stance2);
+        position.updateGround(onGround2);
+        positionUpdate();
+        break;
+      case (byte) 0xff: // Disconnect/Kick
+        String reason = readUTF16();
+        error(reason);
+        break;
+      case 0x00: // Keep Alive
+        keepAlive(in.readInt());
         break;
       case 0x03: // Chat Message
         readUTF16();
@@ -209,8 +236,7 @@ public class Bot {
       case 0x05: // Entity Equipment
         in.readInt();
         in.readShort();
-        in.readShort();
-        in.readShort();
+        readItem();
         break;
       case 0x06: // Spawn Position
         readNBytes(12);
@@ -285,6 +311,9 @@ public class Bot {
         in.readInt();
         in.readByte();
         readItem();
+        in.readByte();
+        in.readByte();
+        in.readByte();
         break;
       case 0x10: // Holding Change
         in.readShort();
@@ -399,9 +428,6 @@ public class Bot {
         in.readShort();
         in.readShort();
         break;
-      case 0x32: // Pre-Chunk
-        readNBytes(9);
-        break;
       case 0x33: // Map Chunk
         readNBytes(13);
         readNBytes(in.readInt() + 4);
@@ -421,6 +447,13 @@ public class Bot {
         break;
       case 0x36: // Block Action
         readNBytes(12);
+        break;
+      case 0x37: // Mining progress
+        in.readInt();
+        in.readInt();
+        in.readInt();
+        in.readInt();
+        in.readByte();
         break;
       case 0x3c: // Explosion
         readNBytes(28);
@@ -527,17 +560,17 @@ public class Bot {
         in.readShort();
         break;
       case (byte) 0xca: // Player Abilities
-        in.readBoolean();
-        in.readBoolean();
-        in.readBoolean();
-        in.readBoolean();
+        in.readByte();
+        in.readByte();
+        in.readByte();
         break;
       case (byte) 0xcb: // Tab-Completion
         readUTF16();
         break;
       case (byte) 0xcc: // Locale and View Distance
         readUTF16();
-        in.readInt();
+        in.readByte();
+        in.readByte();
         in.readByte();
         break;
       case (byte) 0xe6: // ModLoaderMP by SDK
