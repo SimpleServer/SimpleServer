@@ -174,9 +174,6 @@ public class Bot {
   protected void handlePacket(byte packetId) throws IOException {
     // System.out.println("Packet: 0x" + Integer.toHexString(packetId));
     switch (packetId) {
-      case 0x00: // Keep Alive
-        keepAlive(in.readInt());
-        break;
       case 0x01: // Login Request
         int eid = in.readInt();
         if (playerEntityId == 0) {
@@ -265,38 +262,8 @@ public class Bot {
       case 0x0a: // Player
         in.readBoolean();
         break;
-      case 0x0b: // Player Position
-        double x2 = in.readDouble();
-        double stance2 = in.readDouble();
-        double y2 = in.readDouble();
-        double z2 = in.readDouble();
-        boolean onGround2 = in.readBoolean();
-        position.updatePosition(x2, y2, z2, stance2);
-        position.updateGround(onGround2);
-        positionUpdate();
-        break;
       case 0x0c: // Player Look
         readNBytes(9);
-        break;
-      case 0x0d: // Player Position & Look
-        double x = in.readDouble();
-        double stance = in.readDouble();
-        double y = in.readDouble();
-        double z = in.readDouble();
-        float yaw = in.readFloat();
-        float pitch = in.readFloat();
-        boolean onGround = in.readBoolean();
-        position.updatePosition(x, y, z, stance);
-        position.updateLook(yaw, pitch);
-        position.updateGround(onGround);
-        if (!ready) {
-          sendPosition();
-          ready();
-        } else if (dead) {
-          sendPosition();
-          dead = false;
-        }
-        positionUpdate();
         break;
       case 0x0e: // Player Digging
         in.readByte();
@@ -603,10 +570,6 @@ public class Bot {
         sendSharedKey();
         break;
       case (byte) 0xfe: // Server List Ping
-        break;
-      case (byte) 0xff: // Disconnect/Kick
-        String reason = readUTF16();
-        error(reason);
         break;
       default:
         error("Unable to handle packet 0x" + Integer.toHexString(packetId)
