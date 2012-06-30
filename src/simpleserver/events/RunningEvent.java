@@ -29,9 +29,11 @@ import simpleserver.Player;
 import simpleserver.Server;
 import simpleserver.bot.BotController.ConnectException;
 import simpleserver.bot.NpcBot;
-import simpleserver.command.CommandFeedback;
-import simpleserver.command.InvalidCommand;
+import simpleserver.command.ExternalCommand;
+import simpleserver.command.PlayerCommand;
 import simpleserver.command.ServerCommand;
+import simpleserver.config.xml.CommandConfig;
+import simpleserver.config.xml.CommandConfig.Forwarding;
 import simpleserver.config.xml.Event;
 
 class RunningEvent extends Thread implements Runnable {
@@ -381,6 +383,12 @@ class RunningEvent extends Thread implements Runnable {
       return; // no command to execute
     }
 
+    Player p = server.findPlayer(tokens.remove(0));
+    if (p == null) {
+      notifyError("Player not found!");
+      return;
+    }
+
     String message = server.options.getBoolean("useSlashes") ? "/" : "!";
     for (String token : tokens) {
       message += token + " ";
@@ -388,7 +396,20 @@ class RunningEvent extends Thread implements Runnable {
     message = message.substring(0, message.length() - 1);
 
     // execute the server command, overriding the player permissions
-    player.parseCommand(message, true);
+    p.parseCommand(message, true);
+
+    // handle forwarding
+    String cmd = tokens.get(0);
+    PlayerCommand command = server.resolvePlayerCommand(cmd, p.getGroup());
+
+    // forwarding if necessary
+    CommandConfig config = server.config.commands.getTopConfig(cmd);
+    if ((command instanceof ExternalCommand)
+        || (config != null && config.forwarding != Forwarding.NONE)
+        || server.config.properties.getBoolean("forwardAllCommands")) {
+      p.forwardMessage(message);
+    }
+
   }
 
   private void execsvrcmd(ArrayList<String> tokens) {
@@ -398,17 +419,17 @@ class RunningEvent extends Thread implements Runnable {
     }
 
     String cmd = tokens.get(0);
-    String cmdline = "";
+    String args = "";
     for (String t : tokens) {
-      cmdline += t + " ";
+      args += t + " ";
     }
-    cmdline = cmdline.substring(0, cmdline.length() - 1);
+    args = args.substring(0, args.length() - 1);
 
     ServerCommand command = server.getCommandParser().getServerCommand(cmd);
-
-    if ((command != null) && !(command instanceof InvalidCommand)) {
-      command.execute(server, cmdline, feedback);
+    if (command != null) {
+      server.runCommand(cmd, args);
     }
+
   }
 
   private void npcSpawn(ArrayList<String> tokens) {
@@ -720,9 +741,4 @@ class RunningEvent extends Thread implements Runnable {
     System.out.println(err + "\n");
   }
 
-  private CommandFeedback feedback = new CommandFeedback() {
-    public void send(String message, Object... args) {
-      System.out.println("[SimpleServer] " + String.format(message, args));
-    }
-  };
 }

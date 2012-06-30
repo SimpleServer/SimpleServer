@@ -35,6 +35,8 @@ import java.util.List;
 import java.util.concurrent.Semaphore;
 
 import simpleserver.bot.BotController;
+import simpleserver.command.ExternalCommand;
+import simpleserver.command.PlayerCommand;
 import simpleserver.config.GiveAliasList;
 import simpleserver.config.HelpText;
 import simpleserver.config.IPBanList;
@@ -46,8 +48,10 @@ import simpleserver.config.RobotList;
 import simpleserver.config.Rules;
 import simpleserver.config.WhiteList;
 import simpleserver.config.data.GlobalData;
+import simpleserver.config.xml.CommandConfig;
 import simpleserver.config.xml.Config;
 import simpleserver.config.xml.GlobalConfig;
+import simpleserver.config.xml.Group;
 import simpleserver.events.EventHost;
 import simpleserver.export.CustAuthExport;
 import simpleserver.lang.Translations;
@@ -342,6 +346,35 @@ public class Server {
 
   public CommandParser getCommandParser() {
     return commandParser;
+  }
+
+  public PlayerCommand resolvePlayerCommand(String commandName, Group groupObject) {
+    CommandConfig cmdconfig = config.commands.getTopConfig(commandName);
+    String originalName = cmdconfig == null ? commandName : cmdconfig.originalName;
+
+    PlayerCommand command;
+    if (cmdconfig == null) {
+      command = commandParser.getPlayerCommand(commandName);
+      if (command != null && !command.hidden()) {
+        command = null;
+      }
+    } else {
+      command = commandParser.getPlayerCommand(originalName);
+    }
+
+    if (command == null) {
+      if ((groupObject != null && groupObject.forwardUnknownCommands) || cmdconfig != null) {
+        command = new ExternalCommand(commandName);
+      } else {
+        command = commandParser.getPlayerCommand((String) null);
+      }
+    }
+
+    return command;
+  }
+
+  public PlayerCommand resolvePlayerCommand(String commandName) {
+    return resolvePlayerCommand(commandName, null);
   }
 
   public void runCommand(String command, String arguments) {

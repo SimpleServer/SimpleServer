@@ -535,23 +535,7 @@ public class Player {
     CommandConfig config = server.config.commands.getTopConfig(commandName);
     String originalName = config == null ? commandName : config.originalName;
 
-    PlayerCommand command;
-    if (config == null) {
-      command = server.getCommandParser().getPlayerCommand(commandName);
-      if (command != null && !command.hidden()) {
-        command = null;
-      }
-    } else {
-      command = server.getCommandParser().getPlayerCommand(originalName);
-    }
-
-    if (command == null) {
-      if (groupObject.forwardUnknownCommands || config != null) {
-        command = new ExternalCommand(commandName);
-      } else {
-        command = server.getCommandParser().getPlayerCommand((String) null);
-      }
-    }
+    PlayerCommand command = server.resolvePlayerCommand(originalName, groupObject);
 
     if (config != null && !overridePermissions) {
       Permission permission = server.config.getCommandPermission(config.name, args, position.coordinate());
