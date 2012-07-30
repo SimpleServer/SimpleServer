@@ -356,7 +356,10 @@ public class Bot {
         readNBytes(10);
         break;
       case 0x1d: // Destroy Entity
-        readNBytes(in.readByte());
+        byte destroyCount = in.readByte();
+        if (destroyCount > 0) {
+          readNBytes(destroyCount * 4);
+        }
         break;
       case 0x1e: // Entity
         readNBytes(4);

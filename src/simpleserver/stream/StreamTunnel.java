@@ -642,7 +642,10 @@ public class StreamTunnel {
         break;
       case 0x1d: // Destroy Entity
         write(packetId);
-        copyNBytes(write(in.readByte()) * 4);
+        byte destoryCount = write(in.readByte());
+        if (destoryCount > 0) {
+          copyNBytes(destoryCount * 4);
+        }
         break;
       case 0x1e: // Entity
         write(packetId);
