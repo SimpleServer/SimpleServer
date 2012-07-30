@@ -123,13 +123,13 @@ public class NpcBot extends Bot {
   }
 
   public void destroyEntity() throws IOException {
-    int eid = in.readInt();
-    DroppedItem i = dropped.remove(eid);
-
-    if (i != null) {
-      // System.out.println("Destroyed " + eid); // DEBUG
+    byte destroyCount = in.readByte();
+    if (destroyCount > 0) {
+      for (int i = 0; i < destroyCount; i++) {
+        int eid = in.readInt();
+        dropped.remove(eid);
+      }
     }
-
   }
 
   private Player nearestPlayer() {
