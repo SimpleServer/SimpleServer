@@ -33,7 +33,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.HashSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -58,30 +57,6 @@ public class StreamTunnel {
   private static final String CONSOLE_CHAT_PATTERN = "\\[Server:.*\\]";
   private static final int MESSAGE_SIZE = 60;
   private static final int MAXIMUM_MESSAGE_SIZE = 119;
-  public static final HashSet<Short> ENCHANTABLE = new HashSet<Short>();
-
-  static {
-    ENCHANTABLE.add((short) 0x15a); // Fishing rod
-    ENCHANTABLE.add((short) 0x167); // Shears
-    ENCHANTABLE.add((short) 0x105); // Bow
-    // Tools
-    for (short id = 256; id <= 259; id++) {
-      ENCHANTABLE.add(id);
-    }
-    for (short id = 267; id <= 279; id++) {
-      ENCHANTABLE.add(id);
-    }
-    for (short id = 283; id <= 286; id++) {
-      ENCHANTABLE.add(id);
-    }
-    for (short id = 290; id <= 294; id++) {
-      ENCHANTABLE.add(id);
-    }
-    // Armour
-    for (short id = 298; id <= 317; id++) {
-      ENCHANTABLE.add(id);
-    }
-  };
 
   private final boolean isServerTunnel;
   private final String streamType;
@@ -182,11 +157,6 @@ public class StreamTunnel {
         write(in.readInt()); // random number that is returned from server
         break;
       case 0x01: // Login Request/Response
-        if (server.authenticator.useCustAuth(player)
-            && !server.authenticator.onlineAuthenticate(player)) {
-          player.kick(t("%s Failed to login: User not premium", "[CustAuth]"));
-          break;
-        }
         write(packetId);
         if (!isServerTunnel) {
           break;
@@ -249,7 +219,7 @@ public class StreamTunnel {
         tunneler.setName(streamType + "-" + player.getName());
         write(packetId);
         write(version);
-        write(name);
+        write(player.getName());
         write(readUTF16());
         write(in.readInt());
 
@@ -470,12 +440,10 @@ public class StreamTunnel {
         if (dropItem != -1) {
           itemCount = in.readByte();
           uses = in.readShort();
-          if (ENCHANTABLE.contains(dropItem)) {
-            short dataLength = in.readShort();
-            if (dataLength != -1) {
-              data = new byte[dataLength];
-              in.readFully(data);
-            }
+          short dataLength = in.readShort();
+          if (dataLength != -1) {
+            data = new byte[dataLength];
+            in.readFully(data);
           }
         }
         byte blockX = in.readByte();
@@ -551,13 +519,11 @@ public class StreamTunnel {
           if (dropItem != -1) {
             write(itemCount);
             write(uses);
-            if (ENCHANTABLE.contains(dropItem)) {
-              if (data != null) {
-                write((short) data.length);
-                out.write(data);
-              } else {
-                write((short) -1);
-              }
+            if (data != null) {
+              write((short) data.length);
+              out.write(data);
+            } else {
+              write((short) -1);
             }
 
             if (dropItem <= 94 && direction >= 0) {
@@ -608,8 +574,10 @@ public class StreamTunnel {
           write(eid);
           write(name);
           copyNBytes(16);
+          copyUnknownBlob();
         } else {
           skipNBytes(16);
+          skipUnknownBlob();
         }
         break;
       case 0x15: // Pickup Spawn
@@ -645,6 +613,9 @@ public class StreamTunnel {
         write(in.readByte());
         write(in.readByte());
         write(in.readByte());
+        write(in.readShort());
+        write(in.readShort());
+        write(in.readShort());
 
         copyUnknownBlob();
         break;
@@ -671,7 +642,7 @@ public class StreamTunnel {
         break;
       case 0x1d: // Destroy Entity
         write(packetId);
-        copyNBytes(4);
+        copyNBytes(write(in.readByte()) * 4);
         break;
       case 0x1e: // Entity
         write(packetId);
@@ -735,7 +706,7 @@ public class StreamTunnel {
         write(in.readBoolean());
         write(in.readShort());
         write(in.readShort());
-        copyNBytes(write(in.readInt()) + 4);
+        copyNBytes(write(in.readInt()));
         break;
       case 0x34: // Multi Block Change
         write(packetId);
@@ -749,7 +720,7 @@ public class StreamTunnel {
         x = in.readInt();
         y = in.readByte();
         z = in.readInt();
-        byte blockType = in.readByte();
+        short blockType = in.readShort();
         byte metadata = in.readByte();
         coordinate = new Coordinate(x, y, z, player);
 
@@ -767,7 +738,7 @@ public class StreamTunnel {
         break;
       case 0x36: // Block Action
         write(packetId);
-        copyNBytes(12);
+        copyNBytes(14);
         break;
       case 0x37: // Mining progress
         write(packetId);
@@ -777,12 +748,19 @@ public class StreamTunnel {
         write(in.readInt());
         write(in.readByte());
         break;
+      case 0x38: // Chunk Bulk
+        write(packetId);
+        copyNBytes(write(in.readShort()) * 12 + write(in.readInt()));
+        break;
       case 0x3c: // Explosion
         write(packetId);
         copyNBytes(28);
         int recordCount = in.readInt();
         write(recordCount);
         copyNBytes(recordCount * 3);
+        write(in.readFloat());
+        write(in.readFloat());
+        write(in.readFloat());
         break;
       case 0x3d: // Sound/Particle Effect
         write(packetId);
@@ -798,7 +776,7 @@ public class StreamTunnel {
         write(in.readInt());
         write(in.readInt());
         write(in.readInt());
-        write(in.readByte());
+        write(in.readFloat());
         write(in.readByte());
         break;
       case 0x46: // New/Invalid State
@@ -937,9 +915,10 @@ public class StreamTunnel {
         write(in.readShort());
         write(in.readInt());
         write(in.readByte());
-        write(in.readInt());
-        write(in.readInt());
-        write(in.readInt());
+        short nbtLength = write(in.readShort());
+        if (nbtLength > 0) {
+          copyNBytes(nbtLength);
+        }
         break;
       case (byte) 0xc3: // BukkitContrib
         write(packetId);
@@ -973,6 +952,10 @@ public class StreamTunnel {
         write(in.readByte());
         write(in.readByte());
         break;
+      case (byte) 0xcd: // Login & Respawn
+        write(packetId);
+        write(in.readByte());
+        break;
       case (byte) 0xd3: // Red Power (mod by Eloraam)
         write(packetId);
         copyNBytes(1);
@@ -1001,15 +984,29 @@ public class StreamTunnel {
         copyNBytes(0xff & arrayLength);
         break;
       case (byte) 0xfc: // Encryption Key Response
-        write(packetId);
         byte[] sharedKey = new byte[in.readShort()];
         in.readFully(sharedKey);
+        byte[] challengeTokenResponse = new byte[in.readShort()];
+        in.readFully(challengeTokenResponse);
         if (!isServerTunnel) {
+          if (!player.clientEncryption.checkChallengeToken(challengeTokenResponse)) {
+            player.kick("Invalid client response");
+            break;
+          }
           player.clientEncryption.setEncryptedSharedKey(sharedKey);
           sharedKey = player.serverEncryption.getEncryptedSharedKey();
         }
+        if (!isServerTunnel && server.authenticator.useCustAuth(player)
+            && !server.authenticator.onlineAuthenticate(player)) {
+          player.kick(t("%s Failed to login: User not premium", "[CustAuth]"));
+          break;
+        }
+        write(packetId);
         write((short) sharedKey.length);
         write(sharedKey);
+        challengeTokenResponse = player.serverEncryption.encryptChallengeToken();
+        write((short) challengeTokenResponse.length);
+        write(challengeTokenResponse);
         if (isServerTunnel) {
           in = new DataInputStream(new BufferedInputStream(player.serverEncryption.encryptedInputStream(inputStream)));
           out = new DataOutputStream(new BufferedOutputStream(player.clientEncryption.encryptedOutputStream(outputStream)));
@@ -1030,10 +1027,16 @@ public class StreamTunnel {
         write(serverId);
         byte[] keyBytes = new byte[in.readShort()];
         in.readFully(keyBytes);
+        byte[] challengeToken = new byte[in.readShort()];
+        in.readFully(challengeToken);
         player.serverEncryption.setPublicKey(keyBytes);
         byte[] key = player.clientEncryption.getPublicKey();
         write((short) key.length);
         write(key);
+        write((short) challengeToken.length);
+        write(challengeToken);
+        player.serverEncryption.setChallengeToken(challengeToken);
+        player.clientEncryption.setChallengeToken(challengeToken);
         break;
       case (byte) 0xfe: // Server List Ping
         write(packetId);
@@ -1077,15 +1080,12 @@ public class StreamTunnel {
   }
 
   private void copyItem() throws IOException {
-    short id;
-    if ((id = write(in.readShort())) > 0) {
+    if (write(in.readShort()) > 0) {
       write(in.readByte());
       write(in.readShort());
-      if (ENCHANTABLE.contains(id)) {
-        short length;
-        if ((length = write(in.readShort())) > 0) {
-          copyNBytes(length);
-        }
+      short length;
+      if ((length = write(in.readShort())) > 0) {
+        copyNBytes(length);
       }
     }
   }
@@ -1179,19 +1179,38 @@ public class StreamTunnel {
         case 4:
           write(readUTF16());
           break;
-        case 5:
-          write(in.readShort());
-          write(in.readByte());
-          write(in.readShort());
-          break;
-        case 6:
-          write(in.readInt());
-          write(in.readInt());
-          write(in.readInt());
       }
 
       unknown = in.readByte();
       write(unknown);
+    }
+  }
+
+  private void skipUnknownBlob() throws IOException {
+    byte unknown = in.readByte();
+
+    while (unknown != 0x7f) {
+      int type = (unknown & 0xE0) >> 5;
+
+      switch (type) {
+        case 0:
+          in.readByte();
+          break;
+        case 1:
+          in.readShort();
+          break;
+        case 2:
+          in.readInt();
+          break;
+        case 3:
+          in.readFloat();
+          break;
+        case 4:
+          readUTF16();
+          break;
+      }
+
+      unknown = in.readByte();
     }
   }
 

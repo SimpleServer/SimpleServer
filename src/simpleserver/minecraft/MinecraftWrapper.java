@@ -112,6 +112,11 @@ public class MinecraftWrapper {
     } catch (IOException e) {
       autodownloadError(e, "save");
       return false;
+    } finally {
+      try {
+        outputFile.close();
+      } catch (IOException e) {
+      }
     }
 
     if (verifyMinecraftJar()) {

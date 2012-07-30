@@ -34,6 +34,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.spec.X509EncodedKeySpec;
+import java.util.Arrays;
 
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
@@ -50,6 +51,7 @@ import org.bouncycastle.crypto.params.ParametersWithIV;
 
 public abstract class Encryption {
   protected SecretKey sharedKey;
+  protected byte[] challengeToken;
 
   public static class ServerEncryption extends Encryption {
     private PublicKey publicKey;
@@ -78,6 +80,15 @@ public abstract class Encryption {
         e.printStackTrace();
       }
     }
+
+    public byte[] encryptChallengeToken() {
+      try {
+        return encrypt(publicKey, challengeToken, 1);
+      } catch (GeneralSecurityException e) {
+        e.printStackTrace();
+      }
+      return null;
+    }
   }
 
   public static class ClientEncryption extends Encryption {
@@ -104,6 +115,14 @@ public abstract class Encryption {
     public byte[] getPublicKey() {
       return keyPair.getPublic().getEncoded();
     }
+
+    public boolean checkChallengeToken(byte[] challengeTokenResponse) {
+      try {
+        return Arrays.equals(encrypt(keyPair.getPrivate(), challengeTokenResponse, 2), challengeToken);
+      } catch (GeneralSecurityException e) {
+        return false;
+      }
+    }
   }
 
   public BufferedBlockCipher getStreamCipher(boolean out) {
@@ -128,6 +147,10 @@ public abstract class Encryption {
       e.printStackTrace();
     }
     return null;
+  }
+
+  public void setChallengeToken(byte[] challangeToken) {
+    challengeToken = challangeToken;
   }
 
   private static PublicKey getPublicKey(byte[] keyBytes) throws GeneralSecurityException {

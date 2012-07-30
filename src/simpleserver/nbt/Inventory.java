@@ -20,8 +20,6 @@
  */
 package simpleserver.nbt;
 
-import static simpleserver.stream.StreamTunnel.ENCHANTABLE;
-
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -168,10 +166,7 @@ public class Inventory {
       out.writeShort(id);
       out.writeByte(count);
       out.writeShort(damage);
-      if (ENCHANTABLE.contains(id)) {
-        out.writeShort(-1);
-      }
-
+      out.writeShort(-1);
     }
 
   }

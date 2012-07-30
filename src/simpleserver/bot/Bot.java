@@ -20,8 +20,6 @@
  */
 package simpleserver.bot;
 
-import static simpleserver.stream.StreamTunnel.ENCHANTABLE;
-
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.DataInputStream;
@@ -39,7 +37,7 @@ import simpleserver.Server;
 import simpleserver.stream.Encryption.ServerEncryption;
 
 public class Bot {
-  private static final int VERSION = 35;
+  private static final int VERSION = 39;
 
   protected String name;
   protected Server server;
@@ -122,7 +120,8 @@ public class Bot {
 
   protected void login() throws IOException {
     writeLock.lock();
-    out.writeByte(1);
+    out.writeByte(0xcd);
+    out.writeByte(0);
     writeLock.unlock();
   }
 
@@ -132,13 +131,17 @@ public class Bot {
     byte[] key = encryption.getEncryptedSharedKey();
     out.writeShort(key.length);
     out.write(key);
+    byte[] challengeTokenResponse = encryption.encryptChallengeToken();
+    out.writeShort(challengeTokenResponse.length);
+    out.write(challengeTokenResponse);
     out.flush();
     writeLock.unlock();
   }
 
   private void respawn() throws IOException {
     writeLock.lock();
-    out.writeByte(9);
+    out.writeByte(0xcd);
+    out.writeByte(1);
     writeLock.unlock();
   }
 
@@ -299,6 +302,7 @@ public class Bot {
         in.readInt();
         readUTF16();
         readNBytes(16);
+        readUnknownBlob();
         break;
       case 0x15: // Pickup spawn
         readNBytes(24);
@@ -328,6 +332,9 @@ public class Bot {
         in.readByte();
         in.readByte();
         in.readByte();
+        in.readShort();
+        in.readShort();
+        in.readShort();
         readUnknownBlob();
         break;
       case 0x19: // Entity: Painting
@@ -349,7 +356,7 @@ public class Bot {
         readNBytes(10);
         break;
       case 0x1d: // Destroy Entity
-        readNBytes(4);
+        readNBytes(in.readByte());
         break;
       case 0x1e: // Entity
         readNBytes(4);
@@ -397,7 +404,7 @@ public class Bot {
         break;
       case 0x33: // Map Chunk
         readNBytes(13);
-        readNBytes(in.readInt() + 4);
+        readNBytes(in.readInt());
         break;
       case 0x34: // Multi Block Change
         in.readInt();
@@ -409,11 +416,11 @@ public class Bot {
         in.readInt();
         in.readByte();
         in.readInt();
-        in.readByte();
+        in.readShort();
         in.readByte();
         break;
       case 0x36: // Block Action
-        readNBytes(12);
+        readNBytes(13);
         break;
       case 0x37: // Mining progress
         in.readInt();
@@ -422,10 +429,14 @@ public class Bot {
         in.readInt();
         in.readByte();
         break;
+      case 0x38: // Chunk Bulk
+        readNBytes(in.readShort() * 12 + in.readInt());
+        break;
       case 0x3c: // Explosion
         readNBytes(28);
         int recordCount = in.readInt();
         readNBytes(recordCount * 3);
+        readNBytes(12);
         break;
       case 0x3d: // Sound/Particle Effect
         in.readInt();
@@ -439,7 +450,7 @@ public class Bot {
         in.readInt();
         in.readInt();
         in.readInt();
-        in.readByte();
+        in.readFloat();
         in.readByte();
         break;
       case 0x46: // New/Invalid State
@@ -514,9 +525,10 @@ public class Bot {
         in.readShort();
         in.readInt();
         in.readByte();
-        in.readInt();
-        in.readInt();
-        in.readInt();
+        short nbtLenght = in.readShort();
+        if (nbtLenght > 0) {
+          readNBytes(nbtLenght);
+        }
         break;
       case (byte) 0xc8: // Increment Statistic
         readNBytes(5);
@@ -540,6 +552,9 @@ public class Bot {
         in.readByte();
         in.readByte();
         break;
+      case (byte) 0xcd: // Login & Respawn
+        in.readByte();
+        break;
       case (byte) 0xe6: // ModLoaderMP by SDK
         in.readInt(); // mod
         in.readInt(); // packet id
@@ -558,6 +573,8 @@ public class Bot {
       case (byte) 0xfc: // Encryption Key Response
         byte[] sharedKey = new byte[in.readShort()];
         in.readFully(sharedKey);
+        byte[] challangeTokenResponse = new byte[in.readShort()];
+        in.readFully(challangeTokenResponse);
         in = new DataInputStream(new BufferedInputStream(encryption.encryptedInputStream(socket.getInputStream())));
         out = new DataOutputStream(new BufferedOutputStream(encryption.encryptedOutputStream(socket.getOutputStream())));
         login();
@@ -566,7 +583,10 @@ public class Bot {
         readUTF16();
         byte[] keyBytes = new byte[in.readShort()];
         in.readFully(keyBytes);
+        byte[] challangeToken = new byte[in.readShort()];
+        in.readFully(challangeToken);
         encryption.setPublicKey(keyBytes);
+        encryption.setChallengeToken(challangeToken);
         sendSharedKey();
         break;
       case (byte) 0xfe: // Server List Ping
@@ -579,15 +599,12 @@ public class Bot {
   }
 
   private void readItem() throws IOException {
-    short id;
-    if ((id = in.readShort()) > 0) {
+    if (in.readShort() > 0) {
       in.readByte();
       in.readShort();
-      if (ENCHANTABLE.contains(id)) {
-        short length;
-        if ((length = in.readShort()) > 0) {
-          readNBytes(length);
-        }
+      short length;
+      if ((length = in.readShort()) > 0) {
+        readNBytes(length);
       }
     }
   }
