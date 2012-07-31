@@ -41,6 +41,7 @@ import org.xml.sax.SAXException;
 import simpleserver.Coordinate.Dimension;
 import simpleserver.bot.BotController.ConnectException;
 import simpleserver.bot.Giver;
+import simpleserver.bot.Teleporter;
 import simpleserver.command.ExternalCommand;
 import simpleserver.command.PlayerCommand;
 import simpleserver.config.KitList.Kit;
@@ -830,7 +831,7 @@ public class Player {
 
   public void teleport(Position position) throws ConnectException, IOException {
     if (position.dimension() == getDimension()) {
-      server.runCommand("tp", String.format("%s %d %d %d", getName(), (int) position.x(), (int) position.y(), (int) position.z()));
+      server.bots.connect(new Teleporter(this, position));
     } else {
       addTMessage(Color.RED, "You're not in the same dimension as the specified warppoint.");
     }

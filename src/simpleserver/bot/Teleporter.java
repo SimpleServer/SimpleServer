@@ -56,7 +56,7 @@ public class Teleporter extends Bot {
   @Override
   protected void ready() throws IOException {
     super.ready();
-    server.runCommand("tp", player.getRealName() + " " + name);
+    server.runCommand("tp", player.getName() + " " + name);
     timer.schedule(new Logout(), 3000);
   }
 
