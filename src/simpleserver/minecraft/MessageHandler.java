@@ -101,7 +101,7 @@ public class MessageHandler {
         loaded = true;
         notifyAll();
       }
-    } else if (line.contains("[INFO] CONSOLE: Save complete.") || line.contains("[INFO] Save complete.")) {
+    } else if (line.contains("[INFO] Saved the world")) {
       server.setSaving(false);
       if (server.options.getBoolean("announceBackup")) {
         server.runCommand("say", t("Save Complete!"));
