@@ -1,3 +1,9 @@
+== 8.4.4 ==
+ * Protocol version 39
+ * Improvements to event scripting system
+   - see http://github.com/SimpleServer/SimpleServer/wiki/Events
+ * Bugfixes
+
 == 8.4.3 ==
  * Event system greatly improved and extended
    - see http://github.com/SimpleServer/SimpleServer/wiki/Events
