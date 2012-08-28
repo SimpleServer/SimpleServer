@@ -119,6 +119,7 @@
 		<alias>r</alias>
 	</command>
 	<command name="restart" allow="4+" />
+        <command name="rollback" allow="5+" />
 	<command name="rules" allow="0+" />
 	<command name="save" allow="4+">
 		<forward />
