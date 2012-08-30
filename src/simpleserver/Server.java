@@ -431,6 +431,24 @@ public class Server {
   public void forceBackup(String tag) {
     autoBackup.forceBackup(tag);
   }
+  
+  /**
+   * Rollback to n-th last auto backup.
+   * @param n
+   * @return 
+   */
+  public void rollback(int n) throws Exception {
+    autoBackup.rollback(n);
+  }
+  
+  /**
+   * Rollback to backup with tag 'tag'.
+   * @param tag
+   * @return 
+   */
+  public void rollback(String tag) throws Exception {
+    autoBackup.rollback(tag);
+  }
 
   private void kickAllPlayers() {
     String message = t("Server shutting down!");

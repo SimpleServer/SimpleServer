@@ -31,13 +31,67 @@ public class RollbackCommand extends AbstractCommand implements PlayerCommand, S
   }
 
   @Override
-  public void execute(Player player, String message) {
-    player.addTMessage(Color.GRAY, "Rolling back not supported yet.");
+  public void execute(final Player player, final String message) {
+    execute(new BackupCommand.Com() {
+
+      @Override
+      public void sendMsg(String m) {
+        player.addTMessage(Color.GRAY, m);
+      }
+
+      @Override
+      public Server getServer() {
+        return player.getServer();
+      }
+
+      @Override
+      public String getMessage() {
+        return message;
+      }
+    });
   }
 
   @Override
-  public void execute(Server server, String message, CommandFeedback feedback) {
-    feedback.send("Rolling back not supported yet.");
+  public void execute(final Server server, final String message, final CommandFeedback feedback) {
+    execute(new BackupCommand.Com() {
+      @Override
+      public void sendMsg(String m) {
+        feedback.send(m);
+      }
+
+      @Override
+      public Server getServer() {
+        return server;
+      }
+
+      @Override
+      public String getMessage() {
+        return message;
+      }
+    });
+  }
+  
+  private void execute(BackupCommand.Com com) {
+    String[] args = extractArguments(com.getMessage());
+    if (args.length != 2) {
+      com.sendMsg("Wrong number of arguments!");
+      return;
+    }
+    if (args[1].charAt(0) == '@') { //@n: reference to n-th last auto backup
+      try {
+        com.getServer().rollback(Integer.parseInt(args[1].substring(1, args[1].length())));
+      } catch (NumberFormatException ex) {
+        com.sendMsg("Expected number after '@'!");
+      } catch (Exception ex) {
+        com.sendMsg(ex.getMessage());
+      }
+    } else {
+      try {
+        com.getServer().rollback(args[1]);
+      } catch (Exception ex) {
+        com.sendMsg(ex.getMessage());
+      }
+    }
   }
   
 }

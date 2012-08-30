@@ -316,11 +316,13 @@ public class AutoBackup {
     });
   }
   
-  public static String listLastAutoBackups(int n) {
-    StringBuilder sb = new StringBuilder();
-    sb.append("Last ").append(n).append(" auto backups:");
-    File[] files = getAutoBackups();
+  /**
+   * Like 'getAutoBackups()', but sorted from newest to oldest.
+   * @return 
+   */
+  private static File[] getSortedAutoBackups() {
     //sort files by date (newest to oldest)
+    File[] files = getAutoBackups();
     java.util.Arrays.sort(files, new Comparator<File>() {
       @Override
       public int compare(File o1, File o2) {
@@ -331,6 +333,13 @@ public class AutoBackup {
         }
       }
     });
+    return files;
+  }
+  
+  public static String listLastAutoBackups(int n) {
+    StringBuilder sb = new StringBuilder();
+    sb.append("Last ").append(n).append(" auto backups:");
+    File[] files = getSortedAutoBackups();
     for (int i = 1; i <= n && i <= files.length; i++) {
       try {
         sb.append("\n").append("@").append(i).append(" ").append(dateFormatted(files[i-1]));
@@ -365,6 +374,41 @@ public class AutoBackup {
     } catch (ParseException e) {
       return System.currentTimeMillis() - file.lastModified();
     }
+  }
+  
+  /**
+   * Rollback to n-th last auto backup.
+   * @param n
+   * @return 
+   */
+  public void rollback(int n) throws Exception {
+    File[] backups = getSortedAutoBackups();
+    try {
+      rollback(backups[n-1]);
+    } catch (ArrayIndexOutOfBoundsException ex) {
+      throw new Exception("Wrong backup number!");
+    }
+  }
+  
+  /**
+   * Rollback to backup with tag 'tag'.
+   * @param tag
+   * @return 
+   */
+  public void rollback(String tag) throws Exception {
+    File backup = new File(BACKUP_TAGGED_DIRECTORY, tag + ".zip");
+    if (!backup.isFile()) {
+      throw new Exception("Backup does not exist!");
+    }
+  }
+  
+  /**
+   * Rollback to server status at backup
+   * in archive 'backup'.
+   * @param backup Zip archive containing correct server backup
+   */
+  private void rollback(File backup) {
+    
   }
 
   private final class Archiver extends Thread {
