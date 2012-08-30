@@ -31,9 +31,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.zip.ZipEntry;
@@ -63,6 +63,11 @@ public class AutoBackup {
 
   public AutoBackup(Server server) {
     this.server = server;
+    
+    // Create backup directories if not present
+    BACKUP_AUTO_DIRECTORY.mkdirs();
+    BACKUP_TAGGED_DIRECTORY.mkdirs();
+    
     purgeOldBackups();
 
     copyBuffer = new byte[8192];
@@ -282,21 +287,14 @@ public class AutoBackup {
   }
 
   private static File getBackup(boolean old) {
-    // Create backup directories if not present
-    BACKUP_AUTO_DIRECTORY.mkdirs();
-    BACKUP_TAGGED_DIRECTORY.mkdirs();
     // Search for backups in BACKUP_AUTO_DIRECTORY
-    File[] files = BACKUP_AUTO_DIRECTORY.listFiles(new FileFilter() {
-      public boolean accept(File file) {
-        return file.isFile() && file.getPath().contains(".zip");
-      }
-    });
+    File[] files = getAutoBackups();
     long firstCreatedTime = old ? Long.MAX_VALUE : 0;
     File firstCreatedFile = null;
     for (File file : files) {
       long date;
       try {
-        date = date(file);
+        date = dateMillis(file);
       } catch (ParseException e) {
         continue;
       }
@@ -308,13 +306,52 @@ public class AutoBackup {
     }
     return firstCreatedFile;
   }
-
-  private static long date(File file) throws ParseException {
-    DateFormat format = new SimpleDateFormat("yyyy-MM-dd-HH-mm");
+  
+  private static File[] getAutoBackups() {
+    return BACKUP_AUTO_DIRECTORY.listFiles(new FileFilter() {
+      @Override
+      public boolean accept(File file) {
+        return file.isFile() && file.getPath().contains(".zip");
+      }
+    });
+  }
+  
+  public static String listLastAutoBackups(int n) {
+    StringBuilder sb = new StringBuilder();
+    sb.append("Last ").append(n).append(" auto backups:");
+    File[] files = getAutoBackups();
+    //sort files by date (newest to oldest)
+    java.util.Arrays.sort(files, new Comparator<File>() {
+      @Override
+      public int compare(File o1, File o2) {
+        try {
+          return date(o2).compareTo(date(o1));
+        } catch (ParseException ex) { //should not be thrown
+          return 0;
+        }
+      }
+    });
+    for (int i = 1; i <= n && i <= files.length; i++) {
+      try {
+        sb.append("\n").append("@").append(i).append(" ").append(dateFormatted(files[i-1]));
+      } catch (ParseException ex) {
+        continue;
+      }
+    }
+    return sb.toString();
+  }
+  
+  private static Date date(File file) throws ParseException {
+    return new SimpleDateFormat("yyyy-MM-dd-HH-mm").parse(file.getName().split(".zip")[0]);
+  }
+  
+  private static String dateFormatted(File file) throws ParseException {
+    return new SimpleDateFormat("dd/MM/yyyy HH:mm").format(date(file));
+  }
+  
+  private static long dateMillis(File file) throws ParseException {
     GregorianCalendar cal = new GregorianCalendar();
-    Date fileTime;
-    fileTime = format.parse(file.getName().split(".zip")[0]);
-    cal.setTime(fileTime);
+    cal.setTime(date(file));
     return cal.getTimeInMillis();
   }
 
@@ -323,7 +360,7 @@ public class AutoBackup {
       if (file == null) {
         return -1;
       } else {
-        return System.currentTimeMillis() - date(file);
+        return System.currentTimeMillis() - dateMillis(file);
       }
     } catch (ParseException e) {
       return System.currentTimeMillis() - file.lastModified();

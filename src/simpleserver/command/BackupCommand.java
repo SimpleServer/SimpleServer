@@ -23,23 +23,28 @@ package simpleserver.command;
 import simpleserver.Color;
 import simpleserver.Player;
 import simpleserver.Server;
+import simpleserver.thread.AutoBackup;
 
 public class BackupCommand extends AbstractCommand implements PlayerCommand,
     ServerCommand {
   public BackupCommand() {
-    super("backup [tag]", "Backup the map with optional tag");
+    super("backup [<tag>|list] [<list size>]", "Backup the map with optional tag");
   }
 
+  @Override
   public void execute(final Player player, final String message) {
     execute(new Com() {
+      @Override
       public void sendMsg(String m) {
         player.addTMessage(Color.GRAY, m);
       }
 
+      @Override
       public Server getServer() {
         return player.getServer();
       }
 
+      @Override
       public String getMessage() {
         return message;
       }
@@ -47,16 +52,20 @@ public class BackupCommand extends AbstractCommand implements PlayerCommand,
     });
   }
 
+  @Override
   public void execute(final Server server, final String message, final CommandFeedback feedback) {
     execute(new Com() {
+      @Override
       public void sendMsg(String m) {
         feedback.send(m);
       }
 
+      @Override
       public Server getServer() {
         return server;
       }
 
+      @Override
       public String getMessage() {
         return message;
       }
@@ -75,16 +84,25 @@ public class BackupCommand extends AbstractCommand implements PlayerCommand,
   }
 
   private void execute(Com com) {
-    String[] arguments = extractArguments(com.getMessage());
-    if (arguments.length > 1) {
+    String[] args = extractArguments(com.getMessage());
+    if (args.length > 2) {
       com.sendMsg("Wrong number of Arguments!");
       return;
     }
-    com.sendMsg("Forcing backup!");
-    if (arguments.length == 0) { // without tag
+    if (args.length == 0) { // without tag
+      com.sendMsg("Forcing backup!");
       com.getServer().forceBackup();
-    } else { // 'arguments.length == 1': with tag
-      com.getServer().forceBackup(arguments[0]);
+    } else if (args[0].equals("list")) { //list last backups
+      try {
+        com.sendMsg(AutoBackup.listLastAutoBackups(Integer.parseInt(args[1])));
+      } catch (NumberFormatException ex) { //syntax error
+        com.sendMsg("Expected number as third argument!");
+      } catch (ArrayIndexOutOfBoundsException ex) { //standard list
+        com.sendMsg(AutoBackup.listLastAutoBackups(5));
+      }
+    } else { // args[1] is tag
+      com.sendMsg("Forcing backup!");
+      com.getServer().forceBackup(args[0]);
     }
   }
 }
