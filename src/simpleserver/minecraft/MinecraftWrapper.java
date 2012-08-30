@@ -20,6 +20,8 @@
  */
 package simpleserver.minecraft;
 
+import static simpleserver.util.Util.*;
+
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -74,7 +76,7 @@ public class MinecraftWrapper {
       return true;
     }
 
-    System.out.println("[SimpleServer] Downloading " + SERVER_JAR
+    print("Downloading " + SERVER_JAR
         + ".  Please wait!");
 
     HttpClient httpclient = new DefaultHttpClient();
@@ -122,7 +124,7 @@ public class MinecraftWrapper {
     if (verifyMinecraftJar()) {
       return true;
     } else {
-      System.out.println("[SimpleServer] " + SERVER_JAR + " is corrupt!");
+      print(SERVER_JAR + " is corrupt!");
       return false;
     }
   }
@@ -135,8 +137,8 @@ public class MinecraftWrapper {
     try {
       minecraft = runtime.exec(command);
     } catch (IOException e) {
-      System.out.println("[SimpleServer] " + e);
-      System.out.println("[SimpleServer] FATAL ERROR: Could not start minecraft_server.jar!");
+      print(e);
+      print("FATAL ERROR: Could not start minecraft_server.jar!");
       System.exit(-1);
     }
 
@@ -239,8 +241,8 @@ public class MinecraftWrapper {
   }
 
   private void autodownloadError(Exception e, String stepName) {
-    System.out.println("[SimpleServer] " + e);
-    System.out.println("[SimpleServer] Unable to " + stepName + " "
+    print(e);
+    print("Unable to " + stepName + " "
         + SERVER_JAR + "!");
   }
 }

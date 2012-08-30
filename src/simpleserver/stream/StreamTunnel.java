@@ -21,6 +21,7 @@
 package simpleserver.stream;
 
 import static simpleserver.lang.Translations.t;
+import static simpleserver.util.Util.*;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -1329,7 +1330,7 @@ public class StreamTunnel {
 
   private void sendMessagePacket(String message) throws IOException {
     if (message.length() > MESSAGE_SIZE) {
-      System.out.println("[SimpleServer] Invalid message size: " + message);
+      print("Invalid message size: " + message);
       return;
     }
     if (message.length() > 0) {
@@ -1379,7 +1380,7 @@ public class StreamTunnel {
             flushAll();
           } catch (IOException e) {
             if (run && !player.isRobot()) {
-              System.out.println("[SimpleServer] " + e);
+              print(e);
               System.out.print("[SimpleServer] " + streamType
                   + " error handling traffic for " + player.getIPAddress());
               if (lastPacket != null) {

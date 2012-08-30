@@ -20,6 +20,8 @@
  */
 package simpleserver.command;
 
+import static simpleserver.util.Util.*;
+
 import simpleserver.Color;
 import simpleserver.Player;
 import simpleserver.Server;
@@ -111,7 +113,7 @@ public class SetGroupCommand extends PlayerArgCommand {
   protected void setGroup(Server server, int group, String target) {
     server.config.players.setGroup(target, group);
     server.saveConfig();
-    System.out.println("[SimpleServer] Player " + target + "'s group was set to " + new Integer(group).toString() + "!");
+    print("Player " + target + "'s group was set to " + new Integer(group).toString() + "!");
 
     if (server.options.getBoolean("enableCustAuthExport")) {
       server.custAuthExport.updateGroup(target, group);

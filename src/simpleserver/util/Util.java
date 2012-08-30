@@ -18,43 +18,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package simpleserver.nbt;
+package simpleserver.util;
 
-import static simpleserver.util.Util.*;
-
-import java.io.File;
-
-import simpleserver.Coordinate;
-import simpleserver.Coordinate.Dimension;
-
-public class WorldFile {
-  private String filename;
-  private NBTCompound data;
-
-  public WorldFile(String world) {
-    filename = world + File.separator + "level.dat";
-    try {
-      NBTFile nbt = new GZipNBTFile(filename);
-      data = nbt.root().getCompound("Data");
-    } catch (Exception e) {
-      print("Can't read level.dat");
-    }
-  }
-
-  public long seed() {
-    return data.getLong("RandomSeed").get();
-  }
-
-  public Coordinate spawnPoint() {
-    int x, y, z;
-    try {
-      x = data.getInt("SpawnX").get();
-      y = data.getInt("SpawnY").get();
-      z = data.getInt("SpawnZ").get();
-    } catch (Exception e) {
-      x = z = 0;
-      y = 62;
-    }
-    return new Coordinate(x, y, z, Dimension.EARTH);
+public class Util {
+  public static void print(Object o) {
+    System.out.println("[SimpleServer] " + o);
   }
 }

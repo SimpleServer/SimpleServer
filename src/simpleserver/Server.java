@@ -21,6 +21,7 @@
 package simpleserver;
 
 import static simpleserver.lang.Translations.t;
+import static simpleserver.util.Util.*;
 
 import java.io.IOException;
 import java.net.BindException;
@@ -251,7 +252,7 @@ public class Server {
     if (globalConfig.loadsuccess) {
       config = globalConfig.config;
     } else {
-      System.out.println("[SimpleServer] Syntax error in config.xml! Config was not reloaded.");
+      print("Syntax error in config.xml! Config was not reloaded.");
       return false;
     }
 
@@ -476,7 +477,7 @@ public class Server {
     loadResources();
 
     if (!globalConfig.loadsuccess) {
-      System.out.println("[SimpleServer] Syntax error in config.xml! Emergency shutdown...");
+      print("Syntax error in config.xml! Emergency shutdown...");
       System.exit(1);
     }
 
@@ -494,7 +495,7 @@ public class Server {
 
     minecraft = new MinecraftWrapper(this, options, systemInput);
     if (!minecraft.prepareServerJar()) {
-      System.out.println("[SimpleServer] Please download minecraft_server.jar to the folder with SimpleServer.jar.");
+      print("Please download minecraft_server.jar to the folder with SimpleServer.jar.");
       System.exit(1);
     }
 
@@ -508,7 +509,7 @@ public class Server {
     try {
       ClientEncryption.generateKeyPair();
     } catch (NoSuchAlgorithmException e) {
-      System.out.println("[SimpleServer] Error while generating RSA key pair");
+      print("Error while generating RSA key pair");
       e.printStackTrace();
       System.exit(1);
     }
@@ -537,13 +538,13 @@ public class Server {
   }
 
   private void shutdown() {
-    System.out.println("[SimpleServer] Stopping Server...");
+    print("Stopping Server...");
     save = false;
 
     bots.stop();
 
     if (!saveLock.tryAcquire()) {
-      System.out.println("[SimpleServer] Server is currently Backing Up/Saving...");
+      print("Server is currently Backing Up/Saving...");
       while (true) {
         try {
           saveLock.acquire();
@@ -572,7 +573,7 @@ public class Server {
 
     playerList.waitUntilEmpty();
     minecraft.stop();
-    System.out.println("[SimpleServer] Server stopped successfully!");
+    print("Server stopped successfully!");
     saveLock.release();
   }
 
@@ -594,8 +595,8 @@ public class Server {
           try {
             address = InetAddress.getByName(ip);
           } catch (UnknownHostException e) {
-            System.out.println("[SimpleServer] " + e);
-            System.out.println("[SimpleServer] Invalid listening address " + ip);
+            print(e);
+            print("Invalid listening address " + ip);
             break;
           }
         }
@@ -603,17 +604,17 @@ public class Server {
         try {
           socket = new ServerSocket(port, 0, address);
         } catch (IOException e) {
-          System.out.println("[SimpleServer] " + e);
-          System.out.println("[SimpleServer] Could not listen on port " + port
+          print(e);
+          print("Could not listen on port " + port
               + "!\nIs it already in use? Exiting application...");
           break;
         }
 
-        System.out.println("[SimpleServer] Wrapper listening on "
+        print("Wrapper listening on "
             + socket.getInetAddress().getHostAddress() + ":"
             + socket.getLocalPort() + " (connect here)");
         if (socket.getInetAddress().getHostAddress().equals("0.0.0.0")) {
-          System.out.println("[SimpleServer] Note: 0.0.0.0 means all"
+          print("Note: 0.0.0.0 means all"
               + " IP addresses; you want this.");
         }
 
@@ -624,8 +625,8 @@ public class Server {
               client = socket.accept();
             } catch (IOException e) {
               if (run && !restart) {
-                System.out.println("[SimpleServer] " + e);
-                System.out.println("[SimpleServer] Accept failed on port "
+                print(e);
+                print("Accept failed on port "
                     + port + "!");
               }
               break;

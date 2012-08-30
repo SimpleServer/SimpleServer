@@ -20,6 +20,8 @@
  */
 package simpleserver.rcon;
 
+import static simpleserver.util.Util.*;
+
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
@@ -88,7 +90,7 @@ public class RconServer {
         return;
       }
 
-      System.out.println("[SimpleServer] RCON listening on "
+      print("RCON listening on "
           + socket.getInetAddress().getHostAddress() + ":"
           + socket.getLocalPort());
 

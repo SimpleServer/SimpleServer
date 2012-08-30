@@ -21,6 +21,7 @@
 package simpleserver.message;
 
 import static simpleserver.lang.Translations.t;
+import static simpleserver.util.Util.*;
 
 import java.util.IllegalFormatException;
 
@@ -67,7 +68,7 @@ public class GlobalChat extends AbstractChat {
     try {
       prefix = String.format(format, sender.getName(), title, color);
     } catch (IllegalFormatException e) {
-      System.out.println("[SimpleServer] There is an error in your msgFormat/msgTitleFormat settings!");
+      print("There is an error in your msgFormat/msgTitleFormat settings!");
     }
     return prefix;
   }

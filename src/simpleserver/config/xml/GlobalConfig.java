@@ -20,6 +20,8 @@
  */
 package simpleserver.config.xml;
 
+import static simpleserver.util.Util.*;
+
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -59,7 +61,7 @@ public class GlobalConfig extends AbstractConfig {
     try {
       defaults = loadDefaults();
     } catch (Exception e) {
-      System.out.println("[SimpleServer] Error while loading default config.xml");
+      print("Error while loading default config.xml");
       e.printStackTrace();
       return;
     }
@@ -80,16 +82,16 @@ public class GlobalConfig extends AbstractConfig {
       if ((config = LegacyPermissionConfig.load()) != null) {
         this.config = config;
         completeConfig(config, defaults);
-        System.out.println("[SimpleServer] Converted permisisons.xml to config.xml");
+        print("Converted permisisons.xml to config.xml");
       } else {
         this.config = defaults;
-        System.out.println("[SimpleServer] Loaded default config.xml");
+        print("Loaded default config.xml");
       }
     } else {
       try {
         config = load(new FileInputStream(getFile()));
       } catch (Exception e) {
-        System.out.println("[SimpleServer] Error in config.xml: " + e);
+        print("Error in config.xml: " + e);
         e.printStackTrace();
         lock.unlock();
         return;

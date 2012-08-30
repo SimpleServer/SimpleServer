@@ -20,6 +20,8 @@
  */
 package simpleserver.telnet;
 
+import static simpleserver.util.Util.*;
+
 import java.io.IOException;
 import java.net.Socket;
 
@@ -35,11 +37,11 @@ public class TelnetTCP {
   public TelnetTCP(Socket socket, Server server) {
     this.socket = socket;
 
-    System.out.println("[SimpleServer] Telnet Connection from " + getIPAddress()
+    print("Telnet Connection from " + getIPAddress()
         + "!");
     server.requestTracker.addRequest(getIPAddress());
     if (server.isIPBanned(getIPAddress())) {
-      System.out.println("[SimpleServer] IP " + getIPAddress() + " is banned!");
+      print("IP " + getIPAddress() + " is banned!");
       close();
     }
 
@@ -83,7 +85,7 @@ public class TelnetTCP {
 
   public void close() {
     if (!closed) {
-      System.out.println("[SimpleServer] Telnet Connection from " + getIPAddress() + " closed!");
+      print("Telnet Connection from " + getIPAddress() + " closed!");
 
       closed = true;
       auth = false;

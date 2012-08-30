@@ -21,6 +21,7 @@
 package simpleserver.thread;
 
 import static simpleserver.lang.Translations.t;
+import static simpleserver.util.Util.*;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -78,7 +79,7 @@ public class AutoBackup {
 
   private void backup() throws IOException {
     if (server.config.properties.getBoolean("announceBackup")) {
-      System.out.println("[SimpleServer] Backing up server...");
+      print("Backing up server...");
     }
     announce(t("Backing up..."));
 
@@ -167,7 +168,7 @@ public class AutoBackup {
     } finally {
       fout.close();
     }
-    System.out.println("[SimpleServer] Backup saved: " + backup.getPath());
+    print("Backup saved: " + backup.getPath());
   }
 
   private void zipRecursively(File source, ZipOutputStream out)
@@ -335,8 +336,8 @@ public class AutoBackup {
             backup(); // does enable saving
           } catch (IOException e) {
             server.errorLog(e, "Server Backup Failure");
-            System.out.println("[SimpleServer] " + e);
-            System.out.println("[SimpleServer] Automated Server Backup Failure!");
+            print(e);
+            print("Automated Server Backup Failure!");
           }
           server.saveLock.release();
 

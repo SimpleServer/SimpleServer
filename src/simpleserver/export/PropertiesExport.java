@@ -20,6 +20,8 @@
  */
 package simpleserver.export;
 
+import static simpleserver.util.Util.*;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -87,8 +89,8 @@ abstract class PropertiesExport implements Resource {
         stream.close();
       }
     } catch (IOException e) {
-      System.out.println("[SimpleServer] " + e);
-      System.out.println("[SimpleServer] Failed to save export " + filename);
+      print(e);
+      print("Failed to save export " + filename);
     }
   }
 

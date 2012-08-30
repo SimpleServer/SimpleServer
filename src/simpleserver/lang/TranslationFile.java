@@ -20,6 +20,8 @@
  */
 package simpleserver.lang;
 
+import static simpleserver.util.Util.*;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -75,8 +77,8 @@ public class TranslationFile {
 
       options = new JSONObject(contents);
     } catch (Exception e) {
-      System.out.println("[SimpleServer] " + e);
-      System.out.println("[SimpleServer] Could not read " + filename);
+      print(e);
+      print("Could not read " + filename);
     } finally {
       if (reader != null) {
         try {
@@ -101,8 +103,8 @@ public class TranslationFile {
 
       options = new JSONObject(contents);
     } catch (Exception e) {
-      System.out.println("[SimpleServer] " + e);
-      System.out.println("[SimpleServer] Could not read " + filename);
+      print(e);
+      print("Could not read " + filename);
     } finally {
       if (reader != null) {
         try {

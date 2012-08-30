@@ -20,6 +20,8 @@
  */
 package simpleserver.rcon;
 
+import static simpleserver.util.Util.*;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -78,7 +80,7 @@ public class RconHandler implements Runnable {
         /*
         if (System.currentTimeMillis()-lastRead>IDLE_TIME) {
           if (!parent.isRobot)
-            System.out.println("[SimpleServer] Disconnecting " + parent.getIPAddress() + " due to inactivity.");
+            print("Disconnecting " + parent.getIPAddress() + " due to inactivity.");
           try {in.close();} catch (IOException e1) {}
         try {out.close();} catch (IOException e1) {}
           parent.close();
@@ -255,7 +257,7 @@ public class RconHandler implements Runnable {
 
   protected String auth(String passwd) {
     if (!server.options.contains("rconPassword")) {
-      System.out.println("[SimpleServer] RCON Auth Attempt from "
+      print("RCON Auth Attempt from "
           + s.getInetAddress().getHostAddress() + "! (rconPassword is blank)");
       return null;
     }
@@ -263,7 +265,7 @@ public class RconHandler implements Runnable {
       parent.auth = true;
       return "";
     } else {
-      System.out.println("[SimpleServer] RCON Authentication Failed from "
+      print("RCON Authentication Failed from "
           + s.getInetAddress().getHostAddress() + "!");
       return null;
     }

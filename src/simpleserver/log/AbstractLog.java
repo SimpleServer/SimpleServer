@@ -20,6 +20,8 @@
  */
 package simpleserver.log;
 
+import static simpleserver.util.Util.*;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -49,8 +51,8 @@ public class AbstractLog {
         filename = getLogFile();
         stream = new FileOutputStream(filename, true);
       } catch (FileNotFoundException e) {
-        System.out.println("[SimpleServer] " + e);
-        System.out.println("[SimpleServer] Unable to open " + name
+        print(e);
+        print("Unable to open " + name
             + " log for writing!");
         return;
       }
@@ -104,8 +106,8 @@ public class AbstractLog {
             stream.write(line.getBytes());
             stream.flush();
           } catch (IOException e) {
-            System.out.println("[SimpleServer] " + e);
-            System.out.println("[SimpleServer] Writing to " + name
+            print(e);
+            print("Writing to " + name
                 + " log failed!");
             break;
           }

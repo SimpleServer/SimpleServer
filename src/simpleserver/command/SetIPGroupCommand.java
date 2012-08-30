@@ -20,6 +20,8 @@
  */
 package simpleserver.command;
 
+import static simpleserver.util.Util.*;
+
 import java.net.InetAddress;
 import java.util.regex.Pattern;
 
@@ -72,12 +74,12 @@ public class SetIPGroupCommand extends SetGroupCommand implements ServerCommand 
     try {
       ip = getIP(server, target);
     } catch (Exception e) {
-      System.out.println("[SimpleServer] You must specify a user or a valid IP!");
+      print("You must specify a user or a valid IP!");
       return;
     }
     server.config.ips.setGroup(ip, group);
     server.saveConfig();
-    System.out.println("[SimpleServer] Group of " + target + " was set to " + group + "!");
+    print("Group of " + target + " was set to " + group + "!");
     server.updateGroups();
   }
 }

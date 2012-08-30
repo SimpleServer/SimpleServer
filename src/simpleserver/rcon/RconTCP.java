@@ -20,6 +20,8 @@
  */
 package simpleserver.rcon;
 
+import static simpleserver.util.Util.*;
+
 import java.io.IOException;
 import java.net.Socket;
 
@@ -35,11 +37,11 @@ public class RconTCP {
   public RconTCP(Socket socket, Server server) {
     this.socket = socket;
 
-    System.out.println("[SimpleServer] RCON Connection from " + getIPAddress()
+    print("RCON Connection from " + getIPAddress()
         + "!");
     server.requestTracker.addRequest(getIPAddress());
     if (server.isIPBanned(getIPAddress())) {
-      System.out.println("[SimpleServer] IP " + getIPAddress() + " is banned!");
+      print("IP " + getIPAddress() + " is banned!");
       close();
     }
 

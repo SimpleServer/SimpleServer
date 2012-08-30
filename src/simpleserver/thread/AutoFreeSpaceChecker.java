@@ -20,6 +20,8 @@
  */
 package simpleserver.thread;
 
+import static simpleserver.util.Util.*;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.Timer;
@@ -64,37 +66,37 @@ public class AutoFreeSpaceChecker {
 
       long freeSpaceKb = FileSystemUtils.freeSpaceKb();
       if (freeSpaceKb < neededSizeKb) {
-        System.out.println("[SimpleServer] Warning: You have only " +
+        print("Warning: You have only " +
             Math.round(freeSpaceKb / 1024) +
             " MB free space in this drive!");
-        System.out.println("[SimpleServer] Trying to delete old backups...");
+        print("Trying to delete old backups...");
 
         int filesDeleted = 0;
         while (FileSystemUtils.freeSpaceKb() < neededSizeKb) {
           File firstCreatedFile = AutoBackup.oldestBackup();
 
           if (firstCreatedFile != null) {
-            System.out.println("[SimpleServer] Deleting: " + firstCreatedFile.getPath());
+            print("Deleting: " + firstCreatedFile.getPath());
             firstCreatedFile.delete();
             filesDeleted++;
           } else {
-            System.out.println("[SimpleServer] No backups found...");
+            print("No backups found...");
             return;
           }
         }
 
         if (filesDeleted > 1) {
-          System.out.println("[SimpleServer] Deleted " + filesDeleted + " backup archives.");
+          print("Deleted " + filesDeleted + " backup archives.");
         } else {
-          System.out.println("[SimpleServer] Deleted 1 backup archive.");
+          print("Deleted 1 backup archive.");
         }
       }
     } catch (IOException e) {
-      System.out.println("[SimpleServer] " + e);
-      System.out.println("[SimpleServer] Free Space Checker Failed!");
+      print(e);
+      print("Free Space Checker Failed!");
     } catch (IllegalArgumentException e) {
-      System.out.println("[SimpleServer] " + e);
-      System.out.println("[SimpleServer] Backup space calculation failed because of a was file deleted during action. Trying again later.");
+      print(e);
+      print("Backup space calculation failed because of a was file deleted during action. Trying again later.");
 
     }
   }

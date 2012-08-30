@@ -20,6 +20,8 @@
  */
 package simpleserver;
 
+import static simpleserver.util.Util.*;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -59,8 +61,8 @@ public class Main {
           reader.close();
         }
       } catch (IOException e) {
-        System.out.println("[SimpleServer] " + e);
-        System.out.println("[SimpleServer] Warning, jar may be corrupted!");
+        print(e);
+        print("Warning, jar may be corrupted!");
       }
     }
 

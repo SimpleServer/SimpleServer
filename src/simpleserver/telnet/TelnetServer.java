@@ -20,6 +20,8 @@
  */
 package simpleserver.telnet;
 
+import static simpleserver.util.Util.*;
+
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
@@ -93,7 +95,7 @@ public class TelnetServer {
         return;
       }
 
-      System.out.println("[SimpleServer] Telnet listening on "
+      print("Telnet listening on "
           + socket.getInetAddress().getHostAddress() + ":"
           + socket.getLocalPort());
 

@@ -20,6 +20,8 @@
  */
 package simpleserver.config;
 
+import static simpleserver.util.Util.*;
+
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -67,8 +69,8 @@ public abstract class PropertiesConfig extends AbstractConfig {
       properties = (SortedProperties) defaultProperties.clone();
       save();
     } catch (IOException e) {
-      System.out.println("[SimpleServer] " + e);
-      System.out.println("[SimpleServer] Failed to load " + getFilename());
+      print(e);
+      print("Failed to load " + getFilename());
     }
   }
 
@@ -86,8 +88,8 @@ public abstract class PropertiesConfig extends AbstractConfig {
         stream.close();
       }
     } catch (IOException e) {
-      System.out.println("[SimpleServer] " + e);
-      System.out.println("[SimpleServer] Failed to save " + getFilename());
+      print(e);
+      print("Failed to save " + getFilename());
     }
   }
 
@@ -101,8 +103,8 @@ public abstract class PropertiesConfig extends AbstractConfig {
         stream.close();
       }
     } catch (IOException e) {
-      System.out.println("[SimpleServer] " + e);
-      System.out.println("[SimpleServer] Failed to load defaults for "
+      print(e);
+      print("Failed to load defaults for "
           + getFilename());
     }
   }

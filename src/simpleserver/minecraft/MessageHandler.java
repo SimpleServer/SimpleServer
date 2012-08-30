@@ -21,6 +21,7 @@
 package simpleserver.minecraft;
 
 import static simpleserver.lang.Translations.t;
+import static simpleserver.util.Util.*;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -40,7 +41,7 @@ public class MessageHandler {
 
   private CommandFeedback feedback = new CommandFeedback() {
     public void send(String message, Object... args) {
-      System.out.println("[SimpleServer] " + String.format(message, args));
+      print(String.format(message, args));
     }
   };
 
@@ -57,7 +58,7 @@ public class MessageHandler {
   public void handleError(Exception exception) {
     if (!server.isRestarting() && !server.isStopping()) {
       if (exception != null) {
-        System.out.println("[SimpleServer] " + exception);
+        print(exception);
       }
 
       String baseError = "[SimpleServer] Minecraft process stopped unexpectedly!";

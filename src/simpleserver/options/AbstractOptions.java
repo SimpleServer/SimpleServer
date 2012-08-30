@@ -20,6 +20,8 @@
  */
 package simpleserver.options;
 
+import static simpleserver.util.Util.*;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -89,8 +91,8 @@ public abstract class AbstractOptions implements Resource {
     } catch (FileNotFoundException e) {
       missingFile();
     } catch (IOException e) {
-      System.out.println("[SimpleServer] " + e);
-      System.out.println("[SimpleServer] Could not read " + filename);
+      print(e);
+      print("Could not read " + filename);
     }
   }
 
@@ -105,8 +107,8 @@ public abstract class AbstractOptions implements Resource {
         stream.close();
       }
     } catch (IOException e) {
-      System.out.println("[SimpleServer] " + e);
-      System.out.println("[SimpleServer] Could not write " + filename);
+      print(e);
+      print("Could not write " + filename);
     }
   }
 
@@ -129,8 +131,8 @@ public abstract class AbstractOptions implements Resource {
         stream.close();
       }
     } catch (IOException e) {
-      System.out.println("[SimpleServer] " + e);
-      System.out.println("[SimpleServer] Could not read default " + filename);
+      print(e);
+      print("Could not read default " + filename);
     }
 
     options = (SortedProperties) defaultOptions.clone();

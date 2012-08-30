@@ -21,6 +21,7 @@
 package simpleserver;
 
 import static simpleserver.lang.Translations.t;
+import static simpleserver.util.Util.*;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -367,10 +368,10 @@ public class Authenticator {
     if (before != isMinecraftUp) {
       if (!isMinecraftUp) {
         // just went down
-        System.out.println("[SimpleServer] Minecraft.net just went down!");
+        print("Minecraft.net just went down!");
       } else {
         // back online
-        System.out.println("[SimpleServer] Minecraft.net is back online!");
+        print("Minecraft.net is back online!");
       }
     }
   }

@@ -21,6 +21,7 @@
 package simpleserver;
 
 import static simpleserver.lang.Translations.t;
+import static simpleserver.util.Util.*;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -131,16 +132,16 @@ public class Player {
     vars = new ConcurrentHashMap<String, String>();
 
     if (server.isRobot(getIPAddress())) {
-      System.out.println("[SimpleServer] Robot Heartbeat: " + getIPAddress()
+      print("Robot Heartbeat: " + getIPAddress()
           + ".");
       isRobot = true;
     } else {
-      System.out.println("[SimpleServer] IP Connection from " + getIPAddress()
+      print("IP Connection from " + getIPAddress()
           + "!");
     }
 
     if (server.isIPBanned(getIPAddress())) {
-      System.out.println("[SimpleServer] IP " + getIPAddress() + " is banned!");
+      print("IP " + getIPAddress() + " is banned!");
 
       cleanup();
       return;
@@ -657,7 +658,7 @@ public class Player {
     try {
       groupObject = server.config.getGroup(this);
     } catch (SAXException e) {
-      System.out.println("[SimpleServer] A player could not be assigned to any group. (" + e + ")");
+      print("A player could not be assigned to any group. (" + e + ")");
       kick("You could not be asigned to any group.");
       return;
     }
@@ -748,7 +749,7 @@ public class Player {
       }
 
       if (!isRobot) {
-        System.out.println("[SimpleServer] Socket Closed: "
+        print("Socket Closed: "
             + extsocket.getInetAddress().getHostAddress());
       }
     }
@@ -769,7 +770,7 @@ public class Player {
     public void run() {
       while (serverToClient.isAlive() || clientToServer.isAlive()) {
         if (!serverToClient.isActive() || !clientToServer.isActive()) {
-          System.out.println("[SimpleServer] Disconnecting " + getIPAddress()
+          print("Disconnecting " + getIPAddress()
               + " due to inactivity.");
           close();
           break;

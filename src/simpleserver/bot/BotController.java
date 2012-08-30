@@ -20,6 +20,8 @@
  */
 package simpleserver.bot;
 
+import static simpleserver.util.Util.*;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.Calendar;
@@ -56,7 +58,7 @@ public class BotController {
       bot.connect();
     } catch (Exception e) {
       remove(bot);
-      System.out.println("[SimpleServer] Couldn't start bot <" + bot.name + "> (" + bot.getClass().getSimpleName() + ")");
+      print("Couldn't start bot <" + bot.name + "> (" + bot.getClass().getSimpleName() + ")");
       throw new ConnectException();
     }
 
@@ -99,7 +101,7 @@ public class BotController {
       try {
         bot.logout();
       } catch (IOException e) {
-        System.out.println("[SimpleServer] Couldn't stop bot <" + bot.name + "> (" + bot.getClass().getSimpleName() + ")");
+        print("Couldn't stop bot <" + bot.name + "> (" + bot.getClass().getSimpleName() + ")");
       }
     }
     if (timer != null) {

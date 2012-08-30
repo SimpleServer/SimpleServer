@@ -21,6 +21,7 @@
 package simpleserver.thread;
 
 import static simpleserver.lang.Translations.t;
+import static simpleserver.util.Util.*;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -98,8 +99,8 @@ public class AutoRun {
               process = Runtime.getRuntime().exec(command);
             } catch (IOException e) {
               server.runCommand("say", t("Mapping Failed!"));
-              System.out.println("[SimpleServer] " + e);
-              System.out.println("[SimpleServer] Cron Failed! Bad Command!");
+              print(e);
+              print("Cron Failed! Bad Command!");
               server.errorLog(e, "AutoRun Failure");
               continue;
             }
@@ -120,7 +121,7 @@ public class AutoRun {
             }
 
             if (exitCode < 0) {
-              System.out.println("[SimpleServer] c10t Failed! Exited with code "
+              print("c10t Failed! Exited with code "
                   + exitCode + "!");
               server.runCommand("say", t("Mapping Failed!"));
             } else {
