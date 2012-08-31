@@ -34,8 +34,11 @@ import java.io.OutputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Comparator;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -50,6 +53,21 @@ public class AutoBackup {
   private static final File BACKUP_TAGGED_DIRECTORY = new File(BACKUP_BASE_DIRECTORY, "tagged");
   private static final File TEMP_DIRECTORY = new File("tmp");
 
+  //bukkit depending files and directories
+  private static final List<File> RESOURCE_DIRS_CONFIG_BUKKIT = new ArrayList(Arrays.asList(
+          new File("bukkit.yml")
+  ));
+  /*
+   * Directories and files to backup and restore with the current configuration (bukkit yes/no)
+   * Added here are the settings-independant resources
+   * Resources are devided into CONFIG and MAP
+   */
+  private static final List<File> RESOURCES_CONFIG = new ArrayList<File>(Arrays.asList(
+          new File("simpleserver"),
+          new File("simpleserver.properties")
+  ));
+  private static final List<File> RESOURCES_MAP = new ArrayList<File>();
+
   private final Server server;
   private final byte[] copyBuffer;
   private final Archiver archiver;
@@ -63,11 +81,19 @@ public class AutoBackup {
 
   public AutoBackup(Server server) {
     this.server = server;
-    
+
     // Create backup directories if not present
     BACKUP_AUTO_DIRECTORY.mkdirs();
     BACKUP_TAGGED_DIRECTORY.mkdirs();
-    
+
+    //initialize resource directories
+    RESOURCES_MAP.add(new File(server.options.get("levelName")));
+    if (new File("bukkit.yml").exists()) {
+      RESOURCES_CONFIG.addAll(RESOURCE_DIRS_CONFIG_BUKKIT);
+      RESOURCES_MAP.add(new File(server.options.get("levelName" ) + "_nether"));
+      RESOURCES_MAP.add(new File(server.options.get("levelName" ) + "_the_end"));
+    }
+
     purgeOldBackups();
 
     copyBuffer = new byte[8192];
@@ -142,36 +168,23 @@ public class AutoBackup {
     TEMP_DIRECTORY.mkdir();
 
     File backup = new File(TEMP_DIRECTORY, String.format(NAME_FORMAT, new Date()));
-    copyRecursively(new File(server.options.get("levelName")), backup);
+    File backupConfig = new File(backup, "config");
+    File backupMap = new File(backup, "map");
 
-    File configBackup = new File(backup, "config");
-    copyRecursively(new File("simpleserver"), configBackup);
-    copyRecursively(new File("simpleserver.properties"),
-                    new File(configBackup, "simpleserver.properties"));
-
-    File bukkitSettings = new File("bukkit.yml");
-    if (bukkitSettings.exists()) {
-      copyRecursively(bukkitSettings, new File(configBackup, "bukkit.yml"));
+    for (File file : RESOURCES_CONFIG) {
+      copyRecursively(file, backupConfig);
     }
 
-    File nether = new File(server.options.get("levelName") + "_nether");
-    if (nether.exists()) {
-      copyRecursively(nether, new File(backup, server.options.get("levelName") + "_nether"));
+    for (File file : RESOURCES_MAP) {
+      copyRecursively(file, backupMap);
     }
-
-    /*
-    File plugins = new File("plugins");
-    if (plugins.exists()) {
-      copyRecursively(plugins, new File(backup, "plugins"));
-    }
-    */
 
     return backup;
   }
 
   /**
    * Zip and name the temporary created backup
-   * 
+   *
    * @param source Directory to zip
    * @throws IOException
    */
@@ -306,7 +319,7 @@ public class AutoBackup {
     }
     return firstCreatedFile;
   }
-  
+
   private static File[] getAutoBackups() {
     return BACKUP_AUTO_DIRECTORY.listFiles(new FileFilter() {
       @Override
@@ -315,10 +328,10 @@ public class AutoBackup {
       }
     });
   }
-  
+
   /**
    * Like 'getAutoBackups()', but sorted from newest to oldest.
-   * @return 
+   * @return
    */
   private static File[] getSortedAutoBackups() {
     //sort files by date (newest to oldest)
@@ -335,7 +348,7 @@ public class AutoBackup {
     });
     return files;
   }
-  
+
   public static String listLastAutoBackups(int n) {
     StringBuilder sb = new StringBuilder();
     sb.append("Last ").append(n).append(" auto backups:");
@@ -349,15 +362,15 @@ public class AutoBackup {
     }
     return sb.toString();
   }
-  
+
   private static Date date(File file) throws ParseException {
     return new SimpleDateFormat("yyyy-MM-dd-HH-mm").parse(file.getName().split(".zip")[0]);
   }
-  
+
   private static String dateFormatted(File file) throws ParseException {
     return new SimpleDateFormat("dd/MM/yyyy HH:mm").format(date(file));
   }
-  
+
   private static long dateMillis(File file) throws ParseException {
     GregorianCalendar cal = new GregorianCalendar();
     cal.setTime(date(file));
@@ -375,11 +388,11 @@ public class AutoBackup {
       return System.currentTimeMillis() - file.lastModified();
     }
   }
-  
+
   /**
    * Rollback to n-th last auto backup.
    * @param n
-   * @return 
+   * @return
    */
   public void rollback(int n) throws Exception {
     File[] backups = getSortedAutoBackups();
@@ -389,11 +402,11 @@ public class AutoBackup {
       throw new Exception("Wrong backup number!");
     }
   }
-  
+
   /**
    * Rollback to backup with tag 'tag'.
    * @param tag
-   * @return 
+   * @return
    */
   public void rollback(String tag) throws Exception {
     File backup = new File(BACKUP_TAGGED_DIRECTORY, tag + ".zip");
@@ -401,14 +414,14 @@ public class AutoBackup {
       throw new Exception("Backup does not exist!");
     }
   }
-  
+
   /**
    * Rollback to server status at backup
    * in archive 'backup'.
    * @param backup Zip archive containing correct server backup
    */
   private void rollback(File backup) {
-    
+
   }
 
   private final class Archiver extends Thread {
