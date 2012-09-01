@@ -89,8 +89,8 @@ abstract class PropertiesExport implements Resource {
         stream.close();
       }
     } catch (IOException e) {
-      print(e);
-      print("Failed to save export " + filename);
+      println(e);
+      println("Failed to save export " + filename);
     }
   }
 

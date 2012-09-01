@@ -76,7 +76,7 @@ public class MinecraftWrapper {
       return true;
     }
 
-    print("Downloading " + SERVER_JAR
+    println("Downloading " + SERVER_JAR
         + ".  Please wait!");
 
     HttpClient httpclient = new DefaultHttpClient();
@@ -124,7 +124,7 @@ public class MinecraftWrapper {
     if (verifyMinecraftJar()) {
       return true;
     } else {
-      print(SERVER_JAR + " is corrupt!");
+      println(SERVER_JAR + " is corrupt!");
       return false;
     }
   }
@@ -137,8 +137,8 @@ public class MinecraftWrapper {
     try {
       minecraft = runtime.exec(command);
     } catch (IOException e) {
-      print(e);
-      print("FATAL ERROR: Could not start minecraft_server.jar!");
+      println(e);
+      println("FATAL ERROR: Could not start minecraft_server.jar!");
       System.exit(-1);
     }
 
@@ -241,8 +241,8 @@ public class MinecraftWrapper {
   }
 
   private void autodownloadError(Exception e, String stepName) {
-    print(e);
-    print("Unable to " + stepName + " "
+    println(e);
+    println("Unable to " + stepName + " "
         + SERVER_JAR + "!");
   }
 }

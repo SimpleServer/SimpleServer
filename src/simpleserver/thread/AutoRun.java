@@ -99,8 +99,8 @@ public class AutoRun {
               process = Runtime.getRuntime().exec(command);
             } catch (IOException e) {
               server.runCommand("say", t("Mapping Failed!"));
-              print(e);
-              print("Cron Failed! Bad Command!");
+              println(e);
+              println("Cron Failed! Bad Command!");
               server.errorLog(e, "AutoRun Failure");
               continue;
             }
@@ -121,7 +121,7 @@ public class AutoRun {
             }
 
             if (exitCode < 0) {
-              print("c10t Failed! Exited with code "
+              println("c10t Failed! Exited with code "
                   + exitCode + "!");
               server.runCommand("say", t("Mapping Failed!"));
             } else {

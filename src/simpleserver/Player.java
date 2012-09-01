@@ -132,16 +132,16 @@ public class Player {
     vars = new ConcurrentHashMap<String, String>();
 
     if (server.isRobot(getIPAddress())) {
-      print("Robot Heartbeat: " + getIPAddress()
+      println("Robot Heartbeat: " + getIPAddress()
           + ".");
       isRobot = true;
     } else {
-      print("IP Connection from " + getIPAddress()
+      println("IP Connection from " + getIPAddress()
           + "!");
     }
 
     if (server.isIPBanned(getIPAddress())) {
-      print("IP " + getIPAddress() + " is banned!");
+      println("IP " + getIPAddress() + " is banned!");
 
       cleanup();
       return;
@@ -658,7 +658,7 @@ public class Player {
     try {
       groupObject = server.config.getGroup(this);
     } catch (SAXException e) {
-      print("A player could not be assigned to any group. (" + e + ")");
+      println("A player could not be assigned to any group. (" + e + ")");
       kick("You could not be asigned to any group.");
       return;
     }
@@ -749,7 +749,7 @@ public class Player {
       }
 
       if (!isRobot) {
-        print("Socket Closed: "
+        println("Socket Closed: "
             + extsocket.getInetAddress().getHostAddress());
       }
     }
@@ -770,7 +770,7 @@ public class Player {
     public void run() {
       while (serverToClient.isAlive() || clientToServer.isAlive()) {
         if (!serverToClient.isActive() || !clientToServer.isActive()) {
-          print("Disconnecting " + getIPAddress()
+          println("Disconnecting " + getIPAddress()
               + " due to inactivity.");
           close();
           break;

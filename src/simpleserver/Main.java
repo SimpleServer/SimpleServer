@@ -61,8 +61,8 @@ public class Main {
           reader.close();
         }
       } catch (IOException e) {
-        print(e);
-        print("Warning, jar may be corrupted!");
+        println(e);
+        println("Warning, jar may be corrupted!");
       }
     }
 

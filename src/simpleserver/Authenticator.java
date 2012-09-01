@@ -368,10 +368,10 @@ public class Authenticator {
     if (before != isMinecraftUp) {
       if (!isMinecraftUp) {
         // just went down
-        print("Minecraft.net just went down!");
+        println("Minecraft.net just went down!");
       } else {
         // back online
-        print("Minecraft.net is back online!");
+        println("Minecraft.net is back online!");
       }
     }
   }

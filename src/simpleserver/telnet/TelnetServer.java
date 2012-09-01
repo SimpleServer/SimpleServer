@@ -95,7 +95,7 @@ public class TelnetServer {
         return;
       }
 
-      print("Telnet listening on "
+      println("Telnet listening on "
           + socket.getInetAddress().getHostAddress() + ":"
           + socket.getLocalPort());
 

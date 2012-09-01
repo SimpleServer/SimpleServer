@@ -252,7 +252,7 @@ public class Server {
     if (globalConfig.loadsuccess) {
       config = globalConfig.config;
     } else {
-      print("Syntax error in config.xml! Config was not reloaded.");
+      println("Syntax error in config.xml! Config was not reloaded.");
       return false;
     }
 
@@ -477,7 +477,7 @@ public class Server {
     loadResources();
 
     if (!globalConfig.loadsuccess) {
-      print("Syntax error in config.xml! Emergency shutdown...");
+      println("Syntax error in config.xml! Emergency shutdown...");
       System.exit(1);
     }
 
@@ -495,7 +495,7 @@ public class Server {
 
     minecraft = new MinecraftWrapper(this, options, systemInput);
     if (!minecraft.prepareServerJar()) {
-      print("Please download minecraft_server.jar to the folder with SimpleServer.jar.");
+      println("Please download minecraft_server.jar to the folder with SimpleServer.jar.");
       System.exit(1);
     }
 
@@ -509,7 +509,7 @@ public class Server {
     try {
       ClientEncryption.generateKeyPair();
     } catch (NoSuchAlgorithmException e) {
-      print("Error while generating RSA key pair");
+      println("Error while generating RSA key pair");
       e.printStackTrace();
       System.exit(1);
     }
@@ -538,13 +538,13 @@ public class Server {
   }
 
   private void shutdown() {
-    print("Stopping Server...");
+    println("Stopping Server...");
     save = false;
 
     bots.stop();
 
     if (!saveLock.tryAcquire()) {
-      print("Server is currently Backing Up/Saving...");
+      println("Server is currently Backing Up/Saving...");
       while (true) {
         try {
           saveLock.acquire();
@@ -573,7 +573,7 @@ public class Server {
 
     playerList.waitUntilEmpty();
     minecraft.stop();
-    print("Server stopped successfully!");
+    println("Server stopped successfully!");
     saveLock.release();
   }
 
@@ -595,8 +595,8 @@ public class Server {
           try {
             address = InetAddress.getByName(ip);
           } catch (UnknownHostException e) {
-            print(e);
-            print("Invalid listening address " + ip);
+            println(e);
+            println("Invalid listening address " + ip);
             break;
           }
         }
@@ -604,17 +604,17 @@ public class Server {
         try {
           socket = new ServerSocket(port, 0, address);
         } catch (IOException e) {
-          print(e);
-          print("Could not listen on port " + port
+          println(e);
+          println("Could not listen on port " + port
               + "!\nIs it already in use? Exiting application...");
           break;
         }
 
-        print("Wrapper listening on "
+        println("Wrapper listening on "
             + socket.getInetAddress().getHostAddress() + ":"
             + socket.getLocalPort() + " (connect here)");
         if (socket.getInetAddress().getHostAddress().equals("0.0.0.0")) {
-          print("Note: 0.0.0.0 means all"
+          println("Note: 0.0.0.0 means all"
               + " IP addresses; you want this.");
         }
 
@@ -625,8 +625,8 @@ public class Server {
               client = socket.accept();
             } catch (IOException e) {
               if (run && !restart) {
-                print(e);
-                print("Accept failed on port "
+                println(e);
+                println("Accept failed on port "
                     + port + "!");
               }
               break;

@@ -90,7 +90,7 @@ public class RconServer {
         return;
       }
 
-      print("RCON listening on "
+      println("RCON listening on "
           + socket.getInetAddress().getHostAddress() + ":"
           + socket.getLocalPort());
 

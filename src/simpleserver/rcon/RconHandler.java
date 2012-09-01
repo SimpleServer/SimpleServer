@@ -257,7 +257,7 @@ public class RconHandler implements Runnable {
 
   protected String auth(String passwd) {
     if (!server.options.contains("rconPassword")) {
-      print("RCON Auth Attempt from "
+      println("RCON Auth Attempt from "
           + s.getInetAddress().getHostAddress() + "! (rconPassword is blank)");
       return null;
     }
@@ -265,7 +265,7 @@ public class RconHandler implements Runnable {
       parent.auth = true;
       return "";
     } else {
-      print("RCON Authentication Failed from "
+      println("RCON Authentication Failed from "
           + s.getInetAddress().getHostAddress() + "!");
       return null;
     }

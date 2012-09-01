@@ -91,8 +91,8 @@ public abstract class AbstractOptions implements Resource {
     } catch (FileNotFoundException e) {
       missingFile();
     } catch (IOException e) {
-      print(e);
-      print("Could not read " + filename);
+      println(e);
+      println("Could not read " + filename);
     }
   }
 
@@ -107,8 +107,8 @@ public abstract class AbstractOptions implements Resource {
         stream.close();
       }
     } catch (IOException e) {
-      print(e);
-      print("Could not write " + filename);
+      println(e);
+      println("Could not write " + filename);
     }
   }
 
@@ -131,8 +131,8 @@ public abstract class AbstractOptions implements Resource {
         stream.close();
       }
     } catch (IOException e) {
-      print(e);
-      print("Could not read default " + filename);
+      println(e);
+      println("Could not read default " + filename);
     }
 
     options = (SortedProperties) defaultOptions.clone();

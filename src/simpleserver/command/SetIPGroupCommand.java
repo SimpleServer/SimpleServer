@@ -74,12 +74,12 @@ public class SetIPGroupCommand extends SetGroupCommand implements ServerCommand 
     try {
       ip = getIP(server, target);
     } catch (Exception e) {
-      print("You must specify a user or a valid IP!");
+      println("You must specify a user or a valid IP!");
       return;
     }
     server.config.ips.setGroup(ip, group);
     server.saveConfig();
-    print("Group of " + target + " was set to " + group + "!");
+    println("Group of " + target + " was set to " + group + "!");
     server.updateGroups();
   }
 }

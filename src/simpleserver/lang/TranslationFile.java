@@ -77,8 +77,8 @@ public class TranslationFile {
 
       options = new JSONObject(contents);
     } catch (Exception e) {
-      print(e);
-      print("Could not read " + filename);
+      println(e);
+      println("Could not read " + filename);
     } finally {
       if (reader != null) {
         try {
@@ -103,8 +103,8 @@ public class TranslationFile {
 
       options = new JSONObject(contents);
     } catch (Exception e) {
-      print(e);
-      print("Could not read " + filename);
+      println(e);
+      println("Could not read " + filename);
     } finally {
       if (reader != null) {
         try {

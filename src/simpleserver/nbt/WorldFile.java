@@ -37,7 +37,7 @@ public class WorldFile {
       NBTFile nbt = new GZipNBTFile(filename);
       data = nbt.root().getCompound("Data");
     } catch (Exception e) {
-      print("Can't read level.dat");
+      println("Can't read level.dat");
     }
   }
 

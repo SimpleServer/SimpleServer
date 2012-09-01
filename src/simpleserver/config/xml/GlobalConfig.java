@@ -61,7 +61,7 @@ public class GlobalConfig extends AbstractConfig {
     try {
       defaults = loadDefaults();
     } catch (Exception e) {
-      print("Error while loading default config.xml");
+      println("Error while loading default config.xml");
       e.printStackTrace();
       return;
     }
@@ -82,16 +82,16 @@ public class GlobalConfig extends AbstractConfig {
       if ((config = LegacyPermissionConfig.load()) != null) {
         this.config = config;
         completeConfig(config, defaults);
-        print("Converted permisisons.xml to config.xml");
+        println("Converted permisisons.xml to config.xml");
       } else {
         this.config = defaults;
-        print("Loaded default config.xml");
+        println("Loaded default config.xml");
       }
     } else {
       try {
         config = load(new FileInputStream(getFile()));
       } catch (Exception e) {
-        print("Error in config.xml: " + e);
+        println("Error in config.xml: " + e);
         e.printStackTrace();
         lock.unlock();
         return;

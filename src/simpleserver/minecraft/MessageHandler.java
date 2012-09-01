@@ -41,7 +41,7 @@ public class MessageHandler {
 
   private CommandFeedback feedback = new CommandFeedback() {
     public void send(String message, Object... args) {
-      print(String.format(message, args));
+      println(String.format(message, args));
     }
   };
 
@@ -58,7 +58,7 @@ public class MessageHandler {
   public void handleError(Exception exception) {
     if (!server.isRestarting() && !server.isStopping()) {
       if (exception != null) {
-        print(exception);
+        println(exception);
       }
 
       String baseError = "[SimpleServer] Minecraft process stopped unexpectedly!";

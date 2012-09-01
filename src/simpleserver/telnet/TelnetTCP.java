@@ -37,11 +37,11 @@ public class TelnetTCP {
   public TelnetTCP(Socket socket, Server server) {
     this.socket = socket;
 
-    print("Telnet Connection from " + getIPAddress()
+    println("Telnet Connection from " + getIPAddress()
         + "!");
     server.requestTracker.addRequest(getIPAddress());
     if (server.isIPBanned(getIPAddress())) {
-      print("IP " + getIPAddress() + " is banned!");
+      println("IP " + getIPAddress() + " is banned!");
       close();
     }
 
@@ -85,7 +85,7 @@ public class TelnetTCP {
 
   public void close() {
     if (!closed) {
-      print("Telnet Connection from " + getIPAddress() + " closed!");
+      println("Telnet Connection from " + getIPAddress() + " closed!");
 
       closed = true;
       auth = false;

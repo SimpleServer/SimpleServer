@@ -22,6 +22,9 @@ package simpleserver.util;
 
 public class Util {
   public static void print(Object o) {
+    System.out.print("[SimpleServer] " + o);
+  }
+  public static void println(Object o) {
     System.out.println("[SimpleServer] " + o);
   }
 }

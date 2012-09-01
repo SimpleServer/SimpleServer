@@ -37,11 +37,11 @@ public class RconTCP {
   public RconTCP(Socket socket, Server server) {
     this.socket = socket;
 
-    print("RCON Connection from " + getIPAddress()
+    println("RCON Connection from " + getIPAddress()
         + "!");
     server.requestTracker.addRequest(getIPAddress());
     if (server.isIPBanned(getIPAddress())) {
-      print("IP " + getIPAddress() + " is banned!");
+      println("IP " + getIPAddress() + " is banned!");
       close();
     }
 

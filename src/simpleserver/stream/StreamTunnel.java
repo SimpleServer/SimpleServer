@@ -1330,7 +1330,7 @@ public class StreamTunnel {
 
   private void sendMessagePacket(String message) throws IOException {
     if (message.length() > MESSAGE_SIZE) {
-      print("Invalid message size: " + message);
+      println("Invalid message size: " + message);
       return;
     }
     if (message.length() > 0) {
@@ -1380,8 +1380,8 @@ public class StreamTunnel {
             flushAll();
           } catch (IOException e) {
             if (run && !player.isRobot()) {
-              print(e);
-              System.out.print("[SimpleServer] " + streamType
+              println(e);
+              print(streamType
                   + " error handling traffic for " + player.getIPAddress());
               if (lastPacket != null) {
                 System.out.print(" (" + Integer.toHexString(lastPacket) + ")");

@@ -58,7 +58,7 @@ public class BotController {
       bot.connect();
     } catch (Exception e) {
       remove(bot);
-      print("Couldn't start bot <" + bot.name + "> (" + bot.getClass().getSimpleName() + ")");
+      println("Couldn't start bot <" + bot.name + "> (" + bot.getClass().getSimpleName() + ")");
       throw new ConnectException();
     }
 
@@ -101,7 +101,7 @@ public class BotController {
       try {
         bot.logout();
       } catch (IOException e) {
-        print("Couldn't stop bot <" + bot.name + "> (" + bot.getClass().getSimpleName() + ")");
+        println("Couldn't stop bot <" + bot.name + "> (" + bot.getClass().getSimpleName() + ")");
       }
     }
     if (timer != null) {

@@ -20,6 +20,8 @@
  */
 package simpleserver.bot;
 
+import static simpleserver.util.Util.*;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.DataInputStream;
@@ -698,7 +700,7 @@ public class Bot {
   protected void error(String reason) {
     die();
     if (!expectDisconnect) {
-      System.out.print("[SimpleServer] Bot " + name + " died (" + reason + ")");
+      print("Bot " + name + " died (" + reason + ")");
     }
   }
 

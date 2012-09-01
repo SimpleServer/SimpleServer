@@ -51,8 +51,8 @@ public class AbstractLog {
         filename = getLogFile();
         stream = new FileOutputStream(filename, true);
       } catch (FileNotFoundException e) {
-        print(e);
-        print("Unable to open " + name
+        println(e);
+        println("Unable to open " + name
             + " log for writing!");
         return;
       }
@@ -106,8 +106,8 @@ public class AbstractLog {
             stream.write(line.getBytes());
             stream.flush();
           } catch (IOException e) {
-            print(e);
-            print("Writing to " + name
+            println(e);
+            println("Writing to " + name
                 + " log failed!");
             break;
           }

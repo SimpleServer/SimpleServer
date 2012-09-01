@@ -69,8 +69,8 @@ public abstract class PropertiesConfig extends AbstractConfig {
       properties = (SortedProperties) defaultProperties.clone();
       save();
     } catch (IOException e) {
-      print(e);
-      print("Failed to load " + getFilename());
+      println(e);
+      println("Failed to load " + getFilename());
     }
   }
 
@@ -88,8 +88,8 @@ public abstract class PropertiesConfig extends AbstractConfig {
         stream.close();
       }
     } catch (IOException e) {
-      print(e);
-      print("Failed to save " + getFilename());
+      println(e);
+      println("Failed to save " + getFilename());
     }
   }
 
@@ -103,8 +103,8 @@ public abstract class PropertiesConfig extends AbstractConfig {
         stream.close();
       }
     } catch (IOException e) {
-      print(e);
-      print("Failed to load defaults for "
+      println(e);
+      println("Failed to load defaults for "
           + getFilename());
     }
   }

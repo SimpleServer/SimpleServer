@@ -66,37 +66,37 @@ public class AutoFreeSpaceChecker {
 
       long freeSpaceKb = FileSystemUtils.freeSpaceKb();
       if (freeSpaceKb < neededSizeKb) {
-        print("Warning: You have only " +
+        println("Warning: You have only " +
             Math.round(freeSpaceKb / 1024) +
             " MB free space in this drive!");
-        print("Trying to delete old backups...");
+        println("Trying to delete old backups...");
 
         int filesDeleted = 0;
         while (FileSystemUtils.freeSpaceKb() < neededSizeKb) {
           File firstCreatedFile = AutoBackup.oldestBackup();
 
           if (firstCreatedFile != null) {
-            print("Deleting: " + firstCreatedFile.getPath());
+            println("Deleting: " + firstCreatedFile.getPath());
             firstCreatedFile.delete();
             filesDeleted++;
           } else {
-            print("No backups found...");
+            println("No backups found...");
             return;
           }
         }
 
         if (filesDeleted > 1) {
-          print("Deleted " + filesDeleted + " backup archives.");
+          println("Deleted " + filesDeleted + " backup archives.");
         } else {
-          print("Deleted 1 backup archive.");
+          println("Deleted 1 backup archive.");
         }
       }
     } catch (IOException e) {
-      print(e);
-      print("Free Space Checker Failed!");
+      println(e);
+      println("Free Space Checker Failed!");
     } catch (IllegalArgumentException e) {
-      print(e);
-      print("Backup space calculation failed because of a was file deleted during action. Trying again later.");
+      println(e);
+      println("Backup space calculation failed because of a was file deleted during action. Trying again later.");
 
     }
   }

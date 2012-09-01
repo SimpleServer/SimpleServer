@@ -79,7 +79,7 @@ public class AutoBackup {
 
   private void backup() throws IOException {
     if (server.config.properties.getBoolean("announceBackup")) {
-      print("Backing up server...");
+      println("Backing up server...");
     }
     announce(t("Backing up..."));
 
@@ -168,7 +168,7 @@ public class AutoBackup {
     } finally {
       fout.close();
     }
-    print("Backup saved: " + backup.getPath());
+    println("Backup saved: " + backup.getPath());
   }
 
   private void zipRecursively(File source, ZipOutputStream out)
@@ -336,8 +336,8 @@ public class AutoBackup {
             backup(); // does enable saving
           } catch (IOException e) {
             server.errorLog(e, "Server Backup Failure");
-            print(e);
-            print("Automated Server Backup Failure!");
+            println(e);
+            println("Automated Server Backup Failure!");
           }
           server.saveLock.release();
 

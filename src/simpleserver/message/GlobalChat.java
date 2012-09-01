@@ -68,7 +68,7 @@ public class GlobalChat extends AbstractChat {
     try {
       prefix = String.format(format, sender.getName(), title, color);
     } catch (IllegalFormatException e) {
-      print("There is an error in your msgFormat/msgTitleFormat settings!");
+      println("There is an error in your msgFormat/msgTitleFormat settings!");
     }
     return prefix;
   }
