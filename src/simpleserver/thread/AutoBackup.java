@@ -28,6 +28,7 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.PrintWriter;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -45,6 +46,7 @@ import org.apache.commons.io.FileUtils;
 import simpleserver.Server;
 
 public class AutoBackup {
+  private static final String VERSION = "1"; //version of the backup system for compatibility
   private static final long MILLISECONDS_PER_MINUTE = 1000 * 60;
   private static final long MILLISECONDS_PER_HOUR = MILLISECONDS_PER_MINUTE * 60;
   private static final String NAME_FORMAT = "%tF-%1$tH-%1$tM";
@@ -172,12 +174,17 @@ public class AutoBackup {
     }
   }
 
+  /**
+   * Prepare the backup archive.
+   * @return
+   * @throws IOException 
+   */
   private File makeTemporaryCopy() throws IOException {
-    File backup = new File(TEMP_DIRECTORY, String.format(NAME_FORMAT, new Date()));
+    Date date = new Date();
+    File backup = new File(TEMP_DIRECTORY, String.format(NAME_FORMAT, date));
     File backupConfig = new File(backup, "config");
     File backupMap = new File(backup, "map");
 
-    //TODO copy original structure to merge it at rollback
     for (File file : RESOURCES_CONFIG) {
       copy(file, new File(backupConfig, file.getName()));
     }
@@ -185,6 +192,12 @@ public class AutoBackup {
     for (File file : RESOURCES_MAP) {
       copy(file, new File (backupMap, file.getName()));
     }
+    
+    //Create backu23p info file
+    PrintWriter out = new PrintWriter(new File(backup, "backup.info"));
+    out.println("Backup system version: " + VERSION);
+    out.print("Backup date: " + new SimpleDateFormat("dd/MM/yyyy HH:mm").format(date));
+    out.close();
 
     return backup;
   }
