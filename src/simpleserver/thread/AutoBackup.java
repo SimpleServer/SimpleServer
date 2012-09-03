@@ -29,8 +29,6 @@ import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Comparator;
@@ -41,6 +39,8 @@ import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
+
+import org.apache.commons.io.FileUtils;
 
 import simpleserver.Server;
 
@@ -67,6 +67,14 @@ public class AutoBackup {
           new File("simpleserver.properties")
   ));
   private static final List<File> RESOURCES_MAP = new ArrayList<File>();
+  
+  //Filter to exclude unimportant files
+  private static final FileFilter filter = new FileFilter() {
+    @Override
+    public boolean accept(File pathname) {
+      return (!pathname.getName().equals("level.dat_old"));
+    }
+  };
 
   private final Server server;
   private final byte[] copyBuffer;
@@ -165,25 +173,24 @@ public class AutoBackup {
   }
 
   private File makeTemporaryCopy() throws IOException {
-    TEMP_DIRECTORY.mkdir();
-
     File backup = new File(TEMP_DIRECTORY, String.format(NAME_FORMAT, new Date()));
     File backupConfig = new File(backup, "config");
     File backupMap = new File(backup, "map");
 
+    //TODO copy original structure to merge it at rollback
     for (File file : RESOURCES_CONFIG) {
-      copyRecursively(file, backupConfig);
+      copy(file, new File(backupConfig, file.getName()));
     }
 
     for (File file : RESOURCES_MAP) {
-      copyRecursively(file, backupMap);
+      copy(file, new File (backupMap, file.getName()));
     }
 
     return backup;
   }
 
   /**
-   * Zip and name the temporary created backup
+   * Zip and name the temporary created backup.
    *
    * @param source Directory to zip
    * @throws IOException
@@ -247,33 +254,20 @@ public class AutoBackup {
     }
   }
 
-  private void copyRecursively(File source, File target) throws IOException {
+  /**
+   * Copy file or directory 'source' to 'target'-directoy,
+   * which is created if non-existent.
+   * Files not accepted by 'filter' are ignored.
+   * @param source
+   * @param target
+   * @throws IOException 
+   */
+  private void copy(File source, File target) throws IOException {
     if (source.isDirectory()) {
-      target.mkdir();
-
-      for (String child : source.list()) {
-        if (!child.contains("tmp_chunk.dat")) {
-          copyRecursively(new File(source, child), new File(target, child));
-        }
-      }
+      FileUtils.copyDirectory(source, target, filter);
     } else {
-      if (source.getName().equals("level.dat_old")) {
-        return;
-      }
-      InputStream in = new FileInputStream(source);
-      OutputStream out = new FileOutputStream(target);
-
-      try {
-        int length;
-        while ((length = in.read(copyBuffer)) > 0) {
-          out.write(copyBuffer, 0, length);
-        }
-      } finally {
-        try {
-          in.close();
-        } finally {
-          out.close();
-        }
+      if (filter.accept(source)) {
+        FileUtils.copyFile(source, target);
       }
     }
   }
