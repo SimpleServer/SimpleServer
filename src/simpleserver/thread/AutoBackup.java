@@ -23,11 +23,9 @@ package simpleserver.thread;
 import static simpleserver.lang.Translations.t;
 import static simpleserver.util.Util.*;
 
-import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.PrintWriter;
 import java.io.IOException;
 import java.text.ParseException;
@@ -44,6 +42,7 @@ import java.util.zip.ZipOutputStream;
 import org.apache.commons.io.FileUtils;
 
 import simpleserver.Server;
+import simpleserver.util.IO;
 
 public class AutoBackup {
   private static final String VERSION = "1"; //version of the backup system for compatibility
@@ -217,17 +216,8 @@ public class AutoBackup {
     }
 
     File backup = new File(dir, tag + ".zip");
-    FileOutputStream fout = new FileOutputStream(backup);
-    try {
-      ZipOutputStream out = new ZipOutputStream(new BufferedOutputStream(fout));
-      try {
-        zipRecursively(source, out);
-      } finally {
-        out.close();
-      }
-    } finally {
-      fout.close();
-    }
+    IO.zip(source, backup);
+    
     println("Backup saved: " + backup.getPath());
   }
 
@@ -265,6 +255,10 @@ public class AutoBackup {
       }
       out.closeEntry();
     }
+  }
+  
+  private void unzipToTemp(File backup) throws IOException {
+    IO.unzip(backup, TEMP_DIRECTORY);
   }
 
   /**
