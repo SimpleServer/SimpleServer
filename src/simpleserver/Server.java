@@ -131,6 +131,7 @@ public class Server {
   public long mapSeed;
 
   private boolean run = true;
+  private boolean waitStartup = false; //do not start until set
   private boolean restart = false;
   private boolean save = false;
 
@@ -148,6 +149,28 @@ public class Server {
     listener.setName("SimpleServerListener");
   }
 
+  /**
+   * Initiate a restart.
+   * Shut down server but do not start again until
+   * 'manualRestart()' is called.
+   */
+  public void manualRestart() {
+    waitStartup = true;
+    restart();
+  }
+  
+  /**
+   * Continue a restart initiated by 'manualRestart()'.
+   * Startup the waiting server.
+   */
+  public void continueRestart() {
+    waitStartup = false;
+    listener.interrupt();
+  }
+  
+  /**
+   * Do an immediate restart.
+   */
   public void restart() {
     restart = true;
     stop();
@@ -435,7 +458,6 @@ public class Server {
   /**
    * Rollback to n-th last auto backup.
    * @param n
-   * @return 
    */
   public void rollback(int n) throws Exception {
     autoBackup.rollback(n);
@@ -444,7 +466,6 @@ public class Server {
   /**
    * Rollback to backup with tag 'tag'.
    * @param tag
-   * @return 
    */
   public void rollback(String tag) throws Exception {
     autoBackup.rollback(tag);
@@ -622,6 +643,12 @@ public class Server {
       initialize();
 
       while (run) {
+        while (waitStartup) {
+          try {
+            Thread.sleep(1000);
+          } catch (InterruptedException ex) {
+          }
+        }
         startup();
 
         String ip = options.get("ipAddress");
