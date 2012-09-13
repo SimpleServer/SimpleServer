@@ -73,13 +73,13 @@ public class RollbackCommand extends AbstractCommand implements PlayerCommand, S
   
   private void execute(BackupCommand.Com com) {
     String[] args = extractArguments(com.getMessage());
-    if (args.length != 2) {
+    if (args.length != 1) {
       com.sendMsg("Wrong number of arguments!");
       return;
     }
-    if (args[1].charAt(0) == '@') { //@n: reference to n-th last auto backup
+    if (args[0].charAt(0) == '@') { //@n: reference to n-th last auto backup
       try {
-        com.getServer().rollback(Integer.parseInt(args[1].substring(1, args[1].length())));
+        com.getServer().rollback(Integer.parseInt(args[0].substring(1, args[0].length())));
       } catch (NumberFormatException ex) {
         com.sendMsg("Expected number after '@'!");
       } catch (Exception ex) {
@@ -87,7 +87,7 @@ public class RollbackCommand extends AbstractCommand implements PlayerCommand, S
       }
     } else {
       try {
-        com.getServer().rollback(args[1]);
+        com.getServer().rollback(args[0]);
       } catch (Exception ex) {
         com.sendMsg(ex.getMessage());
       }

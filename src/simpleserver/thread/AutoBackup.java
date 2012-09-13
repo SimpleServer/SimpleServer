@@ -53,6 +53,8 @@ public class AutoBackup {
   private static final File BACKUP_AUTO_DIRECTORY = new File(BACKUP_BASE_DIRECTORY, "auto");
   private static final File BACKUP_TAGGED_DIRECTORY = new File(BACKUP_BASE_DIRECTORY, "tagged");
   private static final File TEMP_DIRECTORY = new File("tmp");
+  private static final String BACKUP_CONFIG_FOLDER = "config";
+  private static final String BACKUP_MAP_FOLDER = "map";
 
   //bukkit depending files and directories
   private static final List<File> RESOURCE_DIRS_CONFIG_BUKKIT = new ArrayList(Arrays.asList(
@@ -84,9 +86,11 @@ public class AutoBackup {
   private volatile boolean run = true;
   private volatile boolean forceBackup = false;
   private volatile boolean pauseBackup = false;
+  //private volatile boolean rollback = false;
 
   private volatile String tag = null; // tag for next backup ('null' means
                                       // date/no tagged backup)
+  private volatile File rollback = null; //backup to roll back to (initiate rollback by setting != null)
 
   public AutoBackup(Server server) {
     this.server = server;
@@ -112,9 +116,15 @@ public class AutoBackup {
     archiver.setName("AutoBackup");
   }
 
+  /**
+   * Stop the system / thread.
+   * Note that it does not stop immediately if a rollback is being peformed.
+   */
   public void stop() {
     run = false;
-    archiver.interrupt();
+    if (rollback == null) {
+      archiver.interrupt();
+    }
   }
 
   public void forceBackup() {
@@ -181,8 +191,8 @@ public class AutoBackup {
   private File makeTemporaryCopy() throws IOException {
     Date date = new Date();
     File backup = new File(TEMP_DIRECTORY, String.format(NAME_FORMAT, date));
-    File backupConfig = new File(backup, "config");
-    File backupMap = new File(backup, "map");
+    File backupConfig = new File(backup, BACKUP_CONFIG_FOLDER);
+    File backupMap = new File(backup, BACKUP_MAP_FOLDER);
 
     for (File file : RESOURCES_CONFIG) {
       copy(file, new File(backupConfig, file.getName()));
@@ -255,10 +265,6 @@ public class AutoBackup {
       }
       out.closeEntry();
     }
-  }
-  
-  private void unzipToTemp(File backup) throws IOException {
-    IO.unzip(backup, TEMP_DIRECTORY);
   }
 
   /**
@@ -398,7 +404,8 @@ public class AutoBackup {
   public void rollback(int n) throws Exception {
     File[] backups = getSortedAutoBackups();
     try {
-      rollback(backups[n-1]);
+      rollback = backups[n-1];
+      archiver.interrupt();
     } catch (ArrayIndexOutOfBoundsException ex) {
       throw new Exception("Wrong backup number!");
     }
@@ -410,19 +417,40 @@ public class AutoBackup {
    * @return
    */
   public void rollback(String tag) throws Exception {
-    File backup = new File(BACKUP_TAGGED_DIRECTORY, tag + ".zip");
-    if (!backup.isFile()) {
+    rollback = new File(BACKUP_TAGGED_DIRECTORY, tag + ".zip");
+    if (!rollback.isFile()) {
+      rollback = null;
       throw new Exception("Backup does not exist!");
     }
+    archiver.interrupt();
   }
 
   /**
-   * Rollback to server status at backup
-   * in archive 'backup'.
-   * @param backup Zip archive containing correct server backup
+   * Rollback to server status at backup 'rollback'.
    */
-  private void rollback(File backup) {
-
+  private void rollback() throws IOException {
+    IO.unzip(rollback, TEMP_DIRECTORY);
+    //collect files to restore, delete present files
+    List<File> backup = new ArrayList<File>();
+    File backupConfig = new File(TEMP_DIRECTORY, BACKUP_CONFIG_FOLDER);
+    for (File file : RESOURCES_CONFIG) {
+      deleteRecursively(file);
+      backup.add(new File(backupConfig, file.getName()));
+    }
+    File backupMap = new File(TEMP_DIRECTORY, BACKUP_MAP_FOLDER);
+    for (File file : RESOURCES_MAP) {
+      deleteRecursively(file);
+      backup.add(new File(backupMap, file.getName()));
+    }
+    File dest = new File(".");
+    for (File file : backup) {
+      if (file.isDirectory()) {
+        FileUtils.copyDirectoryToDirectory(file, dest);
+      } else {
+        FileUtils.copyFileToDirectory(file, dest);
+      }
+    }
+    deleteRecursively(TEMP_DIRECTORY);
   }
 
   private final class Archiver extends Thread {
@@ -430,10 +458,30 @@ public class AutoBackup {
     public void run() {
       while (run) {
         if (needsBackup()) {
-          try {
+          doBackup();
+        } else if (rollback != null) {
+          tag = null;
+          doBackup();
+          doRollback();
+          rollback = null;
+        }
+        
+        if (pauseBackup && server.numPlayers() > 0) {
+          pauseBackup = false;
+        }
+
+        try {
+          Thread.sleep(60000);
+        } catch (InterruptedException e) {
+        }
+      }
+    }
+    
+    private void doBackup() {
+      try {
             server.saveLock.acquire();
           } catch (InterruptedException e) {
-            continue;
+            return;
           }
           forceBackup = false;
 
@@ -464,16 +512,16 @@ public class AutoBackup {
           if (server.numPlayers() == 0) {
             pauseBackup = true;
           }
-        }
-        if (pauseBackup && server.numPlayers() > 0) {
-          pauseBackup = false;
-        }
-
-        try {
-          Thread.sleep(60000);
-        } catch (InterruptedException e) {
-        }
+    }
+    
+    private void doRollback() {
+      server.manualRestart();
+      try {
+        rollback();
+      } catch (IOException ex) {
+        println("Rollback failure: " + ex);
       }
+      server.continueRestart();
     }
   }
 }
