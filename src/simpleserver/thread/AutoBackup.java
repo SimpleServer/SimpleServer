@@ -103,8 +103,6 @@ public class AutoBackup {
     RESOURCES_MAP.add(new File(server.options.get("levelName")));
     if (new File("bukkit.yml").exists()) {
       RESOURCES_CONFIG.addAll(RESOURCE_DIRS_CONFIG_BUKKIT);
-      RESOURCES_MAP.add(new File(server.options.get("levelName" ) + "_nether"));
-      RESOURCES_MAP.add(new File(server.options.get("levelName" ) + "_the_end"));
     }
 
     purgeOldBackups();
