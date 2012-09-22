@@ -147,6 +147,7 @@ public class AutoBackup {
       copy = makeTemporaryCopy();
       server.runCommand("save-on", null);
       zipBackup(copy); // create actual backup file
+      this.tag = null; //reset tag switch
     } finally {
       deleteRecursively(TEMP_DIRECTORY);
     }
@@ -200,7 +201,7 @@ public class AutoBackup {
       copy(file, new File (backupMap, file.getName()));
     }
     
-    //Create backu23p info file
+    //Create backup info file
     PrintWriter out = new PrintWriter(new File(backup, "backup.info"));
     out.println("Backup system version: " + VERSION);
     out.print("Backup date: " + new SimpleDateFormat("dd/MM/yyyy HH:mm").format(date));
@@ -304,6 +305,11 @@ public class AutoBackup {
     return getBackup(true);
   }
 
+  /**
+   * Get newest / oldest backup (auto backup).
+   * @param old
+   * @return 
+   */
   private static File getBackup(boolean old) {
     // Search for backups in BACKUP_AUTO_DIRECTORY
     File[] files = getAutoBackups();
