@@ -139,6 +139,8 @@ public class Server {
   public Time time;
   public BotController bots;
   public WorldFile world;
+  
+  private boolean warnFirstStart = false; //set to true when critical files were created to enable restart warning
 
   public Server() {
     listener = new Listener();
@@ -285,6 +287,10 @@ public class Server {
 
   public void saveConfig() {
     globalConfig.save();
+  }
+  
+  public void setCriticalFileWarning() {
+    warnFirstStart = true;
   }
 
   public String findName(String prefix) {
@@ -520,7 +526,11 @@ public class Server {
     if (options.getBoolean("enableRcon")) {
       rconServer = new RconServer(this);
     }
-    world = new WorldFile(options.get("levelName"));
+    try {
+      world = new WorldFile(options.get("levelName"));
+    } catch (Exception ex) {
+      setCriticalFileWarning();
+    }
     autoSpaceCheck = new AutoFreeSpaceChecker(this);
     autoBackup = new AutoBackup(this);
     autosave = new AutoSave(this);
@@ -535,6 +545,13 @@ public class Server {
     }
 
     bots.ready();
+    
+    if (warnFirstStart) {
+      println("Critical files were not found or were regenerated!\n"
+              + "This may occur when starting the server for the first time or deleting files.\n"
+              + "RESTARTING THE SERVER BEFORE USAGE IS RECOMMENDED!");
+      warnFirstStart = false;
+    }
   }
 
   private void shutdown() {

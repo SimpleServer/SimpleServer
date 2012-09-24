@@ -31,13 +31,14 @@ public class WorldFile {
   private String filename;
   private NBTCompound data;
 
-  public WorldFile(String world) {
+  public WorldFile(String world) throws Exception {
     filename = world + File.separator + "level.dat";
     try {
       NBTFile nbt = new GZipNBTFile(filename);
       data = nbt.root().getCompound("Data");
     } catch (Exception e) {
-      println("Can't read level.dat");
+      println("Can't read level.dat: " + e.getMessage() + " (This is normal if the world was just created!)");
+      throw new Exception();
     }
   }
 

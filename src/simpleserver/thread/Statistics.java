@@ -75,7 +75,11 @@ public class Statistics extends Thread {
   }
 
   private void getSessionId() {
-    WorldFile world = new WorldFile(server.options.get("levelName"));
+    WorldFile world = null;
+    try {
+      world = new WorldFile(server.options.get("levelName"));
+    } catch (Exception ex) {
+    }
     long seed = world.seed();
 
     JSONObject data = new JSONObject();
