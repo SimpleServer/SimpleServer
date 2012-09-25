@@ -26,13 +26,19 @@ import java.io.File;
 
 import simpleserver.Coordinate;
 import simpleserver.Coordinate.Dimension;
+import simpleserver.Server;
 
 public class WorldFile {
   private String filename;
   private NBTCompound data;
 
-  public WorldFile(String world) throws Exception {
-    filename = world + File.separator + "level.dat";
+  public WorldFile(Server server) throws Exception {
+    filename = server.options.get("levelName");
+    if (server.isBukkitServer()) {
+      filename += File.separator + server.options.get("levelName"); //first levelName is only world-container, now go into world-folder
+    }
+    filename += File.separator + "level.dat";
+    
     try {
       NBTFile nbt = new GZipNBTFile(filename);
       data = nbt.root().getCompound("Data");

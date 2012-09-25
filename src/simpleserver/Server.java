@@ -20,6 +20,7 @@
  */
 package simpleserver;
 
+import java.io.File;
 import static simpleserver.lang.Translations.t;
 import static simpleserver.util.Util.*;
 
@@ -147,6 +148,15 @@ public class Server {
     listener = new Listener();
     listener.start();
     listener.setName("SimpleServerListener");
+  }
+  
+  /**
+   * Checks if this server runs bukkit.
+   * Determined by existence of "bukkit.yml".
+   * @return 
+   */
+  public boolean isBukkitServer() {
+    return new File("bukkit.yml").exists();
   }
 
   /**
@@ -570,7 +580,7 @@ public class Server {
       rconServer = new RconServer(this);
     }
     try {
-      world = new WorldFile(options.get("levelName"));
+      world = new WorldFile(this);
     } catch (Exception ex) {
       setCriticalFileWarning();
     }

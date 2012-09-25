@@ -101,7 +101,7 @@ public class AutoBackup {
 
     //initialize resource directories
     RESOURCES_MAP.add(new File(server.options.get("levelName")));
-    if (new File("bukkit.yml").exists()) {
+    if (server.isBukkitServer()) {
       RESOURCES_CONFIG.addAll(RESOURCE_DIRS_CONFIG_BUKKIT);
     }
 
