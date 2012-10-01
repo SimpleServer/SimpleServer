@@ -688,7 +688,7 @@ public class Bot {
       controller.remove(this);
     }
     if (trashdat()) {
-      File dat = new File(server.options.get("levelName") + File.separator + "players" + File.separator + name + ".dat");
+      File dat = server.getPlayerFile(name);
       if (controller != null) {
         controller.trash(dat);
       } else {

@@ -47,19 +47,12 @@ public class AutoFreeSpaceChecker {
     this.server = server;
   }
 
+  //TODO maybe adapt to current files considered for backup or only check space of map
   public void check(boolean beforeBackup) {
     try {
       long neededSizeKb = 0;
       if (beforeBackup) {
-        neededSizeKb += Math.round(FileUtils.sizeOfDirectory(new File(server.options.get("levelName"))) / 1024) * 2;
-        File world_nether = new File(server.options.get("levelName") + "_nether");
-        if (world_nether.exists()) {
-          neededSizeKb += Math.round(FileUtils.sizeOfDirectory(world_nether) / 1024) * 2;
-        }
-        File plugins = new File("plugins");
-        if (plugins.exists()) {
-          neededSizeKb += Math.round(FileUtils.sizeOfDirectory(plugins) / 1024) * 2;
-        }
+        neededSizeKb += Math.round(FileUtils.sizeOfDirectory(server.getWorldDirectory()) / 1024) * 2;
       } else {
         neededSizeKb = 50 * 1024;
       }

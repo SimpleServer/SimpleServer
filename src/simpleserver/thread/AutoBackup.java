@@ -100,7 +100,7 @@ public class AutoBackup {
     BACKUP_TAGGED_DIRECTORY.mkdirs();
 
     //initialize resource directories
-    RESOURCES_MAP.add(new File(server.options.get("levelName")));
+    RESOURCES_MAP.add(server.getWorldDirectory());
     if (server.isBukkitServer()) {
       RESOURCES_CONFIG.addAll(RESOURCE_DIRS_CONFIG_BUKKIT);
     }

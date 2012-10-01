@@ -29,18 +29,11 @@ import simpleserver.Coordinate.Dimension;
 import simpleserver.Server;
 
 public class WorldFile {
-  private String filename;
   private NBTCompound data;
 
   public WorldFile(Server server) throws Exception {
-    filename = server.options.get("levelName");
-    if (server.isBukkitServer()) {
-      filename += File.separator + server.options.get("levelName"); //first levelName is only world-container, now go into world-folder
-    }
-    filename += File.separator + "level.dat";
-    
     try {
-      NBTFile nbt = new GZipNBTFile(filename);
+      NBTFile nbt = new GZipNBTFile(server.getWorldFile().getPath());
       data = nbt.root().getCompound("Data");
     } catch (Exception e) {
       println("Can't read level.dat: " + e.getMessage() + " (This is normal if the world was just created!)");

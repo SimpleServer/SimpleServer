@@ -293,9 +293,7 @@ public class Authenticator {
 
   public synchronized void releaseGuestName(String name) {
     freeGuestNumbers.offer(extractGuestNumber(name));
-
-    File dat = new File(server.options.get("levelName") + File.separator + "players" + File.separator + name + ".dat");
-    server.bots.trash(dat);
+    server.bots.trash(server.getPlayerFile(name));
   }
 
   private static short extractGuestNumber(String guestName) {

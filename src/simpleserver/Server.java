@@ -158,6 +158,37 @@ public class Server {
   public boolean isBukkitServer() {
     return new File("bukkit.yml").exists();
   }
+  
+  /**
+   * Returns the main "world" directory, containing
+   * "level.dat", "players" etc.
+   * @return 
+   */
+  public File getWorldDirectory() {
+    File file = new File(options.get("levelName"));
+    if (isBukkitServer()) {
+      //with bukkit: one level deeper (world-container)
+      return new File(file, options.get("levelName"));
+    }
+    return file;
+  }
+  
+  /**
+   * Returns the minecraft world dat-file.
+   * @return 
+   */
+  public File getWorldFile() {
+    return new File(getWorldDirectory(), "level.dat");
+  }
+  
+  /**
+   * Returns the dat-file of player 'name'.
+   * @param name
+   * @return 
+   */
+  public File getPlayerFile(String name) {
+    return new File(new File(getWorldDirectory(), "players"), name + ".dat");
+  }
 
   /**
    * Initiate a restart.

@@ -38,7 +38,7 @@ public class PlayerFile {
   private NBTFile nbt;
 
   public PlayerFile(String name, Server server) {
-    this(server.options.get("levelName") + File.separator + "players" + File.separator + name + ".dat");
+    this(server.getPlayerFile(name).getPath());
   }
 
   public PlayerFile(String filename) {
@@ -95,10 +95,6 @@ public class PlayerFile {
 
   public void save() throws IOException {
     nbt.save(filename);
-  }
-
-  public File file() {
-    return new File(filename);
   }
 
   @Override
