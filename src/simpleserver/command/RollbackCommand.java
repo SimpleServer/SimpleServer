@@ -25,6 +25,12 @@ import simpleserver.Player;
 import simpleserver.Server;
 
 public class RollbackCommand extends AbstractCommand implements PlayerCommand, ServerCommand {
+  private final String warning = " A rollback may result in a broken server."
+          + " Consider restoring the backup manually or use the force option to rollback anyway.";
+  private final String error = "Rollback failure: ";
+  private final String afterError = "THE ROLLBACK COULD NOT BE PERFORMED COMPLETELY"
+          + " SO YOU PROBABLY HAVE A BROKEN SERVER NOW!"
+          + " We recommend to rollback to the backup that was automatically made just before the rollback attempt!";
 
   public RollbackCommand() {
     super("rollback [tag|@n]", "Reset server to a backup named 'tag' or the n-th last non-tagged backup.");
@@ -71,15 +77,40 @@ public class RollbackCommand extends AbstractCommand implements PlayerCommand, S
     });
   }
   
-  private void execute(BackupCommand.Com com) {
+  private void execute(final BackupCommand.Com com) {
     String[] args = extractArguments(com.getMessage());
-    if (args.length != 1) {
+    if (args.length != 1 && args.length != 2) {
       com.sendMsg("Wrong number of arguments!");
       return;
     }
-    if (args[0].charAt(0) == '@') { //@n: reference to n-th last auto backup
+    boolean f = false;
+    int i = 0; //args pos
+    if (args[i].equals("force")) {
+      f = true;
+      i++;
+    }
+    final boolean force = f;
+    if (args[i].charAt(0) == '@') { //@n: reference to n-th last auto backup
       try {
-        com.getServer().rollback(Integer.parseInt(args[0].substring(1, args[0].length())));
+        com.getServer().rollback(
+                new ExecCom() {
+          @Override
+          public void sendWarningRollbackAborted(String msg) {
+            sendMsg(msg + warning);
+          }
+          @Override
+          public void sendErrorRollbackFail(String msg) {
+            sendMsg(error + msg + afterError);
+          }
+          @Override
+          public void sendMsg(String msg) {
+            com.sendMsg(msg);
+          }
+          @Override
+          public boolean isForce() {
+            return force;
+          }
+        }, Integer.parseInt(args[i].substring(1, args[i].length())));
       } catch (NumberFormatException ex) {
         com.sendMsg("Expected number after '@'!");
       } catch (Exception ex) {
@@ -87,11 +118,40 @@ public class RollbackCommand extends AbstractCommand implements PlayerCommand, S
       }
     } else {
       try {
-        com.getServer().rollback(args[0]);
+        com.getServer().rollback(
+                new ExecCom() {
+          @Override
+          public void sendWarningRollbackAborted(String msg) {
+            sendMsg(msg + warning);
+          }
+          @Override
+          public void sendErrorRollbackFail(String msg) {
+            com.sendMsg(error + msg + afterError);
+          }
+          @Override
+          public void sendMsg(String msg) {
+            com.sendMsg(msg);
+          }
+          @Override
+          public boolean isForce() {
+            return force;
+          }
+        }, args[i]);
       } catch (Exception ex) {
         com.sendMsg(ex.getMessage());
       }
     }
+  }
+  
+  /**
+   * Interface to provide access to important information
+   * during the execution in a different thread.
+   */
+  public interface ExecCom {
+    public void sendWarningRollbackAborted(String msg);
+    public void sendErrorRollbackFail(String msg);
+    public void sendMsg(String msg);
+    public boolean isForce();
   }
   
 }

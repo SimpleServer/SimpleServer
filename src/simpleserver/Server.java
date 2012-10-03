@@ -39,6 +39,7 @@ import java.util.concurrent.Semaphore;
 import simpleserver.bot.BotController;
 import simpleserver.command.ExternalCommand;
 import simpleserver.command.PlayerCommand;
+import simpleserver.command.RollbackCommand;
 import simpleserver.config.GiveAliasList;
 import simpleserver.config.HelpText;
 import simpleserver.config.IPBanList;
@@ -153,7 +154,6 @@ public class Server {
   /**
    * Checks if this server runs bukkit.
    * Determined by existence of "bukkit.yml".
-   * @return 
    */
   public boolean isBukkitServer() {
     return new File("bukkit.yml").exists();
@@ -162,7 +162,6 @@ public class Server {
   /**
    * Returns the main "world" directory, containing
    * "level.dat", "players" etc.
-   * @return 
    */
   public File getWorldDirectory() {
     File file = new File(options.get("levelName"));
@@ -174,8 +173,14 @@ public class Server {
   }
   
   /**
+   * Returns the whole directory containing all world files. 
+   */
+  public File getMapDirectory() {
+    return new File(options.get("levelName"));
+  }
+  
+  /**
    * Returns the minecraft world dat-file.
-   * @return 
    */
   public File getWorldFile() {
     return new File(getWorldDirectory(), "level.dat");
@@ -183,8 +188,6 @@ public class Server {
   
   /**
    * Returns the dat-file of player 'name'.
-   * @param name
-   * @return 
    */
   public File getPlayerFile(String name) {
     return new File(new File(getWorldDirectory(), "players"), name + ".dat");
@@ -498,18 +501,16 @@ public class Server {
   
   /**
    * Rollback to n-th last auto backup.
-   * @param n
    */
-  public void rollback(int n) throws Exception {
-    autoBackup.rollback(n);
+  public void rollback(RollbackCommand.ExecCom com, int n) throws Exception {
+    autoBackup.rollback(com, n);
   }
   
   /**
    * Rollback to backup with tag 'tag'.
-   * @param tag
    */
-  public void rollback(String tag) throws Exception {
-    autoBackup.rollback(tag);
+  public void rollback(RollbackCommand.ExecCom com, String tag) throws Exception {
+    autoBackup.rollback(com, tag);
   }
 
   private void kickAllPlayers() {

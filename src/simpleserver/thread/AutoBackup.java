@@ -20,12 +20,15 @@
  */
 package simpleserver.thread;
 
+import java.io.BufferedReader;
 import static simpleserver.lang.Translations.t;
 import static simpleserver.util.Util.*;
 
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.PrintWriter;
 import java.io.IOException;
 import java.text.ParseException;
@@ -42,6 +45,7 @@ import java.util.zip.ZipOutputStream;
 import org.apache.commons.io.FileUtils;
 
 import simpleserver.Server;
+import simpleserver.command.RollbackCommand;
 import simpleserver.util.IO;
 
 public class AutoBackup {
@@ -91,6 +95,7 @@ public class AutoBackup {
   private volatile String tag = null; // tag for next backup ('null' means
                                       // date/no tagged backup)
   private volatile File rollback = null; //backup to roll back to (initiate rollback by setting != null)
+  private volatile RollbackCommand.ExecCom com = null; //communication interface for feedback messages
 
   public AutoBackup(Server server) {
     this.server = server;
@@ -100,7 +105,7 @@ public class AutoBackup {
     BACKUP_TAGGED_DIRECTORY.mkdirs();
 
     //initialize resource directories
-    RESOURCES_MAP.add(server.getWorldDirectory());
+    RESOURCES_MAP.add(server.getMapDirectory());
     if (server.isBukkitServer()) {
       RESOURCES_CONFIG.addAll(RESOURCE_DIRS_CONFIG_BUKKIT);
     }
@@ -204,6 +209,12 @@ public class AutoBackup {
     //Create backup info file
     PrintWriter out = new PrintWriter(new File(backup, "backup.info"));
     out.println("Backup system version: " + VERSION);
+    out.print("Bukkit used: ");
+    if (server.isBukkitServer()) {
+      out.println("yes");
+    } else {
+      out.println("no");
+    }
     out.print("Backup date: " + new SimpleDateFormat("dd/MM/yyyy HH:mm").format(date));
     out.close();
 
@@ -399,16 +410,21 @@ public class AutoBackup {
       return System.currentTimeMillis() - file.lastModified();
     }
   }
+  
+  public void setCom(RollbackCommand.ExecCom com) {
+    this.com = com;
+  }
 
   /**
    * Rollback to n-th last auto backup.
    * @param n
    * @return
    */
-  public void rollback(int n) throws Exception {
+  public void rollback(RollbackCommand.ExecCom com, int n) throws Exception {
     File[] backups = getSortedAutoBackups();
     try {
       rollback = backups[n-1];
+      this.com = com;
       archiver.interrupt();
     } catch (ArrayIndexOutOfBoundsException ex) {
       throw new Exception("Wrong backup number!");
@@ -420,20 +436,66 @@ public class AutoBackup {
    * @param tag
    * @return
    */
-  public void rollback(String tag) throws Exception {
+  public void rollback(RollbackCommand.ExecCom com, String tag) throws Exception {
     rollback = new File(BACKUP_TAGGED_DIRECTORY, tag + ".zip");
     if (!rollback.isFile()) {
       rollback = null;
       throw new Exception("Backup does not exist!");
     }
+    this.com = com;
     archiver.interrupt();
+  }
+  
+  private boolean prepareRollback() {
+    try {
+      IO.unzip(rollback, TEMP_DIRECTORY);
+    } catch (IOException ex) {
+      com.sendWarningRollbackAborted("Error while unzipping backup: " + ex.getMessage());
+      return false;
+    }
+    return true;
+  }
+  
+  /**
+   * Check to be performed just before calling 'rollback()'.
+   * Makes a compatibility check.
+   * @return true - ok
+   *         false  do not rollback
+   */
+  private boolean canRollback() {
+    //check for compatibility: read backup.info
+    File info = new File(TEMP_DIRECTORY, "backup.info");
+    try {
+      BufferedReader in = new BufferedReader(new FileReader(info));
+      String[] lines = new String[3];
+      for (int i = 0; i < 3; i++) {
+        lines[i] = in.readLine();
+        lines[i] = lines[i].substring(lines[i].indexOf(':') + 2);
+      }
+      if (!lines[0].equals(VERSION)) {
+        throw new Exception("Backup was made with a different backup system: backup="
+                + lines[0] + " current=" + VERSION);
+      }
+      if (lines[1].equals("yes") && !server.isBukkitServer()) {
+        throw new Exception("The backup was made with a bukkit server, but now bukkit isn't used!");
+      } else if (lines[1].equals("no") && server.isBukkitServer()) {
+        throw new Exception("The backup was made without a bukkit server, but now bukkit is used!");
+      }
+    } catch (FileNotFoundException ex) {
+      com.sendWarningRollbackAborted("Warning: file \"backup.info\" was not found in the backup archive.");
+      return false;
+    } catch (Exception ex) {
+      com.sendWarningRollbackAborted(ex.getMessage() + " The SimpleServer backup system works differently with/without bukkit.");
+      return false;
+    }
+    return true;
   }
 
   /**
    * Rollback to server status at backup 'rollback'.
    */
-  private void rollback() throws IOException {
-    IO.unzip(rollback, TEMP_DIRECTORY);
+  private void rollback() {
+    com.sendMsg("Rolling back...");
     //collect files to restore, delete present files
     List<File> backup = new ArrayList<File>();
     File backupConfig = new File(TEMP_DIRECTORY, BACKUP_CONFIG_FOLDER);
@@ -447,14 +509,17 @@ public class AutoBackup {
       backup.add(new File(backupMap, file.getName()));
     }
     File dest = new File(".");
-    for (File file : backup) {
-      if (file.isDirectory()) {
-        FileUtils.copyDirectoryToDirectory(file, dest);
-      } else {
-        FileUtils.copyFileToDirectory(file, dest);
+    try {
+      for (File file : backup) {
+        if (file.isDirectory()) {
+          FileUtils.copyDirectoryToDirectory(file, dest);
+        } else {
+          FileUtils.copyFileToDirectory(file, dest);
+        }
       }
+    } catch (IOException ex) { //critical: rollback could not be completed
+      com.sendErrorRollbackFail(ex.getMessage());
     }
-    deleteRecursively(TEMP_DIRECTORY);
   }
 
   private final class Archiver extends Thread {
@@ -519,12 +584,14 @@ public class AutoBackup {
     }
     
     private void doRollback() {
-      server.manualRestart();
-      try {
-        rollback();
-      } catch (IOException ex) {
-        println("Rollback failure: " + ex);
+      prepareRollback();
+      if (!com.isForce() && !canRollback()) {
+        deleteRecursively(TEMP_DIRECTORY);
+        return;
       }
+      server.manualRestart();
+      rollback();
+      deleteRecursively(TEMP_DIRECTORY);
       server.continueRestart();
     }
   }
