@@ -982,9 +982,7 @@ public class StreamTunnel {
       case (byte) 0xfa: // Plugin Message
         write(packetId);
         write(readUTF16());
-        short arrayLength = in.readShort();
-        write(arrayLength);
-        copyNBytes(0xff & arrayLength);
+        copyNBytes(write(in.readShort()));
         break;
       case (byte) 0xfc: // Encryption Key Response
         byte[] sharedKey = new byte[in.readShort()];
