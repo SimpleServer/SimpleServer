@@ -32,13 +32,12 @@ import java.net.UnknownHostException;
 import java.util.concurrent.locks.ReentrantLock;
 
 import simpleserver.Coordinate.Dimension;
+import simpleserver.Main;
 import simpleserver.Position;
 import simpleserver.Server;
 import simpleserver.stream.Encryption.ServerEncryption;
 
 public class Bot {
-  private static final int VERSION = 39;
-
   protected String name;
   protected Server server;
   private boolean connected;
@@ -102,7 +101,7 @@ public class Bot {
   private void handshake() throws IOException {
     writeLock.lock();
     out.writeByte(2);
-    out.writeByte(VERSION);
+    out.writeByte(Main.protocolVersion);
     write(name);
     write("localhost");
     out.writeInt(server.options.getInt("internalPort"));
@@ -232,6 +231,7 @@ public class Bot {
         break;
       case 0x04: // Time Update
         in.readLong();
+        in.readLong();
         break;
       case 0x05: // Entity Equipment
         in.readInt();
@@ -305,7 +305,9 @@ public class Bot {
         readUnknownBlob();
         break;
       case 0x15: // Pickup spawn
-        readNBytes(24);
+        readNBytes(4);
+        readItem();
+        readNBytes(15);
         break;
       case 0x16: // Collect Item
         readNBytes(8);
@@ -447,6 +449,7 @@ public class Bot {
         in.readByte();
         in.readInt();
         in.readInt();
+        in.readBoolean();
         break;
       case 0x3e: // Named Sound Effect
         readUTF16();
@@ -476,7 +479,7 @@ public class Bot {
         in.readShort();
         in.readByte();
         in.readShort();
-        in.readBoolean();
+        in.readByte();
         readItem();
         break;
       case 0x67: // Set Slot
@@ -554,6 +557,7 @@ public class Bot {
         in.readByte();
         in.readByte();
         in.readByte();
+        in.readBoolean();
         break;
       case (byte) 0xcd: // Login & Respawn
         in.readByte();
@@ -635,9 +639,11 @@ public class Bot {
           readUTF16();
           break;
         case 5:
-          in.readShort();
-          in.readByte();
-          in.readShort();
+          int id = in.readShort();
+          if (id != -1) {
+            in.readByte();
+            in.readShort();
+          }
           break;
         case 6:
           in.readInt();

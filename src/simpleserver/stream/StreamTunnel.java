@@ -40,6 +40,7 @@ import simpleserver.Authenticator.AuthRequest;
 import simpleserver.Color;
 import simpleserver.Coordinate;
 import simpleserver.Coordinate.Dimension;
+import simpleserver.Main;
 import simpleserver.Player;
 import simpleserver.Server;
 import simpleserver.command.PlayerListCommand;
@@ -287,6 +288,7 @@ public class StreamTunnel {
 
       case 0x04: // Time Update
         write(packetId);
+        write(in.readLong());
         long time = in.readLong();
         server.setTime(time);
         write(time);
@@ -582,7 +584,9 @@ public class StreamTunnel {
         break;
       case 0x15: // Pickup Spawn
         write(packetId);
-        copyNBytes(24);
+        copyNBytes(4);
+        copyItem();
+        copyNBytes(15);
         break;
       case 0x16: // Collect Item
         write(packetId);
@@ -772,6 +776,7 @@ public class StreamTunnel {
         write(in.readByte());
         write(in.readInt());
         write(in.readInt());
+        write(in.readByte());
         break;
       case 0x3e: // Named Sound/Particle Effect
         write(packetId);
@@ -855,7 +860,7 @@ public class StreamTunnel {
         write(in.readShort());
         write(in.readByte());
         write(in.readShort());
-        write(in.readBoolean());
+        write(in.readByte());
         copyItem();
         break;
       case 0x67: // Set Slot
@@ -954,6 +959,7 @@ public class StreamTunnel {
         write(in.readByte());
         write(in.readByte());
         write(in.readByte());
+        write(in.readBoolean());
         break;
       case (byte) 0xcd: // Login & Respawn
         write(packetId);
@@ -1041,13 +1047,15 @@ public class StreamTunnel {
         break;
       case (byte) 0xfe: // Server List Ping
         write(packetId);
+        write(in.readByte());
         break;
       case (byte) 0xff: // Disconnect/Kick
-        // server list answer 'serverText§playerOnline§maxPlayers'
         write(packetId);
         String reason = readUTF16();
-        if (reason.contains("\u00a7")) {
-          reason = String.format("%s\u00a7%s\u00a7%s",
+        if (reason.startsWith("\u00a71")) {
+          reason = String.format("\u00a71\0%s\0%s\0%s\0%s\0%s",
+                                 Main.protocolVersion,
+                                 Main.minecraftVersion,
                                  server.config.properties.get("serverDescription"),
                                  server.playerList.size(),
                                  server.config.properties.getInt("maxPlayers"));
@@ -1180,6 +1188,12 @@ public class StreamTunnel {
         case 4:
           write(readUTF16());
           break;
+        case 5:
+          short id = write(in.readShort());
+          if (id != -1) {
+            write(in.readByte());
+            write(in.readShort());
+          }
       }
 
       unknown = in.readByte();
