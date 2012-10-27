@@ -20,15 +20,21 @@
  */
 package simpleserver.minecraft;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.jar.JarFile;
 import java.util.zip.ZipFile;
 
+import org.apache.commons.io.filefilter.WildcardFileFilter;
+import org.apache.commons.lang.StringUtils;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.ResponseHandler;
@@ -44,6 +50,7 @@ import simpleserver.thread.SystemInputQueue;
 public class MinecraftWrapper {
   private static final String DOWNLOAD_URL = "http://www.minecraft.net/download/minecraft_server.jar";
   private static final String COMMAND_FORMAT = "java %s -jar %s %s nogui";
+  private static final String COMMAND_FORMAT_PLUGINS = "java %s -cp %s %s %s nogui";
   private static final String MEMORY_FORMAT = "-Xmx%sM -Xms%sM";
   private static final String XINCGC_FORMAT = "-Xincgc -Xmx%sM";
   private static final String DEFAULT_ARGUMENTS = "-XX:+AggressiveOpts";
@@ -203,8 +210,32 @@ public class MinecraftWrapper {
       }
       arguments = String.format("%s %s %s", arguments, memoryArgs, DEFAULT_ARGUMENTS);
     }
-
-    return String.format(COMMAND_FORMAT, arguments, getServerJar(), modArguments());
+    if (options.getBoolean("enablePlugins")) {
+      String mainclass = null;
+      try {
+        JarFile jarFile = new JarFile(getServerJar());
+        mainclass = jarFile.getManifest().getMainAttributes().getValue("Main-Class");
+        jarFile.close();
+      } catch (IOException e) {
+        System.out.println("[SimpleServer] " + e);
+        System.out.println("[SimpleServer] FATAL ERROR: Could not read minecraft_server.jar!");
+        System.exit(-1);
+      }
+      String[] plugins = new File("plugins").list(new WildcardFileFilter("*.zip"));
+      if (plugins == null) {
+        plugins = new String[0];
+      }
+      Arrays.sort(plugins);
+      ArrayList<String> plugstrs = new ArrayList<String>(plugins.length + 1);
+      for (String fname : plugins) {
+        plugstrs.add("plugins/" + fname);
+      }
+      plugstrs.add(getServerJar());
+      String clspath = StringUtils.join(plugstrs, ":");
+      return String.format(COMMAND_FORMAT_PLUGINS, arguments, clspath, mainclass, modArguments());
+    } else {
+      return String.format(COMMAND_FORMAT, arguments, getServerJar(), modArguments());
+    }
   }
 
   private String modArguments() {
