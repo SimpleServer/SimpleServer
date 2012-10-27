@@ -66,20 +66,10 @@ public class XPCommand extends PlayerArgCommand {
     if (server.playerList.findPlayerExact(target) == null) {
       throw new Exception(t("Player %s is not online", target));
     }
-
-    int xp;
-    try {
-      xp = Short.valueOf(amount);
-    } catch (NumberFormatException e) {
-      throw new Exception(t("XP amount must be a number."));
+    if (!amount.matches("^-?\\d+L?$")) {
+      throw new Exception(t("Invalid XP amount"));
     }
-    while (xp > 5000) {
-      server.runCommand("xp", target + " 5000");
-      xp -= 5000;
-    }
-    if (xp > 0) {
-      server.runCommand("xp", target + " " + xp);
-    }
+    server.runCommand("xp", amount + " " + target);
   }
 
   @Override
