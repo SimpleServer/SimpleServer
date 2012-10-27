@@ -33,7 +33,7 @@ public class RollbackCommand extends AbstractCommand implements PlayerCommand, S
           + " We recommend to rollback to the backup that was automatically made just before the rollback attempt!";
 
   public RollbackCommand() {
-    super("rollback [tag|@n]", "Reset server to a backup named 'tag' or the n-th last non-tagged backup.");
+    super("rollback [force] [tag|@n]", "Reset server to a backup named 'tag' or the n-th last non-tagged backup.");
   }
 
   @Override
