@@ -1,6 +1,7 @@
 == 8.4.5 ==
  * Protocol version 47
  * Fixed backup bug
+ * Fixed XP command
  * Revised and improved backup system
    - see http://github.com/SimpleServer/SimpleServer/wiki/Backup-System
  * Added rollback feature

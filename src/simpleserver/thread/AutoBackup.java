@@ -20,27 +20,24 @@
  */
 package simpleserver.thread;
 
-import java.io.BufferedReader;
 import static simpleserver.lang.Translations.t;
-import static simpleserver.util.Util.*;
+import static simpleserver.util.Util.println;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileFilter;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.io.PrintWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Comparator;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.io.FileUtils;
 
@@ -49,7 +46,8 @@ import simpleserver.command.RollbackCommand;
 import simpleserver.util.IO;
 
 public class AutoBackup {
-  private static final String VERSION = "1"; //version of the backup system for compatibility
+  private static final String VERSION = "1"; // version of the backup system for
+                                             // compatibility
   private static final long MILLISECONDS_PER_MINUTE = 1000 * 60;
   private static final long MILLISECONDS_PER_HOUR = MILLISECONDS_PER_MINUTE * 60;
   private static final String NAME_FORMAT = "%tF-%1$tH-%1$tM";
@@ -60,42 +58,43 @@ public class AutoBackup {
   private static final String BACKUP_CONFIG_FOLDER = "config";
   private static final String BACKUP_MAP_FOLDER = "map";
 
-  //bukkit depending files and directories
-  private static final List<File> RESOURCE_DIRS_CONFIG_BUKKIT = new ArrayList(Arrays.asList(
-          new File("bukkit.yml")
-  ));
+  // bukkit depending files and directories
+  private static final List<File> RESOURCE_DIRS_CONFIG_BUKKIT = new ArrayList<File>(Arrays.asList(
+                                                                                          new File("bukkit.yml")
+                                                                                          ));
   /*
    * Directories and files to backup and restore with the current configuration (bukkit yes/no)
    * Added here are the settings-independant resources
    * Resources are devided into CONFIG and MAP
    */
   private static final List<File> RESOURCES_CONFIG = new ArrayList<File>(Arrays.asList(
-          new File("simpleserver"),
-          new File("simpleserver.properties")
-  ));
+                                                                                       new File("simpleserver"),
+                                                                                       new File("simpleserver.properties")
+                                                                               ));
   private static final List<File> RESOURCES_MAP = new ArrayList<File>();
-  
-  //Filter to exclude unimportant files
+
+  // Filter to exclude unimportant files
   private static final FileFilter filter = new FileFilter() {
-    @Override
     public boolean accept(File pathname) {
       return (!pathname.getName().equals("level.dat_old"));
     }
   };
 
   private final Server server;
-  private final byte[] copyBuffer;
   private final Archiver archiver;
 
   private volatile boolean run = true;
   private volatile boolean forceBackup = false;
   private volatile boolean pauseBackup = false;
-  //private volatile boolean rollback = false;
+  // private volatile boolean rollback = false;
 
   private volatile String tag = null; // tag for next backup ('null' means
                                       // date/no tagged backup)
-  private volatile File rollback = null; //backup to roll back to (initiate rollback by setting != null)
-  private volatile RollbackCommand.ExecCom com = null; //communication interface for feedback messages
+  private volatile File rollback = null; // backup to roll back to (initiate
+                                         // rollback by setting != null)
+  private volatile RollbackCommand.ExecCom com = null; // communication
+                                                       // interface for feedback
+                                                       // messages
 
   public AutoBackup(Server server) {
     this.server = server;
@@ -104,7 +103,7 @@ public class AutoBackup {
     BACKUP_AUTO_DIRECTORY.mkdirs();
     BACKUP_TAGGED_DIRECTORY.mkdirs();
 
-    //initialize resource directories
+    // initialize resource directories
     RESOURCES_MAP.add(server.getMapDirectory());
     if (server.isBukkitServer()) {
       RESOURCES_CONFIG.addAll(RESOURCE_DIRS_CONFIG_BUKKIT);
@@ -112,16 +111,14 @@ public class AutoBackup {
 
     purgeOldBackups();
 
-    copyBuffer = new byte[8192];
-
     archiver = new Archiver();
     archiver.start();
     archiver.setName("AutoBackup");
   }
 
   /**
-   * Stop the system / thread.
-   * Note that it does not stop immediately if a rollback is being peformed.
+   * Stop the system / thread. Note that it does not stop immediately if a
+   * rollback is being peformed.
    */
   public void stop() {
     run = false;
@@ -152,7 +149,7 @@ public class AutoBackup {
       copy = makeTemporaryCopy();
       server.runCommand("save-on", null);
       zipBackup(copy); // create actual backup file
-      this.tag = null; //reset tag switch
+      tag = null; // reset tag switch
     } finally {
       deleteRecursively(TEMP_DIRECTORY);
     }
@@ -189,8 +186,9 @@ public class AutoBackup {
 
   /**
    * Prepare the backup archive.
+   * 
    * @return
-   * @throws IOException 
+   * @throws IOException
    */
   private File makeTemporaryCopy() throws IOException {
     Date date = new Date();
@@ -203,10 +201,10 @@ public class AutoBackup {
     }
 
     for (File file : RESOURCES_MAP) {
-      copy(file, new File (backupMap, file.getName()));
+      copy(file, new File(backupMap, file.getName()));
     }
-    
-    //Create backup info file
+
+    // Create backup info file
     PrintWriter out = new PrintWriter(new File(backup, "backup.info"));
     out.println("Backup system version: " + VERSION);
     out.print("Bukkit used: ");
@@ -223,7 +221,7 @@ public class AutoBackup {
 
   /**
    * Zip and name the temporary created backup.
-   *
+   * 
    * @param source Directory to zip
    * @throws IOException
    */
@@ -237,53 +235,17 @@ public class AutoBackup {
 
     File backup = new File(dir, tag + ".zip");
     IO.zip(source, backup);
-    
+
     println("Backup saved: " + backup.getPath());
   }
 
-  private void zipRecursively(File source, ZipOutputStream out)
-      throws IOException {
-    for (File file : source.listFiles()) {
-      zipRecursively(file, out, source.getPath().length() + 1);
-    }
-  }
-
-  private void zipRecursively(File source, ZipOutputStream out, int prefixLength)
-      throws IOException {
-    String name = source.getPath().substring(prefixLength);
-    if (source.isDirectory()) {
-      ZipEntry entry = new ZipEntry(name + "/");
-      out.putNextEntry(entry);
-      out.closeEntry();
-
-      for (File file : source.listFiles()) {
-        zipRecursively(file, out, prefixLength);
-      }
-    } else {
-      ZipEntry entry = new ZipEntry(name);
-      out.putNextEntry(entry);
-
-      FileInputStream in = new FileInputStream(source);
-      try {
-        int length;
-        while ((length = in.read(copyBuffer)) != -1) {
-          out.write(copyBuffer, 0, length);
-          Thread.yield();
-        }
-      } finally {
-        in.close();
-      }
-      out.closeEntry();
-    }
-  }
-
   /**
-   * Copy file or directory 'source' to 'target'-directoy,
-   * which is created if non-existent.
-   * Files not accepted by 'filter' are ignored.
+   * Copy file or directory 'source' to 'target'-directoy, which is created if
+   * non-existent. Files not accepted by 'filter' are ignored.
+   * 
    * @param source
    * @param target
-   * @throws IOException 
+   * @throws IOException
    */
   private void copy(File source, File target) throws IOException {
     if (source.isDirectory()) {
@@ -318,8 +280,9 @@ public class AutoBackup {
 
   /**
    * Get newest / oldest backup (auto backup).
+   * 
    * @param old
-   * @return 
+   * @return
    */
   private static File getBackup(boolean old) {
     // Search for backups in BACKUP_AUTO_DIRECTORY
@@ -344,7 +307,6 @@ public class AutoBackup {
 
   private static File[] getAutoBackups() {
     return BACKUP_AUTO_DIRECTORY.listFiles(new FileFilter() {
-      @Override
       public boolean accept(File file) {
         return file.isFile() && file.getPath().contains(".zip");
       }
@@ -353,17 +315,17 @@ public class AutoBackup {
 
   /**
    * Like 'getAutoBackups()', but sorted from newest to oldest.
+   * 
    * @return
    */
   private static File[] getSortedAutoBackups() {
-    //sort files by date (newest to oldest)
+    // sort files by date (newest to oldest)
     File[] files = getAutoBackups();
     java.util.Arrays.sort(files, new Comparator<File>() {
-      @Override
       public int compare(File o1, File o2) {
         try {
           return date(o2).compareTo(date(o1));
-        } catch (ParseException ex) { //should not be thrown
+        } catch (ParseException ex) { // should not be thrown
           return 0;
         }
       }
@@ -377,7 +339,7 @@ public class AutoBackup {
     File[] files = getSortedAutoBackups();
     for (int i = 1; i <= n && i <= files.length; i++) {
       try {
-        sb.append("\n").append("@").append(i).append(" ").append(dateFormatted(files[i-1]));
+        sb.append("\n").append("@").append(i).append(" ").append(dateFormatted(files[i - 1]));
       } catch (ParseException ex) {
         continue;
       }
@@ -410,20 +372,21 @@ public class AutoBackup {
       return System.currentTimeMillis() - file.lastModified();
     }
   }
-  
+
   public void setCom(RollbackCommand.ExecCom com) {
     this.com = com;
   }
 
   /**
    * Rollback to n-th last auto backup.
+   * 
    * @param n
    * @return
    */
   public void rollback(RollbackCommand.ExecCom com, int n) throws Exception {
     File[] backups = getSortedAutoBackups();
     try {
-      rollback = backups[n-1];
+      rollback = backups[n - 1];
       this.com = com;
       archiver.interrupt();
     } catch (ArrayIndexOutOfBoundsException ex) {
@@ -433,6 +396,7 @@ public class AutoBackup {
 
   /**
    * Rollback to backup with tag 'tag'.
+   * 
    * @param tag
    * @return
    */
@@ -445,7 +409,7 @@ public class AutoBackup {
     this.com = com;
     archiver.interrupt();
   }
-  
+
   private boolean prepareRollback() {
     try {
       IO.unzip(rollback, TEMP_DIRECTORY);
@@ -455,18 +419,19 @@ public class AutoBackup {
     }
     return true;
   }
-  
+
   /**
-   * Check to be performed just before calling 'rollback()'.
-   * Makes a compatibility check.
-   * @return true - ok
-   *         false  do not rollback
+   * Check to be performed just before calling 'rollback()'. Makes a
+   * compatibility check.
+   * 
+   * @return true - ok false do not rollback
    */
   private boolean canRollback() {
-    //check for compatibility: read backup.info
+    // check for compatibility: read backup.info
     File info = new File(TEMP_DIRECTORY, "backup.info");
+    BufferedReader in = null;
     try {
-      BufferedReader in = new BufferedReader(new FileReader(info));
+      in = new BufferedReader(new FileReader(info));
       String[] lines = new String[3];
       for (int i = 0; i < 3; i++) {
         lines[i] = in.readLine();
@@ -474,7 +439,7 @@ public class AutoBackup {
       }
       if (!lines[0].equals(VERSION)) {
         throw new Exception("Backup was made with a different backup system: backup="
-                + lines[0] + " current=" + VERSION);
+            + lines[0] + " current=" + VERSION);
       }
       if (lines[1].equals("yes") && !server.isBukkitServer()) {
         throw new Exception("The backup was made with a bukkit server, but now bukkit isn't used!");
@@ -487,6 +452,11 @@ public class AutoBackup {
     } catch (Exception ex) {
       com.sendWarningRollbackAborted(ex.getMessage() + " The SimpleServer backup system works differently with/without bukkit.");
       return false;
+    } finally {
+      try {
+        in.close();
+      } catch (Exception e) {
+      }
     }
     return true;
   }
@@ -496,7 +466,7 @@ public class AutoBackup {
    */
   private void rollback() {
     com.sendMsg("Rolling back...");
-    //collect files to restore, delete present files
+    // collect files to restore, delete present files
     List<File> backup = new ArrayList<File>();
     File backupConfig = new File(TEMP_DIRECTORY, BACKUP_CONFIG_FOLDER);
     for (File file : RESOURCES_CONFIG) {
@@ -517,7 +487,7 @@ public class AutoBackup {
           FileUtils.copyFileToDirectory(file, dest);
         }
       }
-    } catch (IOException ex) { //critical: rollback could not be completed
+    } catch (IOException ex) { // critical: rollback could not be completed
       com.sendErrorRollbackFail(ex.getMessage());
     }
   }
@@ -534,7 +504,7 @@ public class AutoBackup {
           doRollback();
           rollback = null;
         }
-        
+
         if (pauseBackup && server.numPlayers() > 0) {
           pauseBackup = false;
         }
@@ -545,44 +515,44 @@ public class AutoBackup {
         }
       }
     }
-    
+
     private void doBackup() {
       try {
-            server.saveLock.acquire();
-          } catch (InterruptedException e) {
-            return;
-          }
-          forceBackup = false;
+        server.saveLock.acquire();
+      } catch (InterruptedException e) {
+        return;
+      }
+      forceBackup = false;
 
-          if (server.config.properties.getBoolean("announceSave")) {
-            server.runCommand("say", t("Saving Map..."));
-          }
-          server.setSaving(true);
-          server.runCommand("save-all", null);
-          while (server.isSaving()) {
-            try {
-              Thread.sleep(100);
-            } catch (InterruptedException e) {
-            }
-          }
+      if (server.config.properties.getBoolean("announceSave")) {
+        server.runCommand("say", t("Saving Map..."));
+      }
+      server.setSaving(true);
+      server.runCommand("save-all", null);
+      while (server.isSaving()) {
+        try {
+          Thread.sleep(100);
+        } catch (InterruptedException e) {
+        }
+      }
 
-          server.runCommand("save-off", null);
-          server.autoSpaceCheck.check(true);
+      server.runCommand("save-off", null);
+      server.autoSpaceCheck.check(true);
 
-          try {
-            backup(); // does enable saving
-          } catch (IOException e) {
-            server.errorLog(e, "Server Backup Failure");
-            println(e);
-            println("Automated Server Backup Failure!");
-          }
-          server.saveLock.release();
+      try {
+        backup(); // does enable saving
+      } catch (IOException e) {
+        server.errorLog(e, "Server Backup Failure");
+        println(e);
+        println("Automated Server Backup Failure!");
+      }
+      server.saveLock.release();
 
-          if (server.numPlayers() == 0) {
-            pauseBackup = true;
-          }
+      if (server.numPlayers() == 0) {
+        pauseBackup = true;
+      }
     }
-    
+
     private void doRollback() {
       prepareRollback();
       if (!com.isForce() && !canRollback()) {

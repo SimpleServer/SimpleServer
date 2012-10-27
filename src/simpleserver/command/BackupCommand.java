@@ -31,20 +31,16 @@ public class BackupCommand extends AbstractCommand implements PlayerCommand,
     super("backup [<tag>|list] [<list size>]", "Backup the map with optional tag");
   }
 
-  @Override
   public void execute(final Player player, final String message) {
     execute(new Com() {
-      @Override
       public void sendMsg(String m) {
         player.addTMessage(Color.GRAY, m);
       }
 
-      @Override
       public Server getServer() {
         return player.getServer();
       }
 
-      @Override
       public String getMessage() {
         return message;
       }
@@ -52,20 +48,16 @@ public class BackupCommand extends AbstractCommand implements PlayerCommand,
     });
   }
 
-  @Override
   public void execute(final Server server, final String message, final CommandFeedback feedback) {
     execute(new Com() {
-      @Override
       public void sendMsg(String m) {
         feedback.send(m);
       }
 
-      @Override
       public Server getServer() {
         return server;
       }
 
-      @Override
       public String getMessage() {
         return message;
       }
@@ -92,12 +84,12 @@ public class BackupCommand extends AbstractCommand implements PlayerCommand,
     if (args.length == 0) { // without tag
       com.sendMsg("Forcing backup!");
       com.getServer().forceBackup();
-    } else if (args[0].equals("list")) { //list last backups
+    } else if (args[0].equals("list")) { // list last backups
       try {
         com.sendMsg(AutoBackup.listLastAutoBackups(Integer.parseInt(args[1])));
-      } catch (NumberFormatException ex) { //syntax error
+      } catch (NumberFormatException ex) { // syntax error
         com.sendMsg("Expected number as third argument!");
-      } catch (ArrayIndexOutOfBoundsException ex) { //standard list
+      } catch (ArrayIndexOutOfBoundsException ex) { // standard list
         com.sendMsg(AutoBackup.listLastAutoBackups(5));
       }
     } else { // args[1] is tag

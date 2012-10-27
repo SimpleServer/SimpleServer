@@ -123,7 +123,7 @@ public abstract class AbstractOptions implements Resource {
   protected void loadDefaults() {
     defaultOptions = new SortedProperties();
     InputStream stream = getClass().getResourceAsStream(resourceLocation + "/"
-                                                            + filename);
+        + filename);
     try {
       try {
         defaultOptions.load(stream);

@@ -34,8 +34,8 @@ public class WarpHereCommand extends OnlinePlayerArgCommand {
       target.teleportTo(player);
 
       player.getServer().adminLog("Admin " + player.getName() + " teleported:\t "
-                                      + target.getName() + "\tto\t"
-                                      + player.getName());
+          + target.getName() + "\tto\t"
+          + player.getName());
     } else {
       player.addTMessage(Color.RED, "You and %s are in different dimensions.", target.getName());
       player.addTMessage(Color.RED, "No teleport possible!");

@@ -91,8 +91,8 @@ public abstract class GiveCommand extends AbstractCommand {
       }
 
       target.getServer().adminLog("Give:\t" + logName + "\t"
-                                  + target.getName() + "\t" + id + ":" + damage + "\t("
-                                  + amount + ")");
+          + target.getName() + "\t" + id + ":" + damage + "\t("
+          + amount + ")");
 
       try {
         target.give(id, damage, amount);

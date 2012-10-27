@@ -34,7 +34,7 @@ public class RconCommand extends AbstractCommand implements PlayerCommand {
     if (arguments.length > 0) {
       player.getServer().runCommand(arguments[0], commandArguments);
       player.getServer().adminLog("User " + player.getName() + " used rcon:\t"
-                                      + arguments[0] + "\t" + commandArguments);
+          + arguments[0] + "\t" + commandArguments);
     } else {
       player.addTMessage(Color.RED, "No rcon command specified.");
     }

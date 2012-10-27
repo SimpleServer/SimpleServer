@@ -20,13 +20,12 @@
  */
 package simpleserver.nbt;
 
-import java.io.File;
 import java.io.IOException;
 
 import simpleserver.Coordinate;
+import simpleserver.Coordinate.Dimension;
 import simpleserver.Position;
 import simpleserver.Server;
-import simpleserver.Coordinate.Dimension;
 
 public class PlayerFile {
   public enum GameMode {

@@ -101,7 +101,15 @@ public class MessageHandler {
         loaded = true;
         notifyAll();
       }
-    } else if (line.contains("[INFO] Saved the world") || line.contains("[INFO] CONSOLE: Save complete.")) { //check output from A) vanilla server B) bukkit server
+    } else if (line.contains("[INFO] Saved the world") || line.contains("[INFO] CONSOLE: Save complete.")) { // check
+                                                                                                             // output
+                                                                                                             // from
+                                                                                                             // A)
+                                                                                                             // vanilla
+                                                                                                             // server
+                                                                                                             // B)
+                                                                                                             // bukkit
+                                                                                                             // server
       server.setSaving(false);
       if (server.options.getBoolean("announceBackup")) {
         server.runCommand("say", t("Save Complete!"));

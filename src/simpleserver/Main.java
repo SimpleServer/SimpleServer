@@ -20,7 +20,7 @@
  */
 package simpleserver;
 
-import static simpleserver.util.Util.*;
+import static simpleserver.util.Util.println;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -30,7 +30,7 @@ import java.io.InputStreamReader;
 public class Main {
   private static final String license = "SimpleServer -- Copyright (C) 2011 SimpleServer authors (see CONTRIBUTORS)";
   private static final String warranty = "This program is licensed under The MIT License.\nSee file LICENSE for details.";
-  private static final String baseVersion = "8.4.4";
+  private static final String baseVersion = "8.4.5";
   private static final boolean release = false;
   private static final String releaseState = "pre-release";
   public static final int protocolVersion = 47;

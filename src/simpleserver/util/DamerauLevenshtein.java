@@ -40,11 +40,11 @@ public class DamerauLevenshtein {
         int q = j + 1;
         int cost = (a.charAt(i) == b.charAt(j)) ? 0 : 1;
         d[k][q] = Math.min(d[i][q] + 1,
-                                   Math.min(d[k][j] + 1,
-                                            d[i][j] + cost));
+                           Math.min(d[k][j] + 1,
+                                    d[i][j] + cost));
         if (i >= 1 && j >= 1 && a.charAt(i) == b.charAt(j - 1) && a.charAt(i - 1) == b.charAt(j)) {
           d[k][q] = Math.min(d[k][q],
-                                     d[i - 1][j - 1] + cost);
+                             d[i - 1][j - 1] + cost);
         }
       }
     }

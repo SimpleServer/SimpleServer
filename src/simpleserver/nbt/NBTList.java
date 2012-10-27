@@ -81,7 +81,7 @@ public class NBTList<T extends NBTag> extends NBTag {
     return NBT.values()[tagId];
   }
 
-  @SuppressWarnings( { "unchecked", "hiding" })
+  @SuppressWarnings({ "unchecked", "hiding" })
   public <T extends NBTag> T cast() {
     return (T) this;
   }

@@ -21,10 +21,9 @@
 package simpleserver;
 
 import static simpleserver.lang.Translations.t;
-import static simpleserver.util.Util.*;
+import static simpleserver.util.Util.println;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;

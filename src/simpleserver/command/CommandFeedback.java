@@ -20,7 +20,6 @@
  */
 package simpleserver.command;
 
-
 public interface CommandFeedback {
   public void send(String message, Object... args);
 }

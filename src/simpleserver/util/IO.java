@@ -20,7 +20,6 @@
  */
 package simpleserver.util;
 
-import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -36,20 +35,21 @@ import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
 /**
- * IO methods (especially zip/unzip).
- * Based on http://stackoverflow.com/questions/1399126/java-util-zip-recreating-directory-structure/1399432#1399432
+ * IO methods (especially zip/unzip). Based on
+ * http://stackoverflow.com/questions
+ * /1399126/java-util-zip-recreating-directory-structure/1399432#1399432
  */
 public class IO {
-  
+
+  @SuppressWarnings("resource")
   public static void zip(File directory, File zipfile) throws IOException {
     URI base = directory.toURI();
     Deque<File> queue = new LinkedList<File>();
     queue.push(directory);
     OutputStream out = new FileOutputStream(zipfile);
-    Closeable res = out;
     try {
       ZipOutputStream zout = new ZipOutputStream(out);
-      res = zout;
+      out = zout;
       while (!queue.isEmpty()) {
         directory = queue.pop();
         for (File kid : directory.listFiles()) {
@@ -66,10 +66,10 @@ public class IO {
         }
       }
     } finally {
-      res.close();
+      out.close();
     }
   }
-  
+
   public static void unzip(File zipfile, File directory) throws IOException {
     ZipFile zfile = new ZipFile(zipfile);
     Enumeration<? extends ZipEntry> entries = zfile.entries();
@@ -89,7 +89,7 @@ public class IO {
       }
     }
   }
-  
+
   private static void copy(InputStream in, OutputStream out) throws IOException {
     byte[] buffer = new byte[1024];
     while (true) {

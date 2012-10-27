@@ -133,7 +133,7 @@ public class Server {
   public long mapSeed;
 
   private boolean run = true;
-  private boolean waitStartup = false; //do not start until set
+  private boolean waitStartup = false; // do not start until set
   private boolean restart = false;
   private boolean save = false;
 
@@ -142,50 +142,50 @@ public class Server {
   public Time time;
   public BotController bots;
   public WorldFile world;
-  
-  private boolean warnFirstStart = false; //set to true when critical files were created to enable restart warning
+
+  private boolean warnFirstStart = false; // set to true when critical files
+                                          // were created to enable restart
+                                          // warning
 
   public Server() {
     listener = new Listener();
     listener.start();
     listener.setName("SimpleServerListener");
   }
-  
+
   /**
-   * Checks if this server runs bukkit.
-   * Determined by existence of "bukkit.yml".
+   * Checks if this server runs bukkit. Determined by existence of "bukkit.yml".
    */
   public boolean isBukkitServer() {
     return new File("bukkit.yml").exists();
   }
-  
+
   /**
-   * Returns the main "world" directory, containing
-   * "level.dat", "players" etc.
+   * Returns the main "world" directory, containing "level.dat", "players" etc.
    */
   public File getWorldDirectory() {
     File file = new File(options.get("levelName"));
     if (isBukkitServer()) {
-      //with bukkit: one level deeper (world-container)
+      // with bukkit: one level deeper (world-container)
       return new File(file, options.get("levelName"));
     }
     return file;
   }
-  
+
   /**
-   * Returns the whole directory containing all world files. 
+   * Returns the whole directory containing all world files.
    */
   public File getMapDirectory() {
     return new File(options.get("levelName"));
   }
-  
+
   /**
    * Returns the minecraft world dat-file.
    */
   public File getWorldFile() {
     return new File(getWorldDirectory(), "level.dat");
   }
-  
+
   /**
    * Returns the dat-file of player 'name'.
    */
@@ -194,24 +194,23 @@ public class Server {
   }
 
   /**
-   * Initiate a restart.
-   * Shut down server but do not start again until
+   * Initiate a restart. Shut down server but do not start again until
    * 'manualRestart()' is called.
    */
   public void manualRestart() {
     waitStartup = true;
     restart();
   }
-  
+
   /**
-   * Continue a restart initiated by 'manualRestart()'.
-   * Startup the waiting server.
+   * Continue a restart initiated by 'manualRestart()'. Startup the waiting
+   * server.
    */
   public void continueRestart() {
     waitStartup = false;
     listener.interrupt();
   }
-  
+
   /**
    * Do an immediate restart.
    */
@@ -355,7 +354,7 @@ public class Server {
   public void saveConfig() {
     globalConfig.save();
   }
-  
+
   public void setCriticalFileWarning() {
     warnFirstStart = true;
   }
@@ -498,14 +497,14 @@ public class Server {
   public void forceBackup(String tag) {
     autoBackup.forceBackup(tag);
   }
-  
+
   /**
    * Rollback to n-th last auto backup.
    */
   public void rollback(RollbackCommand.ExecCom com, int n) throws Exception {
     autoBackup.rollback(com, n);
   }
-  
+
   /**
    * Rollback to backup with tag 'tag'.
    */
@@ -630,11 +629,11 @@ public class Server {
     }
 
     bots.ready();
-    
+
     if (warnFirstStart) {
       println("Critical files were not found or were regenerated!\n"
-              + "This may occur when starting the server for the first time or deleting files.\n"
-              + "RESTARTING THE SERVER BEFORE USAGE IS RECOMMENDED!");
+          + "This may occur when starting the server for the first time or deleting files.\n"
+          + "RESTARTING THE SERVER BEFORE USAGE IS RECOMMENDED!");
       warnFirstStart = false;
     }
   }

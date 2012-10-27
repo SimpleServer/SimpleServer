@@ -20,10 +20,7 @@
  */
 package simpleserver.nbt;
 
-import static simpleserver.util.Util.*;
-
-import java.io.File;
-
+import static simpleserver.util.Util.println;
 import simpleserver.Coordinate;
 import simpleserver.Coordinate.Dimension;
 import simpleserver.Server;

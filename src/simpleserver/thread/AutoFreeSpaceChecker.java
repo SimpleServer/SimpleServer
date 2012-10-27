@@ -47,7 +47,8 @@ public class AutoFreeSpaceChecker {
     this.server = server;
   }
 
-  //TODO maybe adapt to current files considered for backup or only check space of map
+  // TODO maybe adapt to current files considered for backup or only check space
+  // of map
   public void check(boolean beforeBackup) {
     try {
       long neededSizeKb = 0;
