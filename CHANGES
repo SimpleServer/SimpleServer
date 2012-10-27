@@ -1,3 +1,10 @@
+== 8.4.5 ==
+ * Protocol version 47
+ * Fixed backup bug
+ * Revised and improved backup system
+   - see http://github.com/SimpleServer/SimpleServer/wiki/Backup-System
+ * Added rollback feature
+
 == 8.4.4 ==
  * Protocol version 39
  * Improvements to event scripting system
