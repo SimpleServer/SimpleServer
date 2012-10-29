@@ -90,7 +90,7 @@ public class AutoFreeSpaceChecker {
       println("Free Space Checker Failed!");
     } catch (IllegalArgumentException e) {
       println(e);
-      println("Backup space calculation failed because of a was file deleted during action. Trying again later.");
+      println("Unable to calculate backup space because a file was deleted unexpectedly. SimpleServer will retry backup at a later time.");
 
     }
   }
