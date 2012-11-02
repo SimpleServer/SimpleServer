@@ -3,7 +3,7 @@
  * Fixed backup bug
  * Fixed XP command
  * Revised and improved backup system
-   - see http://github.com/SimpleServer/SimpleServer/wiki/Backup-System
+   - see http://github.com/SimpleServer/SimpleServer/wiki/Backup-and-Rollback 
  * Added rollback feature
 
 == 8.4.4 ==
