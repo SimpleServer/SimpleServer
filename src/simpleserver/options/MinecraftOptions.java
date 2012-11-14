@@ -53,6 +53,7 @@ public class MinecraftOptions extends AbstractOptions {
     options.setProperty("generate-structures",
                         simpleServerOptions.get("generateStructures"));
     options.setProperty("gamemode", simpleServerOptions.get("gameMode"));
+    options.setProperty("spawn-protection", simpleServerOptions.get("spawnProtection"));
     options.setProperty("motd", "");
 
     super.save();
