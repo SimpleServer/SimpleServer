@@ -52,10 +52,16 @@ public class MinecraftOptions extends AbstractOptions {
     options.setProperty("level-seed", simpleServerOptions.get("worldSeed"));
     options.setProperty("generate-structures",
                         simpleServerOptions.get("generateStructures"));
+    options.setProperty("generator-settings", simpleServerOptions.get("generatorSettings"));
     options.setProperty("gamemode", simpleServerOptions.get("gameMode"));
     options.setProperty("spawn-protection", simpleServerOptions.get("spawnProtection"));
     options.setProperty("motd", "");
-
+    options.setProperty("enable-command-block", simpleServerOptions.get("enableCommandBlock"));
+    options.setProperty("hardcore", simpleServerOptions.get("hardcore"));
+    options.setProperty("max-build-height", simpleServerOptions.get("maxBuildHeight"));
+    options.setProperty("snooper-enabled", simpleServerOptions.get("snooperEnabled"));
+    options.setProperty("texture-pack", simpleServerOptions.get("texturePack"));
+    
     super.save();
   }
 
