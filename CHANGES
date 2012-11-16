@@ -1,4 +1,8 @@
 == 8.4.5 ==
+ * Protocol version 49
+ * Forge support
+
+== 8.4.5 ==
  * Protocol version 47
  * Fixed backup bug
  * Fixed XP command
