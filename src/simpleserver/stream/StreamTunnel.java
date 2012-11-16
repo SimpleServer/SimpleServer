@@ -162,6 +162,9 @@ public class StreamTunnel {
       case 0x01: // Login Request/Response
         write(packetId);
         if (!isServerTunnel) {
+          write(in.readInt());
+          write(readUTF16());
+          copyNBytes(5);
           break;
         }
         player.setEntityId(write(in.readInt()));

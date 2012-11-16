@@ -20,7 +20,8 @@
  */
 package simpleserver.minecraft;
 
-import static simpleserver.util.Util.*;
+import static simpleserver.util.Util.println;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -217,7 +218,7 @@ public class MinecraftWrapper {
         JarFile jarFile = new JarFile(getServerJar());
         mainclass = jarFile.getManifest().getMainAttributes().getValue("Main-Class");
         jarFile.close();
-      } catch (IOException e) {
+      } catch (Exception e) {
         System.out.println("[SimpleServer] " + e);
         System.out.println("[SimpleServer] FATAL ERROR: Could not read minecraft_server.jar!");
         System.exit(-1);

@@ -21,7 +21,7 @@
 package simpleserver.minecraft;
 
 import static simpleserver.lang.Translations.t;
-import static simpleserver.util.Util.*;
+import static simpleserver.util.Util.println;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -96,7 +96,7 @@ public class MessageHandler {
     if (ignoreLine()) {
       return;
     }
-    if (line.contains("[INFO] Done (")) {
+    if (line.contains("[INFO] Done (") || line.contains("[INFO] [Minecraft] Done (")) {
       synchronized (this) {
         loaded = true;
         notifyAll();
