@@ -21,7 +21,8 @@
 package simpleserver.stream;
 
 import static simpleserver.lang.Translations.t;
-import static simpleserver.util.Util.*;
+import static simpleserver.util.Util.print;
+import static simpleserver.util.Util.println;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -914,7 +915,7 @@ public class StreamTunnel {
         write(packetId);
         write(in.readShort());
         write(in.readShort());
-        byte length = in.readByte();
+        short length = in.readShort();
         write(length);
         copyNBytes(0xff & length);
         break;
@@ -1190,11 +1191,7 @@ public class StreamTunnel {
           write(readUTF16());
           break;
         case 5:
-          short id = write(in.readShort());
-          if (id != -1) {
-            write(in.readByte());
-            write(in.readShort());
-          }
+          copyItem();
       }
 
       unknown = in.readByte();
