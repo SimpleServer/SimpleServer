@@ -920,7 +920,7 @@ public class StreamTunnel {
         write(in.readShort());
         short length = in.readShort();
         write(length);
-        copyNBytes(0xff & length);
+        copyNBytes(length);
         break;
       case (byte) 0x84: // added in 12w06a
         write(packetId);
