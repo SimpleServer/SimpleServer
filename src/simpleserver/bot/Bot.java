@@ -320,6 +320,8 @@ public class Bot {
         in.readInt();
         in.readInt();
         in.readInt();
+        in.readByte();
+        in.readByte();
         int flag = in.readInt();
         if (flag > 0) {
           in.readShort();
@@ -438,6 +440,10 @@ public class Bot {
         break;
       case 0x38: // Chunk Bulk
         readNBytes(in.readShort() * 12 + in.readInt());
+        short chunkCount = in.readShort();
+        int dataLength = in.readInt();
+        in.readBoolean();
+        readNBytes(chunkCount * 12 + dataLength);
         break;
       case 0x3c: // Explosion
         readNBytes(28);
