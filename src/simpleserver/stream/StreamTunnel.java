@@ -604,6 +604,8 @@ public class StreamTunnel {
         write(in.readInt());
         write(in.readInt());
         write(in.readInt());
+        write(in.readByte());
+        write(in.readByte());
         int flag = in.readInt();
         write(flag);
         if (flag > 0) {
@@ -762,7 +764,12 @@ public class StreamTunnel {
         break;
       case 0x38: // Chunk Bulk
         write(packetId);
-        copyNBytes(write(in.readShort()) * 12 + write(in.readInt()));
+        short chunkCount = in.readShort();
+        int dataLength = in.readInt();
+        write(chunkCount);
+        write(dataLength);
+        write(in.readBoolean());
+        copyNBytes(chunkCount * 12 + dataLength);
         break;
       case 0x3c: // Explosion
         write(packetId);
