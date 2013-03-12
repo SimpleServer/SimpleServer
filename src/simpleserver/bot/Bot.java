@@ -306,11 +306,6 @@ public class Bot {
         readNBytes(16);
         readUnknownBlob();
         break;
-      case 0x15: // Pickup spawn
-        readNBytes(4);
-        readItem();
-        readNBytes(15);
-        break;
       case 0x16: // Collect Item
         readNBytes(8);
         break;

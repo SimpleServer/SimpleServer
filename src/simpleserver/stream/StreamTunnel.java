@@ -587,12 +587,6 @@ public class StreamTunnel {
           skipUnknownBlob();
         }
         break;
-      case 0x15: // Pickup Spawn
-        write(packetId);
-        copyNBytes(4);
-        copyItem();
-        copyNBytes(15);
-        break;
       case 0x16: // Collect Item
         write(packetId);
         copyNBytes(8);
