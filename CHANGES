@@ -1,4 +1,7 @@
-== 8.4.5 ==
+== 8.4.7 ==
+ * Protocol version 51
+
+== 8.4.6 ==
  * Protocol version 49
  * Forge support
 
