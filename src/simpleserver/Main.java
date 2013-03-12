@@ -33,8 +33,8 @@ public class Main {
   private static final String baseVersion = "8.4.8";
   private static final boolean release = false;
   private static final String releaseState = "release";
-  public static final int protocolVersion = 58;
-  public static final String minecraftVersion = "1.5.0";
+  public static final int protocolVersion = 60;
+  public static final String minecraftVersion = "1.5";
   public static final String version;
 
   static {
