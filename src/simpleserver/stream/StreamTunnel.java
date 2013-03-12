@@ -793,6 +793,17 @@ public class StreamTunnel {
         write(in.readFloat());
         write(in.readByte());
         break;
+      case 0x3f: // unknown
+	write(packetId);
+	write(readUTF16());
+	write(in.readFloat());
+	write(in.readFloat());
+	write(in.readFloat());
+	write(in.readFloat());
+	write(in.readFloat());
+	write(in.readFloat());
+	write(in.readFloat());
+	write(in.readInt());
       case 0x46: // New/Invalid State
         write(packetId);
         write(in.readByte());
@@ -808,6 +819,7 @@ public class StreamTunnel {
         byte invtype = in.readByte();
         String typeString = readUTF16();
         byte unknownByte = in.readByte();
+        boolean windowTitle = in.readBoolean();
         if (invtype == 0) {
           Chest adjacent = server.data.chests.adjacentChest(player.openedChest());
           if (!server.data.chests.isChest(player.openedChest())) {
@@ -971,6 +983,35 @@ public class StreamTunnel {
         write(packetId);
         write(in.readByte());
         break;
+      case (byte) 0xce: // unknown (scoreboard?)
+	write(readUTF16());
+	write(readUTF16());
+	write(in.readByte());
+	break;
+      case (byte) 0xcf: // unknown (scoreboard?)
+	write(readUTF16());
+	byte unknownByte1 = in.readByte();
+	write(unknownByte1);
+	if (unknownByte1 != 1) {
+	  write(readUTF16());
+	  write(in.readInt());
+	}
+	break;
+      case (byte) 0xd0: // unknown
+	write(in.readByte());
+	write(readUTF16());
+	break;
+      case (byte) 0xd1: //unknown
+	write(readUTF16());
+	byte unknownByte2 = in.readByte();
+	write(unknownByte2);
+	if (unknownByte2 == 1) {
+	  write(readUTF16());
+	  write(readUTF16());
+	  write(readUTF16());
+	  write(in.readByte());
+	}
+	break;
       case (byte) 0xd3: // Red Power (mod by Eloraam)
         write(packetId);
         copyNBytes(1);
