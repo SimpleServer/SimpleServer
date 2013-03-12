@@ -1104,6 +1104,17 @@ public class StreamTunnel {
       }
     }
   }
+  
+  private void skipItem() throws IOException {
+    if (in.readShort() > 0) {
+      in.readByte();
+      in.readShort();
+      short length;
+      if ((length = in.readShort()) > 0) {
+        skipNBytes(length);
+      }
+    }
+  }
 
   private long copyVLC() throws IOException {
     long value = 0;
@@ -1172,11 +1183,11 @@ public class StreamTunnel {
   }
 
   private void copyUnknownBlob() throws IOException {
-    byte unknown = in.readByte();
-    write(unknown);
+    byte item = in.readByte();
+    write(item);
 
-    while (unknown != 0x7f) {
-      int type = (unknown & 0xE0) >> 5;
+    while (item != 0x7f) {
+      int type = (item & 0xE0) >> 5;
 
       switch (type) {
         case 0:
@@ -1196,18 +1207,23 @@ public class StreamTunnel {
           break;
         case 5:
           copyItem();
+          break;
+        case 6:
+	  write(in.readInt());
+	  write(in.readInt());
+	  write(in.readInt());
       }
 
-      unknown = in.readByte();
-      write(unknown);
+      item = in.readByte();
+      write(item);
     }
   }
 
   private void skipUnknownBlob() throws IOException {
-    byte unknown = in.readByte();
+    byte item = in.readByte();
 
-    while (unknown != 0x7f) {
-      int type = (unknown & 0xE0) >> 5;
+    while (item != 0x7f) {
+      int type = (item & 0xE0) >> 5;
 
       switch (type) {
         case 0:
@@ -1225,9 +1241,16 @@ public class StreamTunnel {
         case 4:
           readUTF16();
           break;
+        case 5:
+	  skipItem();
+	  break;
+	case 6:
+	  in.readInt();
+	  in.readInt();
+	  in.readInt();
       }
 
-      unknown = in.readByte();
+      item = in.readByte();
     }
   }
 
