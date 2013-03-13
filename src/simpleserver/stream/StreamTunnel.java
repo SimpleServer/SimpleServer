@@ -794,16 +794,16 @@ public class StreamTunnel {
         write(in.readByte());
         break;
       case 0x3f: // unknown
-	write(packetId);
-	write(readUTF16());
-	write(in.readFloat());
-	write(in.readFloat());
-	write(in.readFloat());
-	write(in.readFloat());
-	write(in.readFloat());
-	write(in.readFloat());
-	write(in.readFloat());
-	write(in.readInt());
+        write(packetId);
+        write(readUTF16());
+        write(in.readFloat());
+        write(in.readFloat());
+        write(in.readFloat());
+        write(in.readFloat());
+        write(in.readFloat());
+        write(in.readFloat());
+        write(in.readFloat());
+        write(in.readInt());
       case 0x46: // New/Invalid State
         write(packetId);
         write(in.readByte());
@@ -985,34 +985,34 @@ public class StreamTunnel {
         write(in.readByte());
         break;
       case (byte) 0xce: // unknown (scoreboard?)
-	write(readUTF16());
-	write(readUTF16());
-	write(in.readByte());
-	break;
+        write(readUTF16());
+        write(readUTF16());
+        write(in.readByte());
+        break;
       case (byte) 0xcf: // unknown (scoreboard?)
-	write(readUTF16());
-	byte unknownByte1 = in.readByte();
-	write(unknownByte1);
-	if (unknownByte1 != 1) {
-	  write(readUTF16());
-	  write(in.readInt());
-	}
-	break;
+        write(readUTF16());
+        byte unknownByte1 = in.readByte();
+        write(unknownByte1);
+        if (unknownByte1 != 1) {
+          write(readUTF16());
+          write(in.readInt());
+        }
+        break;
       case (byte) 0xd0: // unknown
-	write(in.readByte());
-	write(readUTF16());
-	break;
-      case (byte) 0xd1: //unknown
-	write(readUTF16());
-	byte unknownByte2 = in.readByte();
-	write(unknownByte2);
-	if (unknownByte2 == 1) {
-	  write(readUTF16());
-	  write(readUTF16());
-	  write(readUTF16());
-	  write(in.readByte());
-	}
-	break;
+        write(in.readByte());
+        write(readUTF16());
+        break;
+      case (byte) 0xd1: // unknown
+        write(readUTF16());
+        byte unknownByte2 = in.readByte();
+        write(unknownByte2);
+        if (unknownByte2 == 1) {
+          write(readUTF16());
+          write(readUTF16());
+          write(readUTF16());
+          write(in.readByte());
+        }
+        break;
       case (byte) 0xd3: // Red Power (mod by Eloraam)
         write(packetId);
         copyNBytes(1);
@@ -1146,7 +1146,7 @@ public class StreamTunnel {
       }
     }
   }
-  
+
   private void skipItem() throws IOException {
     if (in.readShort() > 0) {
       in.readByte();
@@ -1251,9 +1251,9 @@ public class StreamTunnel {
           copyItem();
           break;
         case 6:
-	  write(in.readInt());
-	  write(in.readInt());
-	  write(in.readInt());
+          write(in.readInt());
+          write(in.readInt());
+          write(in.readInt());
       }
 
       item = in.readByte();
@@ -1284,12 +1284,12 @@ public class StreamTunnel {
           readUTF16();
           break;
         case 5:
-	  skipItem();
-	  break;
-	case 6:
-	  in.readInt();
-	  in.readInt();
-	  in.readInt();
+          skipItem();
+          break;
+        case 6:
+          in.readInt();
+          in.readInt();
+          in.readInt();
       }
 
       item = in.readByte();
