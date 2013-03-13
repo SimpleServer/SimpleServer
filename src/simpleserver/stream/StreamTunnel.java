@@ -866,6 +866,7 @@ public class StreamTunnel {
           write(invtype);
           write(typeString);
           write(unknownByte);
+          write(windowTitle);
         }
         break;
       case 0x65: // Close Window
