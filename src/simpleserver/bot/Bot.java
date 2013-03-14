@@ -599,9 +599,9 @@ public class Bot {
           readUTF16();
           in.readByte();
         } else if (mode == 3 || mode == 4) {
-          playerCount == in.readShort();
+          playerCount = in.readShort();
         }
-        
+
         if (playerCount != 0) {
           for (int i = 0; i <= playerCount; i++) {
             readUTF16();
