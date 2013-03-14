@@ -1,4 +1,11 @@
-== 8.4.5 ==
+== 8.4.8 ==
+ * Protocol version 60
+ * Updated to Minecraft 1.5
+ 
+== 8.4.7 ==
+ * Protocol version 51
+
+== 8.4.6 ==
  * Protocol version 49
  * Forge support
 

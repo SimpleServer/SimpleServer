@@ -306,11 +306,6 @@ public class Bot {
         readNBytes(16);
         readUnknownBlob();
         break;
-      case 0x15: // Pickup spawn
-        readNBytes(4);
-        readItem();
-        readNBytes(15);
-        break;
       case 0x16: // Collect Item
         readNBytes(8);
         break;
@@ -478,6 +473,7 @@ public class Bot {
         in.readByte();
         readUTF16();
         in.readByte();
+        in.readBoolean();
         break;
       case 0x65: // Close Window
         in.readByte();
@@ -569,6 +565,48 @@ public class Bot {
         break;
       case (byte) 0xcd: // Login & Respawn
         in.readByte();
+        break;
+      case (byte) 0xce: // create scoreboard
+        readUTF16();
+        readUTF16();
+        in.readByte();
+        break;
+      case (byte) 0xcf: // update score
+        readUTF16();
+        byte updateRemove = in.readByte();
+        if (updateRemove == 0) {
+          readUTF16();
+          in.readInt();
+        }
+        break;
+      case (byte) 0xd0: // display scoreboard
+        in.readByte();
+        readUTF16();
+        break;
+      case (byte) 0xd1: // teams
+        readUTF16();
+        byte mode = in.readByte();
+        short playerCount = 0;
+        if (mode == 0) {
+          readUTF16();
+          readUTF16();
+          readUTF16();
+          in.readByte();
+          playerCount = in.readShort();
+        } else if (mode == 2) {
+          readUTF16();
+          readUTF16();
+          readUTF16();
+          in.readByte();
+        } else if (mode == 3 || mode == 4) {
+          playerCount = in.readShort();
+        }
+
+        if (playerCount != 0) {
+          for (int i = 0; i <= playerCount; i++) {
+            readUTF16();
+          }
+        }
         break;
       case (byte) 0xe6: // ModLoaderMP by SDK
         in.readInt(); // mod

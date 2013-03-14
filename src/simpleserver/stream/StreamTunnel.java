@@ -587,12 +587,6 @@ public class StreamTunnel {
           skipUnknownBlob();
         }
         break;
-      case 0x15: // Pickup Spawn
-        write(packetId);
-        copyNBytes(4);
-        copyItem();
-        copyNBytes(15);
-        break;
       case 0x16: // Collect Item
         write(packetId);
         copyNBytes(8);
@@ -799,6 +793,18 @@ public class StreamTunnel {
         write(in.readFloat());
         write(in.readByte());
         break;
+      case 0x3f: // particle
+        write(packetId);
+        write(readUTF16()); // name of particle
+        write(in.readFloat()); // x
+        write(in.readFloat()); // y
+        write(in.readFloat()); // z
+        write(in.readFloat()); // offset x
+        write(in.readFloat()); // offset y
+        write(in.readFloat()); // offset z
+        write(in.readFloat()); // particle speed
+        write(in.readInt()); // num of particles
+        break;
       case 0x46: // New/Invalid State
         write(packetId);
         write(in.readByte());
@@ -814,6 +820,7 @@ public class StreamTunnel {
         byte invtype = in.readByte();
         String typeString = readUTF16();
         byte unknownByte = in.readByte();
+        boolean windowTitle = in.readBoolean();
         if (invtype == 0) {
           Chest adjacent = server.data.chests.adjacentChest(player.openedChest());
           if (!server.data.chests.isChest(player.openedChest())) {
@@ -860,6 +867,7 @@ public class StreamTunnel {
           write(invtype);
           write(typeString);
           write(unknownByte);
+          write(windowTitle);
         }
         break;
       case 0x65: // Close Window
@@ -976,6 +984,54 @@ public class StreamTunnel {
       case (byte) 0xcd: // Login & Respawn
         write(packetId);
         write(in.readByte());
+        break;
+      case (byte) 0xce: // create scoreboard
+        write(readUTF16());
+        write(readUTF16());
+        write(in.readByte());
+        break;
+      case (byte) 0xcf: // update score
+        write(readUTF16());
+        byte updateRemove = in.readByte();
+        write(updateRemove);
+        if (updateRemove == 0) {
+          write(readUTF16());
+          write(in.readInt());
+        }
+        break;
+      case (byte) 0xd0: // display scoreboard
+        write(in.readByte());
+        write(readUTF16());
+        break;
+      case (byte) 0xd1: // teams
+        write(readUTF16());
+        byte mode = in.readByte();
+        short playerCount = 0;
+        write(mode);
+
+        if (mode == 0) { // team created
+          write(readUTF16()); // team display name
+          write(readUTF16()); // team prefix
+          write(readUTF16()); // team suffix
+          write(in.readByte()); // friendly fire
+          playerCount = in.readShort();
+          write(playerCount);
+        } else if (mode == 2) { // team updated
+          write(readUTF16());
+          write(readUTF16());
+          write(readUTF16());
+          write(in.readByte());
+        } else if (mode == 3 || mode == 4) { // team new player, team removed
+          playerCount = in.readShort();
+          write(playerCount);
+        }
+
+        // only ran if 0,3,4
+        if (playerCount != 0) {
+          for (int i = 0; i <= playerCount; i++) {
+            write(readUTF16());
+          }
+        }
         break;
       case (byte) 0xd3: // Red Power (mod by Eloraam)
         write(packetId);
@@ -1111,6 +1167,17 @@ public class StreamTunnel {
     }
   }
 
+  private void skipItem() throws IOException {
+    if (in.readShort() > 0) {
+      in.readByte();
+      in.readShort();
+      short length;
+      if ((length = in.readShort()) > 0) {
+        skipNBytes(length);
+      }
+    }
+  }
+
   private long copyVLC() throws IOException {
     long value = 0;
     int shift = 0;
@@ -1178,11 +1245,11 @@ public class StreamTunnel {
   }
 
   private void copyUnknownBlob() throws IOException {
-    byte unknown = in.readByte();
-    write(unknown);
+    byte item = in.readByte();
+    write(item);
 
-    while (unknown != 0x7f) {
-      int type = (unknown & 0xE0) >> 5;
+    while (item != 0x7f) {
+      int type = (item & 0xE0) >> 5;
 
       switch (type) {
         case 0:
@@ -1202,18 +1269,23 @@ public class StreamTunnel {
           break;
         case 5:
           copyItem();
+          break;
+        case 6:
+          write(in.readInt());
+          write(in.readInt());
+          write(in.readInt());
       }
 
-      unknown = in.readByte();
-      write(unknown);
+      item = in.readByte();
+      write(item);
     }
   }
 
   private void skipUnknownBlob() throws IOException {
-    byte unknown = in.readByte();
+    byte item = in.readByte();
 
-    while (unknown != 0x7f) {
-      int type = (unknown & 0xE0) >> 5;
+    while (item != 0x7f) {
+      int type = (item & 0xE0) >> 5;
 
       switch (type) {
         case 0:
@@ -1231,9 +1303,16 @@ public class StreamTunnel {
         case 4:
           readUTF16();
           break;
+        case 5:
+          skipItem();
+          break;
+        case 6:
+          in.readInt();
+          in.readInt();
+          in.readInt();
       }
 
-      unknown = in.readByte();
+      item = in.readByte();
     }
   }
 
