@@ -793,17 +793,18 @@ public class StreamTunnel {
         write(in.readFloat());
         write(in.readByte());
         break;
-      case 0x3f: // unknown
+      case 0x3f: // particle
         write(packetId);
-        write(readUTF16());
-        write(in.readFloat());
-        write(in.readFloat());
-        write(in.readFloat());
-        write(in.readFloat());
-        write(in.readFloat());
-        write(in.readFloat());
-        write(in.readFloat());
-        write(in.readInt());
+        write(readUTF16()); // name of particle
+        write(in.readFloat()); // x
+        write(in.readFloat()); // y
+        write(in.readFloat()); // z
+        write(in.readFloat()); // offset x
+        write(in.readFloat()); // offset y
+        write(in.readFloat()); // offset z
+        write(in.readFloat()); // particle speed
+        write(in.readInt()); // num of particles
+        break;
       case 0x46: // New/Invalid State
         write(packetId);
         write(in.readByte());
@@ -984,33 +985,52 @@ public class StreamTunnel {
         write(packetId);
         write(in.readByte());
         break;
-      case (byte) 0xce: // unknown (scoreboard?)
+      case (byte) 0xce: // create scoreboard
         write(readUTF16());
         write(readUTF16());
         write(in.readByte());
         break;
-      case (byte) 0xcf: // unknown (scoreboard?)
+      case (byte) 0xcf: // update score
         write(readUTF16());
-        byte unknownByte1 = in.readByte();
-        write(unknownByte1);
-        if (unknownByte1 != 1) {
+        byte updateRemove = in.readByte();
+        write(updateRemove);
+        if (updateRemove == 0) {
           write(readUTF16());
           write(in.readInt());
         }
         break;
-      case (byte) 0xd0: // unknown
+      case (byte) 0xd0: // display scoreboard
         write(in.readByte());
         write(readUTF16());
         break;
-      case (byte) 0xd1: // unknown
+      case (byte) 0xd1: // teams
         write(readUTF16());
-        byte unknownByte2 = in.readByte();
-        write(unknownByte2);
-        if (unknownByte2 == 1) {
+        byte mode = in.readByte();
+        short playerCount = 0;
+        write(mode);
+
+        if (mode == 0) { // team created
+          write(readUTF16()); // team display name
+          write(readUTF16()); // team prefix
+          write(readUTF16()); // team suffix
+          write(in.readByte()); // friendly fire
+          playerCount = in.readShort();
+          write(playerCount);
+        } else if (mode == 2) { // team updated
           write(readUTF16());
           write(readUTF16());
           write(readUTF16());
           write(in.readByte());
+        } else if (mode == 3 || mode == 4) { // team new player, team removed
+          playerCount = in.readShort();
+          write(playerCount);
+        }
+
+        // only ran if 0,3,4
+        if (playerCount != 0) {
+          for (int i = 0; i <= playerCount; i++) {
+            write(readUTF16());
+          }
         }
         break;
       case (byte) 0xd3: // Red Power (mod by Eloraam)
