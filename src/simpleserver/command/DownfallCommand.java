@@ -20,21 +20,24 @@
  */
 package simpleserver.command;
 
+import static simpleserver.lang.Translations.t;
+import simpleserver.Color;
 import simpleserver.Player;
 import simpleserver.Server;
 
 public class DownfallCommand extends AbstractCommand implements PlayerCommand, ServerCommand {
 
   public DownfallCommand() {
-    super("toggledownfall", "Toggling rain and snow, hold on...");
+    super("toggledownfall", "Toggles rain and snowfall in the world");
   }
 
   public void execute(Server server, String message, CommandFeedback feedback) {
     server.runCommand("toggledownfall", "");
-    feedback.send("Toggled rain and snowfall");
+    feedback.send("Toggling rain and snowfall, hold on...");
   }
 
   public void execute(Player player, String message) {
-    execute(player.getServer(), message, new PlayerFeedback(player));
+    player.getServer().runCommand("toggledownfall", "");
+	  player.addTMessage(Color.GRAY, "Toggling rain and snowfall, hold on...");
   }
 }
