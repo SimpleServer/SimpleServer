@@ -746,7 +746,7 @@ public class Bot {
   protected void error(String reason) {
     die();
     if (!expectDisconnect) {
-      print("Bot " + name + " died (" + reason + ")");
+      print("Bot " + name + " died (" + reason + ")\n");
     }
   }
 
@@ -769,11 +769,11 @@ public class Bot {
             try {
               connect();
             } catch (Exception e2) {
-              error("Soket closed on reconnect");
+              error("Socket closed on reconnect");
             }
             break;
           } else {
-            error("Soket closed");
+            error("Socket closed");
           }
         }
       }
