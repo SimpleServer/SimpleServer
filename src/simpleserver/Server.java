@@ -62,6 +62,7 @@ import simpleserver.log.AdminLog;
 import simpleserver.log.ConnectionLog;
 import simpleserver.log.ErrorLog;
 import simpleserver.log.MessageLog;
+import simpleserver.log.EventsLog;
 import simpleserver.message.Chat;
 import simpleserver.message.Messager;
 import simpleserver.minecraft.MinecraftWrapper;
@@ -114,6 +115,7 @@ public class Server {
   private ErrorLog errorLog;
   private ConnectionLog connectionLog;
   private MessageLog messageLog;
+  private EventsLog eventsLog;
   private SystemInputQueue systemInput;
 
   public CustAuthExport custAuthExport;
@@ -465,6 +467,10 @@ public class Server {
   public void errorLog(Exception exception, String message) {
     errorLog.addMessage(exception, message);
   }
+  
+  public void eventsLog(String event, String message) {
+    eventsLog.addMessage(event,message);
+  }
 
   public void connectionLog(String type, Socket socket, String comments) {
     connectionLog.addMessage(type, socket, comments);
@@ -547,6 +553,7 @@ public class Server {
     adminLog = new AdminLog();
     errorLog = new ErrorLog();
     connectionLog = new ConnectionLog();
+  eventsLog = new EventsLog();
 
     commandParser = new CommandParser(options);
   }
@@ -556,6 +563,7 @@ public class Server {
     adminLog.stop();
     errorLog.stop();
     connectionLog.stop();
+	eventsLog.stop();
     messageLog.stop();
     time.unfreeze();
     bots.cleanup();
