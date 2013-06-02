@@ -35,6 +35,7 @@ import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import org.apache.commons.lang.StringUtils;
 import simpleserver.Server;
 
 public class BotController {
@@ -116,6 +117,12 @@ public class BotController {
   }
 
   public boolean ninja(String name) {
+
+    // hacky fix to translate §eTeleporter50983§e
+    // to Teleporter50983
+    name = name.replaceAll("[^A-Za-z0-9]", "");
+    name = StringUtils.removeEnd(name, "e");
+
     Bot bot = bots.get(name);
     if (bot == null) {
       return deadNinjas.contains(name);
