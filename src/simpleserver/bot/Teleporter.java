@@ -50,6 +50,7 @@ public class Teleporter extends Bot {
   protected void prepare() throws IOException {
     dat = new PlayerFile(name, server);
     dat.setPosition(position);
+    server.bots.ninja(name);
     dat.save();
   }
 

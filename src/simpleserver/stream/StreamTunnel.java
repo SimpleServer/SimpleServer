@@ -56,7 +56,7 @@ public class StreamTunnel {
   private static final byte BLOCK_DESTROYED_STATUS = 2;
   private static final Pattern MESSAGE_PATTERN = Pattern.compile("^<([^>]+)> (.*)$");
   private static final Pattern COLOR_PATTERN = Pattern.compile("\u00a7[0-9a-z]");
-  private static final Pattern JOIN_PATTERN = Pattern.compile("\u00a7.((\\d|\\w)*) (joined|left) the game.");
+  private static final Pattern JOIN_PATTERN = Pattern.compile("\u00a7.((\\d|\\w|\\u00a7)*) (joined|left) the game.");
   private static final String CONSOLE_CHAT_PATTERN = "\\[Server:.*\\]";
   private static final int MESSAGE_SIZE = 60;
   private static final int MAXIMUM_MESSAGE_SIZE = 119;
