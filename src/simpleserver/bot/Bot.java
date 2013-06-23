@@ -624,8 +624,8 @@ public class Bot {
       case (byte) 0xfc: // Encryption Key Response
         byte[] sharedKey = new byte[in.readShort()];
         in.readFully(sharedKey);
-        byte[] challangeTokenResponse = new byte[in.readShort()];
-        in.readFully(challangeTokenResponse);
+        byte[] challengeTokenResponse = new byte[in.readShort()];
+        in.readFully(challengeTokenResponse);
         in = new DataInputStream(new BufferedInputStream(encryption.encryptedInputStream(socket.getInputStream())));
         out = new DataOutputStream(new BufferedOutputStream(encryption.encryptedOutputStream(socket.getOutputStream())));
         login();
@@ -634,10 +634,10 @@ public class Bot {
         readUTF16();
         byte[] keyBytes = new byte[in.readShort()];
         in.readFully(keyBytes);
-        byte[] challangeToken = new byte[in.readShort()];
-        in.readFully(challangeToken);
+        byte[] challengeToken = new byte[in.readShort()];
+        in.readFully(challengeToken);
         encryption.setPublicKey(keyBytes);
-        encryption.setChallengeToken(challangeToken);
+        encryption.setChallengeToken(challengeToken);
         sendSharedKey();
         break;
       case (byte) 0xfe: // Server List Ping
