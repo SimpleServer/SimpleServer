@@ -586,25 +586,23 @@ public class Bot {
       case (byte) 0xd1: // teams
         readUTF16();
         byte mode = in.readByte();
-        short playerCount = 0;
-        if (mode == 0) {
-          readUTF16();
-          readUTF16();
-          readUTF16();
-          in.readByte();
-          playerCount = in.readShort();
-        } else if (mode == 2) {
-          readUTF16();
-          readUTF16();
-          readUTF16();
-          in.readByte();
-        } else if (mode == 3 || mode == 4) {
-          playerCount = in.readShort();
+        short playerCount = -1;
+
+        if (mode == 2 || mode == 0) {
+          readUTF16(); // team display name
+          readUTF16(); // team prefix
+          readUTF16(); // team suffix
+          in.readByte(); // friendly fire
         }
 
-        if (playerCount != 0) {
-          for (int i = 0; i <= playerCount; i++) {
-            readUTF16();
+        // only ran if 0,3,4
+        if (mode == 0 || mode == 3 || mode == 4) {
+          playerCount = in.readShort();
+
+          if (playerCount != -1) {
+            for (int i = 0; i < playerCount; i++) {
+              readUTF16();
+            }
           }
         }
         break;
@@ -626,8 +624,8 @@ public class Bot {
       case (byte) 0xfc: // Encryption Key Response
         byte[] sharedKey = new byte[in.readShort()];
         in.readFully(sharedKey);
-        byte[] challangeTokenResponse = new byte[in.readShort()];
-        in.readFully(challangeTokenResponse);
+        byte[] challengeTokenResponse = new byte[in.readShort()];
+        in.readFully(challengeTokenResponse);
         in = new DataInputStream(new BufferedInputStream(encryption.encryptedInputStream(socket.getInputStream())));
         out = new DataOutputStream(new BufferedOutputStream(encryption.encryptedOutputStream(socket.getOutputStream())));
         login();
@@ -636,10 +634,10 @@ public class Bot {
         readUTF16();
         byte[] keyBytes = new byte[in.readShort()];
         in.readFully(keyBytes);
-        byte[] challangeToken = new byte[in.readShort()];
-        in.readFully(challangeToken);
+        byte[] challengeToken = new byte[in.readShort()];
+        in.readFully(challengeToken);
         encryption.setPublicKey(keyBytes);
-        encryption.setChallengeToken(challangeToken);
+        encryption.setChallengeToken(challengeToken);
         sendSharedKey();
         break;
       case (byte) 0xfe: // Server List Ping

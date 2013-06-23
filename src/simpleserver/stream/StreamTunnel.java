@@ -985,51 +985,50 @@ public class StreamTunnel {
         write(packetId);
         write(in.readByte());
         break;
-      case (byte) 0xce: // create scoreboard
+      case (byte) 0xce: // scoreboard objectives
+        write(packetId);
         write(readUTF16());
         write(readUTF16());
         write(in.readByte());
         break;
       case (byte) 0xcf: // update score
+        write(packetId);
         write(readUTF16());
         byte updateRemove = in.readByte();
         write(updateRemove);
-        if (updateRemove == 0) {
+        if (updateRemove != 1) {
           write(readUTF16());
           write(in.readInt());
         }
         break;
       case (byte) 0xd0: // display scoreboard
+        write(packetId);
         write(in.readByte());
         write(readUTF16());
         break;
       case (byte) 0xd1: // teams
+        write(packetId);
         write(readUTF16());
         byte mode = in.readByte();
-        short playerCount = 0;
+        short playerCount = -1;
         write(mode);
 
-        if (mode == 0) { // team created
+        if (mode == 0 || mode == 2) {
           write(readUTF16()); // team display name
           write(readUTF16()); // team prefix
           write(readUTF16()); // team suffix
           write(in.readByte()); // friendly fire
-          playerCount = in.readShort();
-          write(playerCount);
-        } else if (mode == 2) { // team updated
-          write(readUTF16());
-          write(readUTF16());
-          write(readUTF16());
-          write(in.readByte());
-        } else if (mode == 3 || mode == 4) { // team new player, team removed
-          playerCount = in.readShort();
-          write(playerCount);
         }
 
         // only ran if 0,3,4
-        if (playerCount != 0) {
-          for (int i = 0; i <= playerCount; i++) {
-            write(readUTF16());
+        if (mode == 0 || mode == 3 || mode == 4) {
+          playerCount = in.readShort();
+          write(playerCount);
+
+          if (playerCount != -1) {
+            for (int i = 0; i < playerCount; i++) {
+              write(readUTF16());
+            }
           }
         }
         break;

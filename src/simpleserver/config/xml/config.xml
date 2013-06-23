@@ -124,6 +124,9 @@
 	<command name="save" allow="4+">
 		<forward />
 	</command>
+    <command name="scoreboard" allow="0+">
+        <forward />
+    </command>
 	<command name="servertime" allow="0+" />
 	<command name="setgroup" allow="4+" />
 	<command name="setipgroup" allow="4+" />
