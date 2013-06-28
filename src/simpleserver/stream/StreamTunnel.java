@@ -838,7 +838,6 @@ public class StreamTunnel {
         String title = readUTF16();
         byte number = in.readByte();
         boolean provided = in.readBoolean();
-        int unknown = in.readInt();
         if (invtype == 0) {
           Chest adjacent = server.data.chests.adjacentChest(player.openedChest());
           if (!server.data.chests.isChest(player.openedChest())) {
@@ -886,7 +885,6 @@ public class StreamTunnel {
           write(title);
           write(number);
           write(provided);
-          write(unknown);
         }
         break;
       case 0x65: // Close Window
