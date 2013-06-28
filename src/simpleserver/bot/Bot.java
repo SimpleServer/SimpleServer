@@ -57,7 +57,7 @@ public class Bot {
   protected BotController controller;
   protected boolean gotFirstPacket = false;
   private byte lastPacket;
-  private short health;
+  private float health;
 
   private ServerEncryption encryption = new ServerEncryption();
 
@@ -249,7 +249,7 @@ public class Bot {
         in.readBoolean();
         break;
       case 0x08: // Update Health
-        health = in.readShort();
+        health = in.readFloat();
         in.readShort();
         in.readFloat();
         if (health <= 0) {
@@ -297,8 +297,9 @@ public class Bot {
         readNBytes(5);
         break;
       case 0x13: // Entity Action
-        in.readInt();
-        in.readByte();
+        in.readFloat();
+        in.readShort();
+        in.readFloat();
         break;
       case 0x14: // Named Entity Spawn
         in.readInt();
@@ -353,6 +354,12 @@ public class Bot {
         in.readInt();
         in.readShort();
         break;
+      case 0x1b: // Steer Vehicle
+        in.readFloat();
+        in.readFloat();
+        in.readBoolean();
+        in.readBoolean();
+        break;
       case 0x1c: // Entity Velocity
         readNBytes(10);
         break;
@@ -385,7 +392,9 @@ public class Bot {
         readNBytes(5);
         break;
       case 0x27: // Attach Entity
-        readNBytes(8);
+        in.readInt();
+        in.readInt();
+        in.readBoolean();
         break;
       case 0x28: // Entity Metadata
         in.readInt();
@@ -405,6 +414,12 @@ public class Bot {
         in.readFloat();
         in.readShort();
         in.readShort();
+        break;
+      case 0x2c: // Entity Properties
+        in.readInt();
+        in.readInt();
+        readUTF16();
+        in.readDouble();
         break;
       case 0x33: // Map Chunk
         readNBytes(13);
@@ -474,6 +489,7 @@ public class Bot {
         readUTF16();
         in.readByte();
         in.readBoolean();
+        in.readInt();
         break;
       case 0x65: // Close Window
         in.readByte();
@@ -541,7 +557,8 @@ public class Bot {
         }
         break;
       case (byte) 0xc8: // Increment Statistic
-        readNBytes(5);
+        in.readInt();
+        in.readInt();
         break;
       case (byte) 0xc9: // Player List Item
         readUTF16();
@@ -550,8 +567,8 @@ public class Bot {
         break;
       case (byte) 0xca: // Player Abilities
         in.readByte();
-        in.readByte();
-        in.readByte();
+        in.readFloat();
+        in.readFloat();
         break;
       case (byte) 0xcb: // Tab-Completion
         readUTF16();

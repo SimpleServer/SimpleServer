@@ -328,7 +328,7 @@ public class StreamTunnel {
         break;
       case 0x08: // Update Health
         write(packetId);
-        player.updateHealth(write(in.readShort()));
+        player.updateHealth(write(in.readFloat()));
         player.getHealth();
         write(in.readShort());
         write(in.readFloat());
@@ -572,6 +572,7 @@ public class StreamTunnel {
         write(packetId);
         write(in.readInt());
         write(in.readByte());
+        write(in.readInt());
         break;
       case 0x14: // Named Entity Spawn
         int eid = in.readInt();
@@ -641,6 +642,13 @@ public class StreamTunnel {
         write(in.readInt());
         write(in.readShort());
         break;
+      case 0x1b: // Steer Vehicle
+        write(packetId);
+        write(in.readFloat());
+        write(in.readFloat());
+        write(in.readBoolean());
+        write(in.readBoolean());
+        break;
       case 0x1c: // Entity Velocity
         write(packetId);
         copyNBytes(10);
@@ -683,7 +691,9 @@ public class StreamTunnel {
         break;
       case 0x27: // Attach Entity
         write(packetId);
-        copyNBytes(8);
+        write(in.readInt());
+        write(in.readInt());
+        write(in.readBoolean());
         break;
       case 0x28: // Entity Metadata
         write(packetId);
@@ -706,6 +716,13 @@ public class StreamTunnel {
       case 0x2b: // Experience
         write(packetId);
         player.updateExperience(write(in.readFloat()), write(in.readShort()), write(in.readShort()));
+        break;
+      case 0x2c: // Entity Properties
+        write(packetId);
+        write(in.readInt());
+        write(in.readInt());
+        write(readUTF16());
+        write(in.readDouble());
         break;
       case 0x33: // Map Chunk
         write(packetId);
@@ -818,9 +835,10 @@ public class StreamTunnel {
         boolean allow = true;
         byte id = in.readByte();
         byte invtype = in.readByte();
-        String typeString = readUTF16();
-        byte unknownByte = in.readByte();
-        boolean windowTitle = in.readBoolean();
+        String title = readUTF16();
+        byte number = in.readByte();
+        boolean provided = in.readBoolean();
+        int unknown = in.readInt();
         if (invtype == 0) {
           Chest adjacent = server.data.chests.adjacentChest(player.openedChest());
           if (!server.data.chests.isChest(player.openedChest())) {
@@ -841,15 +859,15 @@ public class StreamTunnel {
                 server.data.save();
                 player.setAttemptedAction(null);
                 player.addTMessage(Color.RED, "This chest is no longer locked!");
-                typeString = t("Open Chest");
+                title = t("Open Chest");
               } else {
-                typeString = server.data.chests.chestName(player.openedChest());
+                title = server.data.chests.chestName(player.openedChest());
               }
             } else {
-              typeString = t("Open Chest");
+              title = t("Open Chest");
               if (player.isAttemptLock()) {
                 lockChest(player.openedChest());
-                typeString = (player.nextChestName() == null) ? t("Locked Chest") : player.nextChestName();
+                title = (player.nextChestName() == null) ? t("Locked Chest") : player.nextChestName();
               }
             }
 
@@ -865,9 +883,10 @@ public class StreamTunnel {
           write(packetId);
           write(id);
           write(invtype);
-          write(typeString);
-          write(unknownByte);
-          write(windowTitle);
+          write(title);
+          write(number);
+          write(provided);
+          write(unknown);
         }
         break;
       case 0x65: // Close Window
@@ -955,7 +974,8 @@ public class StreamTunnel {
         break;
       case (byte) 0xc8: // Increment Statistic
         write(packetId);
-        copyNBytes(5);
+        write(in.readInt());
+        write(in.readInt());
         break;
       case (byte) 0xc9: // Player List Item
         write(packetId);
@@ -966,8 +986,8 @@ public class StreamTunnel {
       case (byte) 0xca: // Player Abilities
         write(packetId);
         write(in.readByte());
-        write(in.readByte());
-        write(in.readByte());
+        write(in.readFloat());
+        write(in.readFloat());
         break;
       case (byte) 0xcb: // Tab-Completion
         write(packetId);
