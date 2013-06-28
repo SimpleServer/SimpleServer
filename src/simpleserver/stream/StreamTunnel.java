@@ -838,6 +838,10 @@ public class StreamTunnel {
         String title = readUTF16();
         byte number = in.readByte();
         boolean provided = in.readBoolean();
+        int unknown = 0;
+        if (invtype == 11) {
+          unknown = in.readInt();
+        }
         if (invtype == 0) {
           Chest adjacent = server.data.chests.adjacentChest(player.openedChest());
           if (!server.data.chests.isChest(player.openedChest())) {
@@ -885,6 +889,9 @@ public class StreamTunnel {
           write(title);
           write(number);
           write(provided);
+          if (invtype == 11) {
+            write(unknown);
+          }
         }
         break;
       case 0x65: // Close Window
@@ -983,7 +990,13 @@ public class StreamTunnel {
         break;
       case (byte) 0xca: // Player Abilities
         write(packetId);
-        write(in.readByte());
+        byte flags = in.readByte();
+        int creative = flags & 1;
+        int flying = flags & 2;
+        int can_fly = flags & 4;
+        int god_mode = flags & 8;
+
+        write(flags);
         write(in.readFloat());
         write(in.readFloat());
         break;
