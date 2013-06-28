@@ -85,7 +85,7 @@ public class Player {
   private String kickMsg = null;
   public Position position;
   private Position deathPlace;
-  private short health = 0;
+  private float health = 0;
   private short experience = 0;
   private int group = 0;
   private int entityId = 0;
@@ -469,11 +469,11 @@ public class Player {
     return deathPlace;
   }
 
-  public short getHealth() {
+  public float getHealth() {
     return health;
   }
 
-  public void updateHealth(short health) {
+  public void updateHealth(float health) {
     this.health = health;
     if (health <= 0) {
       setDeathPlace(new Position(position()));
