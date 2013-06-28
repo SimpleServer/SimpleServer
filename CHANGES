@@ -1,6 +1,14 @@
+== 8.4.10 ==
+ * Protocol version 72
+ * Updated to Minecraft 1.6.0
+ * Fixed "teleporter" commands showing in chat
+ * Fixed /scoreboard command not working
+ * Added support for dedicated events logfile
+
 == 8.4.9 ==
  * Protocol version 61
  * Updated to Minecraft 1.5.2
+
 == 8.4.8 ==
  * Protocol version 60
  * Updated to Minecraft 1.5
