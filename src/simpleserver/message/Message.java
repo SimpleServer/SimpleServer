@@ -31,12 +31,11 @@ import simpleserver.Translate;
 
 public class Message {
 
-  // default to GRAY color and TEXT message
-  private Color color = Color.GRAY;
-  private Translate translate = Translate.TEXT;
+  private Color color;
+  private Translate translate;
   private String using;
 
-  private boolean italic;
+  private boolean italic = false;
 
   private Gson gson = new Gson();
   private JsonObject jsonObject = new JsonObject();
@@ -56,7 +55,13 @@ public class Message {
   }
 
   public String buildMessage() {
-    return ""; // @todo using full spec
+    if (color != null) {
+      jsonObject.addProperty("color", color.toColorString());
+    }
+    jsonObject.addProperty("italic", italic);
+    jsonObject.addProperty("translate", translate.toString());
+    jsonObject.addProperty("using", using);
+    return getJson();
   }
 
   public String buildMessage(boolean old_style) {
