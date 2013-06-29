@@ -41,7 +41,7 @@ public class Messager {
     String builtMessage = build ? chat.buildMessage(message) : message;
 
     for (Player reciever : chat.getRecievers(server.playerList)) {
-      reciever.addMessage(new Message(builtMessage).buildMessage(true));
+      reciever.addMessage(builtMessage);
 
       if (!reciever.equals(chat.getSender())) {
         recieverCount++;

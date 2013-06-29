@@ -336,7 +336,7 @@ public class Player {
   }
 
   public void addMessage(String msg) {
-    messages.add(msg);
+    messages.add(new Message(msg).buildMessage(true));
   }
 
   public void addTMessage(Color color, String format, Object... args) {
@@ -598,7 +598,7 @@ public class Player {
   public void sendMOTD() {
     String[] lines = server.motd.getMOTD().split("\\r?\\n");
     for (String line : lines) {
-      addMessage(new Message(Color.WHITE + line).buildMessage(true));
+      addMessage(line);
     }
   }
 
