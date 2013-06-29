@@ -27,7 +27,7 @@ import simpleserver.Server;
 import simpleserver.util.RingCache;
 
 public class Messager {
-  private static final int MESSAGE_SIZE = 60;
+  private static final int MESSAGE_SIZE = 360;
 
   private Server server;
   private RingCache<String> forwardedMessages = new RingCache<String>(String.class, 10);
@@ -41,7 +41,7 @@ public class Messager {
     String builtMessage = build ? chat.buildMessage(message) : message;
 
     for (Player reciever : chat.getRecievers(server.playerList)) {
-      reciever.addMessage(builtMessage);
+      reciever.addMessage(new Message(builtMessage).buildMessage(true));
 
       if (!reciever.equals(chat.getSender())) {
         recieverCount++;
