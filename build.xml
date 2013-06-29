@@ -69,7 +69,7 @@
 			<zipfileset excludes="META-INF/**" src="lib/serializer.jar" />
 			<zipfileset excludes="META-INF/**" src="lib/xercesImpl.jar" />
 			<zipfileset excludes="META-INF/**" src="lib/bouncycastle.jar" />
-            <zipfileset excludes="META-INF/**" src="lib/gson-2.2.2.jar" />
+			<zipfileset excludes="META-INF/**" src="lib/gson-2.2.2.jar" />
 		</jar>
 	</target>
 
