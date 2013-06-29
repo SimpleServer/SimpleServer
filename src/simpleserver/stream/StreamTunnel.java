@@ -720,9 +720,14 @@ public class StreamTunnel {
       case 0x2c: // Entity Properties
         write(packetId);
         write(in.readInt());
-        write(in.readInt());
-        write(readUTF16());
-        write(in.readDouble());
+        int properties_count = in.readInt();
+        write(properties_count);
+
+        // loop for every property key/value pair
+        for (int i = 0; i < properties_count; i++) {
+          write(readUTF16());
+          write(in.readDouble());
+        }
         break;
       case 0x33: // Map Chunk
         write(packetId);
