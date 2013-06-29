@@ -18,46 +18,57 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package simpleserver;
+package simpleserver.message;
 
-public enum Color {
-  BLACK('0'),
-  DARK_BLUE('1'),
-  DARK_GREEN('2'),
-  DARK_CYAN('3'),
-  DARK_RED('4'),
-  PURPLE('5'),
-  GOLD('6'),
-  GRAY('7'),
-  DARK_GRAY('8'),
-  BLUE('9'),
-  GREEN('a'),
-  CYAN('b'),
-  RED('c'),
-  PINK('d'),
-  YELLOW('e'),
-  WHITE('f');
 
-  private char code;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
+import org.apache.commons.lang.StringUtils;
+import simpleserver.Color;
+import simpleserver.Translate;
 
-  Color(char code) {
-    this.code = code;
+
+public class Message {
+
+  // default to GRAY color and TEXT message
+  private Color color = Color.GRAY;
+  private Translate translate = Translate.TEXT;
+  private String using;
+
+  private boolean italic;
+
+  private Gson gson = new Gson();
+  private JsonObject jsonObject = new JsonObject();
+
+  public Message(Color color, Translate translate, String message) {
+    this.color = color;
+    this.translate = translate;
+    this.using = message;
   }
 
-  @Override
-  public String toString() {
-    return "\u00a7" + code;
+  public Message(String message) {
+    this.using = message;
   }
 
-  public String toColorString() {
-    // @todo test remaining colors if they work w/ MC
-    switch (code) {
-      case '0':
-        return "black";
-      case '1':
-        return "dark blue";
-      default:
-        return "white";
+  public void setItalic(boolean val) {
+    this.italic = val;
+  }
+
+  public String buildMessage() {
+    return ""; // @todo using full spec
+  }
+
+  public String buildMessage(boolean old_style) {
+    if (old_style) {
+      jsonObject.addProperty("text", StringUtils.trim(using));
+      return getJson();
+    }  else {
+      return buildMessage();
     }
+  }
+
+  private String getJson() {
+    return gson.toJson(jsonObject);
   }
 }

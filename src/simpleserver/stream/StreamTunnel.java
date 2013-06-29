@@ -58,7 +58,7 @@ public class StreamTunnel {
   private static final Pattern COLOR_PATTERN = Pattern.compile("\u00a7[0-9a-z]");
   private static final Pattern JOIN_PATTERN = Pattern.compile("\u00a7.((\\d|\\w|\\u00a7)*) (joined|left) the game.");
   private static final String CONSOLE_CHAT_PATTERN = "\\[Server:.*\\]";
-  private static final int MESSAGE_SIZE = 60;
+  private static final int MESSAGE_SIZE = 360;
   private static final int MAXIMUM_MESSAGE_SIZE = 119;
 
   private final boolean isServerTunnel;
@@ -1434,7 +1434,11 @@ public class StreamTunnel {
   private void sendMessage(String message) throws IOException {
     if (message.length() > 0) {
       if (message.length() > MESSAGE_SIZE) {
-        int end = MESSAGE_SIZE - 1;
+        // @todo can't split JSON output unless we retain the the struct
+        // since messages are different (format / design), we can't just
+        // keep hoooking message onto
+        // research new message max size.
+        int end = MESSAGE_SIZE - 3;
         while (end > 0 && message.charAt(end) != ' ') {
           end--;
         }

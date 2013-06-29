@@ -20,44 +20,20 @@
  */
 package simpleserver;
 
-public enum Color {
-  BLACK('0'),
-  DARK_BLUE('1'),
-  DARK_GREEN('2'),
-  DARK_CYAN('3'),
-  DARK_RED('4'),
-  PURPLE('5'),
-  GOLD('6'),
-  GRAY('7'),
-  DARK_GRAY('8'),
-  BLUE('9'),
-  GREEN('a'),
-  CYAN('b'),
-  RED('c'),
-  PINK('d'),
-  YELLOW('e'),
-  WHITE('f');
+public enum Translate {
+  ADMIN("chat.type.admin"),
+  ANNOUNCEMENT("chat.type.announcement"),
+  EMOTE("chat.type.emote"),
+  TEXT("chat.type.text");
 
-  private char code;
+  private String code;
 
-  Color(char code) {
+  Translate(String code) {
     this.code = code;
   }
 
   @Override
   public String toString() {
-    return "\u00a7" + code;
-  }
-
-  public String toColorString() {
-    // @todo test remaining colors if they work w/ MC
-    switch (code) {
-      case '0':
-        return "black";
-      case '1':
-        return "dark blue";
-      default:
-        return "white";
-    }
+    return code;
   }
 }

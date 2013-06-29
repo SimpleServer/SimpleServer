@@ -56,6 +56,7 @@ import simpleserver.config.xml.Permission;
 import simpleserver.message.AbstractChat;
 import simpleserver.message.Chat;
 import simpleserver.message.GlobalChat;
+import simpleserver.message.Message;
 import simpleserver.stream.Encryption;
 import simpleserver.stream.Encryption.ClientEncryption;
 import simpleserver.stream.Encryption.ServerEncryption;
@@ -597,7 +598,7 @@ public class Player {
   public void sendMOTD() {
     String[] lines = server.motd.getMOTD().split("\\r?\\n");
     for (String line : lines) {
-      addMessage(line);
+      addMessage(new Message(Color.WHITE + line).buildMessage(true));
     }
   }
 
