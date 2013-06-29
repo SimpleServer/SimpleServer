@@ -553,7 +553,7 @@ public class Server {
     adminLog = new AdminLog();
     errorLog = new ErrorLog();
     connectionLog = new ConnectionLog();
-  eventsLog = new EventsLog();
+    eventsLog = new EventsLog();
 
     commandParser = new CommandParser(options);
   }
@@ -563,7 +563,7 @@ public class Server {
     adminLog.stop();
     errorLog.stop();
     connectionLog.stop();
-	eventsLog.stop();
+	  eventsLog.stop();
     messageLog.stop();
     time.unfreeze();
     bots.cleanup();

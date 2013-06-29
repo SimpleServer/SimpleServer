@@ -32,7 +32,7 @@ public class EventsLog extends AbstractLog {
     CharArrayWriter charWriter = new CharArrayWriter();
     PrintWriter writer = new PrintWriter(charWriter);
   
-	writer.append(event + "\t" + message);
+	  writer.append(event + "\t" + message);
     super.addMessage(charWriter.toString());
 
     writer.close();
