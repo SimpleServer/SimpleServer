@@ -21,12 +21,15 @@
 package simpleserver.message;
 
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonObject;
+import com.google.gson.*;
+import com.google.gson.reflect.TypeToken;
+import com.google.gson.stream.MalformedJsonException;
 import org.apache.commons.lang.StringUtils;
 import simpleserver.Color;
 import simpleserver.Translate;
+
+import java.lang.reflect.Type;
+import java.util.Collection;
 
 
 public class Message {
@@ -48,6 +51,10 @@ public class Message {
 
   public Message(String message) {
     this.using = message;
+  }
+
+  public Message() {
+
   }
 
   public void setItalic(boolean val) {
@@ -73,7 +80,18 @@ public class Message {
     }
   }
 
+  public MessagePacket decodeMessage(String msg) {
+    MessagePacket messagePacket;
+    try {
+      messagePacket = gson.fromJson(msg, MessagePacket.class);
+    } catch (JsonParseException ex) {
+      messagePacket = null;
+    }
+    return messagePacket;
+  }
+
   private String getJson() {
     return gson.toJson(jsonObject);
   }
 }
+

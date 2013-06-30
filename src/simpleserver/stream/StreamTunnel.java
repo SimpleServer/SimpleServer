@@ -48,6 +48,8 @@ import simpleserver.Server;
 import simpleserver.command.PlayerListCommand;
 import simpleserver.config.data.Chests.Chest;
 import simpleserver.config.xml.Config.BlockPermission;
+import simpleserver.message.Message;
+import simpleserver.message.MessagePacket;
 
 public class StreamTunnel {
   private static final boolean EXPENSIVE_DEBUG_LOGGING = Boolean.getBoolean("EXPENSIVE_DEBUG_LOGGING");
@@ -232,63 +234,74 @@ public class StreamTunnel {
         break;
       case 0x03: // Chat Message
         String message = readUTF16();
+        MessagePacket messagePacket = new Message().decodeMessage(message);
 
-        Matcher joinMatcher = JOIN_PATTERN.matcher(message);
-        if (isServerTunnel && joinMatcher.find()) {
-          if (server.bots.ninja(joinMatcher.group(1))) {
-            break;
-          }
-          if (message.contains("join")) {
-            player.addTMessage(Color.YELLOW, "%s joined the game.", joinMatcher.group(1));
-          } else {
-            player.addTMessage(Color.YELLOW, "%s left the game.", joinMatcher.group(1));
-          }
-          break;
-        }
-        if (isServerTunnel && server.config.properties.getBoolean("useMsgFormats")) {
-          if (server.config.properties.getBoolean("forwardChat") && server.getMessager().wasForwarded(message)) {
-            break;
-          }
+        if (messagePacket == null) {
+          // we are raw text, handle as such
 
-          Matcher colorMatcher = COLOR_PATTERN.matcher(message);
-          String cleanMessage = colorMatcher.replaceAll("");
-
-          Matcher messageMatcher = MESSAGE_PATTERN.matcher(cleanMessage);
-          if (messageMatcher.find()) {
-
-          } else if (cleanMessage.matches(CONSOLE_CHAT_PATTERN) && !server.config.properties.getBoolean("chatConsoleToOps")) {
-            break;
-          }
-
-          if (server.config.properties.getBoolean("msgWrap")) {
-            sendMessage(message);
-          } else {
-            if (message.length() > MAXIMUM_MESSAGE_SIZE) {
-              message = message.substring(0, MAXIMUM_MESSAGE_SIZE);
-            }
-            write(packetId);
-            write(message);
-          }
-        } else if (!isServerTunnel) {
-
-          if (player.isMuted() && !message.startsWith("/")
-              && !message.startsWith("!")) {
-            player.addTMessage(Color.RED, "You are muted! You may not send messages to all players.");
-            break;
-          }
-
-          if (message.charAt(0) == commandPrefix) {
-            message = player.parseCommand(message, false);
-            if (message == null) {
+          if (isServerTunnel && server.config.properties.getBoolean("useMsgFormats")) {
+            if (server.config.properties.getBoolean("forwardChat") && server.getMessager().wasForwarded(message)) {
               break;
             }
-            write(packetId);
-            write(message);
-            return;
-          }
 
-          player.sendMessage(message);
+            Matcher colorMatcher = COLOR_PATTERN.matcher(message);
+            String cleanMessage = colorMatcher.replaceAll("");
+
+            Matcher messageMatcher = MESSAGE_PATTERN.matcher(cleanMessage);
+            if (messageMatcher.find()) {
+
+            } else if (cleanMessage.matches(CONSOLE_CHAT_PATTERN) && !server.config.properties.getBoolean("chatConsoleToOps")) {
+              break;
+            }
+
+            if (server.config.properties.getBoolean("msgWrap")) {
+              sendMessage(message);
+            } else {
+              if (message.length() > MAXIMUM_MESSAGE_SIZE) {
+                //message = message.substring(0, MAXIMUM_MESSAGE_SIZE);
+              }
+              write(packetId);
+              write(message);
+            }
+          } else if (!isServerTunnel) {
+
+            if (player.isMuted() && !message.startsWith("/")
+                    && !message.startsWith("!")) {
+              player.addTMessage(Color.RED, "You are muted! You may not send messages to all players.");
+              break;
+            }
+
+            if (message.charAt(0) == commandPrefix) {
+              message = player.parseCommand(message, false);
+              if (message == null) {
+                break;
+              }
+              write(packetId);
+              write(message);
+              return;
+            }
+
+            player.sendMessage(message);
+          }
+        } else {
+          // we have a json object
+          if (messagePacket.isJoinedPacket()) {
+            String username = messagePacket.getJoinedUsername();
+
+            if (isServerTunnel) {
+              if (server.bots.ninja(username)) {
+                break;
+              }
+              if (message.contains("join")) {
+                player.addTMessage(Color.YELLOW, "%s joined the game.", username);
+              } else {
+                player.addTMessage(Color.YELLOW, "%s left the game.", username);
+              }
+              break;
+            }
+          }
         }
+
         break;
 
       case 0x04: // Time Update
@@ -1433,43 +1446,15 @@ public class StreamTunnel {
 
   private void sendMessage(String message) throws IOException {
     if (message.length() > 0) {
-      if (message.length() > MESSAGE_SIZE) {
-        // @todo can't split JSON output unless we retain the the struct
-        // since messages are different (format / design), we can't just
-        // keep hoooking message onto
-        // research new message max size.
-        int end = MESSAGE_SIZE - 3;
-        while (end > 0 && message.charAt(end) != ' ') {
-          end--;
-        }
-        if (end == 0) {
-          end = MESSAGE_SIZE;
-        } else {
-          end++;
-        }
-
-        if (end > 0 && message.charAt(end) == '\u00a7') {
-          end--;
-        }
-
-        String firstPart = message.substring(0, end);
-        sendMessagePacket(firstPart);
-        sendMessage(getLastColorCode(firstPart) + message.substring(end));
-      } else {
-        int end = message.length();
-        if (message.charAt(end - 1) == '\u00a7') {
-          end--;
-        }
-        sendMessagePacket(message.substring(0, end));
+      int end = message.length();
+      if (message.charAt(end - 1) == '\u00a7') {
+        end--;
       }
+      sendMessagePacket(message.substring(0, end));
     }
   }
 
   private void sendMessagePacket(String message) throws IOException {
-    if (message.length() > MESSAGE_SIZE) {
-      println("Invalid message size: " + message);
-      return;
-    }
     if (message.length() > 0) {
       write((byte) 0x03);
       write(message);
