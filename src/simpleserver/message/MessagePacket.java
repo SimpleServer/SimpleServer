@@ -33,16 +33,27 @@ public class MessagePacket {
 
   }
 
+  private boolean isJson() {
+    if (using == null && translate == null) {
+      return false;
+    }
+    return true;
+  }
+
   public boolean isJoinedPacket() {
-    if (translate.equalsIgnoreCase("multiplayer.player.joined")) {
-      return true;
+    if (isJson()) {
+      if (translate.equalsIgnoreCase("multiplayer.player.joined")) {
+        return true;
+      }
     }
     return false;
   }
 
   public String getJoinedUsername() {
-    if (isJoinedPacket()) {
-      return using[0].toString();
+    if (isJson()) {
+      if (isJoinedPacket()) {
+        return using[0].toString();
+      }
     }
     return "";
   }
