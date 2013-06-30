@@ -297,9 +297,9 @@ public class Bot {
         readNBytes(5);
         break;
       case 0x13: // Entity Action
-        in.readFloat();
-        in.readShort();
-        in.readFloat();
+        in.readInt();
+        in.readByte();
+        in.readInt();
         break;
       case 0x14: // Named Entity Spawn
         in.readInt();
@@ -417,8 +417,13 @@ public class Bot {
         break;
       case 0x2c: // Entity Properties
         in.readInt();
-        in.readInt();
-        readUTF16();
+        int properties_count = in.readInt();
+
+        // loop for every property key/value pair
+        for (int i = 0; i < properties_count; i++) {
+          readUTF16();
+          in.readDouble();
+        }
         in.readDouble();
         break;
       case 0x33: // Map Chunk
@@ -485,11 +490,13 @@ public class Bot {
         break;
       case 0x64: // Open Window
         in.readByte();
-        in.readByte();
+        byte invtype = in.readByte();
         readUTF16();
         in.readByte();
         in.readBoolean();
-        in.readInt();
+        if (invtype == 11) {
+          in.readInt();
+        }
         break;
       case 0x65: // Close Window
         in.readByte();

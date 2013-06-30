@@ -724,7 +724,6 @@ public class StreamTunnel {
       case 0x2a: // Remove Entity Effect
         write(packetId);
         write(in.readInt());
-        write(in.readByte());
         break;
       case 0x2b: // Experience
         write(packetId);
