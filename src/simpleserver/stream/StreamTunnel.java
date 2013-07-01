@@ -299,6 +299,9 @@ public class StreamTunnel {
               }
               break;
             }
+          } else {
+            write(packetId);
+            write(message);
           }
         }
 

@@ -42,7 +42,7 @@ public class MessagePacket {
 
   public boolean isJoinedPacket() {
     if (isJson()) {
-      if (translate.equalsIgnoreCase("multiplayer.player.joined")) {
+      if (translate.equalsIgnoreCase("multiplayer.player.joined") || translate.equalsIgnoreCase("multiplayer.player.left")) {
         return true;
       }
     }
