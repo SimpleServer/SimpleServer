@@ -1003,8 +1003,12 @@ public class StreamTunnel {
         write(in.readInt());
         break;
       case (byte) 0xc9: // Player List Item
+        String username = readUTF16();
+        if (server.bots.ninja(username)) {
+          break;
+        }
         write(packetId);
-        write(readUTF16());
+        write(username);
         write(in.readByte());
         write(in.readShort());
         break;
