@@ -124,7 +124,7 @@
 	<command name="save" allow="4+">
 		<forward />
 	</command>
-    <command name="scoreboard" allow="0+">
+    <command name="scoreboard" allow="4+">
         <forward />
     </command>
 	<command name="servertime" allow="0+" />
