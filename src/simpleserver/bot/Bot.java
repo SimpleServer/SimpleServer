@@ -418,13 +418,24 @@ public class Bot {
       case 0x2c: // Entity Properties
         in.readInt();
         int properties_count = in.readInt();
+        short list_length = 0;
 
         // loop for every property key/value pair
         for (int i = 0; i < properties_count; i++) {
           readUTF16();
           in.readDouble();
+          list_length = in.readShort();
+
+          // loop for list_length
+          if (list_length > 0) {
+            for (int k = 0; k < list_length; k++) {
+              in.readLong();
+              in.readLong();
+              in.readDouble();
+              in.readByte();
+            }
+          }
         }
-        in.readDouble();
         break;
       case 0x33: // Map Chunk
         readNBytes(13);
@@ -562,6 +573,12 @@ public class Bot {
         if (nbtLenght > 0) {
           readNBytes(nbtLenght);
         }
+        break;
+      case (byte) 0x85: // Sign Placement
+        in.readByte();
+        in.readInt();
+        in.readInt();
+        in.readInt();
         break;
       case (byte) 0xc8: // Increment Statistic
         in.readInt();

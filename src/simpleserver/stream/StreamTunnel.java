@@ -736,12 +736,25 @@ public class StreamTunnel {
         write(packetId);
         write(in.readInt());
         int properties_count = in.readInt();
+        short list_length = 0;
         write(properties_count);
 
         // loop for every property key/value pair
         for (int i = 0; i < properties_count; i++) {
           write(readUTF16());
           write(in.readDouble());
+
+          // grab list elements
+          list_length = in.readShort();
+          write(list_length);
+          if (list_length > 0) {
+            for (int k = 0; k < list_length; k++) {
+              write(in.readLong());
+              write(in.readLong());
+              write(in.readDouble());
+              write(in.readByte());
+            }
+          }
         }
         break;
       case 0x33: // Map Chunk
@@ -991,6 +1004,13 @@ public class StreamTunnel {
         if (nbtLength > 0) {
           copyNBytes(nbtLength);
         }
+        break;
+      case (byte) 0x85: // Unknown (Signs?)
+        write(packetId);
+        write(in.readByte());
+        write(in.readInt());
+        write(in.readInt());
+        write(in.readInt());
         break;
       case (byte) 0xc3: // BukkitContrib
         write(packetId);
