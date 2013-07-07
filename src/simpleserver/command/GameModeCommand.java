@@ -54,7 +54,7 @@ public class GameModeCommand extends AbstractCommand implements PlayerCommand {
       return;
     }
 
-    if (gameMode != 0 && gameMode != 1) {
+    if (gameMode != 0 && gameMode != 1 && gameMode != 2) {
       player.addTMessage(Color.RED, "Invalid gameMode %d!", gameMode);
       return;
     }
