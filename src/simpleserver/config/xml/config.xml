@@ -107,6 +107,9 @@
 	<command name="mute" allow="3+" />
 	<command name="myarea" allow="2+" />
 	<command name="mystats" allow="1+" />
+    <command name="playsound" allow="4,5">
+        <foward />
+    </command>
 	<command name="register" allow="1+">
 		<alias>passwd</alias>
 	</command>
@@ -132,6 +135,9 @@
 	<command name="setipgroup" allow="4+" />
 	<command name="setopt" allow="5+" />
 	<command name="spawn" allow="3+" />
+    <command name="spreadplayers" allow="4,5">
+        <forward />
+    </command>
 	<command name="stop" allow="-" />
 	<command name="teleport" allow="4+">
 		<alias>tp</alias>
