@@ -394,7 +394,7 @@ public class Bot {
       case 0x27: // Attach Entity
         in.readInt();
         in.readInt();
-        in.readInt();
+        in.readBoolean();
         break;
       case 0x28: // Entity Metadata
         in.readInt();

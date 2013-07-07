@@ -709,7 +709,7 @@ public class StreamTunnel {
         write(packetId);
         write(in.readInt());
         write(in.readInt());
-        write(in.readInt());
+        write(in.readBoolean());
         break;
       case 0x28: // Entity Metadata
         write(packetId);
