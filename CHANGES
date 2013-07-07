@@ -3,6 +3,10 @@
  * Updated to Minecraft 1.6.2
  * Fixed "teleporter" commands showing in chat
  * Fixed /scoreboard command not working
+ * Added support for /spreadplayers
+ * Added support for /gamerule
+ * Added support for /playsound
+ * Fixed not being able to set gameMode to adventure
  * Added support for dedicated events logfile
  * Updated chat to new JSON format
 

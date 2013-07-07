@@ -74,6 +74,7 @@ accessible commands.
   /enchant [ITEM | add ID:LEVEL | give | remove ID] -- Spawns enchanted items
     Alias: /e
   /gamemode [PLAYER] MODE -- Set gamemode for a specific player
+  /gamerule RULE MODE -- Enable/Disable specific gamerules
   /give ITEM[:DAMAGE] [AMOUNT] -- Spawn items for yourself
   /giveplayer PLAYER ITEM [AMOUNT] -- Spawn items for another player
   /global MESSAGE -- Send a chat message to all players
@@ -99,6 +100,7 @@ accessible commands.
   /myarea [start|end|save|unsave|rename] -- Manage your personal area
   /mystats -- Display your statistics
   /ok PLAYER -- Agree to a visit request
+  /playsound SOUND PLAYER -- Plays sound file for player
   /rcon COMMAND ARGUMENTS... -- Execute a command on the server console
   /read DOCUMENT -- Display a specified text document
   /register [OLD PASSWORD] NEW_PASSWORD NEW_PASSWORD -- Set or change password for Custom Authentication
@@ -114,6 +116,7 @@ accessible commands.
   /setgroup PLAYER GROUP -- Set the group ID of the named player
   /setipgroup IP|Player -- Set the group ID of an IP address
   /spawn -- Teleport to spawn
+  /spreadplayers -- Spreads players apart
   /stop -- Shutdown the entire server
   /teleport PLAYER1 PLAYER2 -- Teleport the first player to the second
     Alias: /tp
