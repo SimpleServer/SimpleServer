@@ -108,7 +108,7 @@
 	<command name="myarea" allow="2+" />
 	<command name="mystats" allow="1+" />
     <command name="playsound" allow="4,5">
-        <foward />
+        <forward />
     </command>
 	<command name="register" allow="1+">
 		<alias>passwd</alias>
