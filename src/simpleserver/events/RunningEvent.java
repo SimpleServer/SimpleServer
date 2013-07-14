@@ -139,14 +139,12 @@ class RunningEvent extends Thread implements Runnable {
         continue;
       } else if (cmd.equals("print") && tokens.size() > 0) {
         System.out.println("L" + String.valueOf(currline) + "@" + event.name + " msg: " + tokens.get(0));
-      } 
-      else if (cmd.equals("log") && tokens.size() >  0){
-		server.eventsLog(event.name + " @L" + String.valueOf(currline),tokens.get(0));
-	  }
-	    else if (cmd.equals("logprint") && tokens.size() > 0){
-		server.eventsLog(event.name + " @L" + String.valueOf(currline),tokens.get(0));
-        System.out.println("L" + String.valueOf(currline) + "@" + event.name + " msg: " + tokens.get(0));		
-	  } else if (cmd.equals("sleep") && tokens.size() > 0) {
+      } else if (cmd.equals("log") && tokens.size() >  0){
+        server.eventsLog(event.name + " @L" + String.valueOf(currline),tokens.get(0));
+      } else if (cmd.equals("logprint") && tokens.size() > 0){
+        server.eventsLog(event.name + " @L" + String.valueOf(currline),tokens.get(0));
+        System.out.println("L" + String.valueOf(currline) + "@" + event.name + " msg: " + tokens.get(0));
+      } else if (cmd.equals("sleep") && tokens.size() > 0) {
         try {
           Thread.sleep(Integer.valueOf(tokens.get(0)));
         } catch (InterruptedException e) {
