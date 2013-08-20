@@ -96,7 +96,7 @@ public class MessageHandler {
     if (ignoreLine()) {
       return;
     }
-    if (line.contains("[INFO] Done (") || line.contains("[INFO] [Minecraft] Done (")) {
+    if (line.contains("[INFO] Done (") || line.contains("[INFO] [Minecraft-Server] Done (")) {
       synchronized (this) {
         loaded = true;
         notifyAll();
