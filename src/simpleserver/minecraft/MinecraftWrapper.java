@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.jar.JarFile;
 import java.util.zip.ZipFile;
 
+import com.google.gson.*;
 import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.client.ClientProtocolException;
@@ -50,7 +51,7 @@ import simpleserver.options.Options;
 import simpleserver.thread.SystemInputQueue;
 
 public class MinecraftWrapper {
-  private static final String DOWNLOAD_URL = "http://www.minecraft.net/download/minecraft_server.jar";
+  private static final String VERSIONS_URL = "http://s3.amazonaws.com/Minecraft.Download/versions/versions.json";
   private static final String COMMAND_FORMAT = "java %s -jar %s %s nogui";
   private static final String COMMAND_FORMAT_PLUGINS = "java %s -cp %s %s %s nogui";
   private static final String MEMORY_FORMAT = "-Xmx%sM -Xms%sM";
@@ -83,13 +84,12 @@ public class MinecraftWrapper {
       return true;
     }
 
-    println("Downloading " + SERVER_JAR
-        + ".  Please wait!");
+    println("Finding current version.  Please wait!");
 
     HttpClient httpclient = new DefaultHttpClient();
     String responseBody;
     try {
-      HttpGet httpget = new HttpGet(DOWNLOAD_URL);
+      HttpGet httpget = new HttpGet(VERSIONS_URL);
       ResponseHandler<String> responseHandler = new BasicResponseHandler();
 
       try {
@@ -103,6 +103,37 @@ public class MinecraftWrapper {
       }
     } finally {
       httpclient.getConnectionManager().shutdown();
+    }
+
+    // download version metadata to find current
+    Gson gson = new Gson();
+    Versions versions = gson.fromJson(responseBody, Versions.class);
+
+    if (versions.latest.release != null) {
+      String current = versions.latest.release.toString();
+      String download_url = "https://s3.amazonaws.com/Minecraft.Download/versions/" + current + "/minecraft_server." + current + ".jar";
+
+      println("Downloading " + current + ".  Please wait!");
+      httpclient = new DefaultHttpClient();
+      try {
+        HttpGet httpget = new HttpGet(download_url);
+        ResponseHandler<String> responseHandler = new BasicResponseHandler();
+
+        try {
+          responseBody = httpclient.execute(httpget, responseHandler);
+        } catch (ClientProtocolException e) {
+          autodownloadError(e, "download");
+          return false;
+        } catch (IOException e) {
+          autodownloadError(e, "download");
+          return false;
+        }
+      } finally {
+        httpclient.getConnectionManager().shutdown();
+      }
+    } else {
+      println(VERSIONS_URL + " could not be decoded!");
+      return false;
     }
 
     OutputStream outputFile;
