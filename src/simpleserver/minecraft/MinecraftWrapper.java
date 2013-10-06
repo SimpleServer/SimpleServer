@@ -110,7 +110,7 @@ public class MinecraftWrapper {
     Versions versions = gson.fromJson(responseBody, Versions.class);
 
     if (versions.latest.release != null) {
-      String current = versions.latest.release.toString();
+      String current = versions.latest.release;
       String download_url = "https://s3.amazonaws.com/Minecraft.Download/versions/" + current + "/minecraft_server." + current + ".jar";
 
       println("Downloading " + current + ".  Please wait!");
