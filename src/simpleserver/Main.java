@@ -30,11 +30,11 @@ import java.io.InputStreamReader;
 public class Main {
   private static final String license = "SimpleServer -- Copyright (C) 2011 SimpleServer authors (see CONTRIBUTORS)";
   private static final String warranty = "This program is licensed under The MIT License.\nSee file LICENSE for details.";
-  private static final String baseVersion = "8.4.11";
+  private static final String baseVersion = "8.4.12";
   private static final boolean release = false;
   private static final String releaseState = "release";
-  public static final int protocolVersion = 1;
-  public static final String minecraftVersion = "1.6.4";
+  public static final int protocolVersion = 4;
+  public static final String minecraftVersion = "1.7.2";
   public static final String version;
 
   static {
