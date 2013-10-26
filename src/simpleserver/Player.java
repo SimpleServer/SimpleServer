@@ -172,11 +172,8 @@ public class Player {
 
     watchdog = new Watchdog();
     try {
-      serverToClient = new StreamTunnel(intsocket.getInputStream(),
-                                        extsocket.getOutputStream(), true, this);
-      clientToServer = new StreamTunnel(extsocket.getInputStream(),
-                                        intsocket.getOutputStream(), false,
-                                        this);
+      serverToClient = new StreamTunnel(intsocket.getInputStream(), extsocket.getOutputStream(), true, this);
+      clientToServer = new StreamTunnel(extsocket.getInputStream(), intsocket.getOutputStream(), false, this);
     } catch (IOException e) {
       e.printStackTrace();
       cleanup();
