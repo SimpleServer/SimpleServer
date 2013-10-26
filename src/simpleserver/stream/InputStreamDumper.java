@@ -154,22 +154,6 @@ public class InputStreamDumper extends FilterInputStream implements DataInput,
     return newString;
   }
 
-  public int readVarInt() throws IOException {
-    byte[] byteArray = new byte[10];
-    int value = 0;
-    int i = 0;
-    int b;
-
-    while (((b = in.readByte()) & 0x80) != 0) {
-      value |= (b & 0x7F) << i;
-      i += 7;
-      if (i > 35) {
-        throw new IllegalArgumentException("Variable length too long");
-      }
-    }
-    return value | (b << i);
-  }
-
   public int skipBytes(int n) throws IOException {
     return in.skipBytes(n);
   }

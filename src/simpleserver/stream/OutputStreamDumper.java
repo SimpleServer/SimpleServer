@@ -151,21 +151,4 @@ public class OutputStreamDumper extends FilterOutputStream implements
     out.writeUTF(s);
     dump.write(s + "\n");
   }
-
-  public void writeVarInt(int value) throws IOException {
-    byte[] byteArray = new byte[10];
-    int i = 0;
-
-    while ((value & 0xFFFFFF80) != 0L) {
-      byteArray[i++] = ((byte) ((value & 0x7F) | 0x80));
-      value >>>= 7;
-    }
-    byteArray[i] = ((byte) (value & 0x7F));
-    byte[] leave = new byte[i + 1];
-    for (; i>= 0; i--) {
-      leave[i] = byteArray[i];
-    }
-
-    out.write(leave, 0, leave.length);
-  }
 }
