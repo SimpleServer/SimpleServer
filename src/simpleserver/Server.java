@@ -762,6 +762,14 @@ public class Server {
     }
   }
 
+  public String getServerIp() {
+    return socket.getInetAddress().getHostAddress();
+  }
+
+  public int getServerPort() {
+    return socket.getLocalPort();
+  }
+
   public void setTime(long time) {
     this.time.is(time);
   }
