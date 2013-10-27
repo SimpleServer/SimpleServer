@@ -914,7 +914,7 @@ public class StreamTunnel {
         case 0x23: // Block Change
           add(packetId);
           x = incoming.getInt();
-          y = (byte) incoming.getShort();
+          y = (byte) readUnsignedByte();
           z = incoming.getInt();
           int blockType = decodeVarInt();
           byte metadata = (byte) readUnsignedByte();
@@ -931,6 +931,206 @@ public class StreamTunnel {
           add(z);
           add(blockType);
           add(metadata);
+          break;
+
+        case 0x24: // Block Action
+          add(packetId);
+          add(incoming.getInt());
+          add(incoming.getShort());
+          add(incoming.getInt());
+          copyUnsignedByte();
+          copyUnsignedByte();
+          copyVarInt();
+          break;
+
+        case 0x25: // Block Break Animation
+          add(packetId);
+          copyVarInt();
+          add(incoming.getInt());
+          add(incoming.getInt());
+          add(incoming.getInt());
+          add(incoming.get());
+          break;
+
+        case 0x26: // Map Chunk Bulk
+          add(packetId);
+          short chunkCount = incoming.getShort();
+          int dataLength = incoming.getInt();
+          add(chunkCount);
+          add(dataLength);
+          add(incoming.get());
+          copyNBytes(chunkCount * 12 + dataLength);
+          break;
+
+        case 0x27: // Explosion
+          add(packetId);
+          add(incoming.getFloat());
+          add(incoming.getFloat());
+          add(incoming.getFloat());
+          int recordCount = incoming.getInt();
+          add(recordCount);
+          copyNBytes(recordCount * 3);
+          add(incoming.getFloat());
+          add(incoming.getFloat());
+          add(incoming.getFloat());
+          break;
+
+        case 0x28: // Effect
+          add(packetId);
+          add(incoming.getInt());
+          add(incoming.getInt());
+          add(incoming.get());
+          add(incoming.getInt());
+          add(incoming.getInt());
+          add(incoming.get());
+          break;
+
+        case 0x29: // Sound Effect
+          add(packetId);
+          add(readUTF8());
+          add(incoming.getInt());
+          add(incoming.getInt());
+          add(incoming.getInt());
+          add(incoming.getFloat());
+          copyUnsignedByte();
+          break;
+
+        case 0x2A: // Particle
+          add(packetId);
+          add(readUTF8());
+          add(incoming.getFloat());
+          add(incoming.getFloat());
+          add(incoming.getFloat());
+          add(incoming.getFloat());
+          add(incoming.getFloat());
+          add(incoming.getFloat());
+          add(incoming.getFloat());
+          add(incoming.getInt());
+          break;
+
+        case 0x2B: // Change Game State
+          add(packetId);
+          copyUnsignedByte();
+          add(incoming.getFloat());
+          break;
+
+        case 0x2C: // Spawn Global Entity
+          add(packetId);
+          copyVarInt();
+          add(incoming.get());
+          add(incoming.getInt());
+          add(incoming.getInt());
+          add(incoming.getInt());
+          break;
+
+        case 0x2D: // Open Window
+          boolean allow = true;
+          byte id = incoming.get();
+          byte invtype = incoming.get();
+          String title = readUTF8();
+          byte number = incoming.get();
+          byte provided = incoming.get();
+          int unknown = 0;
+          if (invtype == 11) {
+            unknown = incoming.getInt();
+          }
+          if (invtype == 0) {
+            Chest adjacent = server.data.chests.adjacentChest(player.openedChest());
+            if (!server.data.chests.isChest(player.openedChest())) {
+              if (adjacent == null) {
+                server.data.chests.addOpenChest(player.openedChest());
+              } else {
+                server.data.chests.giveLock(adjacent.owner, player.openedChest(), adjacent.name);
+              }
+              server.data.save();
+            }
+            if (!player.getGroup().ignoreAreas && (!server.config.blockPermission(player, player.openedChest()).chest || (adjacent != null && !server.config.blockPermission(player, adjacent.coordinate).chest))) {
+              player.addTMessage(Color.RED, "You can't use chests here");
+              allow = false;
+            } else if (server.data.chests.canOpen(player, player.openedChest()) || player.ignoresChestLocks()) {
+              if (server.data.chests.isLocked(player.openedChest())) {
+                if (player.isAttemptingUnlock()) {
+                  server.data.chests.unlock(player.openedChest());
+                  server.data.save();
+                  player.setAttemptedAction(null);
+                  player.addTMessage(Color.RED, "This chest is no longer locked!");
+                  title = t("Open Chest");
+                } else {
+                  title = server.data.chests.chestName(player.openedChest());
+                }
+              } else {
+                title = t("Open Chest");
+                if (player.isAttemptLock()) {
+                  lockChest(player.openedChest());
+                  title = (player.nextChestName() == null) ? t("Locked Chest") : player.nextChestName();
+                }
+              }
+
+            } else {
+              player.addTMessage(Color.RED, "This chest is locked!");
+              allow = false;
+            }
+          }
+          if (!allow) {
+            add((byte) 0x2E);
+            add(id);
+          } else {
+            add(packetId);
+            add(id);
+            add(invtype);
+            add(title);
+            add(number);
+            add(provided);
+            if (invtype == 11) {
+              add(unknown);
+            }
+          }
+          break;
+
+        case 0x2E: // Close Window
+          add(packetId);
+          copyUnsignedByte();
+          break;
+
+        case 0x2F: // Set Slot
+          add(packetId);
+          copyUnsignedByte();
+          add(incoming.getShort());
+          copyItem();
+          break;
+
+        case 0x30: // Window Items
+          add(packetId);
+          copyUnsignedByte();
+          short count = add(incoming.getShort());
+          for (int c = 0; c < count; ++c) {
+            copyItem();
+          }
+          break;
+
+        case 0x31: // Window Property
+          add(packetId);
+          copyUnsignedByte();
+          add(incoming.getShort());
+          add(incoming.getShort());
+          break;
+
+        case 0x32: // Confirm Transaction
+          add(packetId);
+          copyUnsignedByte();
+          add(incoming.getShort());
+          add(incoming.get());
+          break;
+
+        case 0x33: // Update Sign
+          add(packetId);
+          add(incoming.getInt());
+          add(incoming.getShort());
+          add(incoming.getInt());
+          add(readUTF8());
+          add(readUTF8());
+          add(readUTF8());
+          add(readUTF8());
           break;
 
         case 0x3F: // Plugin Message
