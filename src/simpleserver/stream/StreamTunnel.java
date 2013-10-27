@@ -375,7 +375,8 @@ public class StreamTunnel {
         case 0x06: // Update Health / Player Position & Look
           add(packetId);
           if (isServerTunnel) {
-            add(incoming.getFloat());
+            player.updateHealth(add(incoming.getFloat()));
+            player.getHealth();
             add(incoming.getShort());
             add(incoming.getFloat());
           } else {
@@ -862,9 +863,7 @@ public class StreamTunnel {
 
         case 0x1F: // Set Experience
           add(packetId);
-          add(incoming.getFloat());
-          add(incoming.getShort());
-          add(incoming.getShort());
+          player.updateExperience(add(incoming.getFloat()),add(incoming.getShort()),add(incoming.getShort()));
           break;
 
         case 0x20: // Entity Properties
@@ -1133,11 +1132,117 @@ public class StreamTunnel {
           add(readUTF8());
           break;
 
+        case 0x34: // Maps
+          add(packetId);
+          copyVarInt();
+          copyNBytes(add(incoming.getShort()));
+          break;
+
+        case 0x35: // Update Block Entity
+          add(packetId);
+          add(incoming.getInt());
+          add(incoming.getShort());
+          add(incoming.getInt());
+          copyUnsignedByte();
+          short len = incoming.getShort();
+          add(len);
+          if (len > 0) {
+            copyNBytes(len);
+          }
+          break;
+
+        case 0x36: // Sign Editor Open
+          add(packetId);
+          add(incoming.getInt());
+          add(incoming.getInt());
+          add(incoming.getInt());
+          break;
+
+        case 0x37: // Statistics
+          add(packetId);
+          copyVarInt();
+          add(readUTF8());
+          copyVarInt();
+          break;
+
+        case 0x38: // Player List Item
+          add(packetId);
+          add(readUTF8());
+          add(incoming.get());
+          add(incoming.getShort());
+          break;
+
+        case 0x39: // Player Abilities
+          add(packetId);
+          add(incoming.get());
+          add(incoming.getFloat());
+          add(incoming.getFloat());
+          break;
+
+        case 0x3A: // Tab-Complete
+          add(packetId);
+          copyVarInt();
+          add(readUTF8());
+          break;
+
+        case 0x3B: // Scoreboard Objective
+          add(packetId);
+          add(readUTF8());
+          add(readUTF8());
+          add(incoming.get());
+          break;
+
+        case 0x3C: // Update Score
+          add(packetId);
+          add(readUTF8());
+          add(incoming.get());
+          add(readUTF8());
+          add(incoming.get());
+          break;
+
+        case 0x3D: // Display Scoreboard
+          add(packetId);
+          add(incoming.get());
+          add(readUTF8());
+          break;
+
+        case 0x3E: // Teams
+          add(packetId);
+          add(readUTF8());
+          byte mode = incoming.get();
+          short playerCount = -1;
+          add(mode);
+
+          if (mode == 0 || mode == 2) {
+            write(readUTF8()); // team display name
+            write(readUTF8()); // team prefix
+            write(readUTF8()); // team suffix
+            write(incoming.get()); // friendly fire
+          }
+
+          // only ran if 0,3,4
+          if (mode == 0 || mode == 3 || mode == 4) {
+            playerCount = incoming.getShort();
+            write(playerCount);
+
+            if (playerCount != -1) {
+              for (int i = 0; i < playerCount; i++) {
+                write(readUTF8());
+              }
+            }
+          }
+          break;
+
         case 0x3F: // Plugin Message
           add(packetId);
           add(readUTF8());
           short size = incoming.getShort();
           copyNBytes(size);
+          break;
+
+        case 0x40: // Disconnect
+          add(packetId);
+          add(readUTF8());
           break;
       }
 
@@ -1490,21 +1595,11 @@ public class StreamTunnel {
   }
 
   private void kick(String reason) throws IOException {
-    write((byte) 0xff);
+    write((byte) 0x40);
     write(reason);
     packetFinished();
   }
-//
-//  private String getLastColorCode(String message) {
-//    String colorCode = "";
-//    int lastIndex = message.lastIndexOf('\u00a7');
-//    if (lastIndex != -1 && lastIndex + 1 < message.length()) {
-//      colorCode = message.substring(lastIndex, lastIndex + 2);
-//    }
-//
-//    return colorCode;
-//  }
-//
+
   private void sendMessage(String message) throws IOException {
     if (message.length() > 0) {
       int end = message.length();
@@ -1517,7 +1612,7 @@ public class StreamTunnel {
 
   private void sendMessagePacket(String message) throws IOException {
     if (message.length() > 0) {
-      write((byte) 0x03);
+      write((byte) 0x01);
       write(message);
       packetFinished();
     }
