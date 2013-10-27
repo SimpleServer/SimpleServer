@@ -675,6 +675,57 @@ public class StreamTunnel {
           }
           break;
 
+        case 0x0F: // Confirm Transaction / Spawn Mob
+          add(packetId);
+          if (isServerTunnel) {
+            add(incoming.get());
+            add(incoming.getShort());
+            add(incoming.get());
+          } else {
+            copyVarInt();
+            copyUnsignedByte();
+            add(incoming.getInt());
+            add(incoming.getInt());
+            add(incoming.getInt());
+            add(incoming.get());
+            add(incoming.get());
+            add(incoming.get());
+            add(incoming.getShort());
+            add(incoming.getShort());
+            add(incoming.getShort());
+            copyEntityMetadata();
+          }
+          break;
+
+        case 0x10: // Creative Inventory Action / Spawn Painting
+          add(packetId);
+          if (isServerTunnel) {
+            add(incoming.getShort());
+            copyItem();
+          } else {
+            copyVarInt();
+            add(readUTF8());
+            add(incoming.getInt());
+            add(incoming.getInt());
+            add(incoming.getInt());
+            add(incoming.getInt());
+          }
+          break;
+
+        case 0x11: // Enchant Item / Spawn Experience Orb
+          add(packetId);
+          if (isServerTunnel) {
+            add(incoming.get());
+            add(incoming.get());
+          } else {
+            copyVarInt();
+            add(incoming.getInt());
+            add(incoming.getInt());
+            add(incoming.getInt());
+            add(incoming.getShort());
+          }
+          break;
+
         case 0x3F: // Plugin Message
           add(packetId);
           add(readUTF8());
