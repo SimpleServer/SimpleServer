@@ -178,7 +178,7 @@ public class StreamTunnel {
             add(packetId);
 
             if (isServerTunnel) {
-              add(readUTF8());
+              add(readUTF8()); // @todo handle changing of max-player, server name, etc.
             }
             break;
 
@@ -189,8 +189,111 @@ public class StreamTunnel {
       }
 
     } else if (state == STATE_LOGIN) {
-      // @todo add login packets
+      switch(packetId) {
+        case 0x00: // Disconnect / Login Start
+          add(packetId);
+          add(readUTF8());
+          break;
 
+        case 0x01: // Encryption Request / Response
+          if (isServerTunnel) {
+            add(packetId);
+            tunneler.setName(streamType + "-" + player.getUuid());
+            String serverId = readUTF8();
+            if (!server.authenticator.useCustAuth(player)) {
+              serverId = "-";
+            } else {
+              serverId = player.getConnectionHash();
+            }
+            add(serverId);
+            byte[] keyBytes = new byte[outgoing.getShort()];
+            outgoing.put(keyBytes);
+
+            byte[] challengeToken = new byte[outgoing.getShort()];
+            outgoing.put(challengeToken);
+
+            player.serverEncryption.setPublicKey(keyBytes);
+            byte[] key = player.clientEncryption.getPublicKey();
+            add((short) key.length);
+            add(key);
+            add((short) challengeToken.length);
+            add(challengeToken);
+            player.serverEncryption.setChallengeToken(challengeToken);
+            player.clientEncryption.setChallengeToken(challengeToken);
+          } else {
+            byte[] sharedKey = new byte[outgoing.getShort()];
+            outgoing.put(sharedKey);
+            byte[] challengeTokenResponse = new byte[outgoing.getShort()];
+            outgoing.put(challengeTokenResponse);
+
+            if (!player.clientEncryption.checkChallengeToken(challengeTokenResponse)) {
+              player.kick("Invalid client response");
+              break;
+            }
+            player.clientEncryption.setEncryptedSharedKey(sharedKey);
+            sharedKey = player.serverEncryption.getEncryptedSharedKey();
+
+            if (server.authenticator.useCustAuth(player)
+                    && !server.authenticator.onlineAuthenticate(player)) {
+              player.kick(t("%s Failed to login: User not premium", "[CustAuth]"));
+              break;
+            }
+            add(packetId);
+            add((short) sharedKey.length);
+            add(sharedKey);
+            challengeTokenResponse = player.serverEncryption.encryptChallengeToken();
+            add((short) challengeTokenResponse.length);
+            add(challengeTokenResponse);
+            in = new DataInputStream(new BufferedInputStream(player.clientEncryption.encryptedInputStream(inputStream)));
+            out = new DataOutputStream(new BufferedOutputStream(player.serverEncryption.encryptedOutputStream(outputStream)));
+          }
+          break;
+
+        case 0x02: // Login Success
+          add(packetId);
+          String uuid = readUTF8();
+          String name = readUTF8();
+
+          boolean nameSet = false;
+
+          if (name.contains(";")) {
+            name = name.substring(0, name.indexOf(";"));
+          }
+          if (name.equals("Player") || !server.authenticator.isMinecraftUp) {
+            AuthRequest req = server.authenticator.getAuthRequest(player.getIPAddress());
+            if (req != null) {
+              name = req.playerName;
+              nameSet = server.authenticator.completeLogin(req, player);
+            }
+            if (req == null || !nameSet) {
+              if (!name.equals("Player")) {
+                player.addTMessage(Color.RED, "Login verification failed.");
+                player.addTMessage(Color.RED, "You were logged in as guest.");
+              }
+              name = server.authenticator.getFreeGuestName();
+              player.setGuest(true);
+              nameSet = player.setName(name);
+            }
+          } else {
+            nameSet = player.setName(name);
+            if (nameSet) {
+              player.updateRealName(name);
+            }
+          }
+
+          if (player.isGuest() && !server.authenticator.allowGuestJoin()) {
+            player.kick(t("Failed to login: User not authenticated"));
+            nameSet = false;
+          }
+
+          tunneler.setName(streamType + "-" + player.getName());
+          player.setUuid(uuid);
+          player.setState(3);
+          add(uuid);
+          add(player.getName());
+          break;
+
+      }
     } else if (state == STATE_PLAY) {
       // @todo add play packets
 
@@ -538,9 +641,12 @@ public class StreamTunnel {
     int size = outgoing.position();
     outgoing.limit(size);
     outgoing.rewind();
+    outgoing.order(ByteOrder.BIG_ENDIAN);
 
     byte[] tmp = new byte[size];
     outgoing.get(tmp);
+
+    //System.out.println("outbound size: " + size );
 
     out.write(size);
     out.write(tmp);
