@@ -585,6 +585,52 @@ public class StreamTunnel {
           }
           break;
 
+        case 0x0A: // Animation / Use Bed
+          add(packetId);
+          if (isServerTunnel) {
+            add(incoming.getInt());
+            add(incoming.get());
+          } else {
+            add(incoming.getInt());
+            add(incoming.getInt());
+            copyUnsignedByte();
+            add(incoming.getInt());
+          }
+          break;
+
+        case 0x0B: // Entity Action / Animation
+          add(packetId);
+          if (isServerTunnel) {
+            add(incoming.getInt());
+            add(incoming.get());
+            add(incoming.getInt());
+          } else {
+            copyVarInt();
+            copyUnsignedByte();
+          }
+          break;
+
+        case 0x0C: // Steer Vehicle / Spawn Player
+          add(packetId);
+          if (isServerTunnel) {
+            add(incoming.getFloat());
+            add(incoming.getFloat());
+            add(incoming.get());
+            add(incoming.get());
+          } else {
+            copyVarInt();
+            add(readUTF8());
+            add(readUTF8());
+            add(incoming.getInt());
+            add(incoming.getInt());
+            add(incoming.getInt());
+            add(incoming.get());
+            add(incoming.get());
+            add(incoming.getShort());
+            copyEntityMetadata();
+          }
+          break;
+
         case 0x3F: // Plugin Message
           add(packetId);
           add(readUTF8());
@@ -803,42 +849,43 @@ public class StreamTunnel {
     }
   }
 
-//  private void copyUnknownBlob() throws IOException {
-//    byte item = in.readByte();
-//    write(item);
-//
-//    while (item != 0x7f) {
-//      int type = (item & 0xE0) >> 5;
-//
-//      switch (type) {
-//        case 0:
-//          write(in.readByte());
-//          break;
-//        case 1:
-//          write(in.readShort());
-//          break;
-//        case 2:
-//          write(in.readInt());
-//          break;
-//        case 3:
-//          write(in.readFloat());
-//          break;
-//        case 4:
-//          write(readUTF8());
-//          break;
-//        case 5:
-//          copyItem();
-//          break;
-//        case 6:
-//          write(in.readInt());
-//          write(in.readInt());
-//          write(in.readInt());
-//      }
-//
-//      item = in.readByte();
-//      write(item);
-//    }
-//  }
+  private void copyEntityMetadata() throws IOException {
+    byte item = incoming.get();
+    add(item);
+
+    while (item != 0x7F) {
+      int type = (item & 0xE0) >> 5;
+
+      switch (type) {
+        case 0:
+          add(incoming.get());
+          break;
+        case 1:
+          add(incoming.getShort());
+          break;
+        case 2:
+          add(incoming.getInt());
+          break;
+        case 3:
+          add(incoming.getFloat());
+          break;
+        case 4:
+          add(readUTF8());
+          break;
+        case 5:
+          copyItem();
+          break;
+        case 6:
+          add(incoming.getInt());
+          add(incoming.getInt());
+          add(incoming.getInt());
+          break;
+      }
+
+      item = incoming.get();
+      add(item);
+    }
+  }
 //
 //  private void skipUnknownBlob() throws IOException {
 //    byte item = in.readByte();
