@@ -352,7 +352,7 @@ public class StreamTunnel {
             add(incoming.getShort());
             copyItem();
           } else {
-            copyPlayerPosition();
+            copyPlayerPosition(true);
           }
           break;
 
@@ -372,6 +372,17 @@ public class StreamTunnel {
           }
           break;
 
+        case 0x06: // Update Health / Player Position & Look
+          add(packetId);
+          if (isServerTunnel) {
+            add(incoming.getFloat());
+            add(incoming.getShort());
+            add(incoming.getFloat());
+          } else {
+            copyPlayerPosition(false);
+            copyPlayerLook(true);
+          }
+          break;
 
         case 0x3F: // Plugin Message
           add(packetId);
@@ -559,8 +570,8 @@ public class StreamTunnel {
 //    }
 //    server.data.save();
 //  }
-//
-  private void copyPlayerPosition() throws IOException {
+
+  private void copyPlayerPosition(boolean on_ground) throws IOException {
     double x = incoming.getDouble();
     double y = incoming.getDouble();
     double stance = incoming.getDouble();
@@ -573,17 +584,24 @@ public class StreamTunnel {
     add(y);
     add(stance);
     add(z);
-    add(incoming.get()); // on ground (bool)
+
+    if (on_ground) {
+      add(incoming.get()); // on ground (bool)
+    }
   }
 
-//  private void copyPlayerLook() throws IOException {
-//    float yaw = in.readFloat();
-//    float pitch = in.readFloat();
-//    player.position.updateLook(yaw, pitch);
-//    write(yaw);
-//    write(pitch);
-//  }
-//
+  private void copyPlayerLook(boolean on_ground) throws IOException {
+    float yaw = incoming.getFloat();
+    float pitch = incoming.getFloat();
+    player.position.updateLook(yaw, pitch);
+    add(yaw);
+    add(pitch);
+
+    if (on_ground) {
+      add(incoming.get());
+    }
+  }
+
 //  private void copyUnknownBlob() throws IOException {
 //    byte item = in.readByte();
 //    write(item);
