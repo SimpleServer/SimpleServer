@@ -1160,9 +1160,14 @@ public class StreamTunnel {
 
         case 0x37: // Statistics
           add(packetId);
-          copyVarInt();
-          add(readUTF8());
-          copyVarInt();
+          int entrys = decodeVarInt();
+          add(entrys);
+          if (entrys > 0) {
+            for (int i = 0; i < entrys; i++) {
+              add(readUTF8());
+              copyVarInt();
+            }
+          }
           break;
 
         case 0x38: // Player List Item
