@@ -171,7 +171,6 @@ public class StreamTunnel {
         player.setState(state);
         addVarInt(state);
       }
-
     } else if (state == STATE_STATUS) {
         switch(packetId) {
           case 0x00: // JSON Response
@@ -206,10 +205,11 @@ public class StreamTunnel {
               serverId = player.getConnectionHash();
             }
             add(serverId);
-            byte[] keyBytes = new byte[outgoing.getShort()];
+            // @todo fixup sizes
+            byte[] keyBytes = new byte[incoming.getShort()];
             outgoing.put(keyBytes);
 
-            byte[] challengeToken = new byte[outgoing.getShort()];
+            byte[] challengeToken = new byte[incoming.getShort()];
             outgoing.put(challengeToken);
 
             player.serverEncryption.setPublicKey(keyBytes);
@@ -221,9 +221,9 @@ public class StreamTunnel {
             player.serverEncryption.setChallengeToken(challengeToken);
             player.clientEncryption.setChallengeToken(challengeToken);
           } else {
-            byte[] sharedKey = new byte[outgoing.getShort()];
+            byte[] sharedKey = new byte[incoming.getShort()];
             outgoing.put(sharedKey);
-            byte[] challengeTokenResponse = new byte[outgoing.getShort()];
+            byte[] challengeTokenResponse = new byte[incoming.getShort()];
             outgoing.put(challengeTokenResponse);
 
             if (!player.clientEncryption.checkChallengeToken(challengeTokenResponse)) {
@@ -303,24 +303,33 @@ public class StreamTunnel {
       switch(packetId) {
         case 0x00: // Keep-Alive
           add(packetId);
-          add(outgoing.getInt());
+          add(incoming.getInt());
           break;
 
         case 0x01: // Join-Game / Chat-Message
           add(packetId);
           if (isServerTunnel) {
-            int entity_id = outgoing.getInt();
+            int entity_id = incoming.getInt();
             player.setEntityId(entity_id);
             add(entity_id);
             copyUnsignedByte();
-            dimension = outgoing.get();
+            dimension = incoming.get();
             add(dimension);
             copyUnsignedByte();
-            addUnsignedByte(server.config.properties.getInt("maxPlayers"));
+            copyUnsignedByte();
+            //readUnsignedByte(); @todo uncomment once fix 0x00 of status
+            //addUnsignedByte(server.config.properties.getInt("maxPlayers"));
             add(readUTF8());
           } else {
             add(readUTF8()); // @todo handle chat message
           }
+          break;
+
+        case 0x3F: // Plugin Message
+          add(packetId);
+          add(readUTF8());
+          short size = incoming.getShort();
+          copyNBytes(size);
           break;
       }
 
@@ -376,6 +385,14 @@ public class StreamTunnel {
       buffer.write((incoming != null) ? incoming.get() : in.readByte());
     }
     return new String(buffer.toByteArray(), "UTF-8");
+  }
+
+  private int readUnsignedShort() {
+    return (incoming.getShort() & 0xFFFF);
+  }
+
+  private short readUnsignedByte() {
+    return ((short) (incoming.get() & 0xFF));
   }
 
   private void copyVarInt() throws IOException {
@@ -450,14 +467,6 @@ public class StreamTunnel {
         break;
     }
     return i;
-  }
-
-  private int readUnsignedShort() {
-    return (incoming.getShort() & 0xFFFF);
-  }
-
-  private short readUnsignedByte() {
-    return ((short) (incoming.get() & (short) 0xFF));
   }
 
 //  private void lockChest(Coordinate coordinate) {
@@ -629,16 +638,16 @@ public class StreamTunnel {
 //    in.readFully(buffer, 0, bytes % buffer.length);
 //  }
 //
-//  private void copyNBytes(int bytes) throws IOException {
-//    int overflow = bytes / buffer.length;
-//    for (int c = 0; c < overflow; ++c) {
-//      in.readFully(buffer, 0, buffer.length);
-//      out.write(buffer, 0, buffer.length);
-//    }
-//    in.readFully(buffer, 0, bytes % buffer.length);
-//    out.write(buffer, 0, bytes % buffer.length);
-//  }
-//
+  private void copyNBytes(int bytes) throws IOException {
+    int overflow = bytes / buffer.length;
+    for (int c = 0; c < overflow; ++c) {
+      incoming.get(buffer, 0, buffer.length);
+      outgoing.put(buffer, 0, buffer.length);
+    }
+    incoming.get(buffer, 0, bytes % buffer.length);
+    outgoing.put(buffer, 0, bytes % buffer.length);
+  }
+
   private void kick(String reason) throws IOException {
     write((byte) 0xff);
     write(reason);
@@ -689,7 +698,7 @@ public class StreamTunnel {
     byte[] tmp = new byte[size];
     outgoing.get(tmp);
 
-    //System.out.println("outbound size: " + size );
+    System.out.println("outbound size: " + size );
 
     out.write(size);
     out.write(tmp);
