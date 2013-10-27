@@ -134,6 +134,10 @@ public class StreamTunnel {
     run = false;
   }
 
+  public void setState(int i) {
+    state = i;
+  }
+
   public boolean isAlive() {
     return tunneler.isAlive();
   }
@@ -150,7 +154,7 @@ public class StreamTunnel {
     byte[] buf = new byte[length];
     in.readFully(buf, 0, length);
     incoming = ByteBuffer.wrap(buf);
-    outgoing = ByteBuffer.allocate(BUFFER_SIZE);
+    outgoing = ByteBuffer.allocate(length * 2);
 
     Byte packetId  = (byte) decodeVarInt();
 
@@ -161,9 +165,10 @@ public class StreamTunnel {
       if (!isServerTunnel) {
         add(packetId);
         copyVarInt();
-        add(readUTF8().getBytes());
-        add(readUnsignedShort());
+        add(readUTF8());
+        addUnsignedShort(readUnsignedShort());
         state = decodeVarInt();
+        player.setState(state);
         addVarInt(state);
       }
 
@@ -173,7 +178,7 @@ public class StreamTunnel {
             add(packetId);
 
             if (isServerTunnel) {
-              add(readUTF8().getBytes());
+              add(readUTF8());
             }
             break;
 
@@ -251,19 +256,28 @@ public class StreamTunnel {
     outgoing.put(encodeVarInt(i));
   }
 
+  private void addUnsignedShort(int i) {
+    outgoing.putShort((short) (i & 0xFFFF));
+  }
+
   private void add(int i) throws IOException {
     outgoing.putInt(i);
   }
 
-  private void add(byte[] b) {
+  private void add(String s) throws IOException {
+   addVarInt(s.length());
+   add(s.getBytes());
+  }
+
+  private void add(byte[] b) throws IOException {
     outgoing.put(b);
   }
 
-  private void add(byte b) {
+  private void add(byte b) throws IOException {
     outgoing.put(b);
   }
 
-  private void add(long l) {
+  private void add(long l) throws IOException {
     outgoing.putLong(l);
   }
 
