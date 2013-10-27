@@ -346,7 +346,14 @@ public class StreamTunnel {
           break;
 
         case 0x04: // Entity-Equipment / Player Position
-
+          add(packetId);
+          if (isServerTunnel) {
+            add(incoming.getInt());
+            add(incoming.getShort());
+            copyItem();
+          } else {
+            copyPlayerPosition();
+          }
           break;
 
 
@@ -478,6 +485,11 @@ public class StreamTunnel {
     return s;
   }
 
+  private double add(double d) throws IOException {
+    outgoing.putDouble(d);
+    return d;
+  }
+
   private byte[] encodeVarInt(int value) throws IOException {
     ByteArrayOutputStream buffer = new ByteArrayOutputStream();
     while (true) {
@@ -527,21 +539,22 @@ public class StreamTunnel {
 //    server.data.save();
 //  }
 //
-//  private void copyPlayerLocation() throws IOException {
-//    double x = in.readDouble();
-//    double y = in.readDouble();
-//    double stance = in.readDouble();
-//    double z = in.readDouble();
-//    player.position.updatePosition(x, y, z, stance);
-//    if (server.options.getBoolean("enableEvents")) {
-//      player.checkLocationEvents();
-//    }
-//    write(x);
-//    write(y);
-//    write(stance);
-//    write(z);
-//  }
-//
+  private void copyPlayerPosition() throws IOException {
+    double x = incoming.getDouble();
+    double y = incoming.getDouble();
+    double stance = incoming.getDouble();
+    double z = incoming.getDouble();
+    player.position.updatePosition(x, y, z, stance);
+    if (server.options.getBoolean("enableEvents")) {
+      player.checkLocationEvents();
+    }
+    add(x);
+    add(y);
+    add(stance);
+    add(z);
+    add(incoming.get()); // on ground (bool)
+  }
+
 //  private void copyPlayerLook() throws IOException {
 //    float yaw = in.readFloat();
 //    float pitch = in.readFloat();
