@@ -295,7 +295,34 @@ public class StreamTunnel {
 
       }
     } else if (state == STATE_PLAY) {
-      // @todo add play packets
+
+      int x, z;
+      byte y, dimension;
+      Coordinate coordinate;
+
+      switch(packetId) {
+        case 0x00: // Keep-Alive
+          add(packetId);
+          add(outgoing.getInt());
+          break;
+
+        case 0x01: // Join-Game / Chat-Message
+          add(packetId);
+          if (isServerTunnel) {
+            int entity_id = outgoing.getInt();
+            player.setEntityId(entity_id);
+            add(entity_id);
+            copyUnsignedByte();
+            dimension = outgoing.get();
+            add(dimension);
+            copyUnsignedByte();
+            addUnsignedByte(server.config.properties.getInt("maxPlayers"));
+            add(readUTF8());
+          } else {
+            add(readUTF8()); // @todo handle chat message
+          }
+          break;
+      }
 
     } else {
       throw new ArrayIndexOutOfBoundsException();
@@ -355,12 +382,24 @@ public class StreamTunnel {
    outgoing.put(encodeVarInt(decodeVarInt()));
   }
 
+  private void copyUnsignedByte() throws IOException {
+    addUnsignedByte(readUnsignedByte());
+  }
+
+  private void copyUnsignedShort() throws IOException {
+    addUnsignedShort(readUnsignedShort());
+  }
+
   private void addVarInt(int i) throws IOException {
     outgoing.put(encodeVarInt(i));
   }
 
   private void addUnsignedShort(int i) {
     outgoing.putShort((short) (i & 0xFFFF));
+  }
+
+  private void addUnsignedByte(int i) {
+    outgoing.put((byte) (i & 0xFF));
   }
 
   private void add(int i) throws IOException {
@@ -415,6 +454,10 @@ public class StreamTunnel {
 
   private int readUnsignedShort() {
     return (incoming.getShort() & 0xFFFF);
+  }
+
+  private short readUnsignedByte() {
+    return ((short) (incoming.get() & (short) 0xFF));
   }
 
 //  private void lockChest(Coordinate coordinate) {
