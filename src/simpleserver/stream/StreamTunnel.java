@@ -384,6 +384,207 @@ public class StreamTunnel {
           }
           break;
 
+        case 0x07: // Respawn / Player Digging
+          if (isServerTunnel) {
+            add(packetId);
+            player.setDimension(Dimension.get(add(incoming.getInt())));
+            copyUnsignedByte();
+            copyUnsignedByte();
+            add(readUTF8());
+            if (server.options.getBoolean("enableEvents") && isServerTunnel) {
+              server.eventhost.execute(server.eventhost.findEvent("onPlayerRespawn"), player, true, null);
+            }
+          } else {
+            byte status = incoming.get();
+            x = incoming.getInt();
+            y = incoming.get();
+            z = incoming.getInt();
+            byte face = incoming.get();
+
+            coordinate = new Coordinate(x, y, z, player);
+
+            if (!player.getGroup().ignoreAreas) {
+              BlockPermission perm = server.config.blockPermission(player, coordinate);
+
+              if (!perm.use && status == 0) {
+                player.addTMessage(Color.RED, "You can not use this block here!");
+                break;
+              }
+              if (!perm.destroy && status == BLOCK_DESTROYED_STATUS) {
+                player.addTMessage(Color.RED, "You can not destroy this block!");
+                break;
+              }
+            }
+
+            boolean locked = server.data.chests.isLocked(coordinate);
+
+            if (!locked || player.ignoresChestLocks() || server.data.chests.canOpen(player, coordinate)) {
+              if (locked && status == BLOCK_DESTROYED_STATUS) {
+                server.data.chests.releaseLock(coordinate);
+                server.data.save();
+              }
+
+              add(packetId);
+              add(status);
+              add(x);
+              add(y);
+              add(z);
+              add(face);
+
+              if (player.instantDestroyEnabled()) {
+                packetFinished();
+                add(packetId);
+                add(BLOCK_DESTROYED_STATUS);
+                add(x);
+                add(y);
+                add(z);
+                add(face);
+              }
+
+              if (status == BLOCK_DESTROYED_STATUS) {
+                player.destroyedBlock();
+              }
+            }
+          }
+          break;
+
+        case 0x08: // Player Position & Look / Player Block Placement
+          if (isServerTunnel) {
+            add(packetId);
+            copyPlayerPosition(false);
+            copyPlayerLook(true);
+          } else {
+            x = incoming.getInt();
+            y = (byte) readUnsignedByte();
+            z = incoming.getInt();
+            coordinate = new Coordinate(x, y, z, player);
+            final byte direction = incoming.get();
+            final short dropItem = incoming.getShort();
+            byte itemCount = 0;
+            short uses = 0;
+            byte[] data = null;
+            if (dropItem != -1) {
+              itemCount = incoming.get();
+              uses = incoming.getShort();
+              short dataLength = incoming.getShort();
+              if (dataLength != -1) {
+                data = new byte[dataLength];
+                incoming.get(data);
+              }
+            }
+            byte blockX = incoming.get();
+            byte blockY = incoming.get();
+            byte blockZ = incoming.get();
+
+            boolean writePacket = true;
+            boolean drop = false;
+
+            BlockPermission perm = server.config.blockPermission(player, coordinate, dropItem);
+
+            if (server.options.getBoolean("enableEvents")) {
+              player.checkButtonEvents(new Coordinate(x + (x < 0 ? 1 : 0), y + 1, z + (z < 0 ? 1 : 0)));
+            }
+
+            if (server.data.chests.isChest(coordinate)) {
+              // continue
+            } else if (!player.getGroup().ignoreAreas && ((dropItem != -1 && !perm.place) || !perm.use)) {
+              if (!perm.use) {
+                player.addTMessage(Color.RED, "You can not use this block here!");
+              } else {
+                player.addTMessage(Color.RED, "You can not place this block here!");
+              }
+
+              writePacket = false;
+              drop = true;
+            } else if (dropItem == 54) {
+              int xPosition = x;
+              byte yPosition = y;
+              int zPosition = z;
+              switch (direction) {
+                case 0:
+                  --yPosition;
+                  break;
+                case 1:
+                  ++yPosition;
+                  break;
+                case 2:
+                  --zPosition;
+                  break;
+                case 3:
+                  ++zPosition;
+                  break;
+                case 4:
+                  --xPosition;
+                  break;
+                case 5:
+                  ++xPosition;
+                  break;
+              }
+
+              Coordinate targetBlock = new Coordinate(xPosition, yPosition, zPosition, player);
+
+              Chest adjacentChest = server.data.chests.adjacentChest(targetBlock);
+
+              if (adjacentChest != null && !adjacentChest.isOpen() && !adjacentChest.ownedBy(player)) {
+                player.addTMessage(Color.RED, "The adjacent chest is locked!");
+                writePacket = false;
+                drop = true;
+              } else {
+                player.placingChest(targetBlock);
+              }
+            }
+
+            if (writePacket) {
+              add(packetId);
+              add(x);
+              add(y);
+              add(z);
+              add(direction);
+              add(dropItem);
+
+              if (dropItem != -1) {
+                add(itemCount);
+                add(uses);
+                if (data != null) {
+                  add((short) data.length);
+                  add(data);
+                } else {
+                  add((short) -1);
+                }
+
+                if (dropItem <= 94 && direction >= 0) {
+                  player.placedBlock();
+                }
+              }
+              add(blockX);
+              add(blockY);
+              add(blockZ);
+
+              player.openingChest(coordinate);
+
+            } else if (drop) {
+              // Drop the item in hand. This keeps the client state in-sync with the
+              // server. This generally prevents empty-hand clicks by the client
+              // from placing blocks the server thinks the client has in hand.
+              add((byte) 0x0e); // @todo figure out how to drop items in new protocol
+              add((byte) 0x04);
+              add(x);
+              add(y);
+              add(z);
+              add(direction);
+            }
+          }
+          break;
+
+        case 0x09: // Held Item Change / Held Item Change
+          add(packetId);
+          if (isServerTunnel) {
+            add(incoming.get());
+          } else {
+            add(incoming.getShort());
+          }
+          break;
+
         case 0x3F: // Plugin Message
           add(packetId);
           add(readUTF8());
