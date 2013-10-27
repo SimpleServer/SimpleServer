@@ -76,6 +76,7 @@ public class Player {
   public ClientEncryption clientEncryption = new Encryption.ClientEncryption();
 
   private String name = null;
+  private String uuid = null;
   private String renameName = null;
   private String connectionHash;
   private boolean closed = false;
@@ -223,6 +224,14 @@ public class Player {
 
     server.playerList.addPlayer(this);
     return true;
+  }
+
+  public void setUuid(String u) {
+    uuid = u;
+  }
+
+  public String getUuid() {
+    return uuid;
   }
 
   public String getName() {
