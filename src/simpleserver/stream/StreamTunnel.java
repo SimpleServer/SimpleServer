@@ -631,6 +631,50 @@ public class StreamTunnel {
           }
           break;
 
+        case 0x0D: // Close Window / Collect Item
+          add(packetId);
+          if (isServerTunnel) {
+            add(incoming.get());
+          } else {
+            add(incoming.getInt());
+            add(incoming.getInt());
+          }
+          break;
+
+        case 0x0E: // Click Window / Spawn Object
+          if (isServerTunnel) {
+            add(packetId);
+            add(incoming.get());
+            add(incoming.getShort());
+            add(incoming.get());
+            add(incoming.getShort());
+            add(incoming.get());
+            copyItem();
+          } else {
+            int eid = decodeVarInt();
+            String name = readUTF8();
+
+            if (!server.bots.ninja(name)) {
+              add(packetId);
+              add(eid);
+              add(name);
+              add(incoming.getInt());
+              add(incoming.getInt());
+              add(incoming.getInt());
+              add(incoming.get());
+              add(incoming.get());
+              copyEntityMetadata();
+            } else {
+              incoming.getInt();
+              incoming.getInt();
+              incoming.getInt();
+              incoming.get();
+              incoming.get();
+              skipEntityMetadata();
+            }
+          }
+          break;
+
         case 0x3F: // Plugin Message
           add(packetId);
           add(readUTF8());
@@ -658,17 +702,17 @@ public class StreamTunnel {
     }
   }
 
-//  private void skipItem() throws IOException {
-//    if (in.readShort() > 0) {
-//      in.readByte();
-//      in.readShort();
-//      short length;
-//      if ((length = in.readShort()) > 0) {
-//        skipNBytes(length);
-//      }
-//    }
-//  }
-//
+  private void skipItem() throws IOException {
+    if (incoming.getShort() > 0) {
+      incoming.get();
+      incoming.getShort();
+      short length;
+      if ((length = incoming.getShort()) > 0) {
+        copyNBytes(length);
+      }
+    }
+  }
+
 //  private long copyVLC() throws IOException {
 //    long value = 0;
 //    int shift = 0;
@@ -886,41 +930,42 @@ public class StreamTunnel {
       add(item);
     }
   }
-//
-//  private void skipUnknownBlob() throws IOException {
-//    byte item = in.readByte();
-//
-//    while (item != 0x7f) {
-//      int type = (item & 0xE0) >> 5;
-//
-//      switch (type) {
-//        case 0:
-//          in.readByte();
-//          break;
-//        case 1:
-//          in.readShort();
-//          break;
-//        case 2:
-//          in.readInt();
-//          break;
-//        case 3:
-//          in.readFloat();
-//          break;
-//        case 4:
-//          readUTF8();
-//          break;
-//        case 5:
-//          skipItem();
-//          break;
-//        case 6:
-//          in.readInt();
-//          in.readInt();
-//          in.readInt();
-//      }
-//
-//      item = in.readByte();
-//    }
-//  }
+
+  private void skipEntityMetadata() throws IOException {
+    byte item = incoming.get();
+
+    while (item != 0x7F) {
+      int type = (item & 0xE0) >> 5;
+
+      switch (type) {
+        case 0:
+          incoming.get();
+          break;
+        case 1:
+          incoming.getShort();
+          break;
+        case 2:
+          incoming.getInt();
+          break;
+        case 3:
+          incoming.getFloat();
+          break;
+        case 4:
+          readUTF8();
+          break;
+        case 5:
+          skipItem();
+          break;
+        case 6:
+          incoming.getInt();
+          incoming.getInt();
+          incoming.getInt();
+          break;
+      }
+
+      item = incoming.get();
+    }
+  }
 
   private byte write(byte b) throws IOException {
     out.writeByte(b);
