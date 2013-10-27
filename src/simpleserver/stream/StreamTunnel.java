@@ -726,6 +726,75 @@ public class StreamTunnel {
           }
           break;
 
+        case 0x12: // Update Sign / Entity Velocity
+          add(packetId);
+          if (isServerTunnel) {
+            add(incoming.getInt());
+            add(incoming.getShort());
+            add(incoming.getInt());
+            add(readUTF8());
+            add(readUTF8());
+            add(readUTF8());
+            add(readUTF8());
+          } else {
+            add(incoming.getInt());
+            add(incoming.getShort());
+            add(incoming.getShort());
+            add(incoming.getShort());
+          }
+          break;
+
+        case 0x13: // Player Abilities / Destroy Entities
+          add(packetId);
+          if (isServerTunnel) {
+            add(incoming.get());
+            add(incoming.getFloat());
+            add(incoming.getFloat());
+          } else {
+            byte destroyCount = add(incoming.get());
+            if (destroyCount > 0) {
+              copyNBytes(destroyCount * 4);
+            }
+          }
+          break;
+
+        case 0x14: // Tab Complete / Entity
+          add(packetId);
+          if (isServerTunnel) {
+            add(readUTF8());
+          } else {
+            add(incoming.getInt());
+          }
+          break;
+
+        case 0x15: // Client Settings / Entity Relative Move
+          add(packetId);
+          if (isServerTunnel) {
+            add(readUTF8());
+            add(incoming.get());
+            add(incoming.get());
+            add(incoming.get());
+            add(incoming.get());
+            add(incoming.get());
+          } else {
+            add(incoming.getInt());
+            add(incoming.get());
+            add(incoming.get());
+            add(incoming.get());
+          }
+          break;
+
+        case 0x16: // Client Status / Entity Look
+          add(packetId);
+          if (isServerTunnel) {
+            add(incoming.get());
+          } else {
+            add(incoming.getInt());
+            add(incoming.get());
+            add(incoming.get());
+          }
+          break;
+
         case 0x3F: // Plugin Message
           add(packetId);
           add(readUTF8());
@@ -1125,17 +1194,20 @@ public class StreamTunnel {
     // reset our incoming buffer, and write the outgoing one
     incoming = null;
     int size = outgoing.position();
-    outgoing.limit(size);
-    outgoing.rewind();
-    outgoing.order(ByteOrder.BIG_ENDIAN);
 
-    byte[] tmp = new byte[size];
-    outgoing.get(tmp);
+    if (size > 0) {
+      outgoing.limit(size);
+      outgoing.rewind();
+      outgoing.order(ByteOrder.BIG_ENDIAN);
 
-    System.out.println("outbound size: " + size );
+      byte[] tmp = new byte[size];
+      outgoing.get(tmp);
 
-    out.write(size);
-    out.write(tmp);
+      System.out.println("outbound size: " + size );
+
+      out.write(size);
+      out.write(tmp);
+    }
   }
 
   private void flushAll() throws IOException {
