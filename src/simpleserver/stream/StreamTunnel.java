@@ -356,6 +356,22 @@ public class StreamTunnel {
           }
           break;
 
+        case 0x05: // Spawn Position / Player Look
+          add(packetId);
+          if (isServerTunnel) {
+            add(incoming.getInt());
+            add(incoming.getInt());
+            add(incoming.getInt());
+            if (server.options.getBoolean("enableEvents")) {
+              server.eventhost.execute(server.eventhost.findEvent("onPlayerConnect"), player, true, null);
+            }
+          } else {
+            add(incoming.getFloat());
+            add(incoming.getFloat());
+            add(incoming.get());
+          }
+          break;
+
 
         case 0x3F: // Plugin Message
           add(packetId);
@@ -488,6 +504,11 @@ public class StreamTunnel {
   private double add(double d) throws IOException {
     outgoing.putDouble(d);
     return d;
+  }
+
+  private float add(float f) throws IOException {
+    outgoing.putFloat(f);
+    return f;
   }
 
   private byte[] encodeVarInt(int value) throws IOException {
