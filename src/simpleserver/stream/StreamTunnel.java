@@ -795,6 +795,144 @@ public class StreamTunnel {
           }
           break;
 
+        case 0x17: // Plugin Message / Entity Look & Relative Move
+          add(packetId);
+          if (isServerTunnel) {
+            add(readUTF8());
+            short size = incoming.getShort();
+            copyNBytes(size);
+          } else {
+            add(incoming.getInt());
+            add(incoming.get());
+            add(incoming.get());
+            add(incoming.get());
+            add(incoming.get());
+            add(incoming.get());
+          }
+          break;
+
+        case 0x18: // Entity Teleport
+          add(packetId);
+          add(incoming.getInt());
+          add(incoming.getInt());
+          add(incoming.getInt());
+          add(incoming.getInt());
+          add(incoming.get());
+          add(incoming.get());
+          break;
+
+        case 0x19: // Entity Head Lock
+          add(packetId);
+          add(incoming.getInt());
+          add(incoming.get());
+          break;
+
+        case 0x1A: // Entity Status
+          add(packetId);
+          add(incoming.getInt());
+          add(incoming.get());
+          break;
+
+        case 0x1B: // Attach Entity
+          add(packetId);
+          add(incoming.getInt());
+          add(incoming.getInt());
+          add(incoming.get());
+          break;
+
+        case 0x1C: // Entity Metdata
+          add(packetId);
+          add(incoming.getInt());
+          copyEntityMetadata();
+          break;
+
+        case 0x1D: // Entity Effect
+          add(packetId);
+          add(incoming.getInt());
+          add(incoming.get());
+          add(incoming.get());
+          add(incoming.getShort());
+          break;
+
+        case 0x1E: // Remove Entity Effect
+          add(packetId);
+          add(incoming.getInt());
+          add(incoming.get());
+          break;
+
+        case 0x1F: // Set Experience
+          add(packetId);
+          add(incoming.getFloat());
+          add(incoming.getShort());
+          add(incoming.getShort());
+          break;
+
+        case 0x20: // Entity Properties
+          add(packetId);
+          add(incoming.getInt());
+          int properties_count = incoming.getInt();
+          short list_length = 0;
+          add(properties_count);
+
+          // loop for every property key/value pair
+          for (int i = 0; i < properties_count; i++) {
+            add(readUTF8());
+            add(in.readDouble());
+
+            // grab list elements
+            list_length = in.readShort();
+            add(list_length);
+            if (list_length > 0) {
+              for (int k = 0; k < list_length; k++) {
+                add(in.readLong());
+                add(in.readLong());
+                add(in.readDouble());
+                add(in.readByte());
+              }
+            }
+          }
+          break;
+
+        case 0x21: // Chunk Data
+          add(packetId);
+          add(incoming.getInt());
+          add(incoming.getInt());
+          add(incoming.get());
+          copyUnsignedShort();
+          copyUnsignedShort();
+          copyNBytes(add(incoming.getInt()));
+          break;
+
+        case 0x22: // Multi Block Change
+          add(packetId);
+          add(incoming.getInt());
+          add(incoming.getInt());
+          add(incoming.getShort());
+          copyNBytes(add(incoming.getInt()));
+          break;
+
+        case 0x23: // Block Change
+          add(packetId);
+          x = incoming.getInt();
+          y = (byte) incoming.getShort();
+          z = incoming.getInt();
+          int blockType = decodeVarInt();
+          byte metadata = (byte) readUnsignedByte();
+
+          coordinate = new Coordinate(x, y, z, player);
+
+          if (blockType == 54 && player.placedChest(coordinate)) {
+            lockChest(coordinate);
+            player.placingChest(null);
+          }
+
+          add(x);
+          add(y);
+          add(z);
+          add(blockType);
+          add(metadata);
+          break;
+
         case 0x3F: // Plugin Message
           add(packetId);
           add(readUTF8());
@@ -962,25 +1100,25 @@ public class StreamTunnel {
     return i;
   }
 
-//  private void lockChest(Coordinate coordinate) {
-//    Chest adjacentChest = server.data.chests.adjacentChest(coordinate);
-//    if (player.isAttemptLock() || adjacentChest != null && !adjacentChest.isOpen()) {
-//      if (adjacentChest != null && !adjacentChest.isOpen()) {
-//        server.data.chests.giveLock(adjacentChest.owner, coordinate, adjacentChest.name);
-//      } else {
-//        if (adjacentChest != null) {
-//          adjacentChest.lock(player);
-//          adjacentChest.name = player.nextChestName();
-//        }
-//        server.data.chests.giveLock(player, coordinate, player.nextChestName());
-//      }
-//      player.setAttemptedAction(null);
-//      player.addTMessage(Color.GRAY, "This chest is now locked.");
-//    } else if (!server.data.chests.isChest(coordinate)) {
-//      server.data.chests.addOpenChest(coordinate);
-//    }
-//    server.data.save();
-//  }
+  private void lockChest(Coordinate coordinate) {
+    Chest adjacentChest = server.data.chests.adjacentChest(coordinate);
+    if (player.isAttemptLock() || adjacentChest != null && !adjacentChest.isOpen()) {
+      if (adjacentChest != null && !adjacentChest.isOpen()) {
+        server.data.chests.giveLock(adjacentChest.owner, coordinate, adjacentChest.name);
+      } else {
+        if (adjacentChest != null) {
+          adjacentChest.lock(player);
+          adjacentChest.name = player.nextChestName();
+        }
+        server.data.chests.giveLock(player, coordinate, player.nextChestName());
+      }
+      player.setAttemptedAction(null);
+      player.addTMessage(Color.GRAY, "This chest is now locked.");
+    } else if (!server.data.chests.isChest(coordinate)) {
+      server.data.chests.addOpenChest(coordinate);
+    }
+    server.data.save();
+  }
 
   private void copyPlayerPosition(boolean on_ground) throws IOException {
     double x = incoming.getDouble();
