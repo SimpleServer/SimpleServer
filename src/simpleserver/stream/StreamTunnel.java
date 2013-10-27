@@ -800,7 +800,7 @@ public class StreamTunnel {
           add(packetId);
           if (isServerTunnel) {
             add(readUTF8());
-            short size = incoming.getShort();
+            short size = add(incoming.getShort());
             copyNBytes(size);
           } else {
             add(incoming.getInt());
@@ -876,17 +876,17 @@ public class StreamTunnel {
           // loop for every property key/value pair
           for (int i = 0; i < properties_count; i++) {
             add(readUTF8());
-            add(in.readDouble());
+            add(incoming.getDouble());
 
             // grab list elements
-            list_length = in.readShort();
+            list_length = incoming.getShort();
             add(list_length);
             if (list_length > 0) {
               for (int k = 0; k < list_length; k++) {
-                add(in.readLong());
-                add(in.readLong());
-                add(in.readDouble());
-                add(in.readByte());
+                add(incoming.getLong());
+                add(incoming.getLong());
+                add(incoming.getDouble());
+                add(incoming.get());
               }
             }
           }
@@ -1161,7 +1161,7 @@ public class StreamTunnel {
         case 0x37: // Statistics
           add(packetId);
           int entrys = decodeVarInt();
-          add(entrys);
+          addVarInt(entrys);
           if (entrys > 0) {
             for (int i = 0; i < entrys; i++) {
               add(readUTF8());
@@ -1241,7 +1241,7 @@ public class StreamTunnel {
         case 0x3F: // Plugin Message
           add(packetId);
           add(readUTF8());
-          short size = incoming.getShort();
+          short size = add(incoming.getShort());
           copyNBytes(size);
           break;
 
