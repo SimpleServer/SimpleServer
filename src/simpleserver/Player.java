@@ -123,6 +123,8 @@ public class Player {
   private long lastEvent;
   private HashSet<Area> currentAreas = new HashSet<Area>();
 
+  private int state = 0;
+
   public Player(Socket inc, Server parent) {
     connected = System.currentTimeMillis();
     position = new Position();
@@ -195,7 +197,7 @@ public class Player {
       return false;
     }
 
-    if (name == "Player") {
+    if (name.equals("Player")) {
       kick(t("Too many guests in server!"));
       return false;
     }
@@ -227,6 +229,10 @@ public class Player {
 
   public String getName() {
     return renameName;
+  }
+
+  public int getState() {
+    return state;
   }
 
   public String getName(boolean original) {
@@ -278,6 +284,10 @@ public class Player {
 
   public Server getServer() {
     return server;
+  }
+
+  public void setState(int i) {
+    state = i;
   }
 
   public void setChat(AbstractChat chat) {
