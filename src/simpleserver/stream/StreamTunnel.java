@@ -309,9 +309,7 @@ public class StreamTunnel {
         case 0x01: // Join-Game / Chat-Message
           add(packetId);
           if (isServerTunnel) {
-            int entity_id = incoming.getInt();
-            player.setEntityId(entity_id);
-            add(entity_id);
+            player.setEntityId(add(incoming.getInt()));
             copyUnsignedByte();
             dimension = incoming.get();
             add(dimension);
@@ -368,17 +366,17 @@ public class StreamTunnel {
     lastPacket = (packetId == 0x00) ? lastPacket : packetId;
   }
 
-//  private void copyItem() throws IOException {
-//    if (write(in.readShort()) > 0) {
-//      write(in.readByte());
-//      write(in.readShort());
-//      short length;
-//      if ((length = write(in.readShort())) > 0) {
-//        copyNBytes(length);
-//      }
-//    }
-//  }
-//
+  private void copyItem() throws IOException {
+    if (add(incoming.getShort()) > 0) {
+      add(incoming.get());
+      add(incoming.getShort());
+      short length;
+      if ((length = add(incoming.getShort())) > 0) {
+        copyNBytes(length);
+      }
+    }
+  }
+
 //  private void skipItem() throws IOException {
 //    if (in.readShort() > 0) {
 //      in.readByte();
@@ -426,45 +424,58 @@ public class StreamTunnel {
    outgoing.put(encodeVarInt(decodeVarInt()));
   }
 
-  private void copyUnsignedByte() throws IOException {
-    addUnsignedByte(readUnsignedByte());
+  private int copyUnsignedByte() throws IOException {
+    return addUnsignedByte(readUnsignedByte());
   }
 
-  private void copyUnsignedShort() throws IOException {
-    addUnsignedShort(readUnsignedShort());
+  private int copyUnsignedShort() throws IOException {
+    return addUnsignedShort(readUnsignedShort());
   }
 
-  private void addVarInt(int i) throws IOException {
+  private int addVarInt(int i) throws IOException {
     outgoing.put(encodeVarInt(i));
+    return i;
   }
 
-  private void addUnsignedShort(int i) {
+  private int addUnsignedShort(int i) {
     outgoing.putShort((short) (i & 0xFFFF));
+    return i;
   }
 
-  private void addUnsignedByte(int i) {
+  private int addUnsignedByte(int i) {
     outgoing.put((byte) (i & 0xFF));
+    return i;
   }
 
-  private void add(int i) throws IOException {
+  private int add(int i) throws IOException {
     outgoing.putInt(i);
+    return i;
   }
 
-  private void add(String s) throws IOException {
+  private String add(String s) throws IOException {
    addVarInt(s.length());
    add(s.getBytes());
+   return s;
   }
 
-  private void add(byte[] b) throws IOException {
+  private byte[] add(byte[] b) throws IOException {
     outgoing.put(b);
+    return b;
   }
 
-  private void add(byte b) throws IOException {
+  private byte add(byte b) throws IOException {
     outgoing.put(b);
+    return b;
   }
 
-  private void add(long l) throws IOException {
+  private long add(long l) throws IOException {
     outgoing.putLong(l);
+    return l;
+  }
+
+  private short add(short s) throws IOException {
+    outgoing.putShort(s);
+    return s;
   }
 
   private byte[] encodeVarInt(int value) throws IOException {
