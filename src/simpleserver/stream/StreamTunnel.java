@@ -325,6 +325,33 @@ public class StreamTunnel {
           }
           break;
 
+        case 0x02: // Chat-Message / Use Entity
+          add(packetId);
+          if (isServerTunnel) {
+            add(readUTF8());
+          } else {
+            add(incoming.getInt());
+            add(incoming.get());
+          }
+          break;
+
+        case 0x03: // Time-Update / Player
+          add(packetId);
+          if (isServerTunnel) {
+            add(incoming.getLong());
+            long time = incoming.getLong();
+            server.setTime(time);
+            add(time);
+          } else {
+            add(incoming.get());
+          }
+          break;
+
+        case 0x04: // Entity-Equipment / Player Position
+
+          break;
+
+
         case 0x3F: // Plugin Message
           add(packetId);
           add(readUTF8());
