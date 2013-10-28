@@ -380,7 +380,7 @@ public class StreamTunnel {
             add(incoming.getShort());
             add(incoming.getFloat());
           } else {
-            copyPlayerPosition(true, true);
+            copyPlayerPosition(false, true);
             copyPlayerLook(true);
           }
           break;
@@ -800,8 +800,7 @@ public class StreamTunnel {
           add(packetId);
           if (isServerTunnel) {
             add(readUTF8());
-            short size = add(incoming.getShort());
-            copyNBytes(size);
+            copyNBytes(add(incoming.getShort()));
           } else {
             add(incoming.getInt());
             add(incoming.get());
@@ -1241,8 +1240,7 @@ public class StreamTunnel {
         case 0x3F: // Plugin Message
           add(packetId);
           add(readUTF8());
-          short size = add(incoming.getShort());
-          copyNBytes(size);
+          copyNBytes(add(incoming.getShort()));
           break;
 
         case 0x40: // Disconnect
@@ -1441,6 +1439,7 @@ public class StreamTunnel {
     double x = incoming.getDouble();
     double y = incoming.getDouble();
     double stance = 0.0;
+
     if (stance_enabled) {
       stance = incoming.getDouble();
     }
@@ -1451,11 +1450,14 @@ public class StreamTunnel {
     } else {
       player.position.updatePositionWithNoStance(x, y, z);
     }
+
     if (server.options.getBoolean("enableEvents")) {
       player.checkLocationEvents();
     }
+
     add(x);
     add(y);
+
     if (stance_enabled) {
       add(stance);
     }
@@ -1617,9 +1619,10 @@ public class StreamTunnel {
   }
 
   private void kick(String reason) throws IOException {
-    write((byte) 0x40);
-    write(reason);
-    packetFinished();
+    // @todo start new packet
+    //add((byte) 0x40);
+    //add(reason);
+    //packetFinished();
   }
 
   private void sendMessage(String message) throws IOException {
@@ -1634,9 +1637,10 @@ public class StreamTunnel {
 
   private void sendMessagePacket(String message) throws IOException {
     if (message.length() > 0) {
-      write((byte) 0x01);
-      write(message);
-      packetFinished();
+      // @todo start new packet
+      //add((byte) 0x01);
+      //add(message);
+      //packetFinished();
     }
   }
 
