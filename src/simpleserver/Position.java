@@ -106,6 +106,12 @@ public class Position {
     this.stance = stance;
   }
 
+  public void updatePositionWithNoStance(double x, double y, double z) {
+    this.x = x;
+    this.y = y;
+    this.z = z;
+  }
+
   public void updateLook(float yaw, float pitch) {
     this.yaw = yaw;
     this.pitch = pitch;

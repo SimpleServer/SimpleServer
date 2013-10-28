@@ -352,7 +352,7 @@ public class StreamTunnel {
             add(incoming.getShort());
             copyItem();
           } else {
-            copyPlayerPosition(true);
+            copyPlayerPosition(true, true);
           }
           break;
 
@@ -380,7 +380,7 @@ public class StreamTunnel {
             add(incoming.getShort());
             add(incoming.getFloat());
           } else {
-            copyPlayerPosition(false);
+            copyPlayerPosition(true, true);
             copyPlayerLook(true);
           }
           break;
@@ -452,7 +452,7 @@ public class StreamTunnel {
         case 0x08: // Player Position & Look / Player Block Placement
           if (isServerTunnel) {
             add(packetId);
-            copyPlayerPosition(false);
+            copyPlayerPosition(false, false);
             copyPlayerLook(true);
           } else {
             x = incoming.getInt();
@@ -657,7 +657,7 @@ public class StreamTunnel {
 
             if (!server.bots.ninja(name)) {
               add(packetId);
-              add(eid);
+              addVarInt(eid);
               add(name);
               add(incoming.getInt());
               add(incoming.getInt());
@@ -678,7 +678,7 @@ public class StreamTunnel {
 
         case 0x0F: // Confirm Transaction / Spawn Mob
           add(packetId);
-          if (isServerTunnel) {
+          if (!isServerTunnel) {
             add(incoming.get());
             add(incoming.getShort());
             add(incoming.get());
@@ -1430,21 +1430,38 @@ public class StreamTunnel {
     server.data.save();
   }
 
-  private void copyPlayerPosition(boolean on_ground) throws IOException {
+  /**
+   * copyPlayerPosition
+   *
+   * @param ground_enabled do I read the boolean `On Ground`?
+   * @param stance_enabled do I read the Stance double as part of x,y,z coords?
+   * @throws IOException
+   */
+  private void copyPlayerPosition(boolean ground_enabled, boolean stance_enabled) throws IOException {
     double x = incoming.getDouble();
     double y = incoming.getDouble();
-    double stance = incoming.getDouble();
+    double stance = 0.0;
+    if (stance_enabled) {
+      stance = incoming.getDouble();
+    }
     double z = incoming.getDouble();
-    player.position.updatePosition(x, y, z, stance);
+
+    if (stance_enabled) {
+      player.position.updatePosition(x, y, z, stance);
+    } else {
+      player.position.updatePositionWithNoStance(x, y, z);
+    }
     if (server.options.getBoolean("enableEvents")) {
       player.checkLocationEvents();
     }
     add(x);
     add(y);
-    add(stance);
+    if (stance_enabled) {
+      add(stance);
+    }
     add(z);
 
-    if (on_ground) {
+    if (ground_enabled) {
       add(incoming.get()); // on ground (bool)
     }
   }
