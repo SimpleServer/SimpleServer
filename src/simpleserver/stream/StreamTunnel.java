@@ -433,13 +433,14 @@ public class StreamTunnel {
               add(face);
 
               if (player.instantDestroyEnabled()) {
-                packetFinished();
-                add(packetId);
-                add(BLOCK_DESTROYED_STATUS);
-                add(x);
-                add(y);
-                add(z);
-                add(face);
+                // @todo fix instant destroy
+                //packetFinished();
+                //add(packetId);
+                //add(BLOCK_DESTROYED_STATUS);
+                //add(x);
+                //add(y);
+                //add(z);
+                //add(face);
               }
 
               if (status == BLOCK_DESTROYED_STATUS) {
@@ -654,7 +655,7 @@ public class StreamTunnel {
           } else {
             int eid = decodeVarInt();
             String name = readUTF8();
-
+            int objects = 0;
             if (!server.bots.ninja(name)) {
               add(packetId);
               addVarInt(eid);
@@ -664,14 +665,24 @@ public class StreamTunnel {
               add(incoming.getInt());
               add(incoming.get());
               add(incoming.get());
-              copyEntityMetadata();
+              objects = add(incoming.getInt());
+              if (objects > 0) {
+                add(incoming.getShort());
+                add(incoming.getShort());
+                add(incoming.getShort());
+              }
             } else {
               incoming.getInt();
               incoming.getInt();
               incoming.getInt();
               incoming.get();
               incoming.get();
-              skipEntityMetadata();
+              objects = incoming.getInt();
+              if (objects > 0) {
+                incoming.getShort();
+                incoming.getShort();
+                incoming.getShort();
+              }
             }
           }
           break;
@@ -770,7 +781,7 @@ public class StreamTunnel {
 
         case 0x15: // Client Settings / Entity Relative Move
           add(packetId);
-          if (isServerTunnel) {
+          if (!isServerTunnel) {
             add(readUTF8());
             add(incoming.get());
             add(incoming.get());
@@ -798,7 +809,7 @@ public class StreamTunnel {
 
         case 0x17: // Plugin Message / Entity Look & Relative Move
           add(packetId);
-          if (isServerTunnel) {
+          if (!isServerTunnel) {
             add(readUTF8());
             copyNBytes(add(incoming.getShort()));
           } else {
@@ -957,7 +968,13 @@ public class StreamTunnel {
           add(chunkCount);
           add(dataLength);
           add(incoming.get());
-          copyNBytes(chunkCount * 12 + dataLength);
+          copyNBytes(dataLength);
+          for (int i = 0; i < chunkCount; i++) {
+            add(incoming.getInt());
+            add(incoming.getInt());
+            copyUnsignedShort();
+            copyUnsignedShort();
+          }
           break;
 
         case 0x27: // Explosion
@@ -1070,8 +1087,9 @@ public class StreamTunnel {
             }
           }
           if (!allow) {
-            add((byte) 0x2E);
-            add(id);
+            // @todo figure out what this does
+            //add((byte) 0x2E);
+            //add(id);
           } else {
             add(packetId);
             add(id);
@@ -1218,20 +1236,20 @@ public class StreamTunnel {
           add(mode);
 
           if (mode == 0 || mode == 2) {
-            write(readUTF8()); // team display name
-            write(readUTF8()); // team prefix
-            write(readUTF8()); // team suffix
-            write(incoming.get()); // friendly fire
+            add(readUTF8()); // team display name
+            add(readUTF8()); // team prefix
+            add(readUTF8()); // team suffix
+            add(incoming.get()); // friendly fire
           }
 
           // only ran if 0,3,4
           if (mode == 0 || mode == 3 || mode == 4) {
             playerCount = incoming.getShort();
-            write(playerCount);
+            add(playerCount);
 
             if (playerCount != -1) {
               for (int i = 0; i < playerCount; i++) {
-                write(readUTF8());
+                add(readUTF8());
               }
             }
           }
@@ -1245,8 +1263,40 @@ public class StreamTunnel {
 
         case 0x40: // Disconnect
           add(packetId);
-          add(readUTF8());
+          String reason = readUTF8();
+          if (reason.startsWith("\u00a71")) {
+            reason = String.format("\u00a71\0%s\0%s\0%s\0%s\0%s",
+                    Main.protocolVersion,
+                    Main.minecraftVersion,
+                    server.config.properties.get("serverDescription"),
+                    server.playerList.size(),
+                    server.config.properties.getInt("maxPlayers"));
+          }
+          add(reason);
+
+          if (reason.startsWith("Took too long")) {
+            server.addRobot(player);
+          }
+          player.close();
           break;
+
+        default:
+          if (EXPENSIVE_DEBUG_LOGGING) {
+            while (true) {
+              skipNBytes(1);
+              flushAll();
+            }
+          } else {
+            if (lastPacket != null) {
+              throw new IOException("Unable to parse unknown " + streamType
+                      + " packet 0x" + Integer.toHexString(packetId) + " for player "
+                      + player.getName() + " (after 0x" + Integer.toHexString(lastPacket));
+            } else {
+              throw new IOException("Unable to parse unknown " + streamType
+                      + " packet 0x" + Integer.toHexString(packetId) + " for player "
+                      + player.getName());
+            }
+          }
       }
 
     } else {
@@ -1278,20 +1328,6 @@ public class StreamTunnel {
       }
     }
   }
-
-//  private long copyVLC() throws IOException {
-//    long value = 0;
-//    int shift = 0;
-//    while (true) {
-//      int i = write(in.readByte());
-//      value |= (i & 0x7F) << shift;
-//      if ((i & 0x80) == 0) {
-//        break;
-//      }
-//      shift += 7;
-//    }
-//    return value;
-//  }
 
   private String readUTF8() throws IOException {
     ByteArrayOutputStream buffer = new ByteArrayOutputStream();
@@ -1600,14 +1636,14 @@ public class StreamTunnel {
     return b;
   }
 
-//  private void skipNBytes(int bytes) throws IOException {
-//    int overflow = bytes / buffer.length;
-//    for (int c = 0; c < overflow; ++c) {
-//      in.readFully(buffer, 0, buffer.length);
-//    }
-//    in.readFully(buffer, 0, bytes % buffer.length);
-//  }
-//
+  private void skipNBytes(int bytes) throws IOException {
+    int overflow = bytes / buffer.length;
+    for (int c = 0; c < overflow; ++c) {
+      incoming.get(buffer, 0, buffer.length);
+    }
+    incoming.get(buffer, 0, bytes % buffer.length);
+  }
+
   private void copyNBytes(int bytes) throws IOException {
     int overflow = bytes / buffer.length;
     for (int c = 0; c < overflow; ++c) {
@@ -1661,11 +1697,8 @@ public class StreamTunnel {
 
       byte[] tmp = new byte[size];
       outgoing.get(tmp);
-
-      System.out.println("outbound size: " + size );
-
-      out.write(size);
-      out.write(tmp);
+      write(size);
+      write(tmp);
     }
   }
 
