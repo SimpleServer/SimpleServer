@@ -144,7 +144,6 @@ public class Player {
 
     if (server.isIPBanned(getIPAddress())) {
       println("IP " + getIPAddress() + " is banned!");
-
       cleanup();
       return;
     }
