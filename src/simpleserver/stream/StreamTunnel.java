@@ -77,6 +77,7 @@ public class StreamTunnel {
   private char commandPrefix;
 
   private int state = 0;
+  private boolean readyToSend = false;
   private ByteBuffer incoming = null;
   private ByteBuffer outgoing = null;
 
@@ -149,6 +150,7 @@ public class StreamTunnel {
 
   private void handlePacket() throws IOException {
     int length = decodeVarInt();
+    readyToSend = false;
 
     // read length into byte[], copy into ByteBuffer
     byte[] buf = new byte[length];
@@ -166,7 +168,7 @@ public class StreamTunnel {
         add(packetId);
         copyVarInt();
         add(readUTF8());
-        addUnsignedShort(readUnsignedShort());
+        copyUnsignedShort();
         state = decodeVarInt();
         player.setState(state);
         addVarInt(state);
@@ -207,10 +209,10 @@ public class StreamTunnel {
             add(serverId);
             // @todo fixup sizes
             byte[] keyBytes = new byte[incoming.getShort()];
-            outgoing.put(keyBytes);
+            incoming.put(keyBytes);
 
             byte[] challengeToken = new byte[incoming.getShort()];
-            outgoing.put(challengeToken);
+            incoming.put(challengeToken);
 
             player.serverEncryption.setPublicKey(keyBytes);
             byte[] key = player.clientEncryption.getPublicKey();
@@ -222,9 +224,9 @@ public class StreamTunnel {
             player.clientEncryption.setChallengeToken(challengeToken);
           } else {
             byte[] sharedKey = new byte[incoming.getShort()];
-            outgoing.put(sharedKey);
+            incoming.put(sharedKey);
             byte[] challengeTokenResponse = new byte[incoming.getShort()];
-            outgoing.put(challengeTokenResponse);
+            incoming.put(challengeTokenResponse);
 
             if (!player.clientEncryption.checkChallengeToken(challengeTokenResponse)) {
               player.kick("Invalid client response");
@@ -314,9 +316,8 @@ public class StreamTunnel {
             dimension = incoming.get();
             add(dimension);
             copyUnsignedByte();
-            copyUnsignedByte();
-            //readUnsignedByte(); @todo uncomment once fix 0x00 of status
-            //addUnsignedByte(server.config.properties.getInt("maxPlayers"));
+            readUnsignedByte(); //@todo uncomment once fix 0x00 of status
+            addUnsignedByte(server.config.properties.getInt("maxPlayers"));
             add(readUTF8());
           } else {
             add(readUTF8()); // @todo handle chat message
@@ -1282,23 +1283,13 @@ public class StreamTunnel {
 
         default:
           if (EXPENSIVE_DEBUG_LOGGING) {
-            while (true) {
-              skipNBytes(1);
-              flushAll();
-            }
+            copyNBytes(length);
+            flushAll();
           } else {
-            if (lastPacket != null) {
-              throw new IOException("Unable to parse unknown " + streamType
-                      + " packet 0x" + Integer.toHexString(packetId) + " for player "
-                      + player.getName() + " (after 0x" + Integer.toHexString(lastPacket));
-            } else {
-              throw new IOException("Unable to parse unknown " + streamType
-                      + " packet 0x" + Integer.toHexString(packetId) + " for player "
-                      + player.getName());
-            }
+            System.out.println("WARNING: Unknown packet 0x" + Integer.toHexString(packetId));
+            copyNBytes(length);
           }
       }
-
     } else {
       throw new ArrayIndexOutOfBoundsException();
     }
@@ -1681,11 +1672,6 @@ public class StreamTunnel {
   }
 
   private void packetFinished() throws IOException {
-    if (EXPENSIVE_DEBUG_LOGGING) {
-      inputDumper.packetFinished();
-      outputDumper.packetFinished();
-    }
-
     // reset our incoming buffer, and write the outgoing one
     incoming = null;
     int size = outgoing.position();
@@ -1697,14 +1683,23 @@ public class StreamTunnel {
 
       byte[] tmp = new byte[size];
       outgoing.get(tmp);
-      write(size);
+      readyToSend = true;
+
+      write(encodeVarInt(size));
       write(tmp);
+    }
+
+    if (EXPENSIVE_DEBUG_LOGGING) {
+      inputDumper.packetFinished();
+      outputDumper.packetFinished();
     }
   }
 
   private void flushAll() throws IOException {
     try {
-      ((OutputStream) out).flush();
+      if (readyToSend) {
+        ((OutputStream) out).flush();
+      }
     } finally {
       if (EXPENSIVE_DEBUG_LOGGING) {
         inputDumper.flush();
