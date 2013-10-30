@@ -569,12 +569,12 @@ public class StreamTunnel {
               // Drop the item in hand. This keeps the client state in-sync with the
               // server. This generally prevents empty-hand clicks by the client
               // from placing blocks the server thinks the client has in hand.
-              add((byte) 0x0e); // @todo figure out how to drop items in new protocol
-              add((byte) 0x04);
-              add(x);
-              add(y);
-              add(z);
-              add(direction);
+              //add((byte) 0x0e); // @todo figure out how to drop items in new protocol
+              //add((byte) 0x04);
+              //add(x);
+              //add(y);
+              //add(z);
+              //add(direction);
             }
           }
           break;
@@ -645,7 +645,7 @@ public class StreamTunnel {
           break;
 
         case 0x0E: // Click Window / Spawn Object
-          if (isServerTunnel) {
+          if (!isServerTunnel) {
             add(packetId);
             add(incoming.get());
             add(incoming.getShort());
@@ -741,7 +741,7 @@ public class StreamTunnel {
 
         case 0x12: // Update Sign / Entity Velocity
           add(packetId);
-          if (isServerTunnel) {
+          if (!isServerTunnel) {
             add(incoming.getInt());
             add(incoming.getShort());
             add(incoming.getInt());
@@ -799,7 +799,7 @@ public class StreamTunnel {
 
         case 0x16: // Client Status / Entity Look
           add(packetId);
-          if (isServerTunnel) {
+          if (!isServerTunnel) {
             add(incoming.get());
           } else {
             add(incoming.getInt());
@@ -1685,6 +1685,7 @@ public class StreamTunnel {
       outgoing.get(tmp);
       readyToSend = true;
 
+      System.out.println("outbound size: " + size);
       write(encodeVarInt(size));
       write(tmp);
     }
