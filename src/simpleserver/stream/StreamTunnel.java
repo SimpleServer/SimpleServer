@@ -654,36 +654,21 @@ public class StreamTunnel {
             add(incoming.get());
             copyItem();
           } else {
+            add(packetId);
             int eid = decodeVarInt();
-            String name = readUTF8();
+            addVarInt(eid);
+            add(incoming.get());
             int objects = 0;
-            if (!server.bots.ninja(name)) {
-              add(packetId);
-              addVarInt(eid);
-              add(name);
-              add(incoming.getInt());
-              add(incoming.getInt());
-              add(incoming.getInt());
-              add(incoming.get());
-              add(incoming.get());
-              objects = add(incoming.getInt());
-              if (objects > 0) {
-                add(incoming.getShort());
-                add(incoming.getShort());
-                add(incoming.getShort());
-              }
-            } else {
-              incoming.getInt();
-              incoming.getInt();
-              incoming.getInt();
-              incoming.get();
-              incoming.get();
-              objects = incoming.getInt();
-              if (objects > 0) {
-                incoming.getShort();
-                incoming.getShort();
-                incoming.getShort();
-              }
+            add(incoming.getInt());
+            add(incoming.getInt());
+            add(incoming.getInt());
+            add(incoming.get());
+            add(incoming.get());
+            objects = add(incoming.getInt());
+            if (objects > 0) {
+              add(incoming.getShort());
+              add(incoming.getShort());
+              add(incoming.getShort());
             }
           }
           break;
@@ -759,7 +744,7 @@ public class StreamTunnel {
 
         case 0x13: // Player Abilities / Destroy Entities
           add(packetId);
-          if (isServerTunnel) {
+          if (!isServerTunnel) {
             add(incoming.get());
             add(incoming.getFloat());
             add(incoming.getFloat());
@@ -937,10 +922,10 @@ public class StreamTunnel {
           }
 
           add(x);
-          add(y);
+          addUnsignedByte(y);
           add(z);
-          add(blockType);
-          add(metadata);
+          addVarInt(blockType);
+          addUnsignedByte(metadata);
           break;
 
         case 0x24: // Block Action
