@@ -160,8 +160,8 @@ public class StreamTunnel {
 
     Byte packetId  = (byte) decodeVarInt();
 
-    System.out.println("state:" + state + (isServerTunnel ? " server " : " client ") +
-    String.format("%02x", packetId) + " length: " + length);
+    //System.out.println("state:" + state + (isServerTunnel ? " server " : " client ") +
+    //String.format("%02x", packetId) + " length: " + length);
 
     if (state == STATE_HANDSHAKE) {
       if (!isServerTunnel) {
@@ -540,7 +540,7 @@ public class StreamTunnel {
             if (writePacket) {
               add(packetId);
               add(x);
-              add(y);
+              addUnsignedByte(y);
               add(z);
               add(direction);
               add(dropItem);
@@ -590,7 +590,7 @@ public class StreamTunnel {
 
         case 0x0A: // Animation / Use Bed
           add(packetId);
-          if (isServerTunnel) {
+          if (!isServerTunnel) {
             add(incoming.getInt());
             add(incoming.get());
           } else {
@@ -603,7 +603,7 @@ public class StreamTunnel {
 
         case 0x0B: // Entity Action / Animation
           add(packetId);
-          if (isServerTunnel) {
+          if (!isServerTunnel) {
             add(incoming.getInt());
             add(incoming.get());
             add(incoming.getInt());
@@ -636,7 +636,7 @@ public class StreamTunnel {
 
         case 0x0D: // Close Window / Collect Item
           add(packetId);
-          if (isServerTunnel) {
+          if (!isServerTunnel) {
             add(incoming.get());
           } else {
             add(incoming.getInt());
@@ -1658,6 +1658,7 @@ public class StreamTunnel {
 
   private void packetFinished() throws IOException {
     // reset our incoming buffer, and write the outgoing one
+    int pre  = incoming.position();
     incoming = null;
     int size = outgoing.position();
 
@@ -1670,7 +1671,11 @@ public class StreamTunnel {
       outgoing.get(tmp);
       readyToSend = true;
 
-      System.out.println("outbound size: " + size);
+      if (size != pre) {
+        System.out.println(tmp[0]);
+        System.out.println("outbound size: " + size);
+      }
+
       write(encodeVarInt(size));
       write(tmp);
     }
