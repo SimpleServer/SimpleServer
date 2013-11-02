@@ -309,8 +309,8 @@ public class StreamTunnel {
           break;
 
         case 0x01: // Join-Game / Chat-Message
-          add(packetId);
           if (isServerTunnel) {
+            add(packetId);
             player.setEntityId(add(incoming.getInt()));
             copyUnsignedByte();
             dimension = incoming.get();
@@ -320,14 +320,69 @@ public class StreamTunnel {
             addUnsignedByte(server.config.properties.getInt("maxPlayers"));
             add(readUTF8());
           } else {
-            add(readUTF8()); // @todo handle chat message
+            String message = readUTF8();
+
+            if (player.isMuted() && !message.startsWith("/") && !message.startsWith("!")) {
+              player.addTMessage(Color.RED, "You are muted! You may not send messages to all players.");
+              break;
+            }
+
+            if (message.charAt(0) == commandPrefix) {
+              message = player.parseCommand(message, false);
+              if (message == null) {
+                break;
+              }
+              add(message);
+              return;
+            }
+            player.sendMessage(message);
           }
           break;
 
         case 0x02: // Chat-Message / Use Entity
           add(packetId);
           if (isServerTunnel) {
-            add(readUTF8());
+            String message = readUTF8();
+            MessagePacket messagePacket = new Message().decodeMessage(message);
+
+            if (messagePacket == null) {
+              if (server.config.properties.getBoolean("useMsgFormats")) {
+                if (server.config.properties.getBoolean("forwardChat") && server.getMessager().wasForwarded(message)) {
+                  break;
+                }
+
+                Matcher colorMatcher = COLOR_PATTERN.matcher(message);
+                String cleanMessage = colorMatcher.replaceAll("");
+
+                Matcher messageMatcher = MESSAGE_PATTERN.matcher(cleanMessage);
+                if (messageMatcher.find()) {
+
+                } else if (cleanMessage.matches(CONSOLE_CHAT_PATTERN) && !server.config.properties.getBoolean("chatConsoleToOps")) {
+                  break;
+                }
+
+                // @todo bring msgWrap back
+                sendMessage(message);
+                add(message);
+              }
+            } else {
+              // we have a json object
+              if (messagePacket.isJoinedPacket()) {
+                String username = messagePacket.getJoinedUsername();
+
+                if (server.bots.ninja(username)) {
+                  break;
+                }
+                if (message.contains("join")) {
+                  player.addTMessage(Color.YELLOW, "%s joined the game.", username);
+                } else {
+                  player.addTMessage(Color.YELLOW, "%s left the game.", username);
+                }
+                break;
+              } else {
+                add(message);
+              }
+            }
           } else {
             add(incoming.getInt());
             add(incoming.get());
@@ -1659,10 +1714,11 @@ public class StreamTunnel {
   private void packetFinished() throws IOException {
     // reset our incoming buffer, and write the outgoing one
     int pre  = incoming.position();
+    int max = incoming.limit();
     incoming = null;
     int size = outgoing.position();
 
-    if (size > 0) {
+    if (pre == max) {
       outgoing.limit(size);
       outgoing.rewind();
       outgoing.order(ByteOrder.BIG_ENDIAN);
@@ -1671,13 +1727,11 @@ public class StreamTunnel {
       outgoing.get(tmp);
       readyToSend = true;
 
-      if (size != pre) {
-        System.out.println(tmp[0]);
-        System.out.println("outbound size: " + size);
-      }
-
       write(encodeVarInt(size));
       write(tmp);
+    } else {
+      System.out.println("read " + pre + " bytes. found: " + max);
+      System.out.println("outbound size: " + size);
     }
 
     if (EXPENSIVE_DEBUG_LOGGING) {
