@@ -1704,11 +1704,30 @@ public class StreamTunnel {
 
   private void sendMessagePacket(String message) throws IOException {
     if (message.length() > 0) {
-      // @todo start new packet
-      //add((byte) 0x01);
-      //add(message);
-      //packetFinished();
+
+      // create new byte array
+      byte[] packet = new byte[message.getBytes().length + 1];
+      byte[] size = new byte[1];
+      size = encodeVarInt(message.getBytes().length);
+
+      // make byte [size][data]
+      System.arraycopy(size, 0, packet, 0, size.length);
+      System.arraycopy(message.getBytes(), 0, packet, size.length, message.getBytes().length);
+
+      sendPacketIndependently((byte) 0x02, packet);
     }
+  }
+
+  private void sendPacketIndependently(byte id, byte[] data) throws IOException {
+    ByteBuffer tmp = ByteBuffer.allocate(data.length + 1);
+    tmp.put(id);
+    tmp.put(data);
+    
+    write(encodeVarInt(tmp.limit()));
+    tmp.rewind();
+    outgoing.order(ByteOrder.BIG_ENDIAN);
+    write(tmp.array());
+    ((OutputStream) out).flush();
   }
 
   private void packetFinished() throws IOException {
