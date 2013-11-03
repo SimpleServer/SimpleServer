@@ -1706,9 +1706,8 @@ public class StreamTunnel {
     if (message.length() > 0) {
 
       // create new byte array
-      byte[] packet = new byte[message.getBytes().length + 1];
-      byte[] size = new byte[1];
-      size = encodeVarInt(message.getBytes().length);
+      byte[] size = encodeVarInt(message.getBytes().length);
+      byte[] packet = new byte[message.getBytes().length + size.length];
 
       // make byte [size][data]
       System.arraycopy(size, 0, packet, 0, size.length);
