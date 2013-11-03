@@ -316,7 +316,7 @@ public class StreamTunnel {
             dimension = incoming.get();
             add(dimension);
             copyUnsignedByte();
-            readUnsignedByte(); //@todo uncomment once fix 0x00 of status
+            readUnsignedByte();
             addUnsignedByte(server.config.properties.getInt("maxPlayers"));
             add(readUTF8());
           } else {
@@ -1244,8 +1244,12 @@ public class StreamTunnel {
 
         case 0x3A: // Tab-Complete
           add(packetId);
-          copyVarInt();
-          add(readUTF8());
+          int s = decodeVarInt();
+
+          add(encodeVarInt(s));
+          if (s > 0) {
+            add(readUTF8());
+          }
           break;
 
         case 0x3B: // Scoreboard Objective
