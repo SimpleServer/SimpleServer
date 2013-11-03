@@ -81,23 +81,24 @@ public class Giver extends Bot {
     super.ready();
     writeLock.lock();
     for (byte i = 0; i < count; i++) {
-      Slot slot = inv.get(i);
-      out.writeByte(0x66);
-      out.writeByte(0);
-      out.writeShort(Inventory.networkSlot(i));
-      out.writeByte(0);
-      out.writeShort(i * 2);
-      out.writeBoolean(false);
-      slot.write(out);
-      out.flush();
-      out.writeByte(0x66);
-      out.writeByte(0);
-      out.writeShort(-999);
-      out.writeByte(0);
-      out.writeShort(i * 2 + 1);
-      out.writeBoolean(false);
-      out.writeShort(-1);
-      out.flush();
+      // @todo rewrite to use BufferBytes
+//      Slot slot = inv.get(i);
+//      out.writeByte(0x66);
+//      out.writeByte(0);
+//      out.writeShort(Inventory.networkSlot(i));
+//      out.writeByte(0);
+//      out.writeShort(i * 2);
+//      out.writeBoolean(false);
+//      slot.write(out);
+//      out.flush();
+//      out.writeByte(0x66);
+//      out.writeByte(0);
+//      out.writeShort(-999);
+//      out.writeByte(0);
+//      out.writeShort(i * 2 + 1);
+//      out.writeBoolean(false);
+//      out.writeShort(-1);
+//      out.flush();
     }
     writeLock.unlock();
     logout();

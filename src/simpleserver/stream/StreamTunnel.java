@@ -207,7 +207,6 @@ public class StreamTunnel {
               serverId = player.getConnectionHash();
             }
             add(serverId);
-            // @todo fixup sizes
             byte[] keyBytes = new byte[incoming.getShort()];
             incoming.put(keyBytes);
 
