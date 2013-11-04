@@ -89,12 +89,14 @@ public class ChatRoomCommand extends AbstractCommand implements PlayerCommand {
       player.setChat(new LocalChat(player));
     } else if (mode.equals("private")) {
 
-      Player reciever = player.getServer().findPlayer(args[1]);
-      if (reciever == null) {
-        player.addTMessage(Color.RED, "Player not online (%s)", args[1]);
-        return;
-      } else {
-        player.setChat(new PrivateChat(player, reciever));
+      if (args[1] != null) {
+        Player reciever = player.getServer().findPlayer(args[1]);
+        if (reciever == null) {
+          player.addTMessage(Color.RED, "Player not online (%s)", args[1]);
+          return;
+        } else {
+          player.setChat(new PrivateChat(player, reciever));
+        }
       }
     } else {
       player.addTMessage(Color.RED, "specified chatMode does not exist.");
