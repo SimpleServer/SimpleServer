@@ -1022,6 +1022,7 @@ public class StreamTunnel {
           add(incoming.getFloat());
           add(incoming.getFloat());
           add(incoming.getFloat());
+          add(incoming.getFloat());
           int recordCount = incoming.getInt();
           add(recordCount);
           copyNBytes(recordCount * 3);
