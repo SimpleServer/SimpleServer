@@ -1,4 +1,4 @@
-Simple Server 8.4.11
+Simple Server 8.5.0
 An open source simple server tunnel for the official minecraft multiplayer servers.
 Copyright (c) 2011 SimpleServer authors (see CONTRIBUTORS)
 See LICENSE for details.
@@ -6,6 +6,7 @@ See LICENSE for details.
 Wiki: http://github.com/SimpleServer/SimpleServer/wiki
 Forum thread: http://www.minecraftforum.net/viewtopic.php?f=1023&t=336496
 Source: http://github.com/SimpleServer/SimpleServer
+IRC: Freenode #SimpleServer
 
 Installation:
 1) Run launch.bat (Windows), launch.command (Mac OS X), or launch.sh (Linux/BSD)

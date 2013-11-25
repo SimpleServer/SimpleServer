@@ -1,6 +1,5 @@
-== 8.4.11 ==
- * Protocol version 78
- * Updated to Minecraft 1.6.4
+== 8.5.0 ==
+ * Network partial rewrite for Minecraft 1.7.x
  
 == 8.4.10 ==
  * Protocol version 74
