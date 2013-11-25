@@ -669,7 +669,7 @@ public class StreamTunnel {
 
         case 0x0C: // Steer Vehicle / Spawn Player
           add(packetId);
-          if (isServerTunnel) {
+          if (!isServerTunnel) {
             add(incoming.getFloat());
             add(incoming.getFloat());
             add(incoming.get());
@@ -751,7 +751,7 @@ public class StreamTunnel {
 
         case 0x10: // Creative Inventory Action / Spawn Painting
           add(packetId);
-          if (isServerTunnel) {
+          if (!isServerTunnel) {
             add(incoming.getShort());
             copyItem();
           } else {
@@ -766,7 +766,7 @@ public class StreamTunnel {
 
         case 0x11: // Enchant Item / Spawn Experience Orb
           add(packetId);
-          if (isServerTunnel) {
+          if (!isServerTunnel) {
             add(incoming.get());
             add(incoming.get());
           } else {
