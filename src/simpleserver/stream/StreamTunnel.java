@@ -810,9 +810,9 @@ public class StreamTunnel {
           }
           break;
 
-        case 0x14: // Tab Complete / Entity
+        case 0x14: // Tab-Complete / Entity
           add(packetId);
-          if (isServerTunnel) {
+          if (!isServerTunnel) {
             add(readUTF8());
           } else {
             add(incoming.getInt());
@@ -1248,7 +1248,9 @@ public class StreamTunnel {
 
           add(encodeVarInt(s));
           if (s > 0) {
-            add(readUTF8());
+            for (int i = 0; i < s; i++) {
+              add(readUTF8());
+            }
           }
           break;
 
