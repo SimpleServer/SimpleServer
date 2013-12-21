@@ -62,14 +62,6 @@ public class Teleporter extends Bot {
   }
 
   @Override
-  protected void handlePacket(byte packetId) throws IOException {
-    switch (packetId) {
-      default:
-        super.handlePacket(packetId);
-    }
-  }
-
-  @Override
   protected void die() {
     timer.cancel();
     super.die();

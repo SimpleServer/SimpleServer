@@ -22,15 +22,12 @@ package simpleserver.bot;
 
 import static simpleserver.util.Util.print;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.concurrent.locks.ReentrantLock;
 
 import simpleserver.Coordinate.Dimension;
@@ -60,6 +57,10 @@ public class Bot {
   private float health;
 
   private ServerEncryption encryption = new ServerEncryption();
+
+  protected ByteBuffer incoming = null;
+  protected ByteBuffer outgoing = null;
+  protected int state = 0;
 
   public Bot(Server server, String name) {
     this.name = name;
@@ -102,21 +103,25 @@ public class Bot {
 
   private void handshake() throws IOException {
     writeLock.lock();
-    out.writeByte(2);
-    out.writeByte(Main.protocolVersion);
-    write(name);
-    write("localhost");
-    out.writeInt(server.options.getInt("internalPort"));
-    out.flush();
+
+    // @todo cleanup to use functions instead of chaining everything into handshake bytebuffer
+    ByteBuffer handshake = ByteBuffer.allocate(25);
+    handshake.put(encodeVarInt(Main.protocolVersion));
+    handshake.put(encodeVarInt(("localhost").length())); // length of string
+    handshake.put("localhost".getBytes());
+    handshake.putShort((short) (server.options.getInt("internalPort") & 0xFFFF));
+    handshake.put(encodeVarInt(2)); // state "2" -> login
+
+    sendPacketIndependently((byte) 0x00, handshake.array());
     writeLock.unlock();
   }
 
   public void logout() throws IOException {
     die();
     expectDisconnect = true;
-    out.writeByte(0xff);
-    write("quitting");
-    out.flush();
+//    out.writeByte(0xff);
+//    write("quitting");
+//    out.flush();
   }
 
   protected void login() throws IOException {
@@ -175,7 +180,17 @@ public class Bot {
     return true;
   }
 
-  protected void handlePacket(byte packetId) throws IOException {
+  protected void handlePacket() throws IOException {
+    int length = decodeVarInt();
+
+    // read length into byte[], copy into ByteBuffer
+    byte[] buf = new byte[length];
+    in.readFully(buf, 0, length);
+    incoming = ByteBuffer.wrap(buf);
+    outgoing = ByteBuffer.allocate(length * 2);
+
+    Byte packetId  = (byte) decodeVarInt();
+
     // System.out.println("Packet: 0x" + Integer.toHexString(packetId));
     switch (packetId) {
       case 0x01: // Login Request
@@ -184,21 +199,21 @@ public class Bot {
           playerEntityId = eid;
         }
 
-        readUTF16();
-        in.readByte();
-        position.dimension = Dimension.get(in.readByte());
-        in.readByte();
-        in.readByte();
-        in.readByte();
+        readUTF8();
+        incoming.get();
+        position.dimension = Dimension.get(incoming.get());
+        incoming.get();
+        incoming.get();
+        incoming.get();
         break;
-      case 0x0d: // Player Position & Look
-        double x = in.readDouble();
-        double stance = in.readDouble();
-        double y = in.readDouble();
-        double z = in.readDouble();
-        float yaw = in.readFloat();
-        float pitch = in.readFloat();
-        boolean onGround = in.readBoolean();
+      case 0x08: // Player Position & Look
+        double x = incoming.getDouble();
+        double stance = incoming.getDouble();
+        double y = incoming.getDouble();
+        double z = incoming.getDouble();
+        float yaw = incoming.getFloat();
+        float pitch = incoming.getFloat();
+        boolean onGround = (incoming.get() != 0);
         position.updatePosition(x, y, z, stance);
         position.updateLook(yaw, pitch);
         position.updateGround(onGround);
@@ -211,64 +226,44 @@ public class Bot {
         }
         positionUpdate();
         break;
-      case 0x0b: // Player Position
-        double x2 = in.readDouble();
-        double stance2 = in.readDouble();
-        double y2 = in.readDouble();
-        double z2 = in.readDouble();
-        boolean onGround2 = in.readBoolean();
+      case 0x04: // Player Position
+        double x2 = incoming.getDouble();
+        double stance2 = incoming.getDouble();
+        double y2 = incoming.getDouble();
+        double z2 = incoming.getDouble();
+        boolean onGround2 = (incoming.get() != 0);
         position.updatePosition(x2, y2, z2, stance2);
         position.updateGround(onGround2);
         positionUpdate();
         break;
       case (byte) 0xff: // Disconnect/Kick
-        String reason = readUTF16();
+        String reason = readUTF8();
         error(reason);
         break;
       case 0x00: // Keep Alive
-        keepAlive(in.readInt());
+        keepAlive(incoming.getInt());
         break;
 
-      case 0x08: // Update Health
-        health = in.readFloat();
-        in.readShort();
-        in.readFloat();
+      case 0x06: // Update Health
+        health = incoming.getFloat();
+        incoming.getShort();
+        incoming.getFloat();
         if (health <= 0) {
           dead = true;
           respawn();
         }
         break;
-      case 0x09: // Respawn
-        position.dimension = Dimension.get((byte) in.readInt());
-        in.readByte();
-        in.readByte();
-        in.readShort();
-        readUTF16();
-        break;
-      case (byte) 0xfc: // Encryption Key Response
-        byte[] sharedKey = new byte[in.readShort()];
-        in.readFully(sharedKey);
-        byte[] challengeTokenResponse = new byte[in.readShort()];
-        in.readFully(challengeTokenResponse);
-        in = new DataInputStream(new BufferedInputStream(encryption.encryptedInputStream(socket.getInputStream())));
-        out = new DataOutputStream(new BufferedOutputStream(encryption.encryptedOutputStream(socket.getOutputStream())));
-        login();
-        break;
-      case (byte) 0xfd: // Encryption Key Request (server -> client)
-        readUTF16();
-        byte[] keyBytes = new byte[in.readShort()];
-        in.readFully(keyBytes);
-        byte[] challengeToken = new byte[in.readShort()];
-        in.readFully(challengeToken);
-        encryption.setPublicKey(keyBytes);
-        encryption.setChallengeToken(challengeToken);
-        sendSharedKey();
+      case 0x07: // Respawn
+        position.dimension = Dimension.get(incoming.getInt());
+        readUnsignedByte();
+        readUnsignedByte();
+        readUTF8();
         break;
       case (byte) 0xfe: // Server List Ping
         break;
       default:
-        error("Unable to handle packet 0x" + Integer.toHexString(packetId)
-            + " after 0x" + Integer.toHexString(lastPacket));
+        // packet are length prefixed, so just skip the unknowns
+        break;
     }
     lastPacket = packetId;
   }
@@ -299,12 +294,93 @@ public class Bot {
     this.controller = controller;
   }
 
+  protected int decodeVarInt() throws IOException {
+    int i = 0;
+    int j = 0;
+
+    while (true) {
+      int k = ((incoming != null) ? incoming.get() : in.readByte());
+      i |= (k & 0x7F) << j++ * 7;
+
+      if (j > 5) {
+        throw new IllegalArgumentException("VarInt too big");
+      }
+      if ((k & 0x80) != 128)
+        break;
+    }
+    return i;
+  }
+
+  protected byte[] encodeVarInt(int value) throws IOException {
+    ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+    while (true) {
+      if ((value & 0xFFFFFF80) == 0) {
+        buffer.write(value);
+        return buffer.toByteArray();
+      }
+      buffer.write(value & 0x7F | 0x80);
+      value >>>= 7;
+    }
+  }
+
+  protected String readUTF8() throws IOException {
+    ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+    int length = decodeVarInt();
+
+    for (int i = 0; i < length; i++) {
+      buffer.write((incoming != null) ? incoming.get() : in.readByte());
+    }
+    return new String(buffer.toByteArray(), "UTF-8");
+  }
+
+  private int readUnsignedShort() {
+    return (incoming.getShort() & 0xFFFF);
+  }
+
+  private short readUnsignedByte() {
+    return ((short) (incoming.get() & 0xFF));
+  }
+
+  private void copyVarInt() throws IOException {
+    outgoing.put(encodeVarInt(decodeVarInt()));
+  }
+
+  private int copyUnsignedByte() throws IOException {
+    return addUnsignedByte(readUnsignedByte());
+  }
+
+  private int copyUnsignedShort() throws IOException {
+    return addUnsignedShort(readUnsignedShort());
+  }
+
+  private int addUnsignedShort(int i) {
+    outgoing.putShort((short) (i & 0xFFFF));
+    return i;
+  }
+
+  private int addUnsignedByte(int i) {
+    outgoing.put((byte) (i & 0xFF));
+    return i;
+  }
+
+  private void sendPacketIndependently(byte id, byte[] data) throws IOException {
+    ByteBuffer tmp = ByteBuffer.allocate(data.length + 1);
+    tmp.put(id);
+    tmp.put(data);
+
+    out.write(encodeVarInt(tmp.limit()));
+    tmp.rewind();
+    outgoing.order(ByteOrder.BIG_ENDIAN);
+    out.write(tmp.array());
+    ((OutputStream) out).flush();
+  }
+
   private final class Tunneler extends Thread {
     @Override
     public void run() {
       while (connected) {
         try {
-          handlePacket(in.readByte());
+          handlePacket();
           out.flush();
           if (!gotFirstPacket) {
             gotFirstPacket = true;

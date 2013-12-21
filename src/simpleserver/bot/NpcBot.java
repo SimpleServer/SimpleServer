@@ -21,6 +21,7 @@
 package simpleserver.bot;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Timer;
@@ -62,10 +63,20 @@ public class NpcBot extends Bot {
   }
 
   @Override
-  protected void handlePacket(byte packetId) throws IOException {
+  protected void handlePacket() throws IOException {
+    int length = decodeVarInt();
+
+    // read length into byte[], copy into ByteBuffer
+    byte[] buf = new byte[length];
+    in.readFully(buf, 0, length);
+    incoming = ByteBuffer.wrap(buf);
+    outgoing = ByteBuffer.allocate(length * 2);
+
+    Byte packetId  = (byte) decodeVarInt();
+
     switch (packetId) {
       case 0x08: // respawn
-        super.handlePacket(packetId);
+        super.handlePacket();
         if (dead) {
           respawnEvent();
         }
@@ -79,9 +90,6 @@ public class NpcBot extends Bot {
       case 0x1d: // destroy entity
         destroyEntity();
         break;
-
-      default:
-        super.handlePacket(packetId);
     }
   }
 

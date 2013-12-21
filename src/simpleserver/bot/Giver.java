@@ -22,6 +22,7 @@ package simpleserver.bot;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
+import java.nio.ByteBuffer;
 
 import simpleserver.Player;
 import simpleserver.nbt.Inventory;
@@ -68,12 +69,20 @@ public class Giver extends Bot {
 
   @SuppressWarnings("fallthrough")
   @Override
-  protected void handlePacket(byte packetId) throws IOException {
+  protected void handlePacket() throws IOException {
+    int length = decodeVarInt();
+
+    // read length into byte[], copy into ByteBuffer
+    byte[] buf = new byte[length];
+    in.readFully(buf, 0, length);
+    incoming = ByteBuffer.wrap(buf);
+    outgoing = ByteBuffer.allocate(length * 2);
+
+    Byte packetId  = (byte) decodeVarInt();
+
     switch (packetId) {
       case 0x68:
         drop();
-      default:
-        super.handlePacket(packetId);
     }
   }
 

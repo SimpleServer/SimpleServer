@@ -21,6 +21,7 @@
 package simpleserver.bot;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -41,15 +42,23 @@ public class Herobrine extends Bot {
   }
 
   @Override
-  protected void handlePacket(byte packetId) throws IOException {
+  protected void handlePacket() throws IOException {
+    int length = decodeVarInt();
+
+    // read length into byte[], copy into ByteBuffer
+    byte[] buf = new byte[length];
+    in.readFully(buf, 0, length);
+    incoming = ByteBuffer.wrap(buf);
+    outgoing = ByteBuffer.allocate(length * 2);
+
+    Byte packetId  = (byte) decodeVarInt();
+
     switch (packetId) {
       case 0x3:
-        if (readUTF16().contains("quit")) {
+        if (readUTF8().contains("quit")) {
           logout();
         }
         break;
-      default:
-        super.handlePacket(packetId);
     }
   }
 
