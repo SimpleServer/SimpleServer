@@ -96,25 +96,25 @@ public class Bot {
 
   private void keepAlive(int keepAliveId) throws IOException {
     writeLock.lock();
-    out.writeByte(0x0);
-    out.writeInt(keepAliveId);
+    byte[] keepAlive = ByteBuffer.allocate(4).putInt(keepAliveId).array();
+    sendPacketIndependently((byte) 0x00, keepAlive);
     writeLock.unlock();
   }
 
   private void handshake() throws IOException {
     writeLock.lock();
 
-    byte[] s = encodeVarInt(Main.protocolVersion);
-    byte[] v = encodeVarInt(("localhost").length());
-    byte[] t = "localhost".getBytes();
-    short  w = (short) (server.options.getInt("internalPort") & 0xFFFF);
-    byte[] q = encodeVarInt(2);
+    byte[] v = encodeVarInt(Main.protocolVersion);
+    byte[] h = setUTF8("localhost");
+    short  p = (short) (server.options.getInt("internalPort") & 0xFFFF);
+    byte[] s = encodeVarInt(2);
 
-    ByteBuffer handshake = ByteBuffer.allocate(s.length + v.length + t.length + 2 + q.length);
-    handshake.put(s).put(v).put(t).putShort(w).put(q);
+    ByteBuffer handshake = ByteBuffer.allocate(v.length + h.length + 2 + s.length);
+    handshake.put(v).put(h).putShort(p).put(s);
     sendPacketIndependently((byte) 0x00, handshake.array());
     this.state = 2;
     writeLock.unlock();
+    login();
   }
 
   public void logout() throws IOException {
@@ -127,13 +127,12 @@ public class Bot {
 
   protected void login() throws IOException {
     writeLock.lock();
-    byte[] uuid_s = encodeVarInt(4);
-    byte[] uuid = String.valueOf(this.playerEntityId).getBytes();
-    byte[] name_s = encodeVarInt(this.name.length());
-    byte[] name = this.name.getBytes();
+    //byte[] uuid_s = encodeVarInt(4);
+    //byte[] uuid = String.valueOf(this.playerEntityId).getBytes();
+    byte[] name = setUTF8(this.name);
 
-    ByteBuffer login = ByteBuffer.allocate(uuid_s.length + uuid.length + name_s.length + name.length);
-    sendPacketIndependently((byte) 0x02, login.array());
+    ByteBuffer login = ByteBuffer.allocate(name.length);
+    sendPacketIndependently((byte) 0x00, login.array());
     writeLock.unlock();
   }
 
@@ -208,24 +207,60 @@ public class Bot {
         break;
 
       case 2: // login
-
+         switch(packetId) {
+           case 0x00:
+             String name = readUTF8();
+             break;
+         }
         break;
 
       case 3: // play
         switch (packetId) {
+          case 0x00: // Keep Alive
+            keepAlive(incoming.getInt());
+            break;
+
           case 0x01: // Login Request
             int eid = in.readInt();
             if (playerEntityId == 0) {
               playerEntityId = eid;
             }
 
-            readUTF8();
-            incoming.get();
+            readUnsignedByte();
             position.dimension = Dimension.get(incoming.get());
-            incoming.get();
-            incoming.get();
-            incoming.get();
+            readUnsignedByte();
+            readUnsignedByte();
+            readUTF8();
             break;
+
+          case 0x04: // Player Position
+            double x2 = incoming.getDouble();
+            double stance2 = incoming.getDouble();
+            double y2 = incoming.getDouble();
+            double z2 = incoming.getDouble();
+            boolean onGround2 = (incoming.get() != 0);
+            position.updatePosition(x2, y2, z2, stance2);
+            position.updateGround(onGround2);
+            positionUpdate();
+            break;
+
+          case 0x06: // Update Health
+            health = incoming.getFloat();
+            incoming.getShort();
+            incoming.getFloat();
+            if (health <= 0) {
+              dead = true;
+              respawn();
+            }
+            break;
+
+          case 0x07: // Respawn
+            position.dimension = Dimension.get(incoming.getInt());
+            readUnsignedByte();
+            readUnsignedByte();
+            readUTF8();
+            break;
+
           case 0x08: // Player Position & Look
             double x = incoming.getDouble();
             double stance = incoming.getDouble();
@@ -246,40 +281,9 @@ public class Bot {
             }
             positionUpdate();
             break;
-          case 0x04: // Player Position
-            double x2 = incoming.getDouble();
-            double stance2 = incoming.getDouble();
-            double y2 = incoming.getDouble();
-            double z2 = incoming.getDouble();
-            boolean onGround2 = (incoming.get() != 0);
-            position.updatePosition(x2, y2, z2, stance2);
-            position.updateGround(onGround2);
-            positionUpdate();
-            break;
-          case (byte) 0xff: // Disconnect/Kick
+          case (byte) 0x40: // Disconnect/Kick
             String reason = readUTF8();
             error(reason);
-            break;
-          case 0x00: // Keep Alive
-            keepAlive(incoming.getInt());
-            break;
-
-          case 0x06: // Update Health
-            health = incoming.getFloat();
-            incoming.getShort();
-            incoming.getFloat();
-            if (health <= 0) {
-              dead = true;
-              respawn();
-            }
-            break;
-          case 0x07: // Respawn
-            position.dimension = Dimension.get(incoming.getInt());
-            readUnsignedByte();
-            readUnsignedByte();
-            readUTF8();
-            break;
-          case (byte) 0xfe: // Server List Ping
             break;
           default:
             // packet are length prefixed, so just skip the unknowns
@@ -354,6 +358,13 @@ public class Bot {
       buffer.write((incoming != null) ? incoming.get() : in.readByte());
     }
     return new String(buffer.toByteArray(), "UTF-8");
+  }
+
+  private byte[] setUTF8(String str) throws IOException {
+    // add size of varInt(string.length) + string, append to byte[], return it
+    return ByteBuffer.allocate(encodeVarInt(str.length()).length + str.length())
+            .put(encodeVarInt(str.length()))
+            .put(str.getBytes()).array();
   }
 
   private int readUnsignedShort() {
