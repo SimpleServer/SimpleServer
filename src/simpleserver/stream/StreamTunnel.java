@@ -1742,7 +1742,7 @@ public class StreamTunnel {
     incoming = null;
     int size = outgoing.position();
 
-    if (pre == max) {
+    if (pre == max && pre != 0) {
       outgoing.limit(size);
       outgoing.rewind();
       outgoing.order(ByteOrder.BIG_ENDIAN);
@@ -1753,6 +1753,7 @@ public class StreamTunnel {
 
       write(encodeVarInt(size));
       write(tmp);
+    } else if (pre == 0) {
     } else {
       System.out.println("read " + pre + " bytes. found: " + max);
       System.out.println("outbound size: " + size);
