@@ -119,6 +119,7 @@ public class Bot {
 
   public void logout() throws IOException {
     die();
+    //@todo send valid JSON quit message.
     expectDisconnect = true;
 //    out.writeByte(0xff);
 //    write("quitting");
@@ -127,25 +128,11 @@ public class Bot {
 
   protected void login() throws IOException {
     writeLock.lock();
-    //byte[] uuid_s = encodeVarInt(4);
-    //byte[] uuid = String.valueOf(this.playerEntityId).getBytes();
     byte[] name = setUTF8(this.name);
 
     ByteBuffer login = ByteBuffer.allocate(name.length);
+    login.put(name);
     sendPacketIndependently((byte) 0x00, login.array());
-    writeLock.unlock();
-  }
-
-  private void sendSharedKey() throws IOException {
-    writeLock.lock();
-    //out.writeByte(0xfc);
-    //byte[] key = encryption.getEncryptedSharedKey();
-    //out.writeShort(key.length);
-    //out.write(key);
-    //byte[] challengeTokenResponse = encryption.encryptChallengeToken();
-    //out.writeShort(challengeTokenResponse.length);
-    //out.write(challengeTokenResponse);
-    //out.flush();
     writeLock.unlock();
   }
 
@@ -195,7 +182,10 @@ public class Bot {
     outgoing = ByteBuffer.allocate(length * 2);
 
     Byte packetId  = (byte) decodeVarInt();
+    handlePacket(packetId);
+  }
 
+  protected void handlePacket(byte packetId) throws IOException {
     // System.out.println("Packet: 0x" + Integer.toHexString(packetId));
     switch (this.state) {
       case 0: // handshake
@@ -208,8 +198,14 @@ public class Bot {
 
       case 2: // login
          switch(packetId) {
-           case 0x00:
-             String name = readUTF8();
+           case 0x00: // Disconnect
+             readUTF8();
+             break;
+
+           case 0x02: // Login-Success
+             String uuid = readUTF8();
+             name = readUTF8();
+             this.state = 3;
              break;
          }
         break;
@@ -230,6 +226,10 @@ public class Bot {
             position.dimension = Dimension.get(incoming.get());
             readUnsignedByte();
             readUnsignedByte();
+            readUTF8();
+            break;
+
+          case 0x02: // Chat-Message
             readUTF8();
             break;
 
