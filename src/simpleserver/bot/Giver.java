@@ -83,6 +83,11 @@ public class Giver extends Bot {
     switch (packetId) {
       case 0x68:
         drop();
+        break;
+
+      default:
+        super.handlePacket(packetId);
+        break;
     }
   }
 

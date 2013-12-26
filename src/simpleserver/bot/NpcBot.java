@@ -75,13 +75,13 @@ public class NpcBot extends Bot {
     Byte packetId  = (byte) decodeVarInt();
 
     switch (packetId) {
-      case 0x08: // respawn
+      case 0x07: // respawn
         super.handlePacket();
         if (dead) {
           respawnEvent();
         }
         break;
-      case 0x15: // pickup spawn
+      case 0x0E: // spawn object (via dropping)
         addDroppedItem();
         break;
       case 0x16: // collect item
@@ -89,6 +89,10 @@ public class NpcBot extends Bot {
         break;
       case 0x1d: // destroy entity
         destroyEntity();
+        break;
+
+      default:
+        super.handlePacket(packetId);
         break;
     }
   }
