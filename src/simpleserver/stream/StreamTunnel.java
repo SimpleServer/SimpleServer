@@ -339,7 +339,6 @@ public class StreamTunnel {
           break;
 
         case 0x02: // Chat-Message / Use Entity
-          add(packetId);
           if (isServerTunnel) {
             String message = readUTF8();
             MessagePacket messagePacket = new Message().decodeMessage(message);
@@ -359,10 +358,7 @@ public class StreamTunnel {
                 } else if (cleanMessage.matches(CONSOLE_CHAT_PATTERN) && !server.config.properties.getBoolean("chatConsoleToOps")) {
                   break;
                 }
-
-                // @todo bring msgWrap back
                 sendMessage(message);
-                add(message);
               }
             } else {
               // we have a json object
@@ -379,10 +375,12 @@ public class StreamTunnel {
                 }
                 break;
               } else {
+                add(packetId);
                 add(message);
               }
             }
           } else {
+            add(packetId);
             add(incoming.getInt());
             add(incoming.get());
           }
@@ -1786,7 +1784,6 @@ public class StreamTunnel {
 
           try {
             handlePacket();
-
             if (isServerTunnel) {
               while (player.hasMessages()) {
                 sendMessage(player.getMessage());
