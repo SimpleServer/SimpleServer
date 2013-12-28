@@ -414,7 +414,6 @@ public class Bot {
       while (connected) {
         try {
           handlePacket();
-          out.flush();
           if (!gotFirstPacket) {
             gotFirstPacket = true;
           }
