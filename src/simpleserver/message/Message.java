@@ -20,7 +20,6 @@
  */
 package simpleserver.message;
 
-
 import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.MalformedJsonException;
@@ -31,7 +30,6 @@ import simpleserver.Translate;
 import java.lang.reflect.Type;
 import java.util.Collection;
 
-
 public class Message {
 
   private Color color;
@@ -40,7 +38,7 @@ public class Message {
 
   private boolean italic = false;
 
-  private Gson gson = new Gson();
+  private Gson gson = new GsonBuilder().create();
   private JsonObject jsonObject = new JsonObject();
 
   public Message(Color color, Translate translate, String message) {

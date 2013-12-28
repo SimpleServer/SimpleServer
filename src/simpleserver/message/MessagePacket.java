@@ -24,17 +24,25 @@ public class MessagePacket {
   private String color;
   private String translate;
 
-  private boolean italic;
-  private boolean bold;
+  private MessageWith[] with;
 
-  private String[] using;
+  static class MessageWith {
+    private Event clickEvent;
+    private Event hoverEvent;
+    private String text;
+
+    static class Event {
+      private String action;
+      private String value;
+    }
+  }
 
   public MessagePacket() {
 
   }
 
   private boolean isJson() {
-    if (using == null && translate == null) {
+    if (translate == null && color == null) {
       return false;
     }
     return true;
@@ -52,7 +60,9 @@ public class MessagePacket {
   public String getJoinedUsername() {
     if (isJson()) {
       if (isJoinedPacket()) {
-        return using[0].toString();
+        if (with != null && with.length > 0) {
+          return with[0].text;
+        }
       }
     }
     return "";
