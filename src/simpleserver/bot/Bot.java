@@ -145,6 +145,7 @@ public class Bot {
 
   protected void ready() throws IOException {
     ready = true;
+    this.state = 3;
   }
 
   protected void walk(double d) {
@@ -205,7 +206,7 @@ public class Bot {
            case 0x02: // Login-Success
              String uuid = readUTF8();
              name = readUTF8();
-             this.state = 3;
+             ready();
              break;
          }
         break;
@@ -281,7 +282,7 @@ public class Bot {
             }
             positionUpdate();
             break;
-          case (byte) 0x40: // Disconnect/Kick
+          case (byte) 0x40: // Disconnect/Kick                                                                                            this.state = 3;
             String reason = readUTF8();
             error(reason);
             break;
@@ -305,6 +306,9 @@ public class Bot {
       if (controller != null) {
         controller.trash(dat);
       } else {
+        dat.delete();
+      }
+      if (dat.isFile()) {
         dat.delete();
       }
     }
