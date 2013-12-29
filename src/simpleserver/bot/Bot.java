@@ -174,14 +174,16 @@ public class Bot {
   protected void handlePacket() throws IOException {
     int length = decodeVarInt();
 
-    // read length into byte[], copy into ByteBuffer
-    byte[] buf = new byte[length];
-    in.readFully(buf, 0, length);
-    incoming = ByteBuffer.wrap(buf);
-    outgoing = ByteBuffer.allocate(length * 2);
+    if (length != 0) {
+      // read length into byte[], copy into ByteBuffer
+      byte[] buf = new byte[length];
+      in.readFully(buf, 0, length);
+      incoming = ByteBuffer.wrap(buf);
+      outgoing = ByteBuffer.allocate(length * 2);
 
-    Byte packetId  = (byte) decodeVarInt();
-    handlePacket(packetId);
+      Byte packetId  = (byte) decodeVarInt();
+      handlePacket(packetId);
+    }
   }
 
   protected void handlePacket(byte packetId) throws IOException {
@@ -324,6 +326,10 @@ public class Bot {
   }
 
   protected int decodeVarInt() throws IOException {
+    if (incoming != null && incoming.remaining() == 0) {
+      return 0;
+    }
+
     int i = 0;
     int j = 0;
 
@@ -400,8 +406,9 @@ public class Bot {
   }
 
   private void sendPacketIndependently(byte id, byte[] data) throws IOException {
-    ByteBuffer tmp = ByteBuffer.allocate(data.length + 1);
-    tmp.put(id);
+    byte[] packet = encodeVarInt(id);
+    ByteBuffer tmp = ByteBuffer.allocate(data.length + packet.length);
+    tmp.put(packet);
     tmp.put(data);
 
     out.write(encodeVarInt(tmp.limit()));

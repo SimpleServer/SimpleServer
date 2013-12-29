@@ -98,50 +98,50 @@ public class NpcBot extends Bot {
   }
 
   private void collectItem() throws IOException {
-    int what = in.readInt();
-    int who = in.readInt();
+    //int what = in.readInt();
+    //int who = in.readInt();
 
     // System.out.println("Collected " + what + " Collector:" + who +
     // " real player id:" + playerEntityId); // DEBUG
 
-    if (who != playerEntityId) {
-      return;
-    }
-    DroppedItem i = dropped.get(what);
-    if (i != null) {
-      itemCollectEvent(i);
-    }
+    //if (who != playerEntityId) {
+    //  return;
+    //}
+    //DroppedItem i = dropped.get(what);
+    //if (i != null) {
+    //  itemCollectEvent(i);
+    //}
 
   }
 
   private void addDroppedItem() throws IOException {
-    int eid = in.readInt();
-    short id = in.readShort();
-    byte count = in.readByte();
-    short dat = in.readShort();
-    int x = in.readInt();
-    int y = in.readInt();
-    int z = in.readInt();
+    //int eid = in.readInt();
+    //short id = in.readShort();
+    //byte count = in.readByte();
+    //short dat = in.readShort();
+    //int x = in.readInt();
+    //int y = in.readInt();
+    //int z = in.readInt();
 
-    in.readByte(); // rotation
-    in.readByte(); // pitch
-    in.readByte(); // roll
+    //in.readByte(); // rotation
+    //in.readByte(); // pitch
+    //in.readByte(); // roll
 
     // System.out.println("Dropped item " + eid + " itemid:" + id + " amount:" +
     // count); // DEBUG
 
-    dropped.put(eid, new DroppedItem(eid, id, count, dat,
-                                     (double) x / 32, (double) y / 32, (double) z / 32));
+    //dropped.put(eid, new DroppedItem(eid, id, count, dat,
+    //                                 (double) x / 32, (double) y / 32, (double) z / 32));
   }
 
   public void destroyEntity() throws IOException {
-    byte destroyCount = in.readByte();
-    if (destroyCount > 0) {
-      for (int i = 0; i < destroyCount; i++) {
-        int eid = in.readInt();
-        dropped.remove(eid);
-      }
-    }
+    //byte destroyCount = in.readByte();
+    //if (destroyCount > 0) {
+    //  for (int i = 0; i < destroyCount; i++) {
+    //    int eid = in.readInt();
+    //    dropped.remove(eid);
+    //  }
+    //}
   }
 
   private Player nearestPlayer() {
