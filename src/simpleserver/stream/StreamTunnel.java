@@ -29,11 +29,9 @@ import java.nio.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javassist.bytecode.ByteArray;
 import simpleserver.*;
 import simpleserver.Authenticator.AuthRequest;
 import simpleserver.Coordinate.Dimension;
-import simpleserver.command.PlayerListCommand;
 import simpleserver.config.data.Chests.Chest;
 import simpleserver.config.xml.Config.BlockPermission;
 import simpleserver.message.Message;
