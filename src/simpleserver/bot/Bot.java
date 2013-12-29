@@ -119,11 +119,8 @@ public class Bot {
 
   public void logout() throws IOException {
     die();
-    //@todo send valid JSON quit message.
     expectDisconnect = true;
-//    out.writeByte(0xff);
-//    write("quitting");
-//    out.flush();
+    sendPacketIndependently((byte) 0x40, setUTF8("{\"text\": \"quitting\"}"));
   }
 
   protected void login() throws IOException {
@@ -138,6 +135,7 @@ public class Bot {
 
   private void respawn() throws IOException {
     writeLock.lock();
+    // @todo http://wiki.vg/Protocol#Respawn
     //out.writeByte(0xcd);
     //out.writeByte(1);
     writeLock.unlock();
@@ -282,7 +280,7 @@ public class Bot {
             }
             positionUpdate();
             break;
-          case (byte) 0x40: // Disconnect/Kick                                                                                            this.state = 3;
+          case (byte) 0x40: // Disconnect/Kick
             String reason = readUTF8();
             error(reason);
             break;
