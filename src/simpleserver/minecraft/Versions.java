@@ -23,16 +23,17 @@ package simpleserver.minecraft;
 public class Versions {
   public Version[] versions;
   public Latest latest;
-}
 
-class Version {
-  String id;
-  String time;
-  String releaseTime;
-  String type;
-}
 
-class Latest {
-  String snapshot;
-  String release;
+  static class Version {
+    String id;
+    String time;
+    String releaseTime;
+    String type;
+  }
+
+  static class Latest {
+    String snapshot;
+    String release;
+  }
 }
