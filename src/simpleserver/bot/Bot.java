@@ -383,18 +383,6 @@ public class Bot {
     return ((short) (incoming.get() & 0xFF));
   }
 
-  private void copyVarInt() throws IOException {
-    outgoing.put(encodeVarInt(decodeVarInt()));
-  }
-
-  private int copyUnsignedByte() throws IOException {
-    return addUnsignedByte(readUnsignedByte());
-  }
-
-  private int copyUnsignedShort() throws IOException {
-    return addUnsignedShort(readUnsignedShort());
-  }
-
   private int addUnsignedShort(int i) {
     outgoing.putShort((short) (i & 0xFFFF));
     return i;
