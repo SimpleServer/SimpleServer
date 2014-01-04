@@ -664,8 +664,8 @@ public class StreamTunnel {
           break;
 
         case 0x0C: // Steer Vehicle / Spawn Player
-          add(packetId);
           if (!isServerTunnel) {
+            add(packetId);
             add(incoming.getFloat());
             add(incoming.getFloat());
             add(incoming.get());
@@ -676,6 +676,7 @@ public class StreamTunnel {
             String name = readUTF8();
 
             if (!server.bots.ninja(name)) {
+              add(packetId);
               add(eid);
               add(uuid);
               add(name);
@@ -1371,7 +1372,7 @@ public class StreamTunnel {
       incoming.getShort();
       short length;
       if ((length = incoming.getShort()) > 0) {
-        copyNBytes(length);
+        skipNBytes(length);
       }
     }
   }
