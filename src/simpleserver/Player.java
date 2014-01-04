@@ -134,12 +134,10 @@ public class Player {
     vars = new ConcurrentHashMap<String, String>();
 
     if (server.isRobot(getIPAddress())) {
-      println("Robot Heartbeat: " + getIPAddress()
-          + ".");
+      println("Robot Heartbeat: " + getIPAddress() + ".");
       isRobot = true;
     } else {
-      println("IP Connection from " + getIPAddress()
-          + "!");
+      println("IP Connection from " + getIPAddress() + "!");
     }
 
     if (server.isIPBanned(getIPAddress())) {
@@ -164,7 +162,6 @@ public class Player {
         } else {
           server.restart();
         }
-
         cleanup();
         return;
       }

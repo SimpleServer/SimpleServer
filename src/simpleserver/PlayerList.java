@@ -101,7 +101,7 @@ public class PlayerList {
       if (playerToKick == null) {
         player.kick(t("Sorry, server is full!"));
       } else {
-        playerToKick.kick(t("Sorry, making space for more senior member."));
+        playerToKick.kick(t("Sorry, making space for a senior member."));
         players.remove(playerToKick.getName().toLowerCase());
         players.put(player.getName().toLowerCase(), player);
       }
