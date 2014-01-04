@@ -671,16 +671,30 @@ public class StreamTunnel {
             add(incoming.get());
             add(incoming.get());
           } else {
-            copyVarInt();
-            add(readUTF8());
-            add(readUTF8());
-            add(incoming.getInt());
-            add(incoming.getInt());
-            add(incoming.getInt());
-            add(incoming.get());
-            add(incoming.get());
-            add(incoming.getShort());
-            copyEntityMetadata();
+            int eid = decodeVarInt();
+            String uuid = readUTF8();
+            String name = readUTF8();
+
+            if (!server.bots.ninja(name)) {
+              add(eid);
+              add(uuid);
+              add(name);
+              add(incoming.getInt());
+              add(incoming.getInt());
+              add(incoming.getInt());
+              add(incoming.get());
+              add(incoming.get());
+              add(incoming.getShort());
+              copyEntityMetadata();
+            } else {
+              incoming.getInt();
+              incoming.getInt();
+              incoming.getInt();
+              incoming.get();
+              incoming.get();
+              incoming.getShort();
+              skipEntityMetadata();
+            }
           }
           break;
 
