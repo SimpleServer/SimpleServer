@@ -1788,9 +1788,7 @@ public class StreamTunnel {
 
   private void flushAll() throws IOException {
     try {
-      if (readyToSend) {
-        ((OutputStream) out).flush();
-      }
+      ((OutputStream) out).flush();
     } finally {
       if (EXPENSIVE_DEBUG_LOGGING) {
         inputDumper.flush();
