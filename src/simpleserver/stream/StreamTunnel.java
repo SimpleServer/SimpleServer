@@ -148,6 +148,11 @@ public class StreamTunnel {
 
   private void handlePacket() throws IOException {
     int length = decodeVarInt();
+
+    if (length < 1) {
+      return;
+    }
+
     readyToSend = false;
 
     // read length into byte[], copy into ByteBuffer
@@ -163,7 +168,7 @@ public class StreamTunnel {
 
     if (state == STATE_HANDSHAKE) {
       if (!isServerTunnel) {
-        add(packetId);
+        add(encodeVarInt(packetId));
         copyVarInt();
         add(readUTF8());
         copyUnsignedShort();
@@ -174,7 +179,7 @@ public class StreamTunnel {
     } else if (state == STATE_STATUS) {
         switch(packetId) {
           case 0x00: // JSON Response
-            add(packetId);
+            add(encodeVarInt(packetId));
 
             if (isServerTunnel) {
               add(readUTF8()); // @todo handle changing of max-player, server name, etc.
@@ -182,7 +187,7 @@ public class StreamTunnel {
             break;
 
           case 0x01: // Ping
-            add(packetId);
+            add(encodeVarInt(packetId));
             add(incoming.getLong());
             break;
       }
@@ -190,13 +195,13 @@ public class StreamTunnel {
     } else if (state == STATE_LOGIN) {
       switch(packetId) {
         case 0x00: // Disconnect / Login Start
-          add(packetId);
+          add(encodeVarInt(packetId));
           add(readUTF8());
           break;
 
         case 0x01: // Encryption Request / Response
           if (isServerTunnel) {
-            add(packetId);
+            add(encodeVarInt(packetId));
             tunneler.setName(streamType + "-" + player.getUuid());
             String serverId = readUTF8();
             if (!server.authenticator.useCustAuth(player)) {
@@ -237,7 +242,7 @@ public class StreamTunnel {
               player.kick(t("%s Failed to login: User not premium", "[CustAuth]"));
               break;
             }
-            add(packetId);
+            add(encodeVarInt(packetId));
             add((short) sharedKey.length);
             add(sharedKey);
             challengeTokenResponse = player.serverEncryption.encryptChallengeToken();
@@ -249,7 +254,7 @@ public class StreamTunnel {
           break;
 
         case 0x02: // Login Success
-          add(packetId);
+          add(encodeVarInt(packetId));
           String uuid = readUTF8();
           String name = readUTF8();
 
@@ -301,13 +306,13 @@ public class StreamTunnel {
 
       switch(packetId) {
         case 0x00: // Keep-Alive
-          add(packetId);
+          add(encodeVarInt(packetId));
           add(incoming.getInt());
           break;
 
         case 0x01: // Join-Game / Chat-Message
           if (isServerTunnel) {
-            add(packetId);
+            add(encodeVarInt(packetId));
             player.setEntityId(add(incoming.getInt()));
             copyUnsignedByte();
             dimension = incoming.get();
@@ -329,6 +334,7 @@ public class StreamTunnel {
               if (message == null) {
                 break;
               }
+              add(encodeVarInt(packetId));
               add(message);
               return;
             }
@@ -373,19 +379,19 @@ public class StreamTunnel {
                 }
                 break;
               } else {
-                add(packetId);
+                add(encodeVarInt(packetId));
                 add(message);
               }
             }
           } else {
-            add(packetId);
+            add(encodeVarInt(packetId));
             add(incoming.getInt());
             add(incoming.get());
           }
           break;
 
         case 0x03: // Time-Update / Player
-          add(packetId);
+          add(encodeVarInt(packetId));
           if (isServerTunnel) {
             add(incoming.getLong());
             long time = incoming.getLong();
@@ -397,7 +403,7 @@ public class StreamTunnel {
           break;
 
         case 0x04: // Entity-Equipment / Player Position
-          add(packetId);
+          add(encodeVarInt(packetId));
           if (isServerTunnel) {
             add(incoming.getInt());
             add(incoming.getShort());
@@ -408,7 +414,7 @@ public class StreamTunnel {
           break;
 
         case 0x05: // Spawn Position / Player Look
-          add(packetId);
+          add(encodeVarInt(packetId));
           if (isServerTunnel) {
             add(incoming.getInt());
             add(incoming.getInt());
@@ -424,7 +430,7 @@ public class StreamTunnel {
           break;
 
         case 0x06: // Update Health / Player Position & Look
-          add(packetId);
+          add(encodeVarInt(packetId));
           if (isServerTunnel) {
             player.updateHealth(add(incoming.getFloat()));
             player.getHealth();
@@ -438,7 +444,7 @@ public class StreamTunnel {
 
         case 0x07: // Respawn / Player Digging
           if (isServerTunnel) {
-            add(packetId);
+            add(encodeVarInt(packetId));
             player.setDimension(Dimension.get(add(incoming.getInt())));
             copyUnsignedByte();
             copyUnsignedByte();
@@ -476,7 +482,7 @@ public class StreamTunnel {
                 server.data.save();
               }
 
-              add(packetId);
+              add(encodeVarInt(packetId));
               add(status);
               add(x);
               add(y);
@@ -486,7 +492,7 @@ public class StreamTunnel {
               if (player.instantDestroyEnabled()) {
                 // @todo fix instant destroy
                 //packetFinished();
-                //add(packetId);
+                //add(encodeVarInt(packetId));
                 //add(BLOCK_DESTROYED_STATUS);
                 //add(x);
                 //add(y);
@@ -503,7 +509,7 @@ public class StreamTunnel {
 
         case 0x08: // Player Position & Look / Player Block Placement
           if (isServerTunnel) {
-            add(packetId);
+            add(encodeVarInt(packetId));
             copyPlayerPosition(false, false);
             copyPlayerLook(true);
           } else {
@@ -588,7 +594,7 @@ public class StreamTunnel {
             }
 
             if (writePacket) {
-              add(packetId);
+              add(encodeVarInt(packetId));
               add(x);
               addUnsignedByte(y);
               add(z);
@@ -630,7 +636,7 @@ public class StreamTunnel {
           break;
 
         case 0x09: // Held Item Change / Held Item Change
-          add(packetId);
+          add(encodeVarInt(packetId));
           if (isServerTunnel) {
             add(incoming.get());
           } else {
@@ -639,7 +645,7 @@ public class StreamTunnel {
           break;
 
         case 0x0A: // Animation / Use Bed
-          add(packetId);
+          add(encodeVarInt(packetId));
           if (!isServerTunnel) {
             add(incoming.getInt());
             add(incoming.get());
@@ -652,7 +658,7 @@ public class StreamTunnel {
           break;
 
         case 0x0B: // Entity Action / Animation
-          add(packetId);
+          add(encodeVarInt(packetId));
           if (!isServerTunnel) {
             add(incoming.getInt());
             add(incoming.get());
@@ -665,7 +671,7 @@ public class StreamTunnel {
 
         case 0x0C: // Steer Vehicle / Spawn Player
           if (!isServerTunnel) {
-            add(packetId);
+            add(encodeVarInt(packetId));
             add(incoming.getFloat());
             add(incoming.getFloat());
             add(incoming.get());
@@ -676,7 +682,7 @@ public class StreamTunnel {
             String name = readUTF8();
 
             if (!server.bots.ninja(name)) {
-              add(packetId);
+              add(encodeVarInt(packetId));
               add(eid);
               add(uuid);
               add(name);
@@ -700,7 +706,7 @@ public class StreamTunnel {
           break;
 
         case 0x0D: // Close Window / Collect Item
-          add(packetId);
+          add(encodeVarInt(packetId));
           if (!isServerTunnel) {
             add(incoming.get());
           } else {
@@ -711,7 +717,7 @@ public class StreamTunnel {
 
         case 0x0E: // Click Window / Spawn Object
           if (!isServerTunnel) {
-            add(packetId);
+            add(encodeVarInt(packetId));
             add(incoming.get());
             add(incoming.getShort());
             add(incoming.get());
@@ -719,7 +725,7 @@ public class StreamTunnel {
             add(incoming.get());
             copyItem();
           } else {
-            add(packetId);
+            add(encodeVarInt(packetId));
             int eid = decodeVarInt();
             addVarInt(eid);
             add(incoming.get());
@@ -739,7 +745,7 @@ public class StreamTunnel {
           break;
 
         case 0x0F: // Confirm Transaction / Spawn Mob
-          add(packetId);
+          add(encodeVarInt(packetId));
           if (!isServerTunnel) {
             add(incoming.get());
             add(incoming.getShort());
@@ -761,7 +767,7 @@ public class StreamTunnel {
           break;
 
         case 0x10: // Creative Inventory Action / Spawn Painting
-          add(packetId);
+          add(encodeVarInt(packetId));
           if (!isServerTunnel) {
             add(incoming.getShort());
             copyItem();
@@ -776,7 +782,7 @@ public class StreamTunnel {
           break;
 
         case 0x11: // Enchant Item / Spawn Experience Orb
-          add(packetId);
+          add(encodeVarInt(packetId));
           if (!isServerTunnel) {
             add(incoming.get());
             add(incoming.get());
@@ -790,7 +796,7 @@ public class StreamTunnel {
           break;
 
         case 0x12: // Update Sign / Entity Velocity
-          add(packetId);
+          add(encodeVarInt(packetId));
           if (!isServerTunnel) {
             add(incoming.getInt());
             add(incoming.getShort());
@@ -808,7 +814,7 @@ public class StreamTunnel {
           break;
 
         case 0x13: // Player Abilities / Destroy Entities
-          add(packetId);
+          add(encodeVarInt(packetId));
           if (!isServerTunnel) {
             add(incoming.get());
             add(incoming.getFloat());
@@ -822,7 +828,7 @@ public class StreamTunnel {
           break;
 
         case 0x14: // Tab-Complete / Entity
-          add(packetId);
+          add(encodeVarInt(packetId));
           if (!isServerTunnel) {
             add(readUTF8());
           } else {
@@ -831,7 +837,7 @@ public class StreamTunnel {
           break;
 
         case 0x15: // Client Settings / Entity Relative Move
-          add(packetId);
+          add(encodeVarInt(packetId));
           if (!isServerTunnel) {
             add(readUTF8());
             add(incoming.get());
@@ -848,7 +854,7 @@ public class StreamTunnel {
           break;
 
         case 0x16: // Client Status / Entity Look
-          add(packetId);
+          add(encodeVarInt(packetId));
           if (!isServerTunnel) {
             add(incoming.get());
           } else {
@@ -859,7 +865,7 @@ public class StreamTunnel {
           break;
 
         case 0x17: // Plugin Message / Entity Look & Relative Move
-          add(packetId);
+          add(encodeVarInt(packetId));
           if (!isServerTunnel) {
             add(readUTF8());
             copyNBytes(add(incoming.getShort()));
@@ -874,7 +880,7 @@ public class StreamTunnel {
           break;
 
         case 0x18: // Entity Teleport
-          add(packetId);
+          add(encodeVarInt(packetId));
           add(incoming.getInt());
           add(incoming.getInt());
           add(incoming.getInt());
@@ -884,32 +890,32 @@ public class StreamTunnel {
           break;
 
         case 0x19: // Entity Head Lock
-          add(packetId);
+          add(encodeVarInt(packetId));
           add(incoming.getInt());
           add(incoming.get());
           break;
 
         case 0x1A: // Entity Status
-          add(packetId);
+          add(encodeVarInt(packetId));
           add(incoming.getInt());
           add(incoming.get());
           break;
 
         case 0x1B: // Attach Entity
-          add(packetId);
+          add(encodeVarInt(packetId));
           add(incoming.getInt());
           add(incoming.getInt());
           add(incoming.get());
           break;
 
         case 0x1C: // Entity Metdata
-          add(packetId);
+          add(encodeVarInt(packetId));
           add(incoming.getInt());
           copyEntityMetadata();
           break;
 
         case 0x1D: // Entity Effect
-          add(packetId);
+          add(encodeVarInt(packetId));
           add(incoming.getInt());
           add(incoming.get());
           add(incoming.get());
@@ -917,18 +923,18 @@ public class StreamTunnel {
           break;
 
         case 0x1E: // Remove Entity Effect
-          add(packetId);
+          add(encodeVarInt(packetId));
           add(incoming.getInt());
           add(incoming.get());
           break;
 
         case 0x1F: // Set Experience
-          add(packetId);
+          add(encodeVarInt(packetId));
           player.updateExperience(add(incoming.getFloat()),add(incoming.getShort()),add(incoming.getShort()));
           break;
 
         case 0x20: // Entity Properties
-          add(packetId);
+          add(encodeVarInt(packetId));
           add(incoming.getInt());
           int properties_count = incoming.getInt();
           short list_length = 0;
@@ -954,7 +960,7 @@ public class StreamTunnel {
           break;
 
         case 0x21: // Chunk Data
-          add(packetId);
+          add(encodeVarInt(packetId));
           add(incoming.getInt());
           add(incoming.getInt());
           add(incoming.get());
@@ -964,7 +970,7 @@ public class StreamTunnel {
           break;
 
         case 0x22: // Multi Block Change
-          add(packetId);
+          add(encodeVarInt(packetId));
           add(incoming.getInt());
           add(incoming.getInt());
           add(incoming.getShort());
@@ -972,7 +978,7 @@ public class StreamTunnel {
           break;
 
         case 0x23: // Block Change
-          add(packetId);
+          add(encodeVarInt(packetId));
           x = incoming.getInt();
           y = (byte) readUnsignedByte();
           z = incoming.getInt();
@@ -994,7 +1000,7 @@ public class StreamTunnel {
           break;
 
         case 0x24: // Block Action
-          add(packetId);
+          add(encodeVarInt(packetId));
           add(incoming.getInt());
           add(incoming.getShort());
           add(incoming.getInt());
@@ -1004,7 +1010,7 @@ public class StreamTunnel {
           break;
 
         case 0x25: // Block Break Animation
-          add(packetId);
+          add(encodeVarInt(packetId));
           copyVarInt();
           add(incoming.getInt());
           add(incoming.getInt());
@@ -1013,7 +1019,7 @@ public class StreamTunnel {
           break;
 
         case 0x26: // Map Chunk Bulk
-          add(packetId);
+          add(encodeVarInt(packetId));
           short chunkCount = incoming.getShort();
           int dataLength = incoming.getInt();
           add(chunkCount);
@@ -1029,7 +1035,7 @@ public class StreamTunnel {
           break;
 
         case 0x27: // Explosion
-          add(packetId);
+          add(encodeVarInt(packetId));
           add(incoming.getFloat());
           add(incoming.getFloat());
           add(incoming.getFloat());
@@ -1043,7 +1049,7 @@ public class StreamTunnel {
           break;
 
         case 0x28: // Effect
-          add(packetId);
+          add(encodeVarInt(packetId));
           add(incoming.getInt());
           add(incoming.getInt());
           add(incoming.get());
@@ -1053,7 +1059,7 @@ public class StreamTunnel {
           break;
 
         case 0x29: // Sound Effect
-          add(packetId);
+          add(encodeVarInt(packetId));
           add(readUTF8());
           add(incoming.getInt());
           add(incoming.getInt());
@@ -1063,7 +1069,7 @@ public class StreamTunnel {
           break;
 
         case 0x2A: // Particle
-          add(packetId);
+          add(encodeVarInt(packetId));
           add(readUTF8());
           add(incoming.getFloat());
           add(incoming.getFloat());
@@ -1076,13 +1082,13 @@ public class StreamTunnel {
           break;
 
         case 0x2B: // Change Game State
-          add(packetId);
+          add(encodeVarInt(packetId));
           copyUnsignedByte();
           add(incoming.getFloat());
           break;
 
         case 0x2C: // Spawn Global Entity
-          add(packetId);
+          add(encodeVarInt(packetId));
           copyVarInt();
           add(incoming.get());
           add(incoming.getInt());
@@ -1143,7 +1149,7 @@ public class StreamTunnel {
             //add((byte) 0x2E);
             //add(id);
           } else {
-            add(packetId);
+            add(encodeVarInt(packetId));
             add(id);
             add(invtype);
             add(title);
@@ -1156,19 +1162,19 @@ public class StreamTunnel {
           break;
 
         case 0x2E: // Close Window
-          add(packetId);
+          add(encodeVarInt(packetId));
           copyUnsignedByte();
           break;
 
         case 0x2F: // Set Slot
-          add(packetId);
+          add(encodeVarInt(packetId));
           copyUnsignedByte();
           add(incoming.getShort());
           copyItem();
           break;
 
         case 0x30: // Window Items
-          add(packetId);
+          add(encodeVarInt(packetId));
           copyUnsignedByte();
           short count = add(incoming.getShort());
           for (int c = 0; c < count; ++c) {
@@ -1177,21 +1183,21 @@ public class StreamTunnel {
           break;
 
         case 0x31: // Window Property
-          add(packetId);
+          add(encodeVarInt(packetId));
           copyUnsignedByte();
           add(incoming.getShort());
           add(incoming.getShort());
           break;
 
         case 0x32: // Confirm Transaction
-          add(packetId);
+          add(encodeVarInt(packetId));
           copyUnsignedByte();
           add(incoming.getShort());
           add(incoming.get());
           break;
 
         case 0x33: // Update Sign
-          add(packetId);
+          add(encodeVarInt(packetId));
           add(incoming.getInt());
           add(incoming.getShort());
           add(incoming.getInt());
@@ -1202,13 +1208,13 @@ public class StreamTunnel {
           break;
 
         case 0x34: // Maps
-          add(packetId);
+          add(encodeVarInt(packetId));
           copyVarInt();
           copyNBytes(add(incoming.getShort()));
           break;
 
         case 0x35: // Update Block Entity
-          add(packetId);
+          add(encodeVarInt(packetId));
           add(incoming.getInt());
           add(incoming.getShort());
           add(incoming.getInt());
@@ -1221,14 +1227,14 @@ public class StreamTunnel {
           break;
 
         case 0x36: // Sign Editor Open
-          add(packetId);
+          add(encodeVarInt(packetId));
           add(incoming.getInt());
           add(incoming.getInt());
           add(incoming.getInt());
           break;
 
         case 0x37: // Statistics
-          add(packetId);
+          add(encodeVarInt(packetId));
           int entrys = decodeVarInt();
           addVarInt(entrys);
           if (entrys > 0) {
@@ -1240,21 +1246,21 @@ public class StreamTunnel {
           break;
 
         case 0x38: // Player List Item
-          add(packetId);
+          add(encodeVarInt(packetId));
           add(readUTF8());
           add(incoming.get());
           add(incoming.getShort());
           break;
 
         case 0x39: // Player Abilities
-          add(packetId);
+          add(encodeVarInt(packetId));
           add(incoming.get());
           add(incoming.getFloat());
           add(incoming.getFloat());
           break;
 
         case 0x3A: // Tab-Complete
-          add(packetId);
+          add(encodeVarInt(packetId));
           int s = decodeVarInt();
 
           add(encodeVarInt(s));
@@ -1266,14 +1272,14 @@ public class StreamTunnel {
           break;
 
         case 0x3B: // Scoreboard Objective
-          add(packetId);
+          add(encodeVarInt(packetId));
           add(readUTF8());
           add(readUTF8());
           add(incoming.get());
           break;
 
         case 0x3C: // Update Score
-          add(packetId);
+          add(encodeVarInt(packetId));
           add(readUTF8());
           add(incoming.get());
           add(readUTF8());
@@ -1281,13 +1287,13 @@ public class StreamTunnel {
           break;
 
         case 0x3D: // Display Scoreboard
-          add(packetId);
+          add(encodeVarInt(packetId));
           add(incoming.get());
           add(readUTF8());
           break;
 
         case 0x3E: // Teams
-          add(packetId);
+          add(encodeVarInt(packetId));
           add(readUTF8());
           byte mode = incoming.get();
           short playerCount = -1;
@@ -1314,13 +1320,13 @@ public class StreamTunnel {
           break;
 
         case 0x3F: // Plugin Message
-          add(packetId);
+          add(encodeVarInt(packetId));
           add(readUTF8());
           copyNBytes(add(incoming.getShort()));
           break;
 
         case 0x40: // Disconnect
-          add(packetId);
+          add(encodeVarInt(packetId));
           String reason = readUTF8();
           if (reason.startsWith("\u00a71")) {
             reason = String.format("\u00a71\0%s\0%s\0%s\0%s\0%s",
@@ -1476,6 +1482,10 @@ public class StreamTunnel {
   }
 
   private int decodeVarInt() throws IOException {
+    if (incoming != null && incoming.remaining() == 0) {
+      return 0;
+    }
+
     int i = 0;
     int j = 0;
 
