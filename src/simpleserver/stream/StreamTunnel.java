@@ -36,6 +36,7 @@ import simpleserver.config.data.Chests.Chest;
 import simpleserver.config.xml.Config.BlockPermission;
 import simpleserver.message.Message;
 import simpleserver.message.MessagePacket;
+import simpleserver.message.ServerList;
 
 public class StreamTunnel {
   private static final boolean EXPENSIVE_DEBUG_LOGGING = Boolean.getBoolean("EXPENSIVE_DEBUG_LOGGING");
@@ -182,7 +183,17 @@ public class StreamTunnel {
             add(encodeVarInt(packetId));
 
             if (isServerTunnel) {
-              add(readUTF8()); // @todo handle changing of max-player, server name, etc.
+              String message = readUTF8();
+              ServerList serverList = new Message().decodeServerList(message);
+
+              if (serverList != null) {
+                serverList.setMaxPlayers(server.config.properties.getInt("maxPlayers"));
+                serverList.setDescription(server.config.properties.get("serverDescription"));
+                add(new Message().encodeServerList(serverList));
+              } else {
+                // couldn't decode.
+                add(message);
+              }
             }
             break;
 

@@ -88,6 +88,20 @@ public class Message {
     return messagePacket;
   }
 
+  public ServerList decodeServerList(String msg) {
+    ServerList serverList;
+    try {
+      serverList = gson.fromJson(msg, ServerList.class);
+    } catch(JsonParseException ex) {
+      serverList = null;
+    }
+    return serverList;
+  }
+
+  public String encodeServerList(ServerList serverList) {
+    return gson.toJson(serverList);
+  }
+
   private String getJson() {
     return gson.toJson(jsonObject);
   }
