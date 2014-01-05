@@ -63,7 +63,7 @@ import simpleserver.nbt.WorldFile;
 
 public class Statistics extends Thread {
   private static final int VERSION = 1;
-  private static final String URL = "simpleserver.ceilingcat.ch";
+  private static final String URL = "ibotpeaches.com/ss";
   private static final String PATH = "/api/" + VERSION;
 
   private Server server;
@@ -72,6 +72,7 @@ public class Statistics extends Thread {
 
   public Statistics(Server server) {
     this.server = server;
+    this.run();
   }
 
   private void getSessionId() {

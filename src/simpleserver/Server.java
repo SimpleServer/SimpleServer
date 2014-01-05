@@ -71,13 +71,7 @@ import simpleserver.options.Options;
 import simpleserver.rcon.RconServer;
 import simpleserver.stream.Encryption.ClientEncryption;
 import simpleserver.telnet.TelnetServer;
-import simpleserver.thread.AutoBackup;
-import simpleserver.thread.AutoFreeSpaceChecker;
-import simpleserver.thread.AutoRestart;
-import simpleserver.thread.AutoRun;
-import simpleserver.thread.AutoSave;
-import simpleserver.thread.RequestTracker;
-import simpleserver.thread.SystemInputQueue;
+import simpleserver.thread.*;
 
 public class Server {
 
@@ -131,6 +125,7 @@ public class Server {
   public RequestTracker requestTracker;
 
   public EventHost eventhost;
+  public Statistics statistics;
 
   public long mapSeed;
 
@@ -567,6 +562,7 @@ public class Server {
     messageLog.stop();
     time.unfreeze();
     bots.cleanup();
+    statistics.halt();
   }
 
   private void startup() {
@@ -627,6 +623,7 @@ public class Server {
     autoBackup = new AutoBackup(this);
     autosave = new AutoSave(this);
     autoRestart = new AutoRestart(this);
+    statistics = new Statistics(this);
     c10t = new AutoRun(this, options.get("c10tArgs"));
     if (data.freezeTime() >= 0) {
       time.freeze(data.freezeTime());
@@ -676,6 +673,7 @@ public class Server {
     autoBackup.stop();
     autosave.stop();
     autoRestart.stop();
+    statistics.halt();
     requestTracker.stop();
     c10t.stop();
     saveResources();
