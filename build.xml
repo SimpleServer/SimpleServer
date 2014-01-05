@@ -85,7 +85,7 @@
 							<include name="simpleserver.nbt.**" />
 							<include name="simpleserver.config.xml.**" />
 							<include name="simpleserver.command.**" />
-							<include name="simpleserver.message.MessagePacket" />
+							<include name="simpleserver.message.**" />
 							<include name="org.apache.commons.logging.impl.**" />
 							<include name="org.apache.commons.jxpath.ri.**" />
 							<include name="simpleserver.events.**" />
