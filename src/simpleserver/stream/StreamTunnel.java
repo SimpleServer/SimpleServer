@@ -236,6 +236,9 @@ public class StreamTunnel {
             add(challengeToken);
             player.serverEncryption.setChallengeToken(challengeToken);
             player.clientEncryption.setChallengeToken(challengeToken);
+
+            in = new DataInputStream(new BufferedInputStream(player.serverEncryption.encryptedInputStream(inputStream)));
+            out = new DataOutputStream(new BufferedOutputStream(player.clientEncryption.encryptedOutputStream(outputStream)));
           } else {
             byte[] sharedKey = new byte[incoming.getShort()];
             incoming.put(sharedKey);
@@ -1295,7 +1298,7 @@ public class StreamTunnel {
           add(readUTF8());
           add(incoming.get());
           add(readUTF8());
-          add(incoming.get());
+          add(incoming.getInt());
           break;
 
         case 0x3D: // Display Scoreboard
@@ -1745,7 +1748,7 @@ public class StreamTunnel {
     incoming = null;
     int size = outgoing.position();
 
-    if (pre == max && pre != 0) {
+    if (pre != 0) {
       outgoing.limit(size);
       outgoing.rewind();
       outgoing.order(ByteOrder.BIG_ENDIAN);
@@ -1756,10 +1759,6 @@ public class StreamTunnel {
 
       write(encodeVarInt(size));
       write(tmp);
-    } else if (pre == 0) {
-    } else {
-      System.out.println("read " + pre + " bytes. found: " + max);
-      System.out.println("outbound size: " + size);
     }
 
     if (EXPENSIVE_DEBUG_LOGGING) {
