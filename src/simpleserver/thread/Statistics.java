@@ -81,7 +81,13 @@ public class Statistics extends Thread {
       world = new WorldFile(server);
     } catch (Exception ex) {
     }
-    long seed = world.seed();
+
+    long seed = 0;
+    try {
+      seed = world.seed();
+    } catch (NullPointerException ignored) {
+
+    }
 
     JSONObject data = new JSONObject();
     JSONObject stats = new JSONObject();
