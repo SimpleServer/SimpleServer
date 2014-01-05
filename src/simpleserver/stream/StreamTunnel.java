@@ -36,6 +36,7 @@ import simpleserver.config.data.Chests.Chest;
 import simpleserver.config.xml.Config.BlockPermission;
 import simpleserver.message.Message;
 import simpleserver.message.MessagePacket;
+import simpleserver.message.QuitMessage;
 import simpleserver.message.ServerList;
 
 public class StreamTunnel {
@@ -1394,6 +1395,13 @@ public class StreamTunnel {
     }
   }
 
+  private byte[] setUTF8(String str) throws IOException {
+    // add size of varInt(string.length) + string, append to byte[], return it
+    return ByteBuffer.allocate(encodeVarInt(str.length()).length + str.length())
+            .put(encodeVarInt(str.length()))
+            .put(str.getBytes()).array();
+  }
+
   private String readUTF8() throws IOException {
     ByteArrayOutputStream buffer = new ByteArrayOutputStream();
     int length = decodeVarInt();
@@ -1659,11 +1667,6 @@ public class StreamTunnel {
     }
   }
 
-  private byte write(byte b) throws IOException {
-    out.writeByte(b);
-    return b;
-  }
-
   private byte[] write(byte[] b) throws IOException {
     out.write(b);
     return b;
@@ -1672,37 +1675,6 @@ public class StreamTunnel {
   private short write(short s) throws IOException {
     out.writeShort(s);
     return s;
-  }
-
-  private int write(int i) throws IOException {
-    out.writeInt(i);
-    return i;
-  }
-
-  private long write(long l) throws IOException {
-    out.writeLong(l);
-    return l;
-  }
-
-  private float write(float f) throws IOException {
-    out.writeFloat(f);
-    return f;
-  }
-
-  private double write(double d) throws IOException {
-    out.writeDouble(d);
-    return d;
-  }
-
-  private String write(String s) throws IOException {
-    write((short) s.length());
-    out.writeChars(s);
-    return s;
-  }
-
-  private boolean write(boolean b) throws IOException {
-    out.writeBoolean(b);
-    return b;
   }
 
   private void skipNBytes(int bytes) throws IOException {
@@ -1724,10 +1696,7 @@ public class StreamTunnel {
   }
 
   private void kick(String reason) throws IOException {
-    // @todo start new packet
-    //add((byte) 0x40);
-    //add(reason);
-    //packetFinished();
+    sendPacketIndependently((byte) 0x40, setUTF8(new Message().encodeQuitMessage(new QuitMessage().setText(reason))));
   }
 
   private void sendMessage(String message) throws IOException {
@@ -1756,14 +1725,16 @@ public class StreamTunnel {
   }
 
   private void sendPacketIndependently(byte id, byte[] data) throws IOException {
-    ByteBuffer tmp = ByteBuffer.allocate(data.length + 1);
-    tmp.put(id);
+    byte[] packet = encodeVarInt(id);
+    ByteBuffer tmp = ByteBuffer.allocate(data.length + packet.length);
+    tmp.put(packet);
     tmp.put(data);
-    
-    write(encodeVarInt(tmp.limit()));
+
+    out.write(encodeVarInt(tmp.limit()));
     tmp.rewind();
     outgoing.order(ByteOrder.BIG_ENDIAN);
-    write(tmp.array());
+
+    out.write(tmp.array());
     ((OutputStream) out).flush();
   }
 

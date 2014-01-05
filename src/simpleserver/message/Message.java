@@ -102,6 +102,10 @@ public class Message {
     return gson.toJson(serverList);
   }
 
+  public String encodeQuitMessage(QuitMessage quitMessage) {
+    return gson.toJson(quitMessage);
+  }
+
   private String getJson() {
     return gson.toJson(jsonObject);
   }
