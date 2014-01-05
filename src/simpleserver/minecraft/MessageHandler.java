@@ -33,8 +33,8 @@ import simpleserver.command.ServerCommand;
 
 public class MessageHandler {
   private final Server server;
-  private final static Pattern DISCONNECT = Pattern.compile(".*\\[INFO\\] (.*) lost connection:.*");
-  private final static Pattern CONNECT = Pattern.compile(".*\\[INFO\\] (.*) \\[.*\\] logged in with entity id \\d+ at .*");
+  private final static Pattern DISCONNECT = Pattern.compile(".*\\[Server thread/INFO\\]: (.*) lost connection:.*");
+  private final static Pattern CONNECT = Pattern.compile(".*\\[Server thread/INFO\\]: (.*) \\[.*\\] logged in with entity id \\d+ at .*");
 
   private boolean loaded = false;
   private int ignoreLines = 0;
