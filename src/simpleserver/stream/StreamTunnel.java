@@ -165,8 +165,8 @@ public class StreamTunnel {
 
     Byte packetId  = (byte) decodeVarInt();
 
-    System.out.println("state:" + state + (isServerTunnel ? " server " : " client ") +
-    String.format("%02x", packetId) + " length: " + length);
+    //System.out.println("state:" + state + (isServerTunnel ? " server " : " client ") +
+    //String.format("%02x", packetId) + " length: " + length);
 
     if (state == STATE_HANDSHAKE) {
       if (!isServerTunnel) {
@@ -1312,28 +1312,7 @@ public class StreamTunnel {
           break;
 
         case 0x3E: // Teams
-          addVarInt(packetId);
-          add(readUTF8());
-          byte mode = add(incoming.get());
-          short playerCount = -1;
-
-          if (mode == 0 || mode == 2) {
-            add(readUTF8()); // team display name
-            add(readUTF8()); // team prefix
-            add(readUTF8()); // team suffix
-            add(incoming.get()); // friendly fire
-          }
-
-          // only ran if 0,3,4
-          if (mode == 0 || mode == 3 || mode == 4) {
-            playerCount = add(incoming.getShort());
-
-            if (playerCount != -1) {
-              for (int i = 0; i < playerCount; i++) {
-                add(readUTF8());
-              }
-            }
-          }
+          add(incoming.array());
           break;
 
         case 0x3F: // Plugin Message
@@ -1753,7 +1732,6 @@ public class StreamTunnel {
     if (pre != 0) {
       outgoing.limit(size);
       outgoing.rewind();
-      outgoing.order(ByteOrder.BIG_ENDIAN);
 
       byte[] tmp = new byte[size];
       outgoing.get(tmp);
