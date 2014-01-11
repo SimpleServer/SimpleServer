@@ -392,8 +392,17 @@ public class StreamTunnel {
               }
             }
           } else {
+            int target = incoming.getInt();
+
+            Player targetPlayer = server.playerList.findPlayer(target);
+            if (targetPlayer != null) {
+              if (targetPlayer.godModeEnabled()) {
+                incoming.get();
+                break;
+              }
+            }
             addVarInt(packetId);
-            add(incoming.getInt());
+            add(target);
             add(incoming.get());
           }
           break;
