@@ -44,12 +44,10 @@ public class StreamTunnel {
   private static final int IDLE_TIME = 30000;
   private static final int BUFFER_SIZE = 1024;
   private static final byte BLOCK_DESTROYED_STATUS = 2;
+  private static final byte BLOCK_DIGGING_STATUS = 0;
   private static final Pattern MESSAGE_PATTERN = Pattern.compile("^<([^>]+)> (.*)$");
   private static final Pattern COLOR_PATTERN = Pattern.compile("\u00a7[0-9a-z]");
-  private static final Pattern JOIN_PATTERN = Pattern.compile("\u00a7.((\\d|\\w|\\u00a7)*) (joined|left) the game.");
   private static final String CONSOLE_CHAT_PATTERN = "\\[Server:.*\\]";
-  private static final int MESSAGE_SIZE = 360;
-  private static final int MAXIMUM_MESSAGE_SIZE = 119;
   private static final int STATE_HANDSHAKE = 0;
   private static final int STATE_STATUS = 1;
   private static final int STATE_LOGIN = 2;
@@ -69,15 +67,12 @@ public class StreamTunnel {
   private StreamDumper inputDumper;
   private StreamDumper outputDumper;
 
-  private boolean inGame = false;
-
   private volatile long lastRead;
   private volatile boolean run = true;
   private Byte lastPacket;
   private char commandPrefix;
 
   private int state = 0;
-  private boolean readyToSend = false;
   private ByteBuffer incoming = null;
   private ByteBuffer outgoing = null;
 
@@ -154,8 +149,6 @@ public class StreamTunnel {
     if (length < 1) {
       return;
     }
-
-    readyToSend = false;
 
     // read length into byte[], copy into ByteBuffer
     byte[] buf = new byte[length];
@@ -505,14 +498,11 @@ public class StreamTunnel {
               add(face);
 
               if (player.instantDestroyEnabled()) {
-                // @todo fix instant destroy
-                //packetFinished();
-                //addVarInt(packetId);
-                //add(BLOCK_DESTROYED_STATUS);
-                //add(x);
-                //add(y);
-                //add(z);
-                //add(face);
+                packetFinished();
+                ByteBuffer byteBuffer = ByteBuffer.allocate(11);
+                byteBuffer.put(BLOCK_DESTROYED_STATUS);
+                byteBuffer.putInt(x).put(y).putInt(z).put(face);
+                sendPacketIndependently(packetId, byteBuffer.array());
               }
 
               if (status == BLOCK_DESTROYED_STATUS) {
@@ -1716,13 +1706,16 @@ public class StreamTunnel {
 
     out.write(encodeVarInt(tmp.limit()));
     tmp.rewind();
-    outgoing.order(ByteOrder.BIG_ENDIAN);
 
     out.write(tmp.array());
     ((OutputStream) out).flush();
   }
 
   private void packetFinished() throws IOException {
+    if (incoming == null) {
+      return;
+    }
+
     // reset our incoming buffer, and write the outgoing one
     int pre  = incoming.position();
     int max = incoming.limit();
@@ -1735,7 +1728,6 @@ public class StreamTunnel {
 
       byte[] tmp = new byte[size];
       outgoing.get(tmp);
-      readyToSend = true;
 
       write(encodeVarInt(size));
       write(tmp);
