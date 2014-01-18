@@ -44,6 +44,9 @@ public class AreaChat extends AbstractChat {
 
   @Override
   protected boolean sendToPlayer(Player reciever) {
+    if (noArea()) {
+      return false;
+    }
     if (reciever == sender) {
       return true;
     } else if (areas == null || areas.isEmpty()) {
