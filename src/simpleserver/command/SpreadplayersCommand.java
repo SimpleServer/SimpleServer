@@ -32,6 +32,7 @@ public class SpreadplayersCommand extends AbstractCommand {
     public SpreadplayersCommand(String name) {
         super(name, "Spreadplayers command");
     }
+
     @Override
     public boolean shouldPassThroughToConsole(Server server) {
         return true;

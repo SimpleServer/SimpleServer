@@ -22,6 +22,7 @@ package simpleserver.nbt;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -162,11 +163,11 @@ public class Inventory {
       return compound;
     }
 
-    public void write(DataOutputStream out) throws IOException {
-      out.writeShort(id);
-      out.writeByte(count);
-      out.writeShort(damage);
-      out.writeShort(-1);
+    public void write(ByteBuffer buffer) throws IOException {
+      buffer.putShort(id);
+      buffer.put(count);
+      buffer.putShort(damage);
+      buffer.putShort((short) -1);
     }
 
   }
