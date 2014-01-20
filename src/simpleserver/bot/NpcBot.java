@@ -63,16 +63,7 @@ public class NpcBot extends Bot {
   }
 
   @Override
-  protected void handlePacket() throws IOException {
-    int length = decodeVarInt();
-
-    // read length into byte[], copy into ByteBuffer
-    byte[] buf = new byte[length];
-    in.readFully(buf, 0, length);
-    incoming = ByteBuffer.wrap(buf);
-    outgoing = ByteBuffer.allocate(length * 2);
-
-    Byte packetId  = (byte) decodeVarInt();
+  protected void handlePacket(byte packetId) throws IOException {
 
     switch (packetId) {
       case 0x07: // respawn

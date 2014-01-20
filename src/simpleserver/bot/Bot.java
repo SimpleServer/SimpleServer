@@ -393,7 +393,7 @@ public class Bot {
     return i;
   }
 
-  private void sendPacketIndependently(byte id, byte[] data) throws IOException {
+  public void sendPacketIndependently(byte id, byte[] data) throws IOException {
     byte[] packet = encodeVarInt(id);
     ByteBuffer tmp = ByteBuffer.allocate(data.length + packet.length);
     tmp.put(packet);

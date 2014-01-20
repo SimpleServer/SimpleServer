@@ -67,21 +67,11 @@ public class Giver extends Bot {
     return true;
   }
 
-  @SuppressWarnings("fallthrough")
   @Override
-  protected void handlePacket() throws IOException {
-    int length = decodeVarInt();
-
-    // read length into byte[], copy into ByteBuffer
-    byte[] buf = new byte[length];
-    in.readFully(buf, 0, length);
-    incoming = ByteBuffer.wrap(buf);
-    outgoing = ByteBuffer.allocate(length * 2);
-
-    Byte packetId  = (byte) decodeVarInt();
+  protected void handlePacket(byte packetId) throws IOException {
 
     switch (packetId) {
-      case 0x68:
+      case (byte) 0x0E:
         drop();
         break;
 
@@ -94,28 +84,26 @@ public class Giver extends Bot {
   protected void drop() throws IOException {
     super.ready();
     writeLock.lock();
+    ByteBuffer b = ByteBuffer.allocate(24);
+    ByteBuffer c = ByteBuffer.allocate(24);
     for (byte i = 0; i < count; i++) {
-      // @todo rewrite to use BufferBytes
-//      Slot slot = inv.get(i);
-//      out.writeByte(0x66);
-//      out.writeByte(0);
-//      out.writeShort(Inventory.networkSlot(i));
-//      out.writeByte(0);
-//      out.writeShort(i * 2);
-//      out.writeBoolean(false);
-//      slot.write(out);
-//      out.flush();
-//      out.writeByte(0x66);
-//      out.writeByte(0);
-//      out.writeShort(-999);
-//      out.writeByte(0);
-//      out.writeShort(i * 2 + 1);
-//      out.writeBoolean(false);
-//      out.writeShort(-1);
-//      out.flush();
+      Slot slot = inv.get(i);
+      b.put((byte) 0);
+      b.putShort(Inventory.networkSlot(i));
+      b.put((byte) 0);
+      b.putShort((short) (i * 2));
+      b.put((byte) 0);
+      slot.write(b);
+      super.sendPacketIndependently((byte) 0x0E, b.array());
+      c.put((byte) 0);
+      c.putShort((short) -999);
+      c.put((byte) 0);
+      c.putShort((short) (i * 2 + 1));
+      c.put((byte) 0);
+      c.putShort((short) -1);
+      super.sendPacketIndependently((byte) 0x0E, c.array());
     }
     writeLock.unlock();
     logout();
   }
-
 }
